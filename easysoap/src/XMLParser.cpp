@@ -56,8 +56,19 @@ XMLParser::FreeParser()
 void
 XMLParser::InitParser(const char *encoding)
 {
-	FreeParser();
-	m_parser = XML_ParserCreateNS(encoding, '#');
+#if XML_MAJOR_VERSION > 1 || \
+	XML_MAJOR_VERSION == 1 && XML_MINOR_VERSION > 95 || \
+	XML_MAJOR_VERSION == 1 && XML_MINOR_VERSION == 95 && XML_MICRO_VERSION >= 3
+	if (m_parser)
+	{
+		XML_ParserReset(m_parser, encoding);
+	}
+	else
+#endif
+	{
+		FreeParser();
+		m_parser = XML_ParserCreateNS(encoding, '#');
+	}
 	XML_SetElementHandler(m_parser,
 			XMLParser::_startElement,
 			XMLParser::_endElement);
