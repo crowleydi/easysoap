@@ -106,7 +106,7 @@ public:
 			throw SOAPException("Invalid EXTENSION_CONTROL_BLOCK");
 
 		HSE_SEND_HEADER_EX_INFO header;
-		char httpheaders[128];
+		char httpheaders[256];
 		DWORD dwSize = payloadsize;
 
 		const char *httpstatus = 0;
@@ -125,6 +125,7 @@ public:
 
 		snprintf(httpheaders, sizeof(httpheaders),
 			"SOAPServer: %s/%s\r\n"
+			"Content-Type: text/xml; charset=\"UTF-8\"\r\n"
 			"Content-Length: %d\r\n\r\n",
 			EASYSOAP_STRING, EASYSOAP_VERSION_STRING,
 			payloadsize);
@@ -136,7 +137,6 @@ public:
 		header.fKeepConn = TRUE;
 
 		m_ecb->dwHttpStatusCode = httpstatuscode;
-		m_ecb->lpszContentType = "text/xml; charset=\"UTF-8\"";
 		m_ecb->ServerSupportFunction(m_ecb->ConnID, HSE_REQ_SEND_RESPONSE_HEADER_EX, &header, NULL, 0);
 		m_ecb->WriteClient(m_ecb->ConnID,
 			(void *)payload,
