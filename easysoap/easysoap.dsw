@@ -45,6 +45,21 @@ Package=<4>
 
 ###############################################################################
 
+Project: "simplecgi"=.\simpleserver\simplecgi.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name easysoap
+    End Project Dependency
+}}}
+
+###############################################################################
+
 Project: "validator"=.\validator\validator.dsp - Package Owner=<4>
 
 Package=<5>
