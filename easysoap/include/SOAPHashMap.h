@@ -299,22 +299,25 @@ public:
 	// returns true if we found the key and removed it.
 	bool Remove(const K& key)
 	{
-		size_t hash = hashcode(key);
-		// we use ** here so we can treat the first element the
-		// same was as the other elements in the linked list
-		HashElement **he = &m_table[hash % m_buckets];
-		while (*he)
+		if (m_buckets > 0)
 		{
-			if ((*he)->m_hash == hash && equals((*he)->m_key, key))
+			size_t hash = hashcode(key);
+			// we use ** here so we can treat the first element the
+			// same was as the other elements in the linked list
+			HashElement **he = &m_table[hash % m_buckets];
+			while (*he)
 			{
-				HashElement *temp = (*he)->m_next;
-				PutBackHashElement(*he);
-				*he = temp;
+				if ((*he)->m_hash == hash && equals((*he)->m_key, key))
+				{
+					HashElement *temp = (*he)->m_next;
+					PutBackHashElement(*he);
+					*he = temp;
 
-				--m_numItems;
-				return true;
+					--m_numItems;
+					return true;
+				}
+				he = &((*he)->m_next);
 			}
-			he = &((*he)->m_next);
 		}
 		return false;
 	}
@@ -341,40 +344,6 @@ public:
 		return m_numItems;
 	}
 
-#if 0
-	void PrintStatistics(std::ostream& os) const
-	{
-		long counts[12];
-		long total = 0;
-
-		for (int k = 0; k < 12; k++)
-			counts[k] = 0;
-
-		for (size_t i = 0; i < m_buckets; ++i)
-		{
-			int count = 0;
-			HashElement *he = m_table[i];
-			while (he)
-			{
-				++count;
-				++total;
-				he = he->m_next;
-			}
-			if (count >= 11)
-				count = 11;
-			counts[count]++;
-		}
-
-		for(int j = 0; j < 11; j++)
-		{
-			os << "Buckets with " << j << " elements: " << counts[j] << std::endl;
-		}
-		os << "Buckets with more than 10 elements: " << counts[11] << std::endl;
-		os << "Total elements: " << total << std::endl;
-		os << "Number of buckets: " << m_buckets << std::endl;
-	}
-#endif
-
 	// find the item associated with the given key.
 	// returns null if we can't find the key.
 	template<typename X>
@@ -393,13 +362,16 @@ private:
 	template<typename X>
 	Iterator Find(const X& key, size_t hash) const
 	{
-		size_t index = hash % m_buckets;
-		HashElement *he = m_table[index];
-		while (he)
+		if (m_buckets > 0)
 		{
-			if (he->m_hash == hash && equals(he->m_key, key))
-				return Iterator(this, he, ++index);
-			he = he->m_next;
+			size_t index = hash % m_buckets;
+			HashElement *he = m_table[index];
+			while (he)
+			{
+				if (he->m_hash == hash && equals(he->m_key, key))
+					return Iterator(this, he, ++index);
+				he = he->m_next;
+			}
 		}
 		return End();
 	}
