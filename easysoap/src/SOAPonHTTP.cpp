@@ -480,7 +480,7 @@ SOAPHTTPProtocol::GetChunkLength()
 	size_t intValue = 0;  // integer value of hex string
 
 	// skip blank lines
-	while ((super::ReadLine(hexStg, sizeof(hexStg))) == 0)
+	while ((ReadLine(hexStg, sizeof(hexStg))) == 0)
 		;
 
 	while (n < 8)
@@ -500,6 +500,7 @@ SOAPHTTPProtocol::GetChunkLength()
 	}
 
 	SOAPDebugger::Print(1, "\nGetChunkLength: %s = %d\n", hexStg, intValue);
+
 	return intValue;
 }
 
@@ -524,10 +525,20 @@ size_t
 SOAPHTTPProtocol::ReadChunk(char *buffer, size_t len)
 {
 	// get chunk size, abort on empty chunk
-	if (m_canread == 0&& (m_canread = GetChunkLength()) == 0)
+	if (m_canread == 0 && (m_canread = GetChunkLength()) == 0)
 	{
 		if (m_doclose)
 			Close();
+		else
+		{
+			//
+			// There can be trailing junk..
+			while (CanRead())
+			{
+				char buff[10];
+				ReadLine(buff, sizeof(buff));
+			}
+		}
 		return 0;
 	}
 
