@@ -36,9 +36,9 @@ SOAPServerDispatch::SetTransport(SOAPTransport& transport, bool deltrans)
 
 
 SOAPServerDispatch&
-SOAPServerDispatch::Dispatch(const char *ns, SOAPDispatchHandlerInterface *disp)
+SOAPServerDispatch::DispatchTo(SOAPDispatchHandlerInterface *disp)
 {
-	m_handlers[ns] = disp;
+	m_handlers.Add(disp);
 	return *this;
 }
 
@@ -94,18 +94,24 @@ SOAPServerDispatch::Handle()
 		const SOAPMethod& requestMethod = m_request.GetBody().GetMethod();
 		SOAPMethod& responseMethod = m_response.GetBody().GetMethod();
 
-		const char *requestNamespace = requestMethod.GetNamespace();
-		HandlersMap::Iterator i = m_handlers.Find(requestNamespace);
-		if (i)
+		//
+		// TODO:  This is an O(n) lookup...
+		bool handled = false;
+		for (Handlers::Iterator i = m_handlers.Begin(); i != m_handlers.End(); ++i)
 		{
-			// TODO:
-			// Make sure SOAPAction is appropriate for found method.
-			(*i)->ExecuteMethod(requestMethod, responseMethod);
+			if ((*i)->ExecuteMethod(requestMethod, responseMethod))
+			{
+				handled = true;
+				break;
+			}
 		}
-		else
+
+		if (!handled)
 		{
 			faultcode = clientfault;
-			throw SOAPException("Could not dispatch method to namespace: %s", requestNamespace);
+			throw SOAPException("Could not find handler for method \"%s\" in namespace \"%s\"",
+				(const char *)requestMethod.GetName().GetName(),
+				(const char *)requestMethod.GetName().GetNamespace());
 		}
 
 		//

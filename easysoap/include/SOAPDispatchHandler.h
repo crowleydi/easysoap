@@ -28,7 +28,7 @@ class EASYSOAP_EXPORT SOAPDispatchHandlerInterface
 {
 public:
 	virtual ~SOAPDispatchHandlerInterface() {}
-	virtual void ExecuteMethod(const SOAPMethod& request, SOAPMethod& response) = 0;
+	virtual bool ExecuteMethod(const SOAPMethod& request, SOAPMethod& response) = 0;
 };
 
 
@@ -38,24 +38,20 @@ class EASYSOAP_EXPORT SOAPDispatchHandler : public SOAPDispatchHandlerInterface
 {
 private:
 	typedef void (T::*HandlerFunction)(const SOAPMethod& request, SOAPMethod& response);
-	typedef SOAPHashMap<SOAPString, HandlerFunction> DispatchMap;
+	typedef SOAPHashMap<SOAPQName, HandlerFunction> DispatchMap;
 
 	SOAPDispatchHandler(const SOAPDispatchHandler&);
 	SOAPDispatchHandler& operator=(const SOAPDispatchHandler&);
 
-	void ExecuteMethod(const SOAPMethod& request, SOAPMethod& response)
+	bool ExecuteMethod(const SOAPMethod& request, SOAPMethod& response)
 	{
-		DispatchMap::Iterator i = m_dispatchMap.Find(request.GetName().GetName());
+		DispatchMap::Iterator i = m_dispatchMap.Find(request.GetName());
 		if (i)
 		{
 			(m_target->*(*i))(request, response);
+			return true;
 		}
-		else
-		{
-			throw SOAPException("Unknown method request: [%s]::%s",
-				(const char *)request.GetName().GetNamespace(),
-				(const char *)request.GetName().GetName());
-		}
+		return false;
 	}
 
 	DispatchMap	m_dispatchMap;
@@ -72,7 +68,12 @@ protected:
 		m_target = target;
 	}
 
-	void DispatchMethod(const char *name, HandlerFunction func)
+	void DispatchMethod(const char *name, const char *ns, HandlerFunction func)
+	{
+		m_dispatchMap[SOAPQName(name, ns)] = func;
+	}
+
+	void DispatchMethod(const SOAPQName& name, HandlerFunction func)
 	{
 		m_dispatchMap[name] = func;
 	}

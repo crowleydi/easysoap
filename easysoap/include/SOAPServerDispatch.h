@@ -33,7 +33,7 @@ public:
 	~SOAPServerDispatch();
 
 	SOAPServerDispatch& SetTransport(SOAPTransport& transport, bool deltrans = false);
-	SOAPServerDispatch& Dispatch(const char *ns, SOAPDispatchHandlerInterface *disp);
+	SOAPServerDispatch& DispatchTo(SOAPDispatchHandlerInterface *disp);
 	int Handle();
 
 private:
@@ -42,9 +42,9 @@ private:
 	SOAPServerDispatch& operator=(const SOAPServerDispatch&);
 	void WriteFault(const char *code, const char *str);
 
-	typedef SOAPHashMap<SOAPString, SOAPDispatchHandlerInterface*> HandlersMap;
+	typedef SOAPArray<SOAPDispatchHandlerInterface*> Handlers;
 
-	HandlersMap			m_handlers;
+	Handlers			m_handlers;
 	SOAPTransport		*m_transport;
 	bool				m_deltrans;
 	SOAPResponse		m_response;
