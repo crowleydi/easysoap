@@ -49,15 +49,21 @@ public:
 	bool PortIsDefault() const;
 	const SOAPString& Path() const		{return m_path;}
 
+	const SOAPString& GetString() const		{return m_url;}
+	const SOAPString& GetBaseString() const	{return m_base;}
+
 private:
 	void		Reset();
 
-	UrlProtocol		m_proto;
-	SOAPString		m_user;
-	SOAPString		m_password;
-	SOAPString		m_hostname;
-	unsigned int	m_port;
-	SOAPString		m_path;
+	SOAPString		m_url;		// Full URL the user gave us
+	SOAPString		m_base;		// Just the base part (no path)
+
+	UrlProtocol		m_proto;	// Enum for the proto
+	SOAPString		m_user;		// Username in URL (if any)
+	SOAPString		m_password;	// Password in URL (if any)
+	SOAPString		m_hostname; // Hostname in URL
+	unsigned int	m_port;		// Port given in URL, or default
+	SOAPString		m_path;		// The URL Path
 };
 
 #endif // !defined(AFX_SOAPURL_H__592D82D9_B93F_431A_BB8D_F658609814C4__INCLUDED_)

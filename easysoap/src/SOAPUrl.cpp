@@ -100,6 +100,8 @@ SOAPUrl::Set(const char *url)
 				m_proto = unknown_proto;
 				throw SOAPException("Unknown protocol: %s", buffer);
 			}
+			m_base = buffer;
+			m_base.Append("://");
 		}
 		else
 		{
@@ -125,6 +127,8 @@ SOAPUrl::Set(const char *url)
 		if (*url == '@')
 		{
 			// we have 'user:password' part
+			m_base.Append(buffer);
+			m_base.Append("@");
 			++url;
 
 			if (colon)
@@ -150,6 +154,8 @@ SOAPUrl::Set(const char *url)
 		if (*url == '/' || *url == 0)
 		{
 			// we have 'hostname:port' part
+			m_base.Append(buffer);
+			m_base.Append("/");
 			if (colon)
 			{
 				// we have both a hostname and a port;
@@ -167,6 +173,9 @@ SOAPUrl::Set(const char *url)
 			m_path = url;
 		else
 			m_path = "/";
+
+	m_url = keepurl;
+
 	}
 }
 
