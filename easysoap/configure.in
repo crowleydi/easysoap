@@ -4,8 +4,9 @@ dnl
 dnl
 
 AC_INIT(Makefile.am)
+AC_CONFIG_AUX_DIR(conftools)
 
-AM_INIT_AUTOMAKE(EasySoap++, 0.5)
+AM_INIT_AUTOMAKE(EasySoap++, 0.6)
 AM_CONFIG_HEADER(include/easysoap/es_config.h)
 
 dnl
@@ -35,13 +36,17 @@ AC_CXX_TEMPLATE_KEYWORD_QUALIFIER
 AC_CXX_PARTIAL_SPECIALIZATION
 
 dnl Checks for libraries.
-AC_CHECK_LIB(stdc++, __builtin_new)
+AC_CHECK_LIB(gcc, main)
+AC_CHECK_LIB(stdc++, main)
 AC_CHECK_LIB(nsl, gethostbyname)
 AC_CHECK_LIB(socket, send)
 AC_CHECK_LIB(wsock32, WSAStartup)
 AC_CHECK_LIB(crypto, ERR_put_error)
 AC_CHECK_LIB(ssl, SSL_connect)
-AC_CHECK_LIB(expat, XML_Parse)
+AC_CHECK_LIB(expat, XML_Parse,,
+	AC_MSG_ERROR("Could not find the XML parsing library 'expat'.  Download and install from http://expat.sourceforge.net/"))
+AC_CHECK_HEADER(expat.h,,
+	AC_MSG_ERROR("Could not find expat.h"))
 
 dnl Checks for header files.
 AC_HEADER_DIRENT
