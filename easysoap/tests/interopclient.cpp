@@ -1182,6 +1182,7 @@ BeginEndpointTesting(const Endpoint& e, TestType test)
 				break;
 			case round2c:
 				std::cout << ": Round 2 Group C";
+				break;
 			case misc:
 				std::cout << ": Miscellaneous";
 				break;
