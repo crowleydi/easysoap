@@ -32,4 +32,4 @@ typedef unsigned long int UINT4;
 #define PROTO_LIST(list) ()
 #endif
 
-#endif // __rc5_global_h__
+#endif /* __rc5_global_h__ */

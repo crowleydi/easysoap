@@ -36,5 +36,5 @@ void DigestCalcResponse(
     OUT HASHHEX Response      /* request-digest or response-digest */
     );
 
-#endif // _digcalc_h_
+#endif /* _digcalc_h_ */
 

@@ -40,7 +40,7 @@ void CvtHex(
             Hex[i*2+1] = (j + 'a' - 10);
     };
     Hex[HASHHEXLEN] = '\0';
-};
+}
 
 /* calculate H(A1) as per spec */
 void DigestCalcHA1(
@@ -73,7 +73,7 @@ void DigestCalcHA1(
             MD5Final(HA1, &Md5Ctx);
       };
       CvtHex(HA1, SessionKey);
-};
+}
 
 /* calculate request-digest/response-digest as per HTTP Digest spec */
 void DigestCalcResponse(
@@ -93,7 +93,7 @@ void DigestCalcResponse(
       HASH RespHash;
       HASHHEX HA2Hex;
 
-      // calculate H(A2)
+      /* calculate H(A2) */
       MD5Init(&Md5Ctx);
       MD5Update(&Md5Ctx, pszMethod, strlen(pszMethod));
       MD5Update(&Md5Ctx, ":", 1);
@@ -105,7 +105,7 @@ void DigestCalcResponse(
       MD5Final(HA2, &Md5Ctx);
        CvtHex(HA2, HA2Hex);
 
-      // calculate response
+      /* calculate response */
       MD5Init(&Md5Ctx);
       MD5Update(&Md5Ctx, HA1, HASHHEXLEN);
       MD5Update(&Md5Ctx, ":", 1);
@@ -122,5 +122,5 @@ void DigestCalcResponse(
       MD5Update(&Md5Ctx, HA2Hex, HASHHEXLEN);
       MD5Final(RespHash, &Md5Ctx);
       CvtHex(RespHash, Response);
-};
+}
 

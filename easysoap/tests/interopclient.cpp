@@ -1648,9 +1648,9 @@ ParseCGIQuery(SOAPHashMap<SOAPString,SOAPString>& jar, const char *str)
 	{
 		char *t = n;
 		char *v;
-		if (n = sp_strchr(n, '&'))
+		if ((n = sp_strchr(n, '&')))
 			*n++ = 0;
-		if (v = sp_strchr(t, '='))
+		if ((v = sp_strchr(t, '=')))
 			*v++ = 0;
 		jar[hexdecode(t)] = hexdecode(v);
 	}
@@ -1813,6 +1813,8 @@ main(int argc, char* argv[])
 				break;
 			case round2c:
 				GetRound2Endpoints(endpoints, "GroupC");
+				break;
+			default:
 				break;
 			}
 		}

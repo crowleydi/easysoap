@@ -55,8 +55,8 @@ INCLUDES=-I@top_srcdir@/include
 libeasysoap_la_LDFLAGS = -no-undefined -release "0.6.1"
 
 
-AM_CFLAGS=-Wall
-AM_CXXFLAGS=-Wall
+AM_CFLAGS=-Wall -pedantic
+AM_CXXFLAGS=-Wall -pedantic
 
 
 EXTRA_DIST = \

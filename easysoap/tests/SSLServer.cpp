@@ -129,5 +129,6 @@ int main(int argc, char* argv[])
 
 		int rc = cgi.DispatchTo(&Obj).Handle();
 
+		return rc;
 }
 
