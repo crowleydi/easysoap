@@ -37,22 +37,7 @@ SOAPProxy::Execute(SOAPMethod& method)
 	m_parser.Parse(m_response, *m_transport);
 
 	if (m_response.IsFault())
-	{
-		SOAPString message("SOAP Fault");
-		const SOAPParameter *p = m_response.GetBody().GetFault().GetFaultString();
-		if (p)
-		{
-			message.Append(": ");
-			message.Append(p->GetString());
-		}
-		p = m_response.GetBody().GetFault().GetFaultActor();
-		if (p)
-		{
-			message.Append(": ");
-			message.Append(p->GetString());
-		}
-		throw SOAPException(message);
-	}
+		throw SOAPFaultException(m_response.GetBody().GetFault());
 
 	return m_response;
 }
