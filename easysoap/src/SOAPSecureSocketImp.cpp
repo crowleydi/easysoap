@@ -56,7 +56,7 @@ size_t SOAPSecureSocketImp::Read(char *, size_t) {return 0;}
 size_t SOAPSecureSocketImp::Write(const char *, size_t) {return 0;}
 bool SOAPSecureSocketImp::WaitRead(int, int) {return false;}
 void SOAPSecureSocketImp::InitSSL() {}
-void SOAPSecureSocketImp::SetCertificateInfo() {}
+void SOAPSecureSocketImp::SetCertificateInfo(const char* , const char*) {}
 #else
 
 extern "C" {

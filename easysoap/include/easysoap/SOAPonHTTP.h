@@ -68,8 +68,6 @@ public:
 		, m_doclose(false)
 		, m_keepAlive(true)
 		, m_chunked(false)
-		, m_keyfile(0)
-		, m_password(0)
 	{}
 
 	SOAPHTTPProtocol(const SOAPUrl& endpoint)
@@ -78,8 +76,6 @@ public:
 		, m_doclose(false)
 		, m_keepAlive(true)
 		, m_chunked(false)
-		, m_keyfile(0)
-		, m_password(0)
 	{
 		ConnectTo(endpoint);
 	}
@@ -90,8 +86,6 @@ public:
 		, m_doclose(false)
 		, m_keepAlive(true)
 		, m_chunked(false)
-		, m_keyfile(0)
-		, m_password(0)
 	{
 		ConnectTo(endpoint, proxy);
 	}
