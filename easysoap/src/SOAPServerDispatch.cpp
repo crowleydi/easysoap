@@ -83,22 +83,30 @@ SOAPServerDispatch::Handle()
 	const char *faultcode = serverfault;
 	try
 	{
-		SOAPParser parser;
 		// Parse the SOAP packet
+		SOAPParser parser;
 		faultcode = clientfault;
 		parser.Parse(m_request, *m_transport);
 		faultcode = serverfault;
 
-		//
-		// Dispatch the method
 		const SOAPMethod& requestMethod = m_request.GetBody().GetMethod();
 		SOAPMethod& responseMethod = m_response.GetBody().GetMethod();
+
+		//
+		// Set up the "suggested" method return name.  Actual
+		// method can change it.  In future we set it up with
+		// WSDL.
+		SOAPString respname = requestMethod.GetName().GetName();
+		respname.Append("Response");
+		responseMethod.SetName(respname, requestMethod.GetName().GetNamespace());
 
 		//
 		// TODO:  This is an O(n) lookup...
 		bool handled = false;
 		for (Handlers::Iterator i = m_handlers.Begin(); i != m_handlers.End(); ++i)
 		{
+			//
+			// We found a handler.  Now dispatch the method
 			if ((*i)->ExecuteMethod(requestMethod, responseMethod))
 			{
 				handled = true;
