@@ -246,7 +246,7 @@ typedef struct _TPoolZone
 {
 	char *pos,*maxpos;
 	struct _TPoolZone *next,*prev;
-	char data[0];
+	char data[1];
 } TPoolZone;
 
 typedef struct
