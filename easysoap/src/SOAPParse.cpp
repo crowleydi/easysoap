@@ -54,8 +54,13 @@ SOAPParser::Parse(SOAPEnvelope& env, SOAPTransport& trans)
 
 	// make sure our stack is empty
 	m_handlerstack.Clear();
-	m_hrefmap.Clear();
 	m_nsmap.Clear();
+
+	//
+	// clear out any id/href info
+	// we have hanging around...
+	m_idmap.Clear();
+	m_hrefs.Resize(0);
 
 	InitParser(trans.GetCharset());
 	while (1)
@@ -84,6 +89,8 @@ SOAPParser::Parse(SOAPEnvelope& env, SOAPTransport& trans)
 			break;
 		}
 	}
+
+	HandleHRefs();
 
 	return env;
 }
@@ -163,19 +170,19 @@ SOAPParser::endNamespace(const XML_Char *prefix)
 	m_nsmap.Remove(m_work);
 }
 
-SOAPParameter *
-SOAPParser::GetHRefParam(const char *name)
+void
+SOAPParser::SetHRefParam(SOAPParameter *param)
 {
-	HRefMap::Iterator i = m_hrefmap.Find(name);
-	if (i)
-		return *i;
-	return 0;
+	m_hrefs.Add(param);
 }
 
 void
-SOAPParser::SetHRefParam(const char *name, SOAPParameter *param)
+SOAPParser::SetIdParam(const char *id, SOAPParameter *param)
 {
-	m_hrefmap[name] = param;
+	IdMap::Iterator i = m_idmap.Find(id);
+	if (i)
+		throw SOAPException("Found parameter with duplicate id='%s'", id);
+	m_idmap[id] = param;
 }
 
 const char *
@@ -189,3 +196,29 @@ SOAPParser::ExpandNamespace(const char *ns, const char *nsend) const
 	return 0;
 }
 
+void
+SOAPParser::HandleHRefs()
+{
+	//
+	// For all of the parameters with href's
+	// which were registerd, link them to
+	// the param with the corresponding id.
+	for (HRefArray::Iterator i = m_hrefs.Begin(); i != m_hrefs.End(); ++i)
+	{
+		SOAPParameter *p = *i;
+		SOAPParameter::Attrs::Iterator href = p->GetAttributes().Find("href");
+		if (!href)
+			throw SOAPException("Somehow a parameter without an href got in the href map...");
+		const char *h = href.Item().GetName();
+		if (*h == '#')
+		{
+			IdMap::Iterator id = m_idmap.Find(++h);
+			if (!id)
+				throw SOAPException("Could not find parameter for href='%s'", --h);
+			SOAPParameter *pid = *id;
+			p->LinkTo(*pid);
+		}
+		else
+			throw SOAPException("Could not resolve href='%s'", h);
+	}
+}

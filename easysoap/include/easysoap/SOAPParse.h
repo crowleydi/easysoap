@@ -48,12 +48,12 @@ public:
 	// "http://www.w3.org/1999/XMLSchema-instance"
 	const char *ExpandNamespace(const char *name, const char *nsend) const;
 
-	// Given an HRef, return the Parameter for it
-	// if any (will return null if not found)
-	SOAPParameter *GetHRefParam(const char *name);
+	//
+	// Set the SOAPParameter which defines the
+	// give id attribute.
+	void SetIdParam(const char *name, SOAPParameter *);
 
-	// Assign a SOAPParameter to an HRef
-	void SetHRefParam(const char *name, SOAPParameter *);
+	void SetHRefParam(SOAPParameter *);
 
 protected:
 
@@ -67,14 +67,18 @@ private:
 
 	typedef SOAPStack<SOAPParseEventHandler *>	HandlerStack;
 	typedef SOAPHashMap<SOAPString, SOAPString> NamespaceMap;
-	typedef SOAPHashMap<SOAPString, SOAPParameter*> HRefMap;
+	typedef SOAPHashMap<SOAPString, SOAPParameter*> IdMap;
+	typedef SOAPArray<SOAPParameter *>				HRefArray;
+
+	void HandleHRefs();
 
 	SOAPEnvelopeHandler		*m_envelopeHandler;
 	HandlerStack			m_handlerstack;
 	mutable SOAPString		m_work;
 	SOAPEnvelopeHandler		*m_handler;
 	NamespaceMap			m_nsmap;
-	HRefMap					m_hrefmap;
+	IdMap					m_idmap;
+	HRefArray				m_hrefs;
 };
 
 #endif // !defined(AFX_SOAPPARSE_H__751545FF_EF84_42BC_9622_A6CE624F1F14__INCLUDED_)

@@ -88,30 +88,14 @@ SOAPBodyHandler::startElement(SOAPParser& parser, const XML_Char *name, const XM
 	if (m_gotMethod || notRoot)
 	{
 		SOAPParameter *p = &m_body->AddParameter();
-		SOAPParameter *pid = 0;
 
 		if (href)
-		{
-			pid = parser.GetHRefParam(++href);
-			if (pid)
-				p->LinkTo(*pid);
-			else
-				parser.SetHRefParam(href, p);
-
-			return 0;
-		}
-
+			parser.SetHRefParam(p);
 		if (id)
-		{
-			pid = parser.GetHRefParam(id);
-			if (!pid)
-				parser.SetHRefParam(id, p);
-		}
+			parser.SetIdParam(id, p);
 
 		m_paramHandler.SetParameter(p);
 		SOAPParseEventHandler *ret = m_paramHandler.start(parser, name, attrs);
-		if (pid)
-			p->LinkTo(*pid);
 		return ret;
 	}
 
