@@ -24,7 +24,6 @@
 #endif // _MSC_VER
 
 #include "SOAPParameterHandler.h"
-#include "SOAPArrayHandler.h"
 #include "SOAPStructHandler.h"
 
 #include <SOAPNamespaces.h>
@@ -37,7 +36,6 @@
 SOAPParameterHandler::SOAPParameterHandler()
 : m_param(0)
 , m_structHandler(0)
-, m_arrayHandler(0)
 , m_setvalue(false)
 , m_ignoreId(false)
 , m_ignoreName(false)
@@ -46,21 +44,26 @@ SOAPParameterHandler::SOAPParameterHandler()
 
 SOAPParameterHandler::~SOAPParameterHandler()
 {
-	delete m_arrayHandler;
 	delete m_structHandler;
 }
-
-const SOAPQName AttrXsiType1999("type", SOAP_XSI_1999);
-const SOAPQName AttrXsiType2001("type", SOAP_XSI_2001);
-const SOAPQName AttrXsiNull1999("null", SOAP_XSI_1999);
-const SOAPQName AttrXsiNull2001("nil", SOAP_XSI_2001);
-const SOAPQName AttrArrayType("arrayType", SOAP_ENC);
 
 SOAPParseEventHandler *
 SOAPParameterHandler::start(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs)
 {
 	if (!m_ignoreName)
-		m_param->SetName(name);
+	{
+		const char *ns = sp_strchr(name, PARSER_NS_SEP[0]);
+		if (ns)
+		{
+			m_param->GetName().GetNamespace() = "";
+			m_param->GetName().GetNamespace().Append(name, ns - name);
+			m_param->GetName().GetName() = ++ns;
+		}
+		else
+		{
+			m_param->SetName(name);
+		}
+	}
 	m_param->Reset();
 	m_setvalue = true;
 	m_str = "";
@@ -74,91 +77,39 @@ SOAPParameterHandler::start(SOAPParser& parser, const XML_Char *name, const XML_
 		const XML_Char *tag = *cattrs++;
 		const XML_Char *val = *cattrs++;
 
-		if (AttrArrayType == tag)
+		const char *tsep = sp_strchr(tag, PARSER_NS_SEP[0]);
+		if (tsep)
 		{
-			arrayType = val;
-		}
-		else if (AttrXsiType2001 == tag || AttrXsiType1999 == tag)
-		{
-			elementType = val;
-			char *sep = sp_strchr(val, ':');
-			if (sep)
-			{
-				*sep = 0;
-				const char *typens = parser.ExpandNamespace(val);
-				*sep = ':';
-				if (typens)
+				m_attrName.GetNamespace() = "";
+				m_attrName.GetNamespace().Append(tag, tsep - tag);
+				m_attrName.GetName() = ++tsep;
+
+				SOAPQName& attr = m_param->AddAttribute(m_attrName);
+
+				const char *vsep = sp_strchr(val, ':');
+				if (vsep)
 				{
-					m_param->SetType(++sep, typens);
+					const char *vns = parser.ExpandNamespace(val, vsep);
+					attr.Set(++vsep, vns);
 				}
 				else
 				{
-					throw SOAPException("Could not resolve typename for element %s: %s", name, val);
+					attr = val;
 				}
+		}
+		else
+		{
+			tsep = sp_strchr(tag, ':');
+			if (tsep)
+			{
+				throw SOAPException("Could not expand attribute namespace: %s", tag);
 			}
 			else
 			{
-				throw SOAPException("Typename is not namespace qualified for element %s: %s", name, val);
+				m_attrName = tag;
+				m_param->AddAttribute(m_attrName) = val;
 			}
 		}
-		else if (AttrXsiNull2001 == tag || AttrXsiNull1999 == tag)
-		{
-			if (sp_strcmp(val, "1") == 0 || sp_strcasecmp(val, "true") == 0)
-			{
-				m_param->SetNull();
-				m_setvalue = false;
-			}
-		}
-		else
-		{
-			m_param->AddAttribute(tag, val);
-		}
-	}
-
-	if (!elementType)
-	{
-		m_param->SetType(m_paramType);
-	}
-
-	if (arrayType)
-	{
-		if (!m_arrayHandler)
-			m_arrayHandler = new SOAPArrayHandler();
-		m_arrayHandler->SetParameter(m_param);
-		m_setvalue = false;
-
-		const char *sep = sp_strchr(arrayType, ':');
-		const char *typens = 0;
-		if (sep)
-		{
-			char *z = (char *)sep;
-			*z = 0;
-			typens = parser.ExpandNamespace(arrayType);
-
-			if (!typens)
-				throw SOAPException("Could not resolve arrayType for element %s: %s", name, arrayType);
-
-			*z = ':';
-			++sep;
-		}
-		else
-		{
-			typens = parser.ExpandNamespace("");
-
-			if (!typens)
-				throw SOAPException("Array typename is not namespace qualified for element %s: %s", name, arrayType);
-
-			sep = arrayType;
-		}
-
-		char *b = sp_strrchr(sep, '[');
-		if (b)
-			*b = 0;
-		m_arrayHandler->SetArrayType(sep, typens);
-		if (b)
-			*b = '[';
-
-		return m_arrayHandler->start(parser, name, attrs);
 	}
 
 	return this;

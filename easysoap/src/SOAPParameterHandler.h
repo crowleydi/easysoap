@@ -26,7 +26,6 @@
 #include <SOAP.h>
 #include <SOAPParseEventHandler.h>
 
-class SOAPArrayHandler;
 class SOAPStructHandler;
 class SOAPParameter;
 
@@ -40,10 +39,6 @@ public:
 	void SetIgnoreName(bool val = true)				{m_ignoreName = val;}
 	void SetIgnoreId(bool val = true)				{m_ignoreId = val;}
 	void SetParameter(SOAPParameter& param)			{m_param = &param;}
-	void SetParameterType(const XML_Char *type, const XML_Char *typens)
-	{
-		m_paramType.Set(type, typens);
-	}
 
 	virtual SOAPParseEventHandler* start(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs);
 	virtual SOAPParseEventHandler* startElement(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs);
@@ -52,12 +47,10 @@ public:
 
 private:
 	SOAPParameter			*m_param;
-	SOAPQName				m_paramType;
 
 	SOAPString				m_str;
-	SOAPString				m_typestr;
 	SOAPStructHandler		*m_structHandler;
-	SOAPArrayHandler		*m_arrayHandler;
+	SOAPQName				m_attrName;
 	bool					m_setvalue;
 	bool					m_ignoreId;
 	bool					m_ignoreName;

@@ -31,6 +31,9 @@
 #include <SOAPBase64.h>
 #include <SOAPNamespaces.h>
 
+class SOAPParameter;
+#include <SOAPTypeTraits.h>
+
 class SOAPParameterHandler;
 
 class EASYSOAP_EXPORT SOAPParameter
@@ -39,7 +42,7 @@ public:
 
 	typedef SOAPArray<SOAPParameter*>				Array;
 	typedef SOAPHashMap<SOAPString, SOAPParameter*>	Struct;
-	typedef SOAPHashMap<SOAPQName, SOAPString>		Attrs;
+	typedef SOAPHashMap<SOAPQName, SOAPQName>		Attrs;
 
 	SOAPParameter();
 	SOAPParameter(const SOAPParameter& param);
@@ -50,13 +53,13 @@ public:
 
 	void	Reset();
 
+	SOAPQName& GetName()					{return m_name;}
 	const SOAPQName& GetName() const		{return m_name;}
+
 	void SetName(const SOAPQName& name)		{m_name = name;}
 	void SetName(const char *name, const char *ns = 0);
 
-	const SOAPQName& GetType() const		{return m_type;}
-	void SetType(const SOAPQName& type)		{m_type = type;}
-	void SetType(const char *type, const char *ns = 0);
+	void SetType(const char *name, const char *ns = 0);
 
 	void SetValue(bool val);
 	void SetBoolean(const char *val);
@@ -71,6 +74,8 @@ public:
 #ifdef HAVE_WCHART
 	void SetValue(const wchar_t *val);
 #endif // HAVE_WCHART
+
+
 	bool GetBoolean() const;
 
 	int GetInt() const;
@@ -84,10 +89,6 @@ public:
 
 	const SOAPString& GetString() const;
 	operator const SOAPString&() const		{return GetString();}
-
-	//
-	// Use this to get access to the underlying string.
-	SOAPString& GetStringRef()					{return m_strval;}
 
 	Array& GetArray()
 	{
@@ -113,20 +114,21 @@ public:
 		return *m_array[i];
 	}
 
-	const SOAPQName& GetArrayType() const {return m_arrayType;}
-	void SetIsArray();
-	void SetArrayType(const char *name, const char *ns = 0);
-	void SetIsStruct();
 	void SetNull(bool isnull = true);
+	void SetIsStruct();
 
 	bool IsNull() const;
 	bool IsStruct() const;
-	bool IsArray() const;
 
 	const Attrs& GetAttributes() const {return m_attrs;}
-	void AddAttribute(const SOAPQName& name, const char *val);
+	SOAPQName& AddAttribute(const SOAPQName& name);
 
-	bool WriteSOAPPacket(SOAPPacketWriter& packet, bool writetype = true) const;
+	//
+	// Use this to get access to the underlying string.
+	SOAPString& GetStringRef()					{return m_strval;}
+	const SOAPString& GetStringRef() const		{return m_strval;}
+
+	bool WriteSOAPPacket(SOAPPacketWriter& packet) const;
 
 private:
 	void SetParent(SOAPParameter *parent) {m_parent = parent;}
@@ -136,173 +138,76 @@ private:
 	SOAPParameter	*m_parent;
 	SOAPQName		m_name;
 
-	SOAPQName		m_type;			// This could be moved to an attr..
-	SOAPQName		m_arrayType;	// This could be moved to an attr..
+	bool			m_isstruct;	// true for array, struct types
+	SOAPString		m_strval;	// value legal only if m_isstruct == false
 
-	int				m_flags;
-
-	SOAPString		m_strval;
 	Array			m_array;
 	Attrs			m_attrs;
 	mutable Struct	m_struct;
-	mutable bool	m_outtasync;
-
-	static unsigned int		m_gensym;
+	mutable bool	m_outtasync;// true if we need to resynch the hashmap to the array
 };
 
+template<typename T>
 inline SOAPParameter&
-operator<<(SOAPParameter& param, bool val)
+operator<<(SOAPParameter& param, const T& val)
 {
-	param.SetValue(val);
-	return param;
-}
+	SOAPTypeTraits<T> traits;
+	//
+	// If SOAPTypeTraits<> is undefined for your
+	// class then you will have to implement it.
+	// Look in SOAPTypeTraits.h for examples.
+	//
 
-inline SOAPParameter&
-operator<<(SOAPParameter& param, int val)
-{
-	param.SetValue(val);
-	return param;
-}
+	param.Reset();
+	// Add xsi:type attribute
+	traits.GetType(param.AddAttribute(XMLSchemaInstance::type));
+	// serialize
+	traits.Serialize(param, val);
 
-inline SOAPParameter&
-operator<<(SOAPParameter& param, float val)
-{
-	param.SetValue(val);
-	return param;
-}
-
-inline SOAPParameter&
-operator<<(SOAPParameter& param, double val)
-{
-	param.SetValue(val);
-	return param;
-}
-
-inline SOAPParameter&
-operator<<(SOAPParameter& param, const char * val)
-{
-	param.SetValue(val);
-	return param;
-}
-
-inline const SOAPParameter&
-operator>>(const SOAPParameter& param, bool& val)
-{
-	val = param.GetBoolean();
-	return param;
-}
-
-inline const SOAPParameter&
-operator>>(const SOAPParameter& param, int& val)
-{
-	val = param.GetInt();
-	return param;
-}
-
-inline const SOAPParameter&
-operator>>(const SOAPParameter& param, double& val)
-{
-	val = param.GetDouble();
-	return param;
-}
-
-inline const SOAPParameter&
-operator>>(const SOAPParameter& param, float& val)
-{
-	val = param.GetFloat();
-	return param;
-}
-
-inline const SOAPParameter&
-operator>>(const SOAPParameter& param, SOAPString& val)
-{
-	val = param.GetString();
 	return param;
 }
 
 template<typename T>
 inline const SOAPParameter&
-operator<<(SOAPParameter& param, const SOAPArray<T>& val)
+operator>>(const SOAPParameter& param, T& val)
 {
-	param.SetIsArray();
-	for (SOAPArray<T>::ConstIterator i = val.Begin(); i != val.End(); ++i)
-		param.AddParameter() << *i;
-	return param;
-}
-
-template <typename T>
-inline const SOAPParameter&
-operator>>(const SOAPParameter& param, SOAPArray<T>& val)
-{
-	val.Resize(0);
-	for (SOAPParameter::Array::ConstIterator i = param.GetArray().Begin();
-		i != param.GetArray().End(); ++i)
-		**i >> val.Add();
-	return param;
-}
-
-
-inline SOAPParameter&
-operator<<(SOAPParameter& param, short val)
-{
-	param.SetValue((int)val);
-	param.SetType("short");
-	return param;
-}
-
-inline const SOAPParameter&
-operator>>(const SOAPParameter& param, short& val)
-{
-	val = param.GetInt();
-	return param;
-}
-
-inline SOAPParameter&
-operator<<(SOAPParameter& param, char val)
-{
-	param.SetValue((int)val);
-	param.SetType("byte");
-	return param;
-}
-
-inline const SOAPParameter&
-operator>>(const SOAPParameter& param, char& val)
-{
-	val = param.GetInt();
+	SOAPTypeTraits<T> traits;
+	//
+	// If SOAPTypeTraits<> is undefined for your
+	// class then you will have to implement it.
+	// Look in SOAPTypeTraits.h for examples.
+	//
+	traits.Deserialize(param, val);
 	return param;
 }
 
 //
-// Specialize to automatically use base64 encoding
-inline const SOAPParameter&
-operator<<(SOAPParameter& param, const SOAPArray<char>& val)
+// specialize const char * and const wchar_t * so the
+// compiler doesn't get confused thinking it's "char[5]"
+// or something like that...
+inline SOAPParameter&
+operator<<(SOAPParameter& param, const char *val)
 {
-	param.SetValue(""); // coerce it to a string
-	SOAPBase64::Encode(val, param.GetStringRef());
-	param.SetType("base64Binary");
+	SOAPTypeTraits<const char *> traits;
+	param.Reset();
+	traits.GetType(param.AddAttribute(XMLSchemaInstance::type));
+	traits.Serialize(param, val);
+
 	return param;
 }
 
-//
-// Specialize to automatically convert base64 encoding
-inline const SOAPParameter&
-operator>>(const SOAPParameter& param, SOAPArray<char>& val)
+#ifdef HAVE_WCHART
+inline SOAPParameter&
+operator<<(SOAPParameter& param, const wchar_t *val)
 {
-	val.Resize(0);
-	if (param.IsArray())
-	{
-		for (SOAPParameter::Array::ConstIterator i = param.GetArray().Begin();
-			i != param.GetArray().End(); ++i)
-			**i >> val.Add();
-	}
-	else
-	{
-		// Assume it's a base64 encoded string.
-		// Could also check for hex encoding.
-		SOAPBase64::Decode(param.GetString(), val);
-	}
+	SOAPTypeTraits<const wchar_t *> traits;
+	param.Reset();
+	traits.GetType(param.AddAttribute(XMLSchemaInstance::type));
+	traits.Serialize(param, val);
+
 	return param;
 }
+#endif
 
 #endif // !defined(AFX_SOAPPARAMETER_H__30811BAD_D6A1_4535_B256_9EEB56A84026__INCLUDED_)
 
