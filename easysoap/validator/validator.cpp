@@ -19,14 +19,9 @@
 
 //
 //
-//
 //   CGI Program for the Userland SOAP 1.1 Validator Web App
 //   http://validator.soapware.org/
 //
-//
-//
-//   THIS DOESN'T WORK RUNNING UNDER IIS
-//   If you know how to get this to work on IIS, PLEASE let me know.
 //
 
 #include <SOAP.h>

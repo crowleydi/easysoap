@@ -19,14 +19,11 @@
 
 //
 //
-//
 //   A Simple CGI Program for EasySoap++
 //
 //   Just place this file in your cgi-bin directory (or similar)
 //   of your web server and go.
 //
-//   THIS DOESN'T WORK RUNNING UNDER IIS
-//   If you know how to get this to work on IIS, PLEASE let me know.
 //
 
 #include <SOAP.h>
