@@ -241,6 +241,7 @@ SOAPClientSocketImp::Read(char *buff, size_t bufflen)
 	int bytes = 0;
 	if (bufflen > 0)
 	{
+		*buff = 0;
 		bytes = recv(m_socket, buff, bufflen, 0);
 		SOAPDebugger::Print(2, "RECV: %d bytes\n", bytes);
 		if (bytes == 0)
