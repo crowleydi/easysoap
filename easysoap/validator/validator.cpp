@@ -439,7 +439,6 @@ ValidateHandler(SOAPCGIHandler& cgi, const SOAPEnvelope& req, SOAPResponse& resp
 	}
 	else if (meth.GetName() == "http://www.soapware.org/#whichToolkit")
 	{
-		cgi.SetLogFile("c:/whichtk.log");
 		whichToolkit (meth, respm);
 	}
 	else
