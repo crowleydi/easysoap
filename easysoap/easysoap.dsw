@@ -7,10 +7,6 @@ Project: "easysoap"=.\src\easysoap.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
-    begin source code control
-    easysoap
-    .\src
-    end source code control
 }}}
 
 Package=<4>
@@ -23,10 +19,6 @@ Project: "tests"=.\tests\tests.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
-    begin source code control
-    tests
-    .\tests
-    end source code control
 }}}
 
 Package=<4>
