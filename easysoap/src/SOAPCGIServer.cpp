@@ -181,6 +181,7 @@ SOAPCGITransport::Write(const SOAPMethod& method, const char *payload, size_t pa
 	return payloadsize;
 }
 
+int
 SOAPCGIServer::Handle(const char *infile)
 {
 	SOAPCGITransport	cgi;
