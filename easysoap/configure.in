@@ -74,6 +74,14 @@ AC_STRUCT_TM
 dnl Checks for library functions.
 AC_TYPE_SIGNAL
 AC_FUNC_VPRINTF
-AC_CHECK_FUNCS(mktime select socket strdup strtol snprintf)
+AC_CHECK_FUNCS( \
+	mktime \
+	select \
+	socket \
+	strdup \
+	strtol \
+	snprintf \
+	strerror \
+)
 
 AC_OUTPUT(Makefile simpleserver/Makefile validator/Makefile tests/Makefile src/Makefile src/abyss/Makefile src/abyss/src/Makefile include/Makefile)
