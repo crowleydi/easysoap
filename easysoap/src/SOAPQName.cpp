@@ -16,12 +16,16 @@ SOAPQName::Set(const char *name, const char *ns)
 	}
 	else
 	{
-		const char *psep = sp_strstr(name, PARSER_NS_SEP);
+		const char *psep = sp_strchr(name, PARSER_NS_SEP[0]);
 		if (psep)
 		{
 			m_name = (psep + 1);
 			m_namespace = "";
 			m_namespace.Append(name, psep - name);
+		}
+		else if ((psep = sp_strchr(name, ':')))
+		{
+			throw SOAPException("You cannot set a QName to a value with an unexpanded namespace: %s", name);
 		}
 		else
 		{
