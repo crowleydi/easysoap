@@ -91,6 +91,9 @@ public:
 	const SOAPResponse& Execute(const SOAPMethod& method);
 	const SOAPResponse& Execute(const SOAPEnvelope& envelope);
 
+	void SendRequest(const SOAPEnvelope& envelope);
+	const SOAPResponse& GetResponse();
+
 private:
 
 	SOAPProxy(const SOAPProxy& proxy);

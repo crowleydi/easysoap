@@ -39,12 +39,26 @@ SOAPProxy::Execute(const SOAPMethod& method)
 const SOAPResponse&
 SOAPProxy::Execute(const SOAPEnvelope& envelope)
 {
+	SendRequest(envelope);
+	return GetResponse();
+}
+
+void
+SOAPProxy::SendRequest(const SOAPEnvelope& envelope)
+{
 	if (!m_transport)
 		throw SOAPException("No transport!");
 
 	envelope.WriteSOAPPacket(m_packet);
 	m_transport->Write(envelope.GetBody().GetMethod(), m_packet.GetBytes(), m_packet.GetLength());
-	m_response.SetMethod(envelope.GetBody().GetMethod());
+}
+
+const SOAPResponse&
+SOAPProxy::GetResponse()
+{
+	if (!m_transport)
+		throw SOAPException("No transport!");
+
 	m_parser.Parse(m_response, *m_transport);
 
 	if (m_response.IsFault())
