@@ -163,6 +163,16 @@ public:
 		return m_str;
 	}
 
+	bool operator!() const
+	{
+		return m_str == 0;
+	}
+
+	operator bool() const
+	{
+		return m_str != 0;
+	}
+
 	operator const char *() const
 	{
 		return Str();
