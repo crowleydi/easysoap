@@ -67,7 +67,7 @@ XMLParser::InitParser(const char *encoding)
 #endif
 	{
 		FreeParser();
-		m_parser = XML_ParserCreateNS(encoding, '#');
+		m_parser = (struct XML_ParserStruct*)XML_ParserCreateNS(encoding, '#');
 	}
 	XML_SetElementHandler(m_parser,
 			XMLParser::_startElement,
