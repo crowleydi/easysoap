@@ -32,7 +32,6 @@ BEGIN_EASYSOAP_NAMESPACE
 /**
 *
 */
-template <typename T>
 class SOAPServer
 {
 protected:
@@ -40,20 +39,19 @@ protected:
 	~SOAPServer() {}
 
 	SOAPServerDispatch	m_dispatch;
-
-public:
-	T& DispatchTo(SOAPDispatchHandlerInterface* disp)
-	{
-		m_dispatch.DispatchTo(disp);
-		return *(T*)this; // Is there a better way to do this?
-	}
-
-	T& DispatchTo(SOAPHeaderHandlerInterface* disp)
-	{
-		m_dispatch.DispatchTo(disp);
-		return *(T*)this; // Is there a better way to do this?
-	}
 };
+
+#define IMPLEMENT_DISPATCH(T) \
+T& DispatchTo(SOAPDispatchHandlerInterface* disp)\
+{\
+	m_dispatch.DispatchTo(disp);\
+	return *this;\
+}\
+T& DispatchTo(SOAPHeaderHandlerInterface* disp)\
+{\
+	m_dispatch.DispatchTo(disp);\
+	return *this;\
+}
 
 END_EASYSOAP_NAMESPACE
 

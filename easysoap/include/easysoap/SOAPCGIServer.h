@@ -29,13 +29,15 @@ BEGIN_EASYSOAP_NAMESPACE
 /**
 *
 */
-class EASYSOAP_EXPORT SOAPCGIServer : public SOAPServer<SOAPCGIServer>
+class EASYSOAP_EXPORT SOAPCGIServer : public SOAPServer
 {
 public:
 	SOAPCGIServer() {}
 	//
 	// returns false if an error occurred
 	bool Handle(const char *infile = 0);
+
+	IMPLEMENT_DISPATCH(SOAPCGIServer)
 
 private:
 

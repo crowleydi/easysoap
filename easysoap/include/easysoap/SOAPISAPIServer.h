@@ -85,7 +85,7 @@ private:
 /**
 *
 */
-class EASYSOAP_EXPORT SOAPISAPIServer : public SOAPServer<SOAPISAPIServer>
+class EASYSOAP_EXPORT SOAPISAPIServer : public SOAPServer
 {
 public:
 	SOAPISAPIServer() : m_ioport(NULL) {}
@@ -95,6 +95,8 @@ public:
 	// returns false if an error occurred
 	bool Handle(SOAPISAPITransport& trans);
 	int Handle();
+
+	IMPLEMENT_DISPATCH(SOAPISAPIServer)
 
 private:
 

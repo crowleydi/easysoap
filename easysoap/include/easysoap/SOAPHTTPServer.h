@@ -33,7 +33,7 @@ BEGIN_EASYSOAP_NAMESPACE
 /**
 *
 */
-class EASYSOAP_EXPORT SOAPHTTPServer : public SOAPServer<SOAPHTTPServer>
+class EASYSOAP_EXPORT SOAPHTTPServer : public SOAPServer
 {
 public:
 	SOAPHTTPServer(int port=80);
@@ -44,6 +44,8 @@ public:
 	void Stop();
 	void ResetFlag();
 	int IsStopped();
+
+	IMPLEMENT_DISPATCH(SOAPHTTPServer)
 
 private:
 
