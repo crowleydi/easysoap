@@ -99,7 +99,6 @@ SOAPParameter::ClearValue()
 void
 SOAPParameter::Reset()
 {
-	m_parent = 0;
 	m_name.GetName().Empty();
 	m_name.GetNamespace().Empty();
 	ClearValue();
