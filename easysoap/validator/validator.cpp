@@ -37,14 +37,14 @@
 // out the correct way....
 //
 void
-WriteFault(const char *actor, const char *str)
+WriteFault(const char *code, const char *str)
 {
 	printf("Content-Type: text/xml; charset=\"UTF-8\"\n\n");
 
 	printf("<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\">");
 	printf("<SOAP-ENV:Body>");
 	printf("<SOAP-ENV:Fault>");
-	printf("<faultactor>%s</faultactor>", actor);
+	printf("<faultcode>%s</faultcode>", code);
 	printf("<faultstring>%s</faultstring>", str);
 	printf("</SOAP-ENV:Fault>");
 	printf("</SOAP-ENV:Body>");
@@ -454,7 +454,7 @@ int
 main(int argc, char* argv[], char *env[])
 {
 	int retval = 0;
-	const char *faultactor = "SOAP-ENV::Sever";
+	const char *faultcode = "SOAP-ENV::Sever";
 	try
 	{
 		printf("SOAPServer: %s/%s\n", EASYSOAP_STRING, EASYSOAP_VERSION_STRING);
@@ -467,9 +467,9 @@ main(int argc, char* argv[], char *env[])
 		//cgi.SetLogFile("C:/validate.log");
 		//cgi.SetInFile("C:/validate.log");
 
-		faultactor = "SOAP-ENV::Client";
+		faultcode = "SOAP-ENV::Client";
 		p.Parse(env, cgi);
-		faultactor = "SOAP-ENV::Server";
+		faultcode = "SOAP-ENV::Server";
 
 		//
 		// TODO: Test SOAPAction, method namespace
@@ -485,15 +485,15 @@ main(int argc, char* argv[], char *env[])
 		// create SOAPFault
 		//
 		retval = 1;
-		WriteFault(faultactor, sex.What());
+		WriteFault(faultcode, sex.What());
 	}
 	catch (...)
 	{
 		//
 		// create SOAPFault
 		//
-		faultactor = "SOAP-ENV::Server";
-		WriteFault(faultactor, "Serious error occurred.");
+		faultcode = "SOAP-ENV::Server";
+		WriteFault(faultcode, "Serious error occurred.");
 		retval = 1;
 	}
 
