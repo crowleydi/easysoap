@@ -21,7 +21,7 @@
 #include "SOAP.h"
 #include "SOAPPacketWriter.h"
 
-#define ADD_WHITESPACE 0
+bool SOAPPacketWriter::g_makePretty = false;
 
 SOAPPacketWriter::SOAPPacketWriter()
 {
@@ -36,6 +36,12 @@ SOAPPacketWriter::SOAPPacketWriter()
 SOAPPacketWriter::~SOAPPacketWriter()
 {
 	delete [] m_buffer;
+}
+
+void
+SOAPPacketWriter::SetAddWhiteSpace(bool ws)
+{
+	g_makePretty = ws;
 }
 
 const char *
@@ -135,11 +141,10 @@ SOAPPacketWriter::AddAttr(const SOAPQName& tag, const char *value)
 		nstag = i->Str();
 	}
 
-#if ADD_WHITESPACE
-	Write("\r\n\t");
-#else
-	Write(" ");
-#endif
+	if (g_makePretty)
+		Write("\r\n\t");
+	else
+		Write(" ");
 	Write(nstag);
 	Write(":");
 	Write(tag.GetName());
@@ -186,11 +191,11 @@ SOAPPacketWriter::AddAttr(const SOAPQName& tag, const SOAPQName& value)
 		vnstag = i->Str();
 	}
 
-#if ADD_WHITESPACE
-	Write("\r\n\t");
-#else
-	Write(" ");
-#endif
+	if (g_makePretty)
+		Write("\r\n\t");
+	else
+		Write(" ");
+
 	Write(tnstag);
 	Write(":");
 	Write(tag.GetName());
@@ -212,11 +217,11 @@ SOAPPacketWriter::AddAttr(const char *attr, const char *value)
 	if (!m_instart)
 		throw SOAPException("XML serialization error.  Adding attribute when not in start tag.");
 
-#if ADD_WHITESPACE
-	Write("\r\n\t");
-#else
-	Write(" ");
-#endif
+	if (g_makePretty)
+		Write("\r\n\t");
+	else
+		Write(" ");
+
 	Write(attr);
 	Write("=\"");
 	WriteEscaped(value);
@@ -231,11 +236,11 @@ SOAPPacketWriter::AddXMLNS(const char *prefix, const char *ns)
 	{
 		m_nsmap[ns] = prefix;
 
-#if ADD_WHITESPACE
-		Write("\r\n\t");
-#else
-		Write(" ");
-#endif
+		if (g_makePretty)
+			Write("\r\n\t");
+		else
+			Write(" ");
+
 		Write("xmlns");
 		if (prefix)
 		{
@@ -254,9 +259,8 @@ SOAPPacketWriter::EndTag(const char *tag)
 	if (m_instart)
 	{
 		Write("/>");
-#if ADD_WHITESPACE
-		Write("\r\n");
-#endif
+		if (g_makePretty)
+			Write("\r\n");
 		m_instart = false;
 	}
 	else
@@ -264,9 +268,8 @@ SOAPPacketWriter::EndTag(const char *tag)
 		Write("</");
 		Write(tag);
 		Write(">");
-#if ADD_WHITESPACE
-		Write("\r\n");
-#endif
+		if (g_makePretty)
+			Write("\r\n");
 	}
 }
 
@@ -282,9 +285,8 @@ SOAPPacketWriter::EndTag(const SOAPQName& tag)
 	if (m_instart)
 	{
 		Write("/>");
-#if ADD_WHITESPACE
-		Write("\r\n");
-#endif
+		if (g_makePretty)
+			Write("\r\n");
 		m_instart = false;
 	}
 	else
@@ -300,9 +302,8 @@ SOAPPacketWriter::EndTag(const SOAPQName& tag)
 		Write(":");
 		Write(tag.GetName());
 		Write(">");
-#if ADD_WHITESPACE
-		Write("\r\n");
-#endif
+		if (g_makePretty)
+			Write("\r\n");
 	}
 }
 
@@ -323,9 +324,8 @@ SOAPPacketWriter::EndStart()
 	if (m_instart)
 	{
 		Write(">");
-#if ADD_WHITESPACE
-		Write("\r\n");
-#endif
+		if (g_makePretty)
+			Write("\r\n");
 		m_instart = false;
 	}
 }

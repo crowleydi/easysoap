@@ -50,6 +50,8 @@ public:
 	const char *GetSymbol(char *buff, const char *prefix);
 
 	void SetNamespace(const char *ns, const char *tag);
+
+	static void SetAddWhiteSpace(bool ws = true);
 private:
 	void EndStart();
 	void Resize();
@@ -66,6 +68,8 @@ private:
 	unsigned int	m_buffsize;
 	unsigned int	m_gensym;
 	NamespaceMap	m_nsmap;
+
+	static bool		g_makePretty;
 };
 
 #endif // !defined(AFX_SOAPPACKETWRITER_H__DB61E902_B4A0_4AA3_A0F7_479D6295BD06__INCLUDED_)
