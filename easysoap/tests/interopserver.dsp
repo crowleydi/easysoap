@@ -91,6 +91,10 @@ LINK32=link.exe
 
 SOURCE=.\interopserver.cpp
 # End Source File
+# Begin Source File
+
+SOURCE=.\SOAPBuildersInteropHandler.cpp
+# End Source File
 # End Group
 # Begin Group "Header Files"
 
@@ -98,6 +102,10 @@ SOURCE=.\interopserver.cpp
 # Begin Source File
 
 SOURCE=.\interopstruct.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\SOAPBuildersInteropHandler.h
 # End Source File
 # End Group
 # Begin Group "Resource Files"
