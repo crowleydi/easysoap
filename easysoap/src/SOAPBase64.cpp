@@ -160,7 +160,7 @@ SOAPBase64::Encode(const SOAPArray<char>& array, SOAPString& str)
 	size_t numnls = (num64chars / 64);
 	str.Resize(num64chars + numnls + 4);
 
-	char *out = str;
+	char *out = str.Str();
 	const unsigned char *in = (const unsigned char *)array.Ptr();
 	size_t numout = 0;
 

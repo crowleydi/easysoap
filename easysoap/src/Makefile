@@ -25,7 +25,7 @@ SRCS = SOAPArrayHandler.cpp SOAPBody.cpp SOAPBodyHandler.cpp \
 	SOAPParameter.cpp SOAPParameterHandler.cpp SOAPParse.cpp \
 	SOAPProxy.cpp SOAPResponse.cpp SOAPQName.cpp \
 	SOAPSecureSocketImp.cpp SOAPSocket.cpp SOAPStructHandler.cpp \
-	SOAPUrl.cpp SOAPonHTTP.cpp XMLParser.cpp
+	SOAPUrl.cpp SOAPonHTTP.cpp XMLParser.cpp SOAPServerDispatch.cpp
 
 OBJS = SOAPArrayHandler.o SOAPBody.o SOAPBodyHandler.o \
 	SOAPDebugger.o SOAPPacketWriter.o SOAPBase64.o \
@@ -35,7 +35,7 @@ OBJS = SOAPArrayHandler.o SOAPBody.o SOAPBodyHandler.o \
 	SOAPParameter.o SOAPParameterHandler.o SOAPParse.o \
 	SOAPProxy.o SOAPResponse.o SOAPQName.o \
 	SOAPSecureSocketImp.o SOAPSocket.o SOAPStructHandler.o \
-	SOAPUrl.o SOAPonHTTP.o XMLParser.o
+	SOAPUrl.o SOAPonHTTP.o XMLParser.o SOAPServerDispatch.o
 
 all : $(SOAPLIB)
 
@@ -45,4 +45,5 @@ $(SOAPLIB) : $(OBJS)
 
 
 clean :
-	rm -f *.o $(SOAPLIB)
+	rm -f core *.o $(SOAPLIB)
+
