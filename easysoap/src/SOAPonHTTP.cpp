@@ -358,8 +358,8 @@ SOAPHTTPProtocol::GetReply()
 	{
 		m_chunked = true;
 		m_canread = 0;
+		SOAPDebugger::Print(2, "\r\nTransfer is Chunked!\r\n");
 	}
-	SOAPDebugger::Print(2, "\r\nTransfer is %sChunked!\r\n", (m_chunked?"":"not "));
 
 	return httpreturn;
 }
@@ -398,10 +398,7 @@ SOAPHTTPProtocol::GetChunkLength()
 	while ((nbytes = super::ReadLine(hexStg, sizeof(hexStg))) == 0)
 		;
 
-	if (nbytes < 4)
-		return -1;
-
-	while (n < 4)
+	while (n < 8)
 	{
 		if (hexStg[n]=='\0')
 			break;
@@ -451,8 +448,12 @@ SOAPHTTPProtocol::ReadChunk(char *buffer, int len)
 			return 0;
 		}
 	}
+
 	if (len > m_canread)
 		len = m_canread;
+
+	if (len < 0)
+		throw SOAPException("Invalid read chunk length < 0: %d", len);
 
 	ret = super::Read(buffer, len);
 	m_canread -= ret;
