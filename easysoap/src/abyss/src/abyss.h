@@ -350,11 +350,11 @@ uint32 SocketAvailableReadBytes(TSocket *s);
 #ifdef _WIN32
 #ifndef __BORLANDC__
 typedef struct _stati64 TFileStat;
-typedef struct _finddata_t TFileInfo;
-typedef long TFileFind;
 #else
 typedef struct stati64 TFileStat;
 #endif // __BORLANDC__
+typedef struct _finddata_t TFileInfo;
+typedef long TFileFind;
 #else
 
 #include <unistd.h>

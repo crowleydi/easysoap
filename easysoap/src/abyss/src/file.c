@@ -96,7 +96,7 @@ int FileSeek(TFile *f, uint64 pos, uint32 attrib)
 
 uint64 FileSize(TFile *f)
 {
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(__BORLANDC__)
 	return (_filelength(*f));
 #else
 	struct stat fs;
