@@ -599,8 +599,10 @@ void ServerFunc(TConn *c)
 
 	ka=c->server->keepalivemaxconn;
 
+	RequestInit(&r,c);
 	while (ka--)
 	{
+		RequestFree(&r);
 		RequestInit(&r,c);
 
 		/* Wait to read until timeout */
