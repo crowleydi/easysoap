@@ -51,7 +51,7 @@ SOAPParameterHandler::start(const XML_Char *name, const XML_Char **attrs)
 		const XML_Char *tag = *attrs++;
 		const XML_Char *val = *attrs++;
 
-		if (strcmp(tag, FULL_SOAP_XSI "|type") == 0)
+		if (sp_strcmp(tag, FULL_SOAP_XSI "|type") == 0)
 		{
 			m_type = SOAPTypes::GetXsdType(val);
 			if (m_type == SOAPTypes::xsd_none)
@@ -61,7 +61,7 @@ SOAPParameterHandler::start(const XML_Char *name, const XML_Char **attrs)
 			}
 			break;
 		}
-		else if (strcmp(tag, FULL_SOAP_XSI "|null") == 0)
+		else if (sp_strcmp(tag, FULL_SOAP_XSI "|null") == 0)
 		{
 			if (*val == '1')
 				m_type = SOAPTypes::xsd_null;

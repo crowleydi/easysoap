@@ -54,7 +54,7 @@ SOAPBodyHandler::start(const XML_Char *name, const XML_Char **attrs)
 SOAPParseEventHandler *
 SOAPBodyHandler::startElement(const XML_Char *name, const XML_Char **attrs)
 {
-	if (strcmp(name, SOAPFaultHandler::start_tag) == 0)
+	if (sp_strcmp(name, SOAPFaultHandler::start_tag) == 0)
 	{
 		m_body->SetIsFault(true);
 		return m_faultHandler.start(name, attrs);

@@ -125,7 +125,7 @@ SOAPParser::start(const XML_Char *name, const XML_Char **attrs)
 SOAPParseEventHandler *
 SOAPParser::startElement(const XML_Char *name, const XML_Char **attrs)
 {
-	if (strcmp(name, SOAPResponseHandler::start_tag) == 0)
+	if (sp_strcmp(name, SOAPResponseHandler::start_tag) == 0)
 		return m_response->start(name, attrs);
 
 	return 0;

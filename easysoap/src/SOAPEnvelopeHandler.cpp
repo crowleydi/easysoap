@@ -53,11 +53,11 @@ SOAPEnvelopeHandler::start(const XML_Char *name, const XML_Char **attrs)
 SOAPParseEventHandler *
 SOAPEnvelopeHandler::startElement(const XML_Char *name, const XML_Char **attrs)
 {
-	if (strcmp(name, SOAPBodyHandler::start_tag) == 0)
+	if (sp_strcmp(name, SOAPBodyHandler::start_tag) == 0)
 	{
 		return m_bodyHandler.start(name, attrs);
 	}
-	else if (strcmp(name, SOAPHeaderHandler::start_tag) == 0)
+	else if (sp_strcmp(name, SOAPHeaderHandler::start_tag) == 0)
 	{
 		return m_headerHandler.start(name, attrs);
 	}

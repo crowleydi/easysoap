@@ -52,13 +52,13 @@ SOAPParseEventHandler *
 SOAPFaultHandler::startElement(const XML_Char *name, const XML_Char **attrs)
 {
 	// Check for unscopted fault names
-	if (strcmp(name, "faultcode") == 0)
+	if (sp_strcmp(name, "faultcode") == 0)
 		m_paramHandler.SetParameter(m_fault->AddParameter(SOAPFault::faultcode_attr));
-	else if (strcmp(name, "faultactor") == 0)
+	else if (sp_strcmp(name, "faultactor") == 0)
 		m_paramHandler.SetParameter(m_fault->AddParameter(SOAPFault::faultactor_attr));
-	else if (strcmp(name, "detail") == 0)
+	else if (sp_strcmp(name, "detail") == 0)
 		m_paramHandler.SetParameter(m_fault->AddParameter(SOAPFault::faultdetail_attr));
-	else if (strcmp(name, "faultstring") == 0)
+	else if (sp_strcmp(name, "faultstring") == 0)
 		m_paramHandler.SetParameter(m_fault->AddParameter(SOAPFault::faultstring_attr));
 	else
 		m_paramHandler.SetParameter(m_fault->AddParameter(name));
