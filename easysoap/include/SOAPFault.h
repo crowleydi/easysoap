@@ -28,7 +28,7 @@
 
 class SOAPFaultHandler;
 
-class EASYSOAP_EXPORT SOAPFault : protected SOAPParameter
+class EASYSOAP_EXPORT SOAPFault : public SOAPParameter
 {
 public:
 	friend class SOAPFaultHandler;

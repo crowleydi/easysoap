@@ -42,6 +42,12 @@ public:
 
 	bool WriteSOAPPacket(SOAPPacketWriter& packet) const;
 
+	void Reset()
+	{
+		m_header.Reset();
+		m_body.Reset();
+	}
+
 private:
 
 	SOAPHeader	m_header;

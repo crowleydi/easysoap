@@ -45,6 +45,12 @@ public:
 	void SetIsFault(bool isfault = true)	{m_isfault = isfault;}
 	bool WriteSOAPPacket(SOAPPacketWriter& packet) const;
 
+	void Reset()
+	{
+		m_method.Reset();
+		m_fault.Reset();
+	}
+
 private:
 
 	SOAPMethod	m_method;
