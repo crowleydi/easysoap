@@ -129,7 +129,7 @@ SOAPClientSocketImp::WaitRead(int sec, int usec)
 	tv.tv_usec = usec;
 
 	int ret = select(m_socket+1, &fset, 0, 0, sec == -1 ? 0 : &tv);
-	if (ret == SOCKET_ERROR)
+	if (ret == (int)SOCKET_ERROR)
 		throw SOAPException("WaitRead select error");
 
 	return ret == 1;
@@ -148,7 +148,7 @@ SOAPClientSocketImp::WaitWrite(int sec, int usec)
 	tv.tv_usec = usec;
 
 	int ret = select(m_socket+1, 0, &fset, 0, sec == -1 ? 0 : &tv);
-	if (ret == SOCKET_ERROR)
+	if (ret == (int)SOCKET_ERROR)
 		throw SOAPException("WaitWrite select error");
 
 	return ret == 1;
@@ -179,7 +179,7 @@ SOAPClientSocketImp::Connect(const char *server, unsigned int port)
 	sockAddr.sin_family = AF_INET;
 	sockAddr.sin_addr.s_addr = htonl(INADDR_ANY);
 
-	if (bind(m_socket, (struct sockaddr*)&sockAddr, sizeof(sockAddr)) == SOCKET_ERROR)
+	if (bind(m_socket, (struct sockaddr*)&sockAddr, sizeof(sockAddr)) == (int)SOCKET_ERROR)
 		throw SOAPSocketException("Error binding socket");
 
 	sp_memset(&sockAddr, 0, sizeof(sockAddr));
@@ -200,7 +200,7 @@ SOAPClientSocketImp::Connect(const char *server, unsigned int port)
 		}
 	}
 
-	if (connect(m_socket, (struct sockaddr*)&sockAddr, sizeof(sockAddr)) == SOCKET_ERROR)
+	if (connect(m_socket, (struct sockaddr*)&sockAddr, sizeof(sockAddr)) == (int)SOCKET_ERROR)
 	{
 		Close();
 		throw SOAPSocketException("Connection refused to host: %s:%d", server, port);
@@ -228,11 +228,12 @@ SOAPClientSocketImp::Read(char *buff, size_t bufflen)
 	if (bufflen > 0)
 	{
 		bytes = recv(m_socket, buff, bufflen, 0);
+		SOAPDebugger::Print("RECV: %d bytes\r\n", bytes);
 		if (bytes == 0)
 		{
 			Close(); // other side dropped the connection
 		}
-		else if (bytes == SOCKET_ERROR)
+		else if (bytes == (int)SOCKET_ERROR)
 		{
 			Close();
 			throw SOAPSocketException("Error reading socket");
@@ -249,7 +250,8 @@ SOAPClientSocketImp::Write(const char *buff, size_t bufflen)
 	if (bufflen > 0)
 	{
 		bytes = send(m_socket, buff, bufflen, 0);
-		if (bytes == SOCKET_ERROR)
+		SOAPDebugger::Print("SEND: %d bytes\r\n", bytes);
+		if (bytes == (int)SOCKET_ERROR)
 		{
 			Close();
 			throw SOAPSocketException("Error writing to socket");
