@@ -32,6 +32,7 @@
 #define HAVE_FLOAT_H
 #define HAVE_WCHART
 #define HAVE_STRERROR
+#define HAVE_NAMESPACES
 
 #define snprintf _snprintf
 #define vsnprintf _vsnprintf
