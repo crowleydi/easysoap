@@ -30,7 +30,7 @@ public:
 	WhichToolkitHandler()
 	{
 		DispatchTo(this);
-		DispatchMethod("whichToolkit", &WhichToolkitHandler::whichToolkit);
+		DispatchMethod("whichToolkit", "http://www.soapware.org/", &WhichToolkitHandler::whichToolkit);
 	}
 
 	virtual ~WhichToolkitHandler()

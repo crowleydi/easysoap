@@ -25,6 +25,9 @@
 //
 //
 //
+//   THIS DOESN'T WORK RUNNING UNDER IIS
+//   If you know how to get this to work on IIS, PLEASE let me know.
+//
 
 #include <SOAP.h>
 #include <SOAPCGIHandler.h>
@@ -46,8 +49,8 @@ main(int argc, char* argv[], char *env[])
 	//SOAPPacketWriter::SetAddWhiteSpace();
 
 	return cgi.
-		Dispatch("", &validatorHandler).
-		Dispatch("http://www.soapware.org/", &whichToolkitHandler).
+		DispatchTo(&validatorHandler).
+		DispatchTo(&whichToolkitHandler).
 		Handle();
 }
 
