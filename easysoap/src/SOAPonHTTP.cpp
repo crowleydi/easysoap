@@ -206,7 +206,7 @@ SOAPHTTPProtocol::GetReply()
 	// HTTP/1.1 200 OK
 	if (ReadLine(buff, sizeof(buff)) == 0)
 	{
-		throw SOAPException("Couldn't read response.");
+		throw SOAPSocketException("Couldn't read response.");
 	}
 
 	const char *vers = sp_strchr(buff, '/');
