@@ -1,0 +1,4 @@
+#include <Win32Headers++.pch++>
+#define __MWERKS__
+#define EASYSOAP_STATIC
+#pragma precompile_target "MetrowerksPrecomp.mch" 

@@ -1,0 +1,3 @@
+#define __MWERKS__
+#define EASYSOAP_STATIC
+#pragma precompile_target "MetrowerksPrecompTest.mch" 
