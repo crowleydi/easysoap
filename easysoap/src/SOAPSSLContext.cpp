@@ -48,11 +48,17 @@ extern "C" {
 //
 // Initialize OpenSSL
 //
+
+// initialize our static temporary RSA key.
+rsa_st* SOAPSSLContext::m_tmpRSAKey = 0;
+
 class OpenSSLinit
 {
 public:
+
 	OpenSSLinit()
 	{
+		// TODO: Add correct use of the /dev/random port.
 		static const char rnd_seed[] = 
 			"string to make the random number generator"
 			"think it has some entropy.";
@@ -62,10 +68,10 @@ public:
 		SSL_load_error_strings();
 		RAND_seed(rnd_seed, sizeof rnd_seed);
 	}
-
 	~OpenSSLinit()
 	{
 	}
+	private:
 };
 
 // *******************************************************************
@@ -91,6 +97,7 @@ SOAPSSLContext::SOAPSSLContext(const char* certfile, const char* keyfile, const 
 		if (!m_ctx)
 				throw SOAPMemoryException();
 		SetCertInfo(certfile, keyfile, password);
+		m_tmpRSAKey = 0;
 }
 /*
 SOAPSSLContext::SOAPSSLContext(const SOAPSSLContext& ctx)
@@ -112,6 +119,9 @@ void SOAPSSLContext::SetCertInfo(const char* certfile, const char* keyfile, cons
 	
 
 	// TODO: Implmement the rest of the RSA requirements.
+	
+	SSL_CTX_set_tmp_rsa_callback(m_ctx, &tmpRSAkey_cb);
+	
 		
 	// set the certificate file.
 	if ((retcode = SSL_CTX_use_certificate_chain_file(m_ctx, m_certfile.Str()))!= 1)
@@ -125,10 +135,10 @@ void SOAPSSLContext::SetCertInfo(const char* certfile, const char* keyfile, cons
 	// call the right function based on the certificate type.
 	if (type == DSA_cert) {
 		if ((retcode = SSL_CTX_use_PrivateKey_file(m_ctx, m_keyfile.Str(), SSL_FILETYPE_PEM)) != 1) 
-			HandleError("Error trying to use the private key from the certificate file : %s\n", retcode);
+			HandleError("Error trying to use the private key from file : %s\n", retcode);
 	} else {
 		if ((retcode = SSL_CTX_use_RSAPrivateKey_file(m_ctx, m_keyfile.Str(), SSL_FILETYPE_PEM)) != 1)
-			HandleError("Error trying to use the RSA private key from the certificate file: %s\n", retcode);
+			HandleError("Error trying to use the RSA private key from file: %s\n", retcode);
 	}
 
 	if ((retcode = SSL_CTX_check_private_key(m_ctx) != 1))
@@ -149,7 +159,16 @@ int SOAPSSLContext::password_cb(char* buf, int size, int rwflag, void *userdata)
 		return(password.Length());
 }
 
-
+rsa_st* SOAPSSLContext::tmpRSAkey_cb(SSL* s, int SSLexport, int keylen) {
+		if (m_tmpRSAKey)
+				RSA_free(m_tmpRSAKey);
+#if OPENSSL_VERSION_NUMBER >= 0x0900
+		m_tmpRSAKey = RSA_generate_key(keylen, RSA_F4, NULL, NULL);
+#else 
+		m_tmpRSAKey = RSA_generate_key(keylen, RSA_F4, NULL);
+#endif //OPENSSL_VERSION_NUMBER
+		return m_tmpRSAKey;
+}
 
 void SOAPSSLContext::HandleError(const char* context, int retcode)
 {
@@ -167,6 +186,8 @@ void SOAPSSLContext::HandleError(const char* context, int retcode)
 		
 }
 
+
+
 SSL_CTX* SOAPSSLContext::GetContext()
 {
 		return m_ctx;
@@ -179,6 +200,12 @@ SOAPSSLContext::~SOAPSSLContext()
 				SSL_CTX_free(m_ctx);
 				m_ctx = 0;
 		}
+		if (m_tmpRSAKey)
+		{
+				RSA_free(m_tmpRSAKey);
+				m_tmpRSAKey = 0;
+		}
+				
 }
 
 

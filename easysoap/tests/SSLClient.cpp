@@ -103,23 +103,20 @@ int main(int argc, char* argv[])
 
 	SOAPString endpoint;
 	SOAPString keyfile;
+	SOAPString certfile;
 	SOAPString password;
 	// for use without certificates.
 	if (argc == 2) {
 			endpoint = argv[1];
-	} else if (argc == 4) {
+	} else if (argc == 5) {
 			endpoint = argv[1];
-			keyfile = argv[2];
-			struct stat buf;
-			if (0 != stat(keyfile, &buf)) {
-				fprintf(stderr, "unable to open keyfile\n");
-				exit(1);
-		}
-			password = argv[3];
+			certfile = argv[2];
+			keyfile = argv[3];
+			password = argv[4];
 	} else {
 			fprintf(stderr,
 					"Incorrect command line params specified. Try this:\n\n"
-					"\t%s <endpoint> [<path-to-cert> <cert-password>]\n", argv[0]);
+					"\t%s <endpoint> [<path-to-cert> <path-to-key> <cert-password>]\n", argv[0]);
 			exit(1);
 	}
 	try {
@@ -129,7 +126,7 @@ int main(int argc, char* argv[])
 		
 		SOAPSSLContext *ctx=0;
 		if (argc > 2) 
-			ctx = new SOAPSSLContext(argv[3], argv[3], argv[4]);
+			ctx = new SOAPSSLContext(certfile.Str(), keyfile.Str(), password.Str());
 		SOAPonHTTP http;
 		if (ctx)
 			http.SetContext(*ctx);

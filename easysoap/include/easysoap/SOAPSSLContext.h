@@ -25,6 +25,7 @@
 
 struct ssl_st;
 struct ssl_ctx_st;
+struct rsa_st;
 
 BEGIN_EASYSOAP_NAMESPACE
 
@@ -42,6 +43,8 @@ public:
 
 	// callbacks required by openSSL
 	static int 	password_cb(char *buf, int num, int rwflag, void *userdata);
+	static rsa_st* tmpRSAkey_cb(ssl_st* s, int SSLexport, int keylen);
+	
 
 	typedef enum {
 			RSA_cert,
@@ -49,6 +52,7 @@ public:
 	} CertType;
 
 private:
+	static rsa_st*				m_tmpRSAKey;
 	ssl_ctx_st*			m_ctx;
 	SOAPString 			m_certfile;
 	SOAPString 			m_keyfile;
@@ -56,6 +60,7 @@ private:
 	CertType 			type;
 	// handles error, returns true if they are recoverable, false if not.
 	void HandleError(const char* context, int retcode);
+	
 };
 
 END_EASYSOAP_NAMESPACE
