@@ -68,6 +68,7 @@ private:
 	unsigned int	m_buffsize;
 	unsigned int	m_gensym;
 	NamespaceMap	m_nsmap;
+	SOAPString		m_nsstr;
 
 	static bool		g_makePretty;
 };

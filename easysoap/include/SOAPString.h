@@ -136,6 +136,12 @@ public:
 		}
 	}
 
+	void Empty()
+	{
+		if (m_str)
+			*m_str = 0;
+	}
+
 	const char *Str() const
 	{
 		return m_str;

@@ -29,10 +29,10 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-const char *SOAPFault::faultactor_attr = "faultactor";
-const char *SOAPFault::faultcode_attr = "faultcode";
-const char *SOAPFault::faultdetail_attr = "detail";
-const char *SOAPFault::faultstring_attr = "faultstring";
+const SOAPString SOAPFault::faultactor_attr = "faultactor";
+const SOAPString SOAPFault::faultcode_attr = "faultcode";
+const SOAPString SOAPFault::faultdetail_attr = "detail";
+const SOAPString SOAPFault::faultstring_attr = "faultstring";
 
 SOAPFault::SOAPFault()
 {

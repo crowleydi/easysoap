@@ -62,14 +62,13 @@ public:
 
 	bool operator==(const SOAPQName& that) const
 	{
-		return m_name == that.m_name
-			&& m_namespace == that.m_namespace;
+		return (m_name.IsEmpty() && that.m_name.IsEmpty() || m_name == that.m_name)
+			&& (m_namespace.IsEmpty() && that.m_namespace.IsEmpty() || m_namespace == that.m_namespace);
 	}
 
 	bool operator!=(const SOAPQName& that) const
 	{
-		return m_name != that.m_name
-			|| m_namespace != that.m_namespace;
+		return !(*this == that);
 	}
 
 	bool operator==(const char *) const;

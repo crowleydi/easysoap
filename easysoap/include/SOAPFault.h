@@ -70,10 +70,10 @@ private:
 		AddParameter(param).SetValue(value);
 	}
 
-	static const char *faultcode_attr;
-	static const char *faultstring_attr;
-	static const char *faultactor_attr;
-	static const char *faultdetail_attr;
+	static const SOAPString faultcode_attr;
+	static const SOAPString faultstring_attr;
+	static const SOAPString faultactor_attr;
+	static const SOAPString faultdetail_attr;
 };
 
 

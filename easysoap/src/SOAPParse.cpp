@@ -177,7 +177,8 @@ SOAPParser::SetHRefParam(const SOAPString& name, SOAPParameter *param)
 const char *
 SOAPParser::ExpandNamespace(const char *ns) const
 {
-	NamespaceMap::Iterator i = m_nsmap.Find(ns);
+	m_work = ns;
+	NamespaceMap::Iterator i = m_nsmap.Find(m_work);
 	if (i)
 		return i->Str();
 	return 0;

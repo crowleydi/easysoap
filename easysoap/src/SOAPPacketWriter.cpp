@@ -89,7 +89,7 @@ SOAPPacketWriter::StartTag(const SOAPQName& tag, const char *prefix)
 	bool addxmlns = false;
 	char buffer[64];
 
-	if (tag.GetNamespace() == "")
+	if (tag.GetNamespace().IsEmpty())
 	{
 		StartTag(tag.GetName());
 		return;
@@ -231,10 +231,11 @@ SOAPPacketWriter::AddAttr(const char *attr, const char *value)
 void
 SOAPPacketWriter::AddXMLNS(const char *prefix, const char *ns)
 {
-	NamespaceMap::Iterator i = m_nsmap.Find(ns);
+	m_nsstr = ns;
+	NamespaceMap::Iterator i = m_nsmap.Find(m_nsstr);
 	if (!i)
 	{
-		m_nsmap[ns] = prefix;
+		m_nsmap[m_nsstr] = prefix;
 
 		if (g_makePretty)
 			Write("\n\t");
@@ -248,7 +249,7 @@ SOAPPacketWriter::AddXMLNS(const char *prefix, const char *ns)
 			Write(prefix);
 		}
 		Write("=\"");
-		WriteEscaped(ns);
+		WriteEscaped(m_nsstr);
 		Write("\"");
 	}
 }
@@ -276,7 +277,7 @@ SOAPPacketWriter::EndTag(const char *tag)
 void
 SOAPPacketWriter::EndTag(const SOAPQName& tag)
 {
-	if (tag.GetNamespace() == "")
+	if (tag.GetNamespace().IsEmpty())
 	{
 		EndTag(tag.GetName());
 		return;

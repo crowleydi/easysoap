@@ -45,7 +45,7 @@ SOAPQName::Set(const char *name, const char *ns)
 		else
 		{
 			m_name = name;
-			m_namespace = "";
+			m_namespace.Empty();
 		}
 	}
 }
@@ -53,8 +53,8 @@ SOAPQName::Set(const char *name, const char *ns)
 void
 SOAPQName::Clear()
 {
-	m_name = "";
-	m_namespace = "";
+	m_name.Empty();
+	m_namespace.Empty();
 }
 
 bool
