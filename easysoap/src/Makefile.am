@@ -19,7 +19,7 @@ noinst_HEADERS = \
     SOAPEnvelopeHandler.h SOAPFaultHandler.h SOAPHeaderHandler.h \
     SOAPMethodHandler.h SOAPParameterHandler.h \
     SOAPSecureSocketImp.h SOAPStructHandler.h 
-INCLUDES=$(EASYSOAP_INCLUDES) $(SSL_DEFINES) -I@top_srcdir@/src/abyss/src
+INCLUDES=-I@top_srcdir@/include -I@top_srcdir@/src/abyss/src
 
 libeasysoap_la_LDFLAGS = -no-undefined
 libeasysoap_la_LIBADD = abyss/src/libabyss.la

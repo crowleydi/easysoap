@@ -1,9 +1,14 @@
 noinst_PROGRAMS = validator
 
 validator_SOURCES = \
-    validator.cpp UserlandValidatorHandler.cpp WhichToolkitHandler.cpp 
-validator_LDADD = $(STATIC_EASYSOAP_LIBS)
-validator_DEPENDENCIES = $(STATIC_EASYSOAP_LIBS)
-INCLUDES = $(EASYSOAP_INCLUDES)
+    validator.cpp \
+	UserlandValidatorHandler.cpp \
+	UserlandValidatorHandler.h \
+	WhichToolkitHandler.cpp  \
+	WhichToolkitHandler.h 
 
-EXTRA_DIST = README.TXT UserlandValidatorHandler.h WhichToolkitHandler.h 
+LDADD = ../src/libeasysoap.la
+LDFLAGS = -no-install
+INCLUDES = -I@top_srcdir@/include
+
+EXTRA_DIST = README.TXT

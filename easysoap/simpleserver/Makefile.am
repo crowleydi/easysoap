@@ -1,13 +1,13 @@
 noinst_PROGRAMS = simpleserver simpleclient
 
-simpleserver_SOURCES = simpleserver.cpp
-simpleserver_DEPENDENCIES = $(STATIC_EASYSOAP_LIBS)
-simpleserver_LDADD = $(STATIC_EASYSOAP_LIBS)
+simpleserver_SOURCES = \
+	simpleserver.cpp
 
-simpleclient_SOURCES = simpleclient.cpp
-simpleclient_DEPENDENCIES = $(STATIC_EASYSOAP_LIBS)
-simpleclient_LDADD = $(STATIC_EASYSOAP_LIBS)
+simpleclient_SOURCES = \
+	simpleclient.cpp
 
-INCLUDES = $(EASYSOAP_INCLUDES)
+LDADD = ../src/libeasysoap.la
+LDFLAGS = -no-install
+INCLUDES = -I@top_srcdir@/include
 
 EXTRA_DIST = README.TXT

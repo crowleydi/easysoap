@@ -3,13 +3,14 @@ easysoap_HEADERS = \
     SOAPArray.h \
     SOAPBase64.h \
     SOAPBody.h \
-    SOAPCGIHandler.h \
+    SOAPCGIServer.h \
     SOAPDebugger.h \
     SOAPDispatchHandler.h \
     SOAPEnvelope.h \
     SOAPException.h \
     SOAPFault.h \
     SOAP.h \
+    SOAPHTTPServer.h \
     SOAPHashMap.h \
     SOAPHeader.h \
     SOAPMethod.h \
