@@ -169,7 +169,10 @@ UserlandValidatorHandler::manyTypesTest(const SOAPMethod& req, SOAPMethod& resp)
 	(result.AddParameter() << dat).SetType("timeInstant");
 
 	result.AddParameter() << bin;
-	result.SetIsArray();
+
+	// Have to add array encoding attributes ...
+	result.AddAttribute(SOAPEnc::arrayType).Set("ur-type[6]", SOAP_XSD);
+	result.AddAttribute(XMLSchemaInstance::type) = SOAPEnc::Array;
 }
 
 //
