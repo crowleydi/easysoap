@@ -185,7 +185,7 @@ private:
 		// We use strrchr() in case it's something like
 		// "xsd:string[][2]" which is certainly possible...
 		const char *s = sp_strrchr(val.GetName(), '[');
-		if (*s++ == '[')
+		if (s && *s++ == '[')
 		{
 			if (*s == ']')
 				return false;
@@ -444,7 +444,7 @@ private:
 		// We use strrchr() in case it's something like
 		// "xsd:string[][2,3]" which is certainly possible...
 		const char *s = sp_strrchr(val.GetName(), '[');
-		if (*s++ == '[')
+		if (s && *s++ == '[')
 		{
 			char *e = 0;
 			x = strtol(s, &e, 10);
