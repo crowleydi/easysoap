@@ -108,7 +108,7 @@ class SSLServer : public SOAPDispatchHandler < SSLServer >
 					if (!tmp.IsEmpty()) {
 						response.AddParameter(SSLEnvVars[i]) << tmp;
 					} else {
-						response.AddParameter(SSLEnvVars[i]) << "Not Set";
+						response.AddParameter(SSLEnvVars[i]) << (const char *)"Not Set";
 					}
 				++i;
 					

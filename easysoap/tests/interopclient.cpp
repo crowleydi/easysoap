@@ -815,7 +815,7 @@ TestEchoBooleanJunk(SOAPProxy& proxy, const Endpoint& e)
 {
 	SOAPMethod method;
 	SetupMethod(method, "echoBoolean", e);
-	(method.AddParameter("inputBoolean") << "junk").SetType("boolean", XMLSchema2001::xsd);
+	(method.AddParameter("inputBoolean") << (const char *)"junk").SetType("boolean", XMLSchema2001::xsd);
 
 	const SOAPResponse& response = proxy.Execute(method);
 

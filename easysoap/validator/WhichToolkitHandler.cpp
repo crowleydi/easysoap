@@ -38,15 +38,15 @@ WhichToolkitHandler::whichToolkit(const SOAPMethod& request, SOAPMethod& respons
 	//response.SetName("whichToolkitResult");
 	SOAPParameter& param = response.AddParameter("Result");
 
-	param.AddParameter("toolkitDocsUrl") << EASYSOAP_HOMEPAGE;
-	param.AddParameter("toolkitName") << EASYSOAP_STRING;
-	param.AddParameter("toolkitVersion") << EASYSOAP_VERSION_STRING;
+	param.AddParameter("toolkitDocsUrl") << (const char *)EASYSOAP_HOMEPAGE;
+	param.AddParameter("toolkitName") << (const char *)EASYSOAP_STRING;
+	param.AddParameter("toolkitVersion") << (const char *)EASYSOAP_VERSION_STRING;
 	param.AddParameter("toolkitOperatingSystem") <<
 	// TODO: This is a bit broken...
 #ifdef _WIN32
-		"Windows 2000";
+		(const char *)"Windows 2000";
 #else
-		"Linux";
+		(const char *)"Linux";
 #endif
 	param.SetIsStruct();
 }
