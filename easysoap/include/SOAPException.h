@@ -32,10 +32,9 @@
 
 class EASYSOAP_EXPORT SOAPException  
 {
-private:
+protected:
 	SOAPString	 m_what;
 
-protected:
 	SOAPException() {}
 
 	void FormattedMessage(const char *fmt, va_list args)
