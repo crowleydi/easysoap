@@ -189,24 +189,28 @@ SOAPPacketWriter::AddAttr(const SOAPQName& tag, const SOAPQName& value)
 	if (!m_instart)
 		throw SOAPException("XML serialization error.  Adding attribute when not in start tag.");
 
-	NamespaceMap::Iterator i = m_nsmap.Find(tag.GetNamespace());
-	if (!i)
-	{
-		addtns = true;
-		tnsprefix = GetSymbol(tbuff, "ns");
-	}
-	else
-	{
-		tnsprefix = i->prefix;
-	}
-
 	if (g_makePretty)
 		Write("\r\n\t");
 	else
 		Write(" ");
 
-	Write(tnsprefix);
-	Write(":");
+	if (!tag.GetNamespace().IsEmpty())
+	{
+		NamespaceMap::Iterator i = m_nsmap.Find(tag.GetNamespace());
+		if (!i)
+		{
+			addtns = true;
+			tnsprefix = GetSymbol(tbuff, "ns");
+		}
+		else
+		{
+			tnsprefix = i->prefix;
+		}
+
+		Write(tnsprefix);
+		Write(":");
+	}
+
 	Write(tag.GetName());
 	Write("=\"");
 
@@ -216,7 +220,7 @@ SOAPPacketWriter::AddAttr(const SOAPQName& tag, const SOAPQName& value)
 	}
 	else
 	{
-		i = m_nsmap.Find(value.GetNamespace());
+		NamespaceMap::Iterator i = m_nsmap.Find(value.GetNamespace());
 		if (!i)
 		{
 			addvns = true;
