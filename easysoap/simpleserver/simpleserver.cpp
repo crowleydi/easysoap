@@ -21,57 +21,14 @@
 //
 //   A Simple EasySoap++ SOAP server 
 //
-//   Just place this file in your cgi-bin directory (or similar)
-//   of your web server and go.
-//
-//
 
 #include <iostream>
 
 #include <SOAP.h>
 #include <SOAPHTTPServer.h>
 
-class DemoCalculatorHandler : public SOAPDispatchHandler<DemoCalculatorHandler>
-{
-public:
-	DemoCalculatorHandler()
-	{
-		const char * ns = "http://easysoap.sourceforge.net/demos/calculator";
-		DispatchMethod("add", ns, &DemoCalculatorHandler::add);
-		DispatchMethod("mult", ns, &DemoCalculatorHandler::mult);
-	}
+#include "calchandler.h"
 
-	DemoCalculatorHandler* GetTarget(const SOAPEnvelope& request)
-	{
-		return this;
-	}
-
-	void add(const SOAPMethod& request, SOAPMethod& response)
-	{
-		int a;
-		int b;
-
-		request.GetParameter("a") >> a;
-		request.GetParameter("b") >> b;
-
-		int n = a + b;
-
-		response.AddParameter("n") << n;
-	}
-
-	void mult(const SOAPMethod& request, SOAPMethod& response)
-	{
-		int a;
-		int b;
-
-		request.GetParameter("a") >> a;
-		request.GetParameter("b") >> b;
-
-		int n = a * b;
-
-		response.AddParameter("n") << n;
-	}
-};
 
 //
 //
