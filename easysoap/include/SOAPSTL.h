@@ -74,6 +74,12 @@ public:
 	}
 };
 
+#ifdef HAVE_PARTIAL_SPECIALIZATION
+template <typename T>
+class SOAPTypeTraits< std::vector<T> > : public SOAPArrayTypeTraits
+{
+};
+#else // DONT HAVE_PARTIAL_SPECIALIZATION
 class SOAPTypeTraits< std::vector<bool> > : public SOAPArrayTypeTraits
 {
 };
@@ -101,6 +107,7 @@ class SOAPTypeTraits< std::vector<double> > : public SOAPArrayTypeTraits
 class SOAPTypeTraits< std::vector<std::string> > : public SOAPArrayTypeTraits
 {
 };
+#endif // HAVE_PARTIAL_SPECIALIZATION
 
 
 //

@@ -352,6 +352,12 @@ class SOAPTypeTraits< SOAPHex > : public SOAPHexTraits
 {
 };
 
+#ifdef HAVE_PARTIAL_SPECIALIZATION
+template <typename T>
+class SOAPTypeTraits< SOAPArray<T> > : public SOAPArrayTypeTraits
+{
+};
+#else // DONT HAVE_PARTIAL_SPECIALIZATION
 class SOAPTypeTraits< SOAPArray<bool> > : public SOAPArrayTypeTraits
 {
 };
@@ -379,6 +385,7 @@ class SOAPTypeTraits< SOAPArray<double> > : public SOAPArrayTypeTraits
 class SOAPTypeTraits< SOAPArray<SOAPString> > : public SOAPArrayTypeTraits
 {
 };
+#endif // HAVE_PARTIAL_SPECIALIZATION
 
 class SOAP2DArrayTypeTraits
 {
@@ -493,6 +500,12 @@ public:
 	}
 };
 
+#ifdef HAVE_PARTIAL_SPECIALIZATION
+template <typename T>
+class SOAPTypeTraits< SOAP2DArray<T> > : public SOAP2DArrayTypeTraits
+{
+};
+#else // DONT HAVE_PARTIAL_SPECIALIZATION
 class SOAPTypeTraits< SOAP2DArray<bool> > : public SOAP2DArrayTypeTraits
 {
 };
@@ -520,6 +533,7 @@ class SOAPTypeTraits< SOAP2DArray<double> > : public SOAP2DArrayTypeTraits
 class SOAPTypeTraits< SOAP2DArray<SOAPString> > : public SOAP2DArrayTypeTraits
 {
 };
+#endif // HAVE_PARTIAL_SPECIALIZATION
 
 
 #endif // !defined(AFX_SOAPTYPETRAITS_H__C5FEAF2C_BF9D_4B2A_BA32_516712F68E78__INCLUDED_)
