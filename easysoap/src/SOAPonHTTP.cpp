@@ -527,18 +527,9 @@ SOAPHTTPProtocol::ReadChunk(char *buffer, size_t len)
 	// get chunk size, abort on empty chunk
 	if (m_canread == 0 && (m_canread = GetChunkLength()) == 0)
 	{
+		m_chunked = false;
 		if (m_doclose)
 			Close();
-		else
-		{
-			//
-			// There can be trailing junk..
-			while (CanRead())
-			{
-				char buff[10];
-				ReadLine(buff, sizeof(buff));
-			}
-		}
 		return 0;
 	}
 
