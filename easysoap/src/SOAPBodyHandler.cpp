@@ -29,8 +29,6 @@
 #include <SOAPNamespaces.h>
 
 
-static const SOAPQName RootTag("root", SOAP_ENC);
-
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -62,7 +60,7 @@ SOAPBodyHandler::startElement(SOAPParser& parser, const XML_Char *name, const XM
 {
 	const char *id = 0;
 	const char *href = 0;
-	const char *root = 0;
+	bool notRoot = false;
 
 	const XML_Char **cattrs = attrs;
 	while (*cattrs)
@@ -77,13 +75,13 @@ SOAPBodyHandler::startElement(SOAPParser& parser, const XML_Char *name, const XM
 		{
 			href = val;
 		}
-		else if (RootTag == tag)
+		else if (sp_strcmp(tag, SOAP_ENC PARSER_NS_SEP "root") == 0)
 		{
-			root = val;
+			notRoot = (sp_strcmp(val, "0") == 0);
 		}
 	}
 
-	if (m_gotMethod || root && sp_strcmp(root, "0"))
+	if (m_gotMethod || notRoot)
 	{
 		SOAPParameter *p = 0;
 		if (id)
@@ -98,7 +96,7 @@ SOAPBodyHandler::startElement(SOAPParser& parser, const XML_Char *name, const XM
 			if (!p)
 				throw SOAPException("Body handler: unknown element, href=%s", href);
 		}
-		else if (root)
+		else if (notRoot)
 		{
 			p = &m_body->GetMethod().AddParameter(name);
 		}
@@ -108,7 +106,7 @@ SOAPBodyHandler::startElement(SOAPParser& parser, const XML_Char *name, const XM
 	}
 
 	m_gotMethod = true;
-	if (sp_strcmp(name, SOAPFaultHandler::start_tag) == 0)
+	if (sp_strcmp(name, SOAP_ENV PARSER_NS_SEP "Fault") == 0)
 	{
 		m_body->SetIsFault(true);
 		return m_faultHandler.start(parser, name, attrs);

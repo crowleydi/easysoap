@@ -24,6 +24,7 @@
 #pragma warning (disable: 4786)
 #endif // _MSC_VER
 
+#include <SOAP.h>
 #include <SOAPNamespaces.h>
 
 #include "SOAPHeaderHandler.h"

@@ -32,8 +32,6 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-const char *SOAPEnvelopeHandler::start_tag = SOAP_ENV PARSER_NS_SEP "Envelope";
-
 SOAPEnvelopeHandler::SOAPEnvelopeHandler(SOAPEnvelope& envelope)
 : m_done(false)
 , m_envelope(&envelope)
@@ -80,7 +78,7 @@ SOAPEnvelopeHandler::startElement(SOAPParser& parser, const XML_Char *name, cons
 void
 SOAPEnvelopeHandler::endElement(const XML_Char *name)
 {
-	if (sp_strcmp(name, start_tag) == 0)
+	if (sp_strcmp(name, SOAP_ENV PARSER_NS_SEP "Envelope") == 0)
 		m_done = true;
 }
 

@@ -29,14 +29,6 @@
 #include <SOAPNamespaces.h>
 #include <SOAPPacketWriter.h>
 
-const SOAPQName EnvelopeTag("Envelope", SOAP_ENV);
-const SOAPQName EncodingAttr("encodingStyle", SOAP_ENV);
-
-
-const SOAPQName SOAPEnvelope::MustUnderstand("mustUnderstand", SOAP_ENV);
-const SOAPQName SOAPEnvelope::Actor("mustUnderstand", SOAP_ENV);
-
-
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -55,7 +47,7 @@ bool
 SOAPEnvelope::WriteSOAPPacket(SOAPPacketWriter& packet) const
 {
 	packet.Reset();
-	packet.StartTag(EnvelopeTag, "E");
+	packet.StartTag(SOAPEnv::Envelope, "E");
 
 	// TODO: automagically add only the tags we need...
 	packet.AddXMLNS("A", SOAP_ENC);
@@ -63,13 +55,13 @@ SOAPEnvelope::WriteSOAPPacket(SOAPPacketWriter& packet) const
 	packet.AddXMLNS("y", SOAP_XSD);
 	packet.SetNamespace("___easysoap_default_ns", "y");
 
-	// TODO: allow user to set encoding style
-	packet.AddAttr(EncodingAttr, SOAP_ENC);
+	// TODO: allow user to set custom encoding style
+	packet.AddAttr(SOAPEnv::encodingStyle, SOAP_ENC);
 
 	m_header.WriteSOAPPacket(packet);
 	m_body.WriteSOAPPacket(packet);
 
-	packet.EndTag(EnvelopeTag);
+	packet.EndTag(SOAPEnv::Envelope);
 
 	return true;
 }

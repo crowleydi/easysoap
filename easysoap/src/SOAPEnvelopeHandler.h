@@ -43,8 +43,6 @@ public:
 
 	bool Done()	{return m_done;}
 
-	static const char *start_tag;
-
 private:
 	bool				m_done;
 	SOAPEnvelope		*m_envelope;

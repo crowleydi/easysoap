@@ -40,10 +40,10 @@ public:
 
 private:
 
-	SOAPBody			*m_body;
-	bool				m_gotMethod;
-	SOAPMethodHandler	m_methodHandler;
-	SOAPFaultHandler	m_faultHandler;
+	SOAPBody				*m_body;
+	bool					m_gotMethod;
+	SOAPMethodHandler		m_methodHandler;
+	SOAPFaultHandler		m_faultHandler;
 	SOAPParameterHandler	m_paramHandler;
 };
 

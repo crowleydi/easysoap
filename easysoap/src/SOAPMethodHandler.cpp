@@ -47,7 +47,19 @@ SOAPParseEventHandler *
 SOAPMethodHandler::start(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs)
 {
 	m_method->Reset();
-	m_method->SetName(name);
+
+	const char *ns = sp_strchr(name, PARSER_NS_SEP[0]);
+	if (ns)
+	{
+		m_method->GetName().GetNamespace() = "";
+		m_method->GetName().GetNamespace().Append(name, ns - name);
+		m_method->GetName().GetName() = ++ns;
+	}
+	else
+	{
+		m_method->SetName(name);
+	}
+
 	return this;
 }
 

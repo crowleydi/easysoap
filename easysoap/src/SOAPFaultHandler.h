@@ -36,7 +36,6 @@ public:
 	virtual SOAPParseEventHandler* start(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs);
 	virtual SOAPParseEventHandler* startElement(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs);
 
-	static const char *start_tag;
 private:
 	SOAPFault				*m_fault;
 	SOAPParameterHandler	m_paramHandler;
