@@ -194,5 +194,27 @@ operator>>(const SOAPParameter& param, SOAPString& val)
 	return param;
 }
 
+template<typename T>
+inline const SOAPParameter&
+operator<<(SOAPParameter& param, const SOAPArray<T>& val)
+{
+	param.SetType(SOAPTypes::soap_array);
+	for (SOAPArray<T>::ConstIterator i = val.Begin(); i != val.End(); ++i)
+		param.AddParameter() << *i;
+	return param;
+}
+
+template <typename T>
+inline const SOAPParameter&
+operator>>(const SOAPParameter& param, SOAPArray<T>& val)
+{
+	val.Resize(0);
+	for (SOAPArray<SOAPParameter>::ConstIterator i = param.GetArray().Begin();
+		i != param.GetArray().End();
+		++i)
+		*i >> val.Add();
+	return param;
+}
+
 #endif // !defined(AFX_SOAPPARAMETER_H__30811BAD_D6A1_4535_B256_9EEB56A84026__INCLUDED_)
 
