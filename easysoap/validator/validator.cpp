@@ -26,8 +26,8 @@
 //
 //
 
-#include "SOAP.h"
-#include "SOAPCGIHandler.h"
+#include <SOAP.h>
+#include <SOAPCGIHandler.h>
 
 //
 //
@@ -68,9 +68,9 @@ WriteFault(const char *actor, const char *str)
 //
 
 void
-countTheEntities(const SOAPMethod& m, SOAPMethod& rm)
+countTheEntities(const SOAPMethod& req, SOAPMethod& resp)
 {
-	const SOAPString& s = m.GetParameter("s").GetString();
+	const SOAPString& s = req.GetParameter("s").GetString();
 	const char *str = s;
 
 	int ctAmpersands = 0;
@@ -103,8 +103,8 @@ countTheEntities(const SOAPMethod& m, SOAPMethod& rm)
 		}
 	}
 
-	rm.SetName("countTheEntitiesResponse");
-	SOAPParameter& result = rm.AddParameter("Result");
+	resp.SetName("countTheEntitiesResponse");
+	SOAPParameter& result = resp.AddParameter("Result");
 	result.AddParameter("ctAmpersands") << ctAmpersands;
 	result.AddParameter("ctApostrophes") << ctApostrophes;
 	result.AddParameter("ctLeftAngleBrackets") << ctLeftAngleBrackets;
@@ -158,16 +158,17 @@ operator<<(SOAPParameter& param, const stooges& st)
 // Now lets do it!
 //
 void
-easyStructTest(const SOAPMethod& m, SOAPMethod& rm)
+easyStructTest(const SOAPMethod& req, SOAPMethod& resp)
 {
 	stooges st;
-	const SOAPParameter& p = m.GetParameter("stooges");
+	const SOAPParameter& p = req.GetParameter("stooges");
+
 	p >> st;
 
 	int sum = st.moe + st.curly + st.larry;
 
-	rm.SetName("easyStructTestResponse");
-	rm.AddParameter("Result") << sum;
+	resp.SetName("easyStructTestResponse");
+	resp.AddParameter("Result") << sum;
 }
 
 
@@ -238,14 +239,15 @@ operator<<(SOAPParameter& param, const echostruct& st)
 // Now lets do it!
 //
 void
-echoStructTest(const SOAPMethod& m, SOAPMethod& rm)
+echoStructTest(const SOAPMethod& req, SOAPMethod& resp)
 {
 	echostruct st;
-	const SOAPParameter& p = m.GetParameter("myStruct");
+	const SOAPParameter& p = req.GetParameter("myStruct");
+
 	p >> st;
 
-	rm.SetName("echoStructTestResponse");
-	rm.AddParameter("Result") << st;
+	resp.SetName("echoStructTestResponse");
+	resp.AddParameter("Result") << st;
 }
 
 //
@@ -259,7 +261,7 @@ echoStructTest(const SOAPMethod& m, SOAPMethod& rm)
 
 
 void
-manyTypesTest(const SOAPMethod& m, SOAPMethod& rm)
+manyTypesTest(const SOAPMethod& req, SOAPMethod& resp)
 {
 	int			num;
 	bool		b;
@@ -268,16 +270,16 @@ manyTypesTest(const SOAPMethod& m, SOAPMethod& rm)
 	SOAPString	dat;
 	SOAPString	bin;
 
-	m.GetParameter("num") >> num;
-	m.GetParameter("bool") >> b;
-	m.GetParameter("state") >> state;
-	m.GetParameter("doub") >> doub;
-	m.GetParameter("dat") >> dat;
-	m.GetParameter("bin") >> bin;
+	req.GetParameter("num") >> num;
+	req.GetParameter("bool") >> b;
+	req.GetParameter("state") >> state;
+	req.GetParameter("doub") >> doub;
+	req.GetParameter("dat") >> dat;
+	req.GetParameter("bin") >> bin;
 
-	rm.SetName("manyTypesTestResponse");
+	resp.SetName("manyTypesTestResponse");
 
-	SOAPParameter& result = rm.AddParameter("Result");
+	SOAPParameter& result = resp.AddParameter("Result");
 	result.AddParameter() << num;
 	result.AddParameter() << b;
 
@@ -305,17 +307,17 @@ manyTypesTest(const SOAPMethod& m, SOAPMethod& rm)
 //
 
 void
-moderateSizeArrayCheck(const SOAPMethod& m, SOAPMethod& rm)
+moderateSizeArrayCheck(const SOAPMethod& req, SOAPMethod& resp)
 {
-	const SOAPParameter& p = m.GetParameter("myArray");
+	const SOAPParameter& p = req.GetParameter("myArray");
 	size_t numels = p.GetArray().Size();
 
 	SOAPString result;
 	result += p.GetArray()[0].GetString();
 	result += p.GetArray()[numels - 1].GetString();
 
-	rm.SetName("moderateSizeArrayCheckResponse");
-	rm.AddParameter("Result") << result;
+	resp.SetName("moderateSizeArrayCheckResponse");
+	resp.AddParameter("Result") << result;
 }
 
 //
@@ -337,16 +339,16 @@ moderateSizeArrayCheck(const SOAPMethod& m, SOAPMethod& rm)
 //
 
 void
-nestedStructTest(const SOAPMethod& m, SOAPMethod& rm)
+nestedStructTest(const SOAPMethod& req, SOAPMethod& resp)
 {
-	const SOAPParameter& p = m.GetParameter("myStruct");
+	const SOAPParameter& p = req.GetParameter("myStruct");
 
 	stooges st;
 	p.GetParameter("year2000").GetParameter("month04").GetParameter("day01") >> st;
 
 	int sum = st.curly + st.larry + st.moe;
-	rm.SetName("nestedStructTestResponse");
-	rm.AddParameter("Result") << sum;
+	resp.SetName("nestedStructTestResponse");
+	resp.AddParameter("Result") << sum;
 }
 
 //
@@ -358,14 +360,14 @@ nestedStructTest(const SOAPMethod& m, SOAPMethod& rm)
 // a struct containing three elements, times10, times100 and times1000,
 // the result of multiplying the number by 10, 100 and 1000.
 void
-simpleStructReturnTest(const SOAPMethod& m, SOAPMethod& rm)
+simpleStructReturnTest(const SOAPMethod& req, SOAPMethod& resp)
 {
 	int myNumber;
-	m.GetParameter("myNumber") >> myNumber;
+	req.GetParameter("myNumber") >> myNumber;
 
-	rm.SetName("simpleStructReturnTestResponse");
+	resp.SetName("simpleStructReturnTestResponse");
 
-	SOAPParameter& result = rm.AddParameter("Result");
+	SOAPParameter& result = resp.AddParameter("Result");
 	result.AddParameter("times10") << myNumber * 10;
 	result.AddParameter("times100") << myNumber * 100;
 	result.AddParameter("times1000") << myNumber * 1000;
@@ -387,14 +389,15 @@ simpleStructReturnTest(const SOAPMethod& m, SOAPMethod& rm)
 // the name of the server, and not the SOAP toolkit being used. 
 
 void
-whichToolkit(const SOAPMethod& m, SOAPMethod& rm)
+whichToolkit(const SOAPMethod& req, SOAPMethod& resp)
 {
-	rm.SetName("whichToolkitResult");
-	SOAPParameter& param = rm.AddParameter("Result");
-	param.AddParameter("toolkitDocsUrl") << "http://easysoap.sourceforge.net/";
-	param.AddParameter("toolkitName") << "Easysoap++";
-	param.AddParameter("toolkitVersion") << "0.2";
+	resp.SetName("whichToolkitResult");
+	SOAPParameter& param = resp.AddParameter("Result");
+	param.AddParameter("toolkitDocsUrl") << EASYSOAP_HOMEPAGE;
+	param.AddParameter("toolkitName") << EASYSOAP_STRING;
+	param.AddParameter("toolkitVersion") << EASYSOAP_VERSION_STRING;
 	param.AddParameter("toolkitOperatingSystem") <<
+	// TODO: This is a bit broken...
 #ifdef _WIN32
 		"Windows 2000";
 #else
@@ -404,7 +407,7 @@ whichToolkit(const SOAPMethod& m, SOAPMethod& rm)
 }
 
 void
-ValidateHandler(SOAPCGIHandler& cgi, const SOAPEnvelope& req, SOAPResponse& resp)
+ValidateHandler(const SOAPEnvelope& req, SOAPResponse& resp)
 {
 	const SOAPMethod& meth = req.GetBody().GetMethod();
 	SOAPMethod& respm = resp.GetBody().GetMethod();
@@ -447,13 +450,14 @@ ValidateHandler(SOAPCGIHandler& cgi, const SOAPEnvelope& req, SOAPResponse& resp
 			(const char *)meth.GetName().GetNamespace());
 }
 
-int main(int argc, char* argv[], char *env[])
+int
+main(int argc, char* argv[], char *env[])
 {
 	int retval = 0;
-	const char *faultactor = "SOAP::Sever";
+	const char *faultactor = "SOAP-ENV::Sever";
 	try
 	{
-		printf("SOAPServer: Easysoap++/0.2\n");
+		printf("SOAPServer: %s/%s\n", EASYSOAP_STRING, EASYSOAP_VERSION_STRING);
 
 		SOAPParser p;
 		SOAPResponse resp;
@@ -463,16 +467,16 @@ int main(int argc, char* argv[], char *env[])
 		//cgi.SetLogFile("C:/validate.log");
 		//cgi.SetInFile("C:/validate.log");
 
-		faultactor = "SOAP::Client";
+		faultactor = "SOAP-ENV::Client";
 		p.Parse(env, cgi);
-		faultactor = "SOAP::Server";
+		faultactor = "SOAP-ENV::Server";
 
 		const SOAPMethod& m = env.GetBody().GetMethod();
 
 		//
 		// TODO: Test SOAPAction, method namespace
 		//
-		ValidateHandler(cgi, env, resp);
+		ValidateHandler(env, resp);
 
 		resp.WriteSOAPPacket(w);
 		cgi.Write(resp.GetBody().GetMethod(), w.GetBytes(), w.GetLength());
@@ -490,7 +494,7 @@ int main(int argc, char* argv[], char *env[])
 		//
 		// create SOAPFault
 		//
-		faultactor = "SOAP::Server";
+		faultactor = "SOAP-ENV::Server";
 		WriteFault(faultactor, "Serious error occurred.");
 		retval = 1;
 	}
