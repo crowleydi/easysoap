@@ -23,6 +23,7 @@
 #include <httpext.h>
 #include <easysoap/SOAPISAPIServer.h>
 
+USING_EASYSOAP_NAMESPACE
 
 class SOAPISAPITransport : public SOAPTransport
 {
