@@ -1,0 +1,38 @@
+a little information on the SSLClient / Server binaries:
+--------------------------------------------------------
+
+SSLServer:
+----------
+
+This is a cgi that is designed to be accessed through an Apache server running
+the mod_ssl module. There are a couple of minor configuration changes that
+need to be made to your httpd.conf for this to work as expected. Add the
+following lines:
+
+SSLOptions +StdEnvVars
+
+wherever you define your HTTPS Virtual host.
+
+Additionally, you will probably want to roll your own cert chain if you want
+to use client side certificates. See the OpenSSL Documentation for this.
+
+To get client side certs working, you need to make mod_ssl aware of the CACert
+file that generated the client cert, do this by adding the line 
+
+SSLCACertificateFile </location of the cert file>
+
+and optionally
+
+SSLCertificateFile <location of cert>
+SSLCertificateKeyFile <locataion of private key>
+
+To force checking of the client cert, use
+
+SSLVerifyClient Require
+SSLVerifyDepth 1
+
+Then copy the SSLServer to your server's cgi-bin dir, and run SSLClient
+against it.
+
+SSLClient:
+----------
