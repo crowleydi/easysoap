@@ -27,6 +27,7 @@ THESOURCES = \
 	SOAPSecureSocketImp.cpp \
 	SOAPServerDispatch.cpp \
 	SOAPSocket.cpp \
+	SOAPSSLContext.cpp \
 	SOAPStructHandler.cpp \
 	SOAPTypeTraits.cpp \
 	SOAPUrl.cpp \
