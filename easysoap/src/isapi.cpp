@@ -17,6 +17,9 @@
 // This file needs to be compiled and linked with code
 // which implements the ThreadProc() method.
 //
+// BE SURE TO INCLUDE isapi.def IN YOUR PROJECT
+// Or, like me, you might spend a couple hours trying to figure
+// out why the freaking DLL isn't loading....
 //
 #include <httpext.h>
 
