@@ -22,16 +22,20 @@
 #ifndef __ES_CONF_H_
 #define __ES_CONF_H_
 
-#define EASYSOAP_EXPORT
+#include "es_comp.h"
 
-#ifdef HAVE_CONFIG_H
-#include "es_config.h"
+#ifndef EASYSOAP_EXPORT
+#define EASYSOAP_EXPORT
 #endif
 
 #ifdef HAVE_TEMPLATE_KEYWORD_QUALIFIER
 #define MEMBER_TYPE(T) typename T
 #else
 #define MEMBER_TYPE(T) T
+#endif
+
+#ifdef DEBUG_DMALLOC
+#  include <dmalloc.h>
 #endif
 
 #endif // __ES_CONF_H_

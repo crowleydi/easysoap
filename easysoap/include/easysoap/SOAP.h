@@ -28,7 +28,7 @@
 #define EASYSOAP_VERSION_STRING	"0.5"
 #define EASYSOAP_VERSION		50
 
-#include <easysoap/es_comp.h>
+#include <easysoap/es_conf.h>
 
 #include <easysoap/SOAPUtil.h>
 #include <easysoap/SOAPHashMap.h>

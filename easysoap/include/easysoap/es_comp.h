@@ -56,15 +56,17 @@
 #ifndef __ES_COMP_H
 # define __ES_COMP_H
 
+#ifdef HAVE_CONFIG_H
+#  include <easysoap/es_config.h>
 /* distinguish real MSC from Metrowerks and Intel */
-# if defined(_MSC_VER) && !defined(__MWERKS__) && !defined (__ICL) && !defined (__COMO__)
+# elif defined(_MSC_VER) && !defined(__MWERKS__) && !defined (__ICL) && !defined (__COMO__)
 /* Microsoft Visual C++ 4.0, 4.1, 4.2, 5.0 */
 #  include <easysoap/es_msvc.h>
 # elif defined (__MWERKS__)
 /* Metrowerks CodeWarrior */
 #  include <easysoap/es_mwerks.h>
 # else
-#  include <easysoap/es_conf.h>
+# error "No configuration file found."
 #endif
 
 
