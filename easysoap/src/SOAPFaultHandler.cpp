@@ -49,7 +49,7 @@ SOAPFaultHandler::SetFault(SOAPFault& fault)
 }
 
 SOAPParseEventHandler *
-SOAPFaultHandler::start(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs)
+SOAPFaultHandler::start(SOAPParser&, const XML_Char *, const XML_Char **)
 {
 	return this;
 }

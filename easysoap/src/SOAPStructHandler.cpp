@@ -44,7 +44,7 @@ SOAPStructHandler::~SOAPStructHandler()
 }
 
 SOAPParseEventHandler *
-SOAPStructHandler::start(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs)
+SOAPStructHandler::start(SOAPParser&, const XML_Char *, const XML_Char **)
 {
 	m_param->SetIsStruct();
 	return this;

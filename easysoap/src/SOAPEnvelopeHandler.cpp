@@ -56,7 +56,7 @@ SOAPEnvelopeHandler::SetEnvelope(SOAPEnvelope& env)
 
 
 SOAPParseEventHandler *
-SOAPEnvelopeHandler::start(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs)
+SOAPEnvelopeHandler::start(SOAPParser&, const XML_Char *, const XML_Char **)
 {
 	m_done = false;
 	return this;

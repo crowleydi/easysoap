@@ -65,9 +65,6 @@ SOAPParameterHandler::start(SOAPParser& parser, const XML_Char *name, const XML_
 	m_setvalue = true;
 	m_str = "";
 
-	const XML_Char *elementType = 0;
-	const XML_Char *arrayType = 0;
-
 	const XML_Char **cattrs = attrs;
 	while (*cattrs)
 	{
@@ -136,7 +133,7 @@ SOAPParameterHandler::characterData(const XML_Char *str, int len)
 }
 
 void
-SOAPParameterHandler::endElement(const XML_Char *name)
+SOAPParameterHandler::endElement(const XML_Char *)
 {
 	if (m_setvalue)
 	{

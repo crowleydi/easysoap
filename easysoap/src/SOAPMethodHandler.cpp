@@ -50,7 +50,7 @@ SOAPMethodHandler::SetMethod(SOAPMethod& method)
 }
 
 SOAPParseEventHandler *
-SOAPMethodHandler::start(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs)
+SOAPMethodHandler::start(SOAPParser&, const XML_Char *name, const XML_Char **)
 {
 	m_method->Reset();
 

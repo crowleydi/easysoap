@@ -47,7 +47,7 @@ SOAPFault::~SOAPFault()
 }
 
 bool
-SOAPFault::WriteSOAPPacket(SOAPPacketWriter& packet) const
+SOAPFault::WriteSOAPPacket(SOAPPacketWriter&) const
 {
 	// nothing to do yet...
 	return true;

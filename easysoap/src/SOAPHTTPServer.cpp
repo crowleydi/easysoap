@@ -107,7 +107,7 @@ SOAPHTTPServerTransport::Read(char *buffer, size_t buffsize)
 }
 
 size_t
-SOAPHTTPServerTransport::Write(const SOAPMethod& method, const char *payload, size_t payloadsize)
+SOAPHTTPServerTransport::Write(const SOAPMethod&, const char *payload, size_t payloadsize)
 {
 	char lenstr[32];
 	snprintf(lenstr, sizeof(lenstr), "%u", payloadsize);

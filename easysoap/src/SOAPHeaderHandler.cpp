@@ -51,7 +51,7 @@ SOAPHeaderHandler::SetHeader(SOAPHeader& header)
 }
 
 SOAPParseEventHandler *
-SOAPHeaderHandler::start(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs)
+SOAPHeaderHandler::start(SOAPParser&, const XML_Char *, const XML_Char **)
 {
 	return this;
 }

@@ -53,7 +53,7 @@ SOAPBodyHandler::SetBody(SOAPBody& body)
 }
 
 SOAPParseEventHandler *
-SOAPBodyHandler::start(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs)
+SOAPBodyHandler::start(SOAPParser&, const XML_Char *, const XML_Char **)
 {
 	m_gotMethod = false;
 	return this;

@@ -52,7 +52,7 @@ bool SOAPSecureSocketImp::Connect(const char *, unsigned int) {return false;}
 void SOAPSecureSocketImp::Close() { }
 size_t SOAPSecureSocketImp::Read(char *, size_t) {return 0;}
 size_t SOAPSecureSocketImp::Write(const char *, size_t) {return 0;}
-bool SOAPSecureSocketImp::WaitRead(int sec, int usec) {return false;}
+bool SOAPSecureSocketImp::WaitRead(int, int) {return false;}
 void SOAPSecureSocketImp::InitSSL() {}
 
 #else
