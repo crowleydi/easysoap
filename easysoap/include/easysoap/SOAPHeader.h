@@ -55,6 +55,7 @@ public:
 
 	bool WriteSOAPPacket(SOAPPacketWriter& packet) const;
 
+	static const char *actorNext;
 private:
 
 	SOAPParameter*	GetNewHeader();

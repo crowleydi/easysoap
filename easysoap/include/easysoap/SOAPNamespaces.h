@@ -23,20 +23,11 @@
 #ifndef __SOAPNamesSpaces_h__
 #define __SOAPNamesSpaces_h__
 
-#define SOAP_ENV "http://schemas.xmlsoap.org/soap/envelope/"
-#define SOAP_ENC "http://schemas.xmlsoap.org/soap/encoding/"
-#define SOAP_ACTOR_NEXT "http://schemas.xmlsoap.org/soap/actor/next"
-
-#define SOAP_XSI_1999 "http://www.w3.org/1999/XMLSchema-instance"
-#define SOAP_XSD_1999 "http://www.w3.org/1999/XMLSchema"
-#define SOAP_XSI_2001 "http://www.w3.org/2001/XMLSchema-instance"
-#define SOAP_XSD_2001 "http://www.w3.org/2001/XMLSchema"
-#define SOAP_XSI SOAP_XSI_2001
-#define SOAP_XSD SOAP_XSD_2001
-
 class EASYSOAP_EXPORT SOAPEnc
 {
 public:
+	static const char *base;
+
 	//
 	// for locating the document root
 	static const SOAPQName root;
@@ -55,6 +46,8 @@ public:
 class EASYSOAP_EXPORT SOAPEnv
 {
 public:
+	static const char *base;
+
 	static const SOAPQName Body;
 	static const SOAPQName Header;
 	static const SOAPQName Envelope;
@@ -67,11 +60,24 @@ public:
 	static const SOAPQName actor;
 };
 
-class EASYSOAP_EXPORT XMLSchemaInstance
+class EASYSOAP_EXPORT XMLSchema2001
 {
 public:
+	static const char *xsi;
+	static const char *xsd;
+
 	static const SOAPQName type;
 	static const SOAPQName nil;
+};
+
+class EASYSOAP_EXPORT XMLSchema1999
+{
+public:
+	static const char *xsi;
+	static const char *xsd;
+
+	static const SOAPQName type;
+	static const SOAPQName null;
 };
 
 #endif // __SOAPNamesSpaces_h__

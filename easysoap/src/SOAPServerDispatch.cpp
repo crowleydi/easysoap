@@ -81,9 +81,9 @@ SOAPServerDispatch::WriteFault(const SOAPFault& fault)
 {
 	m_writer.Reset();
 	m_writer.StartTag("SOAP-ENV:Envelope");
-	m_writer.AddXMLNS("SOAP-ENV", SOAP_ENV);
-	m_writer.AddXMLNS("xsi", SOAP_XSI);
-	m_writer.AddXMLNS("xsd", SOAP_XSD);
+	m_writer.AddXMLNS("SOAP-ENV", SOAPEnv::base);
+	m_writer.AddXMLNS("xsi", XMLSchema2001::xsi);
+	m_writer.AddXMLNS("xsd", XMLSchema2001::xsd);
 	m_writer.StartTag("SOAP-ENV:Body");
 	fault.WriteSOAPPacket(m_writer);
 	m_writer.EndTag("SOAP-ENV:Body");
@@ -230,7 +230,7 @@ SOAPServerDispatch::HandleHeaders(SOAPEnvelope& request, SOAPResponse& response)
 		{
 			//
 			// TODO: Be able to specify/check for a custom QName for this endpoint
-			if (!actor || (*actor == SOAP_ACTOR_NEXT))
+			if (!actor || (*actor == SOAPHeader::actorNext))
 			{
 				//
 				// TODO:  This is an O(n) lookup... but n is (hopefully!) small

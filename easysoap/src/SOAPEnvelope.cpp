@@ -50,12 +50,12 @@ SOAPEnvelope::WriteSOAPPacket(SOAPPacketWriter& packet) const
 	packet.StartTag(SOAPEnv::Envelope, "E");
 
 	// TODO: automagically add only the tags we need...
-	packet.AddXMLNS("A", SOAP_ENC);
-	packet.AddXMLNS("s", SOAP_XSI);
-	packet.AddXMLNS("y", SOAP_XSD);
+	packet.AddXMLNS("A", SOAPEnc::base);
+	packet.AddXMLNS("s", XMLSchema2001::xsi);
+	packet.AddXMLNS("y", XMLSchema2001::xsd);
 
 	// TODO: allow user to set custom encoding style
-	packet.AddAttr(SOAPEnv::encodingStyle, SOAP_ENC);
+	packet.AddAttr(SOAPEnv::encodingStyle, SOAPEnc::base);
 
 	m_header.WriteSOAPPacket(packet);
 	m_body.WriteSOAPPacket(packet);

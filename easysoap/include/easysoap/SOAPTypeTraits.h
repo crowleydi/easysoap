@@ -223,7 +223,7 @@ public:
 		SOAPParameter::Attrs::Iterator attr;
 		//
 		// check for xsi:nil
-		attr = param.GetAttributes().Find(XMLSchemaInstance::nil);
+		attr = param.GetAttributes().Find(XMLSchema2001::nil);
 		if (attr && arr.Size() == 0)
 		{
 			val.resize(0);
@@ -336,7 +336,7 @@ class SOAPBase64Traits : public SOAPByteArrayEncodingTraits
 public:
 	static void GetType(SOAPQName& type)
 	{
-		type.Set("base64Binary", SOAP_XSD);
+		type.Set("base64binary", XMLSchema2001::xsd);
 	}
 };
 
@@ -369,7 +369,7 @@ class SOAPHexTraits : public SOAPByteArrayEncodingTraits
 public:
 	static void GetType(SOAPQName& type)
 	{
-		type.Set("hexBinary", SOAP_XSD);
+		type.Set("hexBinary", XMLSchema2001::xsd);
 	}
 };
 
@@ -485,7 +485,7 @@ public:
 		SOAPParameter::Attrs::Iterator attr;
 		//
 		// check xsi:nil attribute
-		attr = param.GetAttributes().Find(XMLSchemaInstance::nil);
+		attr = param.GetAttributes().Find(XMLSchema2001::nil);
 		if (attr && arr.Size() == 0)
 		{
 			val.resize(0, 0);

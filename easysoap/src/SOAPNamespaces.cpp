@@ -23,21 +23,33 @@
 #include <easysoap/SOAP.h>
 #include <easysoap/SOAPNamespaces.h>
 
-const SOAPQName SOAPEnc::root("root", SOAP_ENC);
-const SOAPQName SOAPEnc::Array("Array", SOAP_ENC);
-const SOAPQName SOAPEnc::arrayType("arrayType", SOAP_ENC);
-const SOAPQName SOAPEnc::offset("offset", SOAP_ENC);
-const SOAPQName SOAPEnc::position("position", SOAP_ENC);
-const SOAPQName SOAPEnc::base64("base64", SOAP_ENC);
+#include "es_namespaces.h"
 
-const SOAPQName SOAPEnv::Body("Body", SOAP_ENV);
-const SOAPQName SOAPEnv::Header("Header", SOAP_ENV);
-const SOAPQName SOAPEnv::Envelope("Envelope", SOAP_ENV);
-const SOAPQName SOAPEnv::Fault("Fault", SOAP_ENV);
-const SOAPQName SOAPEnv::encodingStyle("encodingStyle", SOAP_ENV);
-const SOAPQName SOAPEnv::mustUnderstand("mustUnderstand", SOAP_ENV);
-const SOAPQName SOAPEnv::actor("actor", SOAP_ENV);
+const char *SOAPEnc::base = SOAP_ENC;
 
-const SOAPQName XMLSchemaInstance::nil("nil", SOAP_XSI);
-const SOAPQName XMLSchemaInstance::type("type", SOAP_XSI);
+const SOAPQName SOAPEnc::root("root", SOAPEnc::base);
+const SOAPQName SOAPEnc::Array("Array", SOAPEnc::base);
+const SOAPQName SOAPEnc::arrayType("arrayType", SOAPEnc::base);
+const SOAPQName SOAPEnc::offset("offset", SOAPEnc::base);
+const SOAPQName SOAPEnc::position("position", SOAPEnc::base);
+const SOAPQName SOAPEnc::base64("base64", SOAPEnc::base);
+
+const char *SOAPEnv::base = SOAP_ENV;
+const SOAPQName SOAPEnv::Body("Body", SOAPEnv::base);
+const SOAPQName SOAPEnv::Header("Header", SOAPEnv::base);
+const SOAPQName SOAPEnv::Envelope("Envelope", SOAPEnv::base);
+const SOAPQName SOAPEnv::Fault("Fault", SOAPEnv::base);
+const SOAPQName SOAPEnv::encodingStyle("encodingStyle", SOAPEnv::base);
+const SOAPQName SOAPEnv::mustUnderstand("mustUnderstand", SOAPEnv::base);
+const SOAPQName SOAPEnv::actor("actor", SOAPEnv::base);
+
+const char *XMLSchema1999::xsi = SOAP_XSI_1999;
+const char *XMLSchema1999::xsd = SOAP_XSD_1999;
+const SOAPQName XMLSchema1999::null("null", XMLSchema1999::xsi);
+const SOAPQName XMLSchema1999::type("type", XMLSchema1999::xsi);
+
+const char *XMLSchema2001::xsi = SOAP_XSI_2001;
+const char *XMLSchema2001::xsd = SOAP_XSD_2001;
+const SOAPQName XMLSchema2001::nil("nil", XMLSchema2001::xsi);
+const SOAPQName XMLSchema2001::type("type", XMLSchema2001::xsi);
 

@@ -747,7 +747,7 @@ void
 TestEchoBooleanJunk(SOAPProxy& proxy, const Endpoint& e)
 {
 	SOAPMethod method("echoBoolean", e.nspace, e.soapaction, e.needsappend);
-	(method.AddParameter("inputBoolean") << "junk").SetType("boolean", SOAP_XSD);
+	(method.AddParameter("inputBoolean") << "junk").SetType("boolean", XMLSchema2001::xsd);
 
 	const SOAPResponse& response = proxy.Execute(method);
 
@@ -972,7 +972,7 @@ TestEchoHdrString(SOAPProxy& proxy, const Endpoint& e,
 
 	header.AddAttribute(SOAPEnv::mustUnderstand) = mustUnderstand ? "1" : "0";
 	if (actor == 1)
-		header.AddAttribute(SOAPEnv::actor) = SOAP_ACTOR_NEXT;
+		header.AddAttribute(SOAPEnv::actor) = SOAPHeader::actorNext;
 	else if (actor == 2)
 		header.AddAttribute(SOAPEnv::actor) = "http://jackandjill.com/wentup/thehill";
 
@@ -1021,7 +1021,7 @@ TestEchoHdrStruct(SOAPProxy& proxy, const Endpoint& e,
 
 	header.AddAttribute(SOAPEnv::mustUnderstand) = mustUnderstand ? "1" : "0";
 	if (actor == 1)
-		header.AddAttribute(SOAPEnv::actor) = SOAP_ACTOR_NEXT;
+		header.AddAttribute(SOAPEnv::actor) = SOAPHeader::actorNext;
 	else if (actor == 2)
 		header.AddAttribute(SOAPEnv::actor) = "http://jackandjill.com/wentup/thehill";
 

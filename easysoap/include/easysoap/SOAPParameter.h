@@ -183,7 +183,7 @@ operator<<(SOAPParameter& param, const T& val)
 	//
 	param.ClearValue();
 	// Add xsi:type attribute
-	SOAPTypeTraits<T>::GetType(param.AddAttribute(XMLSchemaInstance::type));
+	SOAPTypeTraits<T>::GetType(param.AddAttribute(XMLSchema2001::type));
 	// serialize
 	return SOAPTypeTraits<T>::Serialize(param, val);
 }
@@ -208,7 +208,7 @@ inline SOAPParameter&
 operator<<(SOAPParameter& param, const char *val)
 {
 	param.ClearValue();
-	SOAPTypeTraits<const char *>::GetType(param.AddAttribute(XMLSchemaInstance::type));
+	SOAPTypeTraits<const char *>::GetType(param.AddAttribute(XMLSchema2001::type));
 	return SOAPTypeTraits<const char *>::Serialize(param, val);
 }
 
@@ -217,7 +217,7 @@ inline SOAPParameter&
 operator<<(SOAPParameter& param, const wchar_t *val)
 {
 	param.ClearValue();
-	SOAPTypeTraits<const wchar_t *>::GetType(param.AddAttribute(XMLSchemaInstance::type));
+	SOAPTypeTraits<const wchar_t *>::GetType(param.AddAttribute(XMLSchema2001::type));
 	return SOAPTypeTraits<const wchar_t *>::Serialize(param, val);
 }
 #endif

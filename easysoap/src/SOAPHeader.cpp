@@ -31,6 +31,8 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
+const char *SOAPHeader::actorNext = "http://schemas.xmlsoap.org/soap/actor/next";
+
 SOAPHeader::SOAPHeader()
 : m_outtasync(false)
 {

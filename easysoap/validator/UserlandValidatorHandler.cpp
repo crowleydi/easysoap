@@ -160,30 +160,30 @@ UserlandValidatorHandler::manyTypesTest(const SOAPMethod& req, SOAPMethod& resp)
 
 	// This is ugly.  Really ugly.  Because the validator
 	// demands 1999 schema, we have to set everything manually...
-	SOAPQName	type1999("type", SOAP_XSI_1999);
+	SOAPQName	type1999("type", XMLSchema1999::xsi);
 
 
 	SOAPTypeTraits<int>::Serialize(result.AddParameter(), num)
-		.AddAttribute(type1999).Set("int", SOAP_XSD_1999);
+		.AddAttribute(type1999).Set("int", XMLSchema1999::xsd);
 
 	SOAPTypeTraits<bool>::Serialize(result.AddParameter(), b)
-		.AddAttribute(type1999).Set("boolean", SOAP_XSD_1999);
+		.AddAttribute(type1999).Set("boolean", XMLSchema1999::xsd);
 
 	SOAPTypeTraits<SOAPString>::Serialize(result.AddParameter(), state)
-		.AddAttribute(type1999).Set("string", SOAP_XSD_1999);
+		.AddAttribute(type1999).Set("string", XMLSchema1999::xsd);
 
 	// The validator is wrong.  It wants double accuracy but wire type is float
 	SOAPTypeTraits<double>::Serialize(result.AddParameter(), doub)
-		.AddAttribute(type1999).Set("float", SOAP_XSD_1999);
+		.AddAttribute(type1999).Set("float", XMLSchema1999::xsd);
 
 	SOAPTypeTraits<SOAPString>::Serialize(result.AddParameter(), dat)
-		.AddAttribute(type1999).Set("timeInstant", SOAP_XSD_1999);
+		.AddAttribute(type1999).Set("timeInstant", XMLSchema1999::xsd);
 
 	SOAPTypeTraits<SOAPString>::Serialize(result.AddParameter(), bin)
-		.AddAttribute(type1999).Set("string", SOAP_XSD_1999);
+		.AddAttribute(type1999).Set("string", XMLSchema1999::xsd);
 
 	// Have to add array encoding attributes ...
-	result.AddAttribute(SOAPEnc::arrayType).Set("ur-type[6]", SOAP_XSD_1999);
+	result.AddAttribute(SOAPEnc::arrayType).Set("ur-type[6]", XMLSchema1999::xsd);
 	result.AddAttribute(type1999) = SOAPEnc::Array;
 }
 

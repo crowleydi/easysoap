@@ -28,6 +28,7 @@
 #include <easysoap/SOAPNamespaces.h>
 
 #include "SOAPEnvelopeHandler.h"
+#include "es_namespaces.h"
 
 #define BUFF_SIZE 1024
 
