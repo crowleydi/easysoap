@@ -205,17 +205,15 @@ sp_strchr(const char *s, char c)
 inline char*
 sp_strrchr(const char *s, char c)
 {
+	char *w = 0;
 	if (s)
 	{
-		const char * w = s;
-		while (*w++)
-			;
-
-		while (w-- != s)
-			if (*w == c)
-				return (char*)w;
+		do
+			if (*s == c)
+				w = (char*)s;
+		while (*s++);
 	}
-	return 0;
+	return w;
 }
 
 inline void *
