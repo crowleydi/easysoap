@@ -26,7 +26,6 @@
 #endif // _MSC_VER
 
 // avoid include of expat.h
-typedef void *XML_Parser;
 typedef char XML_Char;
 
 class SOAPParser;

@@ -21,9 +21,6 @@
 #pragma warning (disable: 4786)
 #endif // _MSC_VER
 
-#include <expat.h>
-
-
 #include "SOAP.h"
 #include "SOAPParse.h"
 #include "SOAPResponseHandler.h"
@@ -38,7 +35,6 @@
 
 SOAPParser::SOAPParser()
 {
-	m_parser = 0;
 }
 
 SOAPParser::~SOAPParser()
@@ -49,28 +45,6 @@ SOAPParser::~SOAPParser()
 SOAPResponse&
 SOAPParser::Parse(SOAPResponse& resp, SOAPTransport& trans)
 {
-	if (m_parser)
-	{
-		XML_ParserFree(m_parser);
-		m_parser = 0;
-	}
-
-	m_parser = XML_ParserCreateNS((const char *)NULL, (char)PARSER_NS_SEP[0]);
-	XML_SetUserData(m_parser, this);
-
-	XML_SetElementHandler(m_parser,
-			SOAPParser::_startElement,
-			SOAPParser::_endElement);
-
-	XML_SetCharacterDataHandler(m_parser,
-			SOAPParser::_characterData);
-
-	XML_SetStartNamespaceDeclHandler(m_parser,
-			SOAPParser::_startNamespace);
-
-	XML_SetEndNamespaceDeclHandler(m_parser,
-			SOAPParser::_endNamespace);
-
 	SOAPResponseHandler response(resp);
 	m_response = &response;
 
@@ -78,12 +52,13 @@ SOAPParser::Parse(SOAPResponse& resp, SOAPTransport& trans)
 	m_handlerstack.Clear();
 	m_hrefmap.Clear();
 
+	InitParser();
 	while (1)
 	{
 		//
 		// create a buffer to read the HTTP payload into
 		//
-		void *buffer = XML_GetBuffer(m_parser, BUFF_SIZE);
+		void *buffer = GetParseBuffer(BUFF_SIZE);
 		if (!buffer)
 			throw SOAPMemoryException();
 
@@ -91,25 +66,18 @@ SOAPParser::Parse(SOAPResponse& resp, SOAPTransport& trans)
 		// read the HTTP payload
 		//
 		int read = trans.Read((char *)buffer, BUFF_SIZE);
-
-		if (!XML_ParseBuffer(m_parser, read, read == 0))
+		if (!ParseBuffer(read))
 		{
 			throw SOAPException(
 				"Error while parsing SOAP XML payload: %s",
-				XML_ErrorString(XML_GetErrorCode(m_parser)));
+				GetErrorMessage());
 		}
 
-		if (m_response->Done())
+		if (read != 0 && m_response->Done())
 		{
-			XML_ParseBuffer(m_parser, 0, 1);
+			ParseBuffer(0);
 			break;
 		}
-	}
-
-	if (m_parser)
-	{
-		XML_ParserFree(m_parser);
-		m_parser = 0;
 	}
 
 	return resp;
@@ -223,44 +191,4 @@ SOAPParser::ResolveName(const char *name, SOAPString& result)
 		}
 	}
 }
-
-//
-// static methods
-//
-
-void
-SOAPParser::_startElement(void *userData, const XML_Char *name, const XML_Char **attrs)
-{
-	SOAPParser *parser = (SOAPParser *)userData;
-	parser->startElement(name, attrs);
-}
-
-void
-SOAPParser::_endElement(void *userData, const XML_Char *name)
-{
-	SOAPParser *parser = (SOAPParser *)userData;
-	parser->endElement(name);
-}
-
-void
-SOAPParser::_characterData(void *userData, const XML_Char *str, int len)
-{
-	SOAPParser *parser = (SOAPParser *)userData;
-	parser->characterData(str, len);
-}
-
-void
-SOAPParser::_startNamespace(void *userData, const XML_Char *prefix, const XML_Char *uri)
-{
-	SOAPParser *parser = (SOAPParser *)userData;
-	parser->startNamespace(prefix, uri);
-}
-
-void
-SOAPParser::_endNamespace(void *userData, const XML_Char *prefix)
-{
-	SOAPParser *parser = (SOAPParser *)userData;
-	parser->endNamespace(prefix);
-}
-
 

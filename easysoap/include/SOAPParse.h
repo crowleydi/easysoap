@@ -21,14 +21,18 @@
 #if !defined(AFX_SOAPPARSE_H__751545FF_EF84_42BC_9622_A6CE624F1F14__INCLUDED_)
 #define AFX_SOAPPARSE_H__751545FF_EF84_42BC_9622_A6CE624F1F14__INCLUDED_
 
+
+#include "SOAP.h"
+#include "XMLParser.h"
+
 #include "SOAPTransport.h"
-#include "SOAPParseEventHandler.h"
 #include "SOAPStack.h"
 
 class SOAPResponse;
 class SOAPResponseHandler;
+class SOAPParserEventHandler;
 
-class EASYSOAP_EXPORT SOAPParser
+class EASYSOAP_EXPORT SOAPParser : protected XMLParser
 {
 public:
 
@@ -37,13 +41,14 @@ public:
 
 	SOAPResponse& Parse(SOAPResponse& resp, SOAPTransport& trans);
 
-	// Used by subscribers/handlers to resolve something like "xsi:integer" into
-	// a fully qualified name (or whatever) "http://www.w3.org/1999/XMLSchema-instance#integer"
+	// Used by subscribers/handlers to resolve something like
+	// "xsi:integer" into a fully qualified name
+	// "http://www.w3.org/1999/XMLSchema-instance#integer"
 	void ResolveName(const char *name, SOAPString& result);
 	SOAPParameter *GetHRefParam(const SOAPString& name);
 	void SetHRefParam(const SOAPString&, SOAPParameter *);
 
-private:
+protected:
 
 	void startElement(const XML_Char *name, const XML_Char **attrs);
 	void endElement(const XML_Char *name);
@@ -51,17 +56,7 @@ private:
 	void startNamespace(const XML_Char *prefix, const XML_Char *uri);
 	void endNamespace(const XML_Char *prefix);
 
-	//
-	// the C based XML parser calls through to these methods
-	// which pass them on to the C++ interface
-	//
-	static void _startElement(void *userData, const XML_Char *name, const XML_Char **attrs);
-	static void _endElement(void *userData, const XML_Char *name);
-	static void _characterData(void *userData, const XML_Char *str, int len);
-	static void _startNamespace(void *userData, const XML_Char *prefix, const XML_Char *uri);
-	static void _endNamespace(void *userData, const XML_Char *prefix);
-
-	XML_Parser							m_parser;
+private:
 
 	typedef SOAPStack<SOAPParseEventHandler *>	HandlerStack;
 	typedef SOAPHashMap<SOAPString, SOAPString> NamespaceMap;
