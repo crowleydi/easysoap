@@ -33,9 +33,9 @@
 #ifdef EASYSOAP_STATIC
 #define EASYSOAP_EXPORT
 #else // not EASYSOAP_STATIC
-#ifdef EASYSOAP_EXPORTS
+#ifdef EASYSOAP_DLL
 #define EASYSOAP_EXPORT __declspec( dllexport )
-#else // not EASYSOAP_EXPORTS
+#else // not EASYSOAP_DLL
 #define EASYSOAP_EXPORT __declspec (dllimport )
 #endif // EASYSOAP_EXPORTS
 #endif // EASYSOAP_STATIC
@@ -53,6 +53,7 @@
 
 class SOAPPacketWriter;
 
+#include "SOAPParseEventHandler.h"
 #include "SOAPProxy.h"
 
 #endif // __SOAP_h__

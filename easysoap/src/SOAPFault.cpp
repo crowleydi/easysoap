@@ -49,3 +49,27 @@ SOAPFault::WriteSOAPPacket(SOAPPacketWriter& packet) const
 {
 	return true;
 }
+
+const SOAPParameter&
+SOAPFault::GetFaultCode() const
+{
+	return m_params[faultcode_attr];
+}
+
+const SOAPParameter&
+SOAPFault::GetFaultString() const
+{
+	return m_params[faultstring_attr];
+}
+
+const SOAPParameter&
+SOAPFault::GetFaultActor() const
+{
+	return m_params[faultactor_attr];
+}
+
+const SOAPParameter&
+SOAPFault::GetDetail() const
+{
+	return m_params[faultdetail_attr];
+}

@@ -31,7 +31,7 @@ typedef void *XML_Parser;
 class SOAPResponse;
 class SOAPResponseHandler;
 
-class SOAPParser : private SOAPParseEventHandler
+class EASYSOAP_EXPORT SOAPParser : private SOAPParseEventHandler
 {
 public:
 

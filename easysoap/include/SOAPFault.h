@@ -32,17 +32,31 @@ public:
 	SOAPFault();
 	virtual ~SOAPFault();
 
-	void SetFaultCode(const char *faultcode)	{SetFaultValue(faultcode_attr, faultcode);}
-	const SOAPParameter& GetFaultCode() const	{return m_params[faultcode_attr];}
+	void SetFaultCode(const char *faultcode)
+	{
+		SetFaultValue(faultcode_attr, faultcode);
+	}
 
-	void SetFaultString(const char *faultstring){SetFaultValue(faultstring_attr, faultstring);}
-	const SOAPParameter& GetFaultString() const	{return m_params[faultstring_attr];}
+	void SetFaultString(const char *faultstring)
+	{
+		SetFaultValue(faultstring_attr, faultstring);
+	}
 
-	void SetFaultActor(const char *faultactor)	{SetFaultValue(faultactor_attr, faultactor);}
-	const SOAPParameter& GetFaultActor() const	{return m_params[faultactor_attr];}
+	void SetDetail(const char *detail)
+	{
+		SetFaultValue(faultdetail_attr, detail);
+	}
 
-	void SetDetail(const char *detail)			{SetFaultValue(faultdetail_attr, detail);}
-	const SOAPParameter& GetDetail() const		{return m_params[faultdetail_attr];}
+	void SetFaultActor(const char *faultactor)
+	{
+		SetFaultValue(faultactor_attr, faultactor);
+	}
+
+	const SOAPParameter& GetFaultString() const;
+	const SOAPParameter& GetFaultActor() const;
+	const SOAPParameter& GetFaultCode() const;
+	const SOAPParameter& GetDetail() const;
+
 	bool WriteSOAPPacket(SOAPPacketWriter& packet) const;
 
 private:
