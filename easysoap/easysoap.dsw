@@ -45,7 +45,25 @@ Package=<4>
 
 ###############################################################################
 
-Project: "simplecgi"=.\simpleserver\simplecgi.dsp - Package Owner=<4>
+Project: "simpleclient"=.\simpleserver\simpleclient.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name simplecgi
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name simpleserver
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "simpleserver"=.\simpleserver\simpleserver.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
