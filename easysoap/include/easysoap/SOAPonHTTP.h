@@ -64,6 +64,7 @@ private:
 	void	WriteHostHeader(const SOAPUrl&);
 	void	FlushInput();
 	void	StartVerb(const char *verb, const char *path);
+	void	AddAuthorization(const char *type, const SOAPUrl& point);
 	size_t  ReadChunk(char *buffer, size_t len);
 	size_t  ReadBytes(char *buffer, size_t len);
 

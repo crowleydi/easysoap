@@ -94,18 +94,6 @@ SOAPonHTTP::Write(const SOAPMethod& method, const char *payload, size_t payloads
 #ifdef HAVE_LIBZ
 		m_http.WriteHeader("Accept-Encoding", "gzip, deflate");
 #endif // HAVE_LIBZ
-		if (!m_endpoint.User().IsEmpty() || !m_endpoint.Password().IsEmpty())
-		{
-			SOAPString up = m_endpoint.User();
-			up.Append(":");
-			up.Append(m_endpoint.Password());
-			SOAPString enc;
-			SOAPBase64Base::Encode(up, up.Length(), enc);
-
-			up = "Basic ";
-			up.Append(enc);
-			m_http.WriteHeader("Authorization", (const char *)up);
-		}
 
 		m_http.Write("SOAPAction:");
 		if (method.GetSoapAction())
@@ -198,10 +186,12 @@ void
 SOAPonHTTP::ConnectTo(const SOAPUrl& endpoint, const SOAPUrl& proxy)
 {
 	m_endpoint = endpoint;
+
 	if (m_ctx)
 			m_http.SetContext(*m_ctx);
 	if (m_cbdata)
 			m_http.SetVerifyCBData(m_cbdata);
+
 	m_http.ConnectTo(endpoint, proxy);
 }
 
@@ -246,6 +236,9 @@ int
 SOAPHTTPProtocol::Get(const char *path)
 {
 	StartVerb("GET", path);
+	AddAuthorization("Authorization", m_endpoint);
+	AddAuthorization("Proxy-Authorization", m_proxy);
+
 	WriteLine("");
 	int ret = GetReply();
 	if (ret == 100)
@@ -302,10 +295,28 @@ SOAPHTTPProtocol::StartVerb(const char *verb, const char *path)
 }
 
 void
+SOAPHTTPProtocol::AddAuthorization(const char *type, const SOAPUrl& endpoint)
+{
+	if (!endpoint.User().IsEmpty() || !endpoint.Password().IsEmpty())
+	{
+		SOAPString up = endpoint.User();
+		up.Append(":");
+		up.Append(endpoint.Password());
+		SOAPString enc;
+		SOAPBase64Base::Encode(up, up.Length(), enc);
+
+		up = "Basic ";
+		up.Append(enc);
+		WriteHeader(type, (const char *)up);
+	}
+}
+
+void
 SOAPHTTPProtocol::BeginPost(const char *path)
 {
-
 	StartVerb("POST", path);
+	AddAuthorization("Authorization", m_endpoint);
+	AddAuthorization("Proxy-Authorization", m_proxy);
 }
 
 int
