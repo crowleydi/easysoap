@@ -22,8 +22,6 @@
 #pragma warning (disable: 4786)
 #endif // _WIN32
 
-#include <string>
-
 #include "SOAP.h"
 #include "SOAPTypes.h"
 #include "SOAPNamespaces.h"
@@ -33,20 +31,30 @@
 //////////////////////////////////////////////////////////////////////
 typedef SOAPHashMap<SOAPString, SOAPTypes::xsd_type> TypeMap;
 
-static TypeMap typemap;
-static int init_typemap()
+static TypeMap *__es_typemap = 0;
+static TypeMap& GetTypeMap()
 {
-	typemap["xsd:int"] = SOAPTypes::xsd_int;
-	typemap["xsd:float"] = SOAPTypes::xsd_float;
-	typemap["xsd:double"] = SOAPTypes::xsd_double;
-	typemap["xsd:string"] = SOAPTypes::xsd_string;
+	if (!__es_typemap)
+	{
+		__es_typemap = new TypeMap();
+		TypeMap& typemap = *__es_typemap;
 
-	typemap["SOAP-ENC:SOAPStruct"] = SOAPTypes::soap_struct;
-	typemap["SOAP-ENC:Array"] = SOAPTypes::soap_array;
+		typemap["xsd:int"] = SOAPTypes::xsd_int;
+		typemap["xsd:float"] = SOAPTypes::xsd_float;
+		typemap["xsd:double"] = SOAPTypes::xsd_double;
+		typemap["xsd:string"] = SOAPTypes::xsd_string;
 
-	return 1;
+		typemap["SOAP-ENC:SOAPStruct"] = SOAPTypes::soap_struct;
+		typemap["SOAP-ENC:Array"] = SOAPTypes::soap_array;
+	}
+	return *__es_typemap;
 }
-static int didinit = init_typemap();
+
+static class gc_es_typemap
+{
+public:
+	~gc_es_typemap() {delete __es_typemap;}
+} _gc_es_typemap;
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -83,9 +91,9 @@ SOAPTypes::GetXsdString(xsd_type type)
 SOAPTypes::xsd_type
 SOAPTypes::GetXsdType(const char *str)
 {
-	TypeMap::Iterator i = typemap.Find(str);
+	TypeMap::Iterator i = GetTypeMap().Find(str);
 
-	if (i == typemap.End())
+	if (i == GetTypeMap().End())
 		return xsd_none;
 
 	return *i;
