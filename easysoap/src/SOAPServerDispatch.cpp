@@ -77,20 +77,13 @@ SOAPServerDispatch::DispatchTo(SOAPHeaderHandlerInterface *disp)
 // out the correct way....
 //
 void
-SOAPServerDispatch::WriteFault(const char *code, const char *str)
+SOAPServerDispatch::WriteFault(const SOAPFault& fault)
 {
 	m_writer.Reset();
 	m_writer.StartTag("SOAP-ENV:Envelope");
 	m_writer.AddXMLNS("SOAP-ENV", SOAP_ENV);
 	m_writer.StartTag("SOAP-ENV:Body");
-	m_writer.StartTag("SOAP-ENV:Fault");
-	m_writer.StartTag("faultcode");
-	m_writer.WriteValue(code);
-	m_writer.EndTag("faultcode");
-	m_writer.StartTag("faultstring");
-	m_writer.WriteValue(str);
-	m_writer.EndTag("faultstring");
-	m_writer.EndTag("SOAP-ENV:Fault");
+	fault.WriteSOAPPacket(m_writer);
 	m_writer.EndTag("SOAP-ENV:Body");
 	m_writer.EndTag("SOAP-ENV:Envelope");
 
@@ -158,37 +151,44 @@ SOAPServerDispatch::Handle(SOAPTransport& trans)
 			m_writer.GetBytes(),
 			m_writer.GetLength());
 	}
+	catch(SOAPFault& fault)
+	{
+		retval = -1;
+		HandleFault(fault);
+		WriteFault(fault);
+	}
 	catch(SOAPMustUnderstandException& mux)
 	{
-		//
-		// create SOAPFault
-		//
 		retval = -1;
 
-		HandleException(mux);
-		WriteFault("SOAP-ENV:MustUnderstand", mux.What());
+		SOAPFault fault;
+		fault.SetFaultString(mux.What());
+		fault.SetFaultCode("SOAP-ENV:MustUnderstand");
+
+		HandleFault(fault);
+		WriteFault(fault);
 	}
 	catch(SOAPException& sex)
 	{
-		//
-		// create SOAPFault
-		//
 		retval = -1;
 
-		HandleException(sex);
-		WriteFault(faultcode, sex.What());
+		SOAPFault fault;
+		fault.SetFaultString(sex.What());
+		fault.SetFaultCode(faultcode);
+
+		HandleFault(fault);
+		WriteFault(fault);
 	}
 	catch (...)
 	{
-		//
-		// create SOAPFault
-		//
-		faultcode = serverfault;
 		retval = -1;
 
-		SOAPException e("Serious error occured.");
-		HandleException(e);
-		WriteFault(faultcode, e.What());
+		SOAPFault fault;
+		fault.SetFaultString("Serious error occured.");
+		fault.SetFaultCode(serverfault);
+
+		HandleFault(fault);
+		WriteFault(fault);
 	}
 
 	return retval;

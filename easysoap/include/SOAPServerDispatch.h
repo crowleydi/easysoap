@@ -43,13 +43,13 @@ public:
 protected:
 	virtual bool	HandleRequest(SOAPEnvelope& request, SOAPResponse& response);
 	virtual void	HandleHeaders(SOAPEnvelope& request, SOAPResponse& response);
-	virtual void	HandleException(SOAPException&) {}
+	virtual void	HandleFault(SOAPFault&) {}
 
 private:
 
 	SOAPServerDispatch(const SOAPServerDispatch&);
 	SOAPServerDispatch& operator=(const SOAPServerDispatch&);
-	void WriteFault(const char *code, const char *str);
+	void WriteFault(const SOAPFault& fault);
 
 	typedef SOAPArray<SOAPDispatchHandlerInterface*> Handlers;
 	typedef SOAPArray<SOAPHeaderHandlerInterface*> HeaderHandlers;

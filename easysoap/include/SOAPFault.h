@@ -38,24 +38,37 @@ public:
 
 	void SetFaultCode(const char *faultcode)
 	{
-		SetFaultValue(faultcode_attr, faultcode);
+		AddFaultCode().SetValue(faultcode);
 	}
 
 	void SetFaultString(const char *faultstring)
 	{
-		SetFaultValue(faultstring_attr, faultstring);
+		AddFaultString().SetValue(faultstring);
 	}
-
-	/*  This is incorrect
-	void SetDetail(const char *detail)
-	{
-		SetFaultValue(faultdetail_attr, detail);
-	}
-	*/
 
 	void SetFaultActor(const char *faultactor)
 	{
-		SetFaultValue(faultactor_attr, faultactor);
+		AddFaultActor().SetValue(faultactor);
+	}
+
+	SOAPParameter& AddFaultCode()
+	{
+		return AddParameter(faultcode_attr);
+	}
+
+	SOAPParameter& AddFaultString()
+	{
+		return AddParameter(faultstring_attr);
+	}
+
+	SOAPParameter& AddFaultActor()
+	{
+		return AddParameter(faultactor_attr);
+	}
+
+	SOAPParameter& AddFaultDetail()
+	{
+		return AddParameter(faultdetail_attr);
 	}
 
 	const SOAPParameter* GetFaultString() const;
@@ -63,15 +76,7 @@ public:
 	const SOAPParameter* GetFaultCode() const;
 	const SOAPParameter* GetDetail() const;
 
-	bool WriteSOAPPacket(SOAPPacketWriter& packet) const;
-
 private:
-
-	void SetFaultValue(const char *param, const char *value)
-	{
-		AddParameter(param).SetValue(value);
-	}
-
 	static const SOAPString faultcode_attr;
 	static const SOAPString faultstring_attr;
 	static const SOAPString faultactor_attr;

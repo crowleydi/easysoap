@@ -38,19 +38,12 @@ const SOAPString SOAPFault::faultstring_attr = "faultstring";
 
 SOAPFault::SOAPFault()
 {
-
+	SetName(SOAPEnv::Fault);
 }
 
 SOAPFault::~SOAPFault()
 {
 
-}
-
-bool
-SOAPFault::WriteSOAPPacket(SOAPPacketWriter&) const
-{
-	// nothing to do yet...
-	return true;
 }
 
 const SOAPParameter*
