@@ -38,7 +38,7 @@ WriteParameter(const SOAPParameter& param)
 
 	case SOAPTypes::soap_array:
 		{
-			std::cout << "Array {";
+			std::cout << "Array {" << std::endl;
 
 			const SOAPParameter::Array& val = param.GetArray();
 			for (SOAPParameter::Array::const_iterator i = val.begin(); i != val.end(); ++i)
@@ -49,7 +49,7 @@ WriteParameter(const SOAPParameter& param)
 		break;
 	case SOAPTypes::soap_struct:
 		{
-			std::cout << "Struct {";
+			std::cout << "Struct {" << std::endl;
 
 			const SOAPParameter::Struct& val = param.GetStruct();
 			for (SOAPParameter::Struct::const_iterator i = val.begin(); i != val.end(); ++i)
