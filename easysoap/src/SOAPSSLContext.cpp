@@ -49,12 +49,12 @@ extern "C" {
 // Initialize OpenSSL
 //
 
-// initialize our static temporary RSA key.
-rsa_st* SOAPSSLContext::m_tmpRSAKey = 0;
 
 class OpenSSLinit
 {
-public:
+	private:
+		static rsa_st* m_tmpRSAKey;
+	public:
 
 	OpenSSLinit()
 	{
@@ -62,7 +62,6 @@ public:
 		static const char rnd_seed[] = 
 			"string to make the random number generator"
 			"think it has some entropy.";
-
 		SSL_library_init();
 		ERR_load_crypto_strings();
 		SSL_load_error_strings();
@@ -70,10 +69,27 @@ public:
 	}
 	~OpenSSLinit()
 	{
+			if (m_tmpRSAKey)
+		{
+				RSA_free(m_tmpRSAKey);
+				m_tmpRSAKey = 0;
+		}
 	}
-	private:
-};
 
+	static rsa_st* tmpRSAkey_cb(SSL* s, int SSLexport, int keylen) {
+		if (m_tmpRSAKey)
+				RSA_free(m_tmpRSAKey);
+#if OPENSSL_VERSION_NUMBER >= 0x0900
+		m_tmpRSAKey = RSA_generate_key(keylen, RSA_F4, NULL, NULL);
+#else 
+		m_tmpRSAKey = RSA_generate_key(keylen, RSA_F4, NULL);
+#endif //OPENSSL_VERSION_NUMBER
+		return m_tmpRSAKey;
+	}
+
+
+};
+rsa_st* OpenSSLinit::m_tmpRSAKey = 0;
 // *******************************************************************
 
 
@@ -124,7 +140,7 @@ void SOAPSSLContext::SetCertInfo(const char* certfile, const char* keyfile, cons
 	type = RSA_cert;
 	
 	// RSA requires a callback function that can generate the correct sized key on the fly...
-	SSL_CTX_set_tmp_rsa_callback(m_ctx, &tmpRSAkey_cb);
+	SSL_CTX_set_tmp_rsa_callback(m_ctx, &OpenSSLinit::tmpRSAkey_cb);
 		
 	// set the certificate file.
 	if ((retcode = SSL_CTX_use_certificate_chain_file(m_ctx, m_certfile.Str()))!= 1)
@@ -159,18 +175,6 @@ int SOAPSSLContext::password_cb(char* buf, int size, int rwflag, void *userdata)
 		
 		return(password.Length());
 }
-
-rsa_st* SOAPSSLContext::tmpRSAkey_cb(SSL* s, int SSLexport, int keylen) {
-		if (m_tmpRSAKey)
-				RSA_free(m_tmpRSAKey);
-#if OPENSSL_VERSION_NUMBER >= 0x0900
-		m_tmpRSAKey = RSA_generate_key(keylen, RSA_F4, NULL, NULL);
-#else 
-		m_tmpRSAKey = RSA_generate_key(keylen, RSA_F4, NULL);
-#endif //OPENSSL_VERSION_NUMBER
-		return m_tmpRSAKey;
-}
-
 void SOAPSSLContext::HandleError(const char* context, int retcode)
 {
 	char msg[2048];
@@ -199,12 +203,7 @@ SOAPSSLContext::~SOAPSSLContext()
 				SSL_CTX_free(m_ctx);
 				m_ctx = 0;
 		}
-		if (m_tmpRSAKey)
-		{
-				RSA_free(m_tmpRSAKey);
-				m_tmpRSAKey = 0;
-		}
-				
+			
 }
 
 

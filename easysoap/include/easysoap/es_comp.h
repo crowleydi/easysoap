@@ -56,7 +56,7 @@
 #ifndef __ES_COMP_H
 # define __ES_COMP_H
 
-#ifdef HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H 
 #  include "es_config.h"
 /* distinguish real MSC from Metrowerks and Intel */
 # elif defined(_MSC_VER) && !defined(__MWERKS__) && !defined (__ICL) && !defined (__COMO__)

@@ -8,7 +8,7 @@ interopserver_SOURCES = \
 	SOAPBuildersInteropHandlerB.cpp \
 	SOAPBuildersHeaderHandler.h \
 	SOAPBuildersHeaderHandler.cpp \
-	interopserver.cpp
+	interopserver.cpp 
 
 interopclient_SOURCES = \
 	interopclient.cpp \
@@ -23,4 +23,4 @@ SSLServer_SOURCES = \
 LDADD = ../src/libeasysoap.la
 INCLUDES = -I@top_srcdir@/include
 
-EXTRA_DIST = README.TXT interopclient.dsp interopserver.dsp
+EXTRA_DIST = README.TXT interopclient.dsp interopserver.dsp README.SSL

@@ -43,7 +43,6 @@ public:
 
 	// callbacks required by openSSL
 	static int 	password_cb(char *buf, int num, int rwflag, void *userdata);
-	static rsa_st* tmpRSAkey_cb(ssl_st* s, int SSLexport, int keylen);
 	
 
 	typedef enum {
