@@ -25,14 +25,14 @@
 
 #define SOAP_ENV "http://schemas.xmlsoap.org/soap/envelope/"
 #define SOAP_ENC "http://schemas.xmlsoap.org/soap/encoding/"
+#define SOAP_ACTOR_NEXT "http://schemas.xmlsoap.org/soap/actor/next"
+
 #define SOAP_XSI_1999 "http://www.w3.org/1999/XMLSchema-instance"
 #define SOAP_XSD_1999 "http://www.w3.org/1999/XMLSchema"
 #define SOAP_XSI_2001 "http://www.w3.org/2001/XMLSchema-instance"
 #define SOAP_XSD_2001 "http://www.w3.org/2001/XMLSchema"
 #define SOAP_XSI SOAP_XSI_2001
 #define SOAP_XSD SOAP_XSD_2001
-
-#define PARSER_NS_SEP "#"
 
 class EASYSOAP_EXPORT SOAPEnc
 {
