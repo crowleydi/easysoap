@@ -124,6 +124,7 @@ private:
 	SOAPUrl				m_endpoint;
 
 public:
+	SOAPonHTTP() {}
 	SOAPonHTTP(const SOAPUrl& endpoint);
 	SOAPonHTTP(const SOAPUrl& endpoint, const SOAPUrl& proxy);
 
