@@ -32,7 +32,13 @@ template<typename T>
 struct SOAPHashCodeFunctor;
 
 template<typename T>
-struct SOAPEqualsFunctor;
+struct SOAPEqualsFunctor
+{
+	bool operator()(const T& a, const T& b) const
+	{
+		return a == b;
+	}
+};
 
 template <typename K, typename I,
 	typename H = SOAPHashCodeFunctor<K>,
