@@ -32,6 +32,7 @@ SOAPDebugger::Write(const char *bytes, size_t len)
 	if (m_file)
 	{
 		fwrite(bytes, 1, len, m_file);
+		fflush(m_file);
 	}
 }
 
@@ -44,6 +45,7 @@ SOAPDebugger::Print(const char *str, ...)
 		va_start(ap, str);
 		vfprintf(m_file, str, ap);
 		va_end(ap);
+		fflush(m_file);
 	}
 }
 
