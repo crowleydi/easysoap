@@ -53,6 +53,13 @@ static TypeMap& GetTypeMap()
 		typemap[FULL_SOAP_XSD PARSER_NS_SEP "string"] = SOAPTypes::xsd_string;
 		typemap[FULL_SOAP_XSD PARSER_NS_SEP "base64"] = SOAPTypes::xsd_base64;
 
+		typemap[FULL_SOAP_XSD_2001 PARSER_NS_SEP "int"] = SOAPTypes::xsd_int;
+		typemap[FULL_SOAP_XSD_2001 PARSER_NS_SEP "integer"] = SOAPTypes::xsd_integer;
+		typemap[FULL_SOAP_XSD_2001 PARSER_NS_SEP "float"] = SOAPTypes::xsd_float;
+		typemap[FULL_SOAP_XSD_2001 PARSER_NS_SEP "double"] = SOAPTypes::xsd_double;
+		typemap[FULL_SOAP_XSD_2001 PARSER_NS_SEP "string"] = SOAPTypes::xsd_string;
+		typemap[FULL_SOAP_XSD_2001 PARSER_NS_SEP "base64"] = SOAPTypes::xsd_base64;
+
 		typemap["SOAP-ENC:SOAPStruct"] = SOAPTypes::soap_struct;
 		typemap["SOAP-ENC:Array"] = SOAPTypes::soap_array;
 
