@@ -14,4 +14,4 @@ LDADD = ../src/libeasysoap.la
 LD_FLAGS = -no-install
 INCLUDES = -I@top_srcdir@/include
 
-EXTRA_DIST = README.TXT
+EXTRA_DIST = README.TXT interopclient.dsp interopserver.dsp

@@ -25,3 +25,5 @@ libeasysoap_la_LDFLAGS = -no-undefined
 libeasysoap_la_LIBADD = abyss/src/libabyss.la
 
 libeasysoap_a_LIBADD = abyss/src/libabyss.la
+
+EXTRA_DIST = easysoap.dsp
