@@ -34,7 +34,7 @@ class EASYSOAP_EXPORT SOAPParameter
 {
 public:
 
-	typedef SOAPArray<SOAPParameter *>				Array;
+	typedef SOAPArray<SOAPParameter>				Array;
 	typedef SOAPHashMap<SOAPString, SOAPParameter*>	Struct;
 	typedef SOAPHashMap<SOAPString, SOAPString>		Attrs;
 
@@ -92,15 +92,8 @@ public:
 		return m_array;
 	}
 
-	Struct& GetStruct()
-	{
-		return m_struct;
-	}
-
-	const Struct& GetStruct() const
-	{
-		return m_struct;
-	}
+	Struct& GetStruct();
+	const Struct& GetStruct() const;
 
 	SOAPParameter& AddParameter(const char *name = "item");
 	const SOAPParameter *GetParameter(const char *name) const;
@@ -123,6 +116,7 @@ public:
 private:
 	void SetParent(SOAPParameter *parent) {m_parent = parent;}
 	void Assign(const SOAPParameter&);
+	void CheckStructSync();
 
 	friend class SOAPParameterHandler;
 
@@ -134,6 +128,7 @@ private:
 	Array			m_array;
 	Struct			m_struct;
 	bool			m_isnull;
+	bool			m_outtasync;
 	SOAPTypes::xsd_type m_basetype;
 
 	static unsigned int		m_gensym;
@@ -210,10 +205,9 @@ inline const SOAPParameter&
 operator>>(const SOAPParameter& param, SOAPArray<T>& val)
 {
 	val.Resize(0);
-	for (SOAPArray<SOAPParameter*>::ConstIterator i = param.GetArray().Begin();
-		i != param.GetArray().End();
-		++i)
-		**i >> val.Add();
+	for (SOAPParameter::Array::ConstIterator i = param.GetArray().Begin();
+		i != param.GetArray().End(); ++i)
+		*i >> val.Add();
 	return param;
 }
 

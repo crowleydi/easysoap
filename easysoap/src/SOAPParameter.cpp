@@ -40,6 +40,7 @@ static const char *SOAP_xsi_type = TAG_SOAP_XSI ":type";
 SOAPParameter::SOAPParameter()
 : m_parent(0)
 , m_isnull(true)
+, m_outtasync(false)
 , m_basetype(SOAPTypes::xsd_none)
 {
 	Reset();
@@ -68,11 +69,12 @@ SOAPParameter::Assign(const SOAPParameter& param)
 	m_strval = param.m_strval;
 
 	const Array& params = param.GetArray();
+	m_array.Resize(params.Size());
 	for (size_t i = 0; i < params.Size(); ++i)
 	{
-		SOAPParameter * p = new SOAPParameter();
-		p->SetParent(this);
-		*p = *params[i];
+		SOAPParameter& p = m_array[i];
+		p.SetParent(this);
+		p = params[i];
 	}
 }
 
@@ -87,8 +89,6 @@ SOAPParameter::operator=(const SOAPParameter& param)
 void
 SOAPParameter::Reset()
 {
-	for (Array::Iterator i = m_array.Begin(); i != m_array.End(); ++i)
-		delete *i;
 	m_array.Resize(0);
 	m_struct.Clear();
 	m_attrs.Clear();
@@ -99,13 +99,10 @@ SOAPParameter::Reset()
 void
 SOAPParameter::SetName(const char *name)
 {
-	if (m_parent && m_name.Length() > 0)
-		m_parent->m_struct.Remove(m_name);
-
 	m_name = name;
 
 	if (m_parent)
-		m_parent->m_struct[m_name] = this;
+		m_parent->m_outtasync = true;
 }
 
 void
@@ -271,6 +268,8 @@ SOAPParameter::GetDouble() const
 const SOAPParameter *
 SOAPParameter::GetParameter(const char *name) const
 {
+	SOAPParameter *ncthis = const_cast<SOAPParameter *>(this);
+	ncthis->CheckStructSync();
 	Struct::Iterator i = m_struct.Find(name);
 	if (i)
 		return *i;
@@ -281,13 +280,41 @@ SOAPParameter::GetParameter(const char *name) const
 SOAPParameter&
 SOAPParameter::AddParameter(const char *name)
 {
+	SOAPParameter& ret = m_array.Add();
+	ret.SetParent(this);
+	ret.SetName(name);
+	m_outtasync = true;
 
-	SOAPParameter *ret = new SOAPParameter();
-	m_array.Add(ret);
-	ret->SetParent(this);
-	ret->SetName(name);
+	return ret;
+}
 
-	return *ret;
+SOAPParameter::Struct&
+SOAPParameter::GetStruct()
+{
+	CheckStructSync();
+	return m_struct;
+}
+
+const SOAPParameter::Struct&
+SOAPParameter::GetStruct() const
+{
+	SOAPParameter *ncthis = const_cast<SOAPParameter *>(this);
+	ncthis->CheckStructSync();
+	return m_struct;
+}
+
+void
+SOAPParameter::CheckStructSync()
+{
+	if (m_outtasync)
+	{
+		m_struct.Clear();
+		for (Array::Iterator i = m_array.Begin(); i != m_array.End(); ++i)
+		{
+			m_struct[i->GetName()] = i;
+		}
+		m_outtasync = false;
+	}
 }
 
 bool
@@ -333,7 +360,7 @@ SOAPParameter::WriteSOAPPacket(SOAPPacketWriter& packet) const
 			char typebuff[128];
 			if (GetArray().Size() > 0)
 			{
-				snprintf(typebuff, sizeof(typebuff), "%s[%d]", GetArray()[0]->GetTypeString(), GetArray().Size());
+				snprintf(typebuff, sizeof(typebuff), "%s[%d]", GetArray()[0].GetTypeString(), GetArray().Size());
 				packet.AddAttr(TAG_SOAP_ENC ":arrayType", typebuff);
 			}
 			else
@@ -342,7 +369,7 @@ SOAPParameter::WriteSOAPPacket(SOAPPacketWriter& packet) const
 			}
 
 			for (size_t i = 0; i < GetArray().Size(); ++i)
-				GetArray()[i]->WriteSOAPPacket(packet);
+				GetArray()[i].WriteSOAPPacket(packet);
 
 		}
 		break;
