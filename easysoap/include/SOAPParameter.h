@@ -66,7 +66,9 @@ public:
 	void SetDouble(const char *val);
 
 	void SetValue(const char *val);
+#ifdef HAVE_WCHART
 	void SetValue(const wchar_t *val);
+#endif // HAVE_WCHART
 	bool GetBoolean() const;
 
 	int GetInt() const;

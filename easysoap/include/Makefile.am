@@ -32,8 +32,8 @@ easysoap_HEADERS = \
     SOAPonHTTP.h \
     XMLParser.h \
     es_comp.h \
-    es_gcc.h \
+    es_conf.h \
     es_msvc.h \
     es_mwerks.h 
 EXTRA_DIST = \
-    config/MetrowerksPrecomp.pch config/MetrowerksPrecompTest.pch
+    config/MetrowerksPrecomp.pch config/MetrowerksPrecompTest.pch es_config.h

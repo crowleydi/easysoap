@@ -210,6 +210,7 @@ SOAPParameter::SetValue(const char *val)
 		SetNull();
 }
 
+#ifdef HAVE_WCHART
 void
 SOAPParameter::SetValue(const wchar_t *val)
 {
@@ -223,6 +224,7 @@ SOAPParameter::SetValue(const wchar_t *val)
 	else
 		SetNull();
 }
+#endif
 
 void
 SOAPParameter::SetFloat(const char *val)

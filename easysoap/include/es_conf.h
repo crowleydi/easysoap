@@ -17,9 +17,13 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifndef __ES_GCC_H_
-#define __ES_GCC_H_
+#ifndef __ES_CONF_H_
+#define __ES_CONF_H_
 
 #define EASYSOAP_EXPORT
 
-#endif // __ES_GCC_H_
+#ifdef HAVE_CONFIG_H
+#include <es_config.h>
+#endif
+
+#endif // __ES_CONF_H_

@@ -61,11 +61,8 @@
 # elif defined (__MWERKS__)
 /* Metrowerks CodeWarrior */
 #  include <es_mwerks.h>
-# elif defined (__GNUC__ )
-/* g++ 2.7.x and above */
-#  include <es_gcc.h>
 # else
-#  include <es_unknown.h>
+#  include <es_conf.h>
 #endif
 
 
