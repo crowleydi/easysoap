@@ -32,6 +32,9 @@
 #include <sys/time.h>
 #endif // _WIN32
 
+#include <SOAP.h>
+#include <SOAPDebugger.h>
+
 #ifndef HAVE_LIBSSL
 
 #include "SOAPSecureSocketImp.h"
@@ -57,6 +60,7 @@ void SOAPSecureSocketImp::InitSSL() {}
 extern "C" {
 #include <openssl/ssl.h>
 #include <openssl/err.h>
+#include <openssl/rand.h>
 };
 
 #include "SOAPSecureSocketImp.h"
@@ -69,9 +73,15 @@ static class OpenSSLinit
 public:
 	OpenSSLinit()
 	{
+		static const char rnd_seed[] = 
+			"string to make the random number generator"
+			"think it has some entropy.";
+
 		SSL_library_init();
 		SSL_load_error_strings();
+		RAND_seed(rnd_seed, sizeof rnd_seed);
 	}
+
 	~OpenSSLinit()
 	{
 	}
@@ -204,6 +214,7 @@ SOAPSecureSocketImp::Read(char *buff, size_t bufflen)
 		do
 		{
 			bytes = SSL_read(m_ssl, buff, bufflen);
+			SOAPDebugger::Print(2, "SRECV: %d bytes\n", bytes);
 			if (bytes > 0)
 			{
 				// good, we read some bytes.
@@ -216,6 +227,7 @@ SOAPSecureSocketImp::Read(char *buff, size_t bufflen)
 				bytes = 0;
 			}
 		} while (retry);
+		SOAPDebugger::Write(1, buff, bytes);
 	}
 	return bytes;
 }
@@ -232,6 +244,7 @@ SOAPSecureSocketImp::Write(const char *buff, size_t bufflen)
 		do
 		{
 			size_t bytes = SSL_write(m_ssl, buff, bufflen);
+			SOAPDebugger::Print(2, "SSEND: %d bytes\n", bytes);
 			if (bytes > 0)
 			{
 				if (bytes != bufflen)
@@ -247,6 +260,7 @@ SOAPSecureSocketImp::Write(const char *buff, size_t bufflen)
 				bytes = 0;
 			}
 		} while (retry);
+		SOAPDebugger::Write(1, buff, bufflen);
 	}
 	return 0;
 }
