@@ -253,11 +253,10 @@ SOAPPacketWriter::AddAttr(const char *attr, const char *value)
 void
 SOAPPacketWriter::AddXMLNS(const char *prefix, const char *ns)
 {
-	m_nsstr = ns;
-	NamespaceMap::Iterator i = m_nsmap.Find(m_nsstr);
+	NamespaceMap::Iterator i = m_nsmap.Find(ns);
 	if (!i)
 	{
-		m_nsmap[m_nsstr] = prefix;
+		m_nsmap[ns] = prefix;
 
 		if (g_makePretty)
 			Write("\r\n\t");
@@ -271,7 +270,7 @@ SOAPPacketWriter::AddXMLNS(const char *prefix, const char *ns)
 			Write(prefix);
 		}
 		Write("=\"");
-		WriteEscaped(m_nsstr);
+		WriteEscaped(ns);
 		Write("\"");
 	}
 }
