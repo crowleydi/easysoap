@@ -27,7 +27,7 @@ public:
 	XMLParser();
 	virtual ~XMLParser();
 
-	void InitParser();
+	void InitParser(const char *charset = 0);
 	void *GetParseBuffer(int size);
 	bool ParseBuffer(int size);
 	const char *GetErrorMessage();

@@ -50,10 +50,10 @@ XMLParser::FreeParser()
 }
 
 void
-XMLParser::InitParser()
+XMLParser::InitParser(const char *encoding)
 {
 	FreeParser();
-	m_parser = XML_ParserCreateNS((const char *)NULL, '#');
+	m_parser = XML_ParserCreateNS(encoding, '#');
 	XML_SetElementHandler(m_parser,
 			XMLParser::_startElement,
 			XMLParser::_endElement);
