@@ -60,13 +60,13 @@ private:
 
 public:
 	// Default constructor
-	SOAPString(const char *str = 0) : m_str(0), m_alloc(128)
+	SOAPString(const char *str = 0) : m_str(0), m_alloc(32)
 	{
 		Assign(str);
 	}
 
 	// Copy constructor
-	SOAPString(const SOAPString& str) : m_str(0), m_alloc(128)
+	SOAPString(const SOAPString& str) : m_str(0), m_alloc(32)
 	{
 		Assign(str.m_str);
 	}
