@@ -35,14 +35,11 @@ public:
 
 	virtual SOAPParseEventHandler* start(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs);
 	virtual SOAPParseEventHandler* startElement(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs);
-	virtual void endElement(const XML_Char *name);
-	virtual void characterData(const XML_Char *str, int len);
-
-	static const char *start_tag;
 
 private:
 
 	SOAPBody			*m_body;
+	bool				m_gotMethod;
 	SOAPMethodHandler	m_methodHandler;
 	SOAPFaultHandler	m_faultHandler;
 	SOAPParameterHandler	m_paramHandler;

@@ -30,10 +30,9 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-const char *SOAPBodyHandler::start_tag = SOAP_ENV PARSER_NS_SEP "Body";
-
 SOAPBodyHandler::SOAPBodyHandler(SOAPBody& body)
 : m_body(&body)
+, m_gotMethod(false)
 , m_methodHandler(body.GetMethod())
 , m_faultHandler(body.GetFault())
 {
@@ -49,44 +48,44 @@ SOAPBodyHandler::~SOAPBodyHandler()
 SOAPParseEventHandler *
 SOAPBodyHandler::start(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs)
 {
+	m_gotMethod = false;
 	return this;
 }
 
 SOAPParseEventHandler *
 SOAPBodyHandler::startElement(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs)
 {
+	if (m_gotMethod)
+	{
+		SOAPParameter *p = 0;
+		const XML_Char **cattrs = attrs;
+		while (*cattrs)
+		{
+			const char *tag = *cattrs++;
+			const char *val = *cattrs++;
+			if (sp_strcmp(tag, "id") == 0)
+			{
+				p = parser.GetHRefParam(val);
+				break;
+			}
+		}
+
+		if (!p)
+			//throw SOAPException("Unknown element: %s");
+			return 0;
+
+		m_paramHandler.SetParameter(*p);
+		return m_paramHandler.start(parser, name, attrs);
+	}
+
+	m_gotMethod = true;
 	if (sp_strcmp(name, SOAPFaultHandler::start_tag) == 0)
 	{
 		m_body->SetIsFault(true);
 		return m_faultHandler.start(parser, name, attrs);
 	}
 
-	const XML_Char **cattrs = attrs;
-	while (*cattrs)
-	{
-		const char *tag = *cattrs++;
-		const char *val = *cattrs++;
-		if (sp_strcmp(tag, "id") == 0)
-		{
-			SOAPParameter *p = parser.GetHRefParam(val);
-			if (!p)
-				throw SOAPException("Sorry, currently don't support pre-declared href/id parameters.");
-
-			m_paramHandler.SetParameter(*p);
-			return m_paramHandler.start(parser, name, attrs);
-		}
-	}
-
 	m_body->SetIsFault(false);
 	return m_methodHandler.start(parser, name, attrs);
 }
 
-void
-SOAPBodyHandler::characterData(const XML_Char *str, int len)
-{
-}
-
-void
-SOAPBodyHandler::endElement(const XML_Char *name)
-{
-}

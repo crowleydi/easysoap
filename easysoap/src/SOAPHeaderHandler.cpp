@@ -29,8 +29,6 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-const char *SOAPHeaderHandler::start_tag = SOAP_ENV ":Header";
-
 SOAPHeaderHandler::SOAPHeaderHandler(SOAPHeader& header)
 : m_header(&header)
 {
@@ -54,12 +52,3 @@ SOAPHeaderHandler::startElement(SOAPParser& parser, const XML_Char *name, const 
 	return 0;
 }
 
-void
-SOAPHeaderHandler::characterData(const XML_Char *str, int len)
-{
-}
-
-void
-SOAPHeaderHandler::endElement(const XML_Char *name)
-{
-}

@@ -55,14 +55,4 @@ SOAPArrayHandler::startElement(SOAPParser& parser, const XML_Char *name, const X
 	return m_paramHandler->start(parser, name, attrs);
 }
 
-void
-SOAPArrayHandler::characterData(const XML_Char *str, int len)
-{
-}
-
-void
-SOAPArrayHandler::endElement(const XML_Char *name)
-{
-}
-
 

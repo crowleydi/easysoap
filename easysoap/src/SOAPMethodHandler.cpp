@@ -55,15 +55,4 @@ SOAPMethodHandler::startElement(SOAPParser& parser, const XML_Char *name, const 
 	return m_paramHandler.start(parser, name, attrs);
 }
 
-void
-SOAPMethodHandler::characterData(const XML_Char *str, int len)
-{
-}
-
-void
-SOAPMethodHandler::endElement(const XML_Char *name)
-{
-}
-
-
 

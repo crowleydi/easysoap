@@ -55,13 +55,4 @@ SOAPFaultHandler::startElement(SOAPParser& parser, const XML_Char *name, const X
 	return m_paramHandler.start(parser, name, attrs);
 }
 
-void
-SOAPFaultHandler::characterData(const XML_Char *str, int len)
-{
-}
-
-void
-SOAPFaultHandler::endElement(const XML_Char *name)
-{
-}
 

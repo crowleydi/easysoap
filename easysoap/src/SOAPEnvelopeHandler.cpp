@@ -56,15 +56,15 @@ SOAPParseEventHandler *
 SOAPEnvelopeHandler::startElement(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs)
 {
 	m_done = false;
-	if (sp_strcmp(name, SOAPBodyHandler::start_tag) == 0)
+	if (sp_strcmp(name, SOAP_ENV PARSER_NS_SEP "Body") == 0)
 	{
 		return m_bodyHandler.start(parser, name, attrs);
 	}
-	else if (sp_strcmp(name, SOAPHeaderHandler::start_tag) == 0)
+	else if (sp_strcmp(name, SOAP_ENV PARSER_NS_SEP "Header") == 0)
 	{
 		return m_headerHandler.start(parser, name, attrs);
 	}
-	else if (sp_strcmp(name, SOAPEnvelopeHandler::start_tag) == 0)
+	else if (sp_strcmp(name, SOAP_ENV PARSER_NS_SEP "Envelope") == 0)
 	{
 		return this;
 	}
@@ -72,11 +72,6 @@ SOAPEnvelopeHandler::startElement(SOAPParser& parser, const XML_Char *name, cons
 	// FIX ME: Get actual tag used, not one with the namespace
 	// //
 	throw SOAPException("Unknown tag in SOAP Envelope: %s", name);
-}
-
-void
-SOAPEnvelopeHandler::characterData(const XML_Char *str, int len)
-{
 }
 
 void
