@@ -247,12 +247,9 @@ public:
 
 		//
 		// parse arrayType attribute
-		attr = param.GetAttributes().Find(SOAPEnc::arrayType);
-		if (!attr)
-			throw SOAPException("Cannot de-serialize array without arrayType attribute.");
-
 		size_t numvals;
-		if (!parsepos(SOAPEnc::arrayType, *attr, numvals))
+		attr = param.GetAttributes().Find(SOAPEnc::arrayType);
+		if (!attr || !parsepos(SOAPEnc::arrayType, *attr, numvals))
 			numvals = arr.Size();
 
 		if (arr.Size() > numvals)
