@@ -1,6 +1,8 @@
 lib_LTLIBRARIES = libeasysoap.la
 lib_LIBRARIES = libeasysoap.a
 THESOURCES = \
+	digcalc.c \
+	md5c.c \
 	SOAPBase64.cpp \
 	SOAPBody.cpp \
 	SOAPBodyHandler.cpp \
@@ -35,6 +37,9 @@ THESOURCES = \
 libeasysoap_la_SOURCES = $(THESOURCES)
 libeasysoap_a_SOURCES = $(THESOURCES)
 noinst_HEADERS = \
+	digcalc.h \
+	global.h \
+	md5.h \
 	SOAPBodyHandler.h \
 	SOAPClientSocketImp.h \
 	SOAPEnvelopeHandler.h \
@@ -55,6 +60,8 @@ AM_CXXFLAGS=-Wall
 
 
 EXTRA_DIST = \
+	digtest.c \
+	mddriver.c \
 	SOAPWinInetTransport.cpp \
 	SOAPISAPIServer.cpp \
 	SOAPHTTPServer.cpp \

@@ -34,6 +34,33 @@
 
 #include "SOAPSecureSocketImp.h"
 
+// For MD5 Digest Authentication
+extern "C" {
+#include "digcalc.h"
+}
+
+#if 0
+static void testDigest()
+{
+      const char * pszNonce = "dcd98b7102dd2f0e8b11d0f600bfb0c093";
+      const char * pszCNonce = "0a4f113b";
+      const char * pszUser = "Mufasa";
+      const char * pszRealm = "testrealm@host.com";
+      const char * pszPass = "Circle Of Life";
+      const char * pszAlg = "md5";
+      char szNonceCount[9] = "00000001";
+      const char * pszMethod = "GET";
+      const char * pszQop = "auth";
+      const char * pszURI = "/dir/index.html";
+      HASHHEX HA1;
+      HASHHEX HA2 = "";
+      HASHHEX Response;
+
+      DigestCalcHA1(pszAlg, pszUser, pszRealm, pszPass, pszNonce, pszCNonce, HA1);
+      DigestCalcResponse(HA1, pszNonce, szNonceCount, pszCNonce, pszQop, pszMethod, pszURI, HA2, Response);
+};
+#endif
+
 #define DEFAULT_USERAGENT EASYSOAP_STRING "/" EASYSOAP_VERSION_STRING
 
 USING_EASYSOAP_NAMESPACE
