@@ -3,14 +3,16 @@
  */
 
 #include <string.h>
-#include <easysoap/es_config.h>
+#include <easysoap/es_conf.h>
 
 #ifdef HAVE_STRCASECMP
 #define STRICMP strcasecmp
-#elif HAVE_STRICMP
+#else
+#ifdef HAVE_STRICMP
 #define STRICMP stricmp
 #else
 #error "No stricmp function."
+#endif
 #endif
 
 #include "global.h"
