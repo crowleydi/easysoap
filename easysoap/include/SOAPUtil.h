@@ -380,6 +380,9 @@ sp_UTF16_UCS(T& utf16, int& c)
 inline bool
 sp_UCS_UTF8(int c, char *& utf8)
 {
+	if (c < 0)
+		return false;
+
 	if (c <= 0x7F)
 	{
 		/* Leave ASCII encoded */
@@ -415,7 +418,7 @@ sp_UCS_UTF8(int c, char *& utf8)
 		*utf8++ = (0x80 | ((c >> 6) & 0x3F));
 		*utf8++ = (0x80 | (c & 0x3F));
 	}
-	else if (c <= 0x7FFFFFFF)
+	else //if (c <= 0x7FFFFFFF)
 	{
 		/* 1111110x + 5 */
 		*utf8++ = (0xFC | (c >> 30));
@@ -424,11 +427,6 @@ sp_UCS_UTF8(int c, char *& utf8)
 		*utf8++ = (0x80 | ((c >> 12) & 0x3F));
 		*utf8++ = (0x80 | ((c >> 6) & 0x3F));
 		*utf8++ = (0x80 | (c & 0x3F));
-	}
-	else
-	{
-		/* Not a valid character... */
-		return false;
 	}
 
 	return true;
