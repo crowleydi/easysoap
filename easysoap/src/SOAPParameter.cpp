@@ -31,16 +31,14 @@
 
 SOAPParameter::SOAPParameter()
 : m_parent(0)
-, m_isstruct(false)
-, m_outtasync(false)
+, m_dataPtr(&m_x_data)
 {
 	Reset();
 }
 
 SOAPParameter::SOAPParameter(const SOAPParameter& param)
 : m_parent(0)
-, m_isstruct(false)
-, m_outtasync(false)
+, m_dataPtr(&m_x_data)
 {
 	Assign(param);
 }
@@ -55,21 +53,29 @@ SOAPParameter::Assign(const SOAPParameter& param)
 {
 	Reset();
 	m_name = param.m_name;
-	m_strval = param.m_strval;
-	m_isstruct = param.m_isstruct;
-	m_attrs = param.GetAttributes();
+	m_x_data.Assign(this, *param.m_dataPtr);
+}
 
-	const Array& params = param.GetArray();
+
+void
+SOAPParameter::Data::Assign(SOAPParameter *parent, const Data& d)
+{
+	m_strval = d.m_strval;
+	m_isstruct = d.m_isstruct;
+	m_attrs = d.m_attrs;
+
+	const Array& params = d.m_array;
 	m_array.Resize(params.Size());
 	for (size_t i = 0; i < params.Size(); ++i)
 	{
-		m_array[i] = m_pool.Get(*params[i]);
-		m_array[i]->SetParent(this);
+		m_array[i] = parent->m_pool.Get(*params[i]);
+		m_array[i]->SetParent(parent);
 	}
 
 	m_outtasync = true;
 	m_struct.Clear();
 }
+
 
 SOAPParameter&
 SOAPParameter::operator=(const SOAPParameter& param)
@@ -82,10 +88,16 @@ SOAPParameter::operator=(const SOAPParameter& param)
 void
 SOAPParameter::ClearValue()
 {
+	m_dataPtr->Clear(m_pool);
+}
+
+void
+SOAPParameter::Data::Clear(Pool& pool)
+{
 	for (Array::Iterator i = m_array.Begin(); i != m_array.End(); ++i)
 	{
 		(*i)->Reset();
-		m_pool.Return(*i);
+		pool.Return(*i);
 	}
 
 	m_attrs.Clear();
@@ -100,10 +112,12 @@ void
 SOAPParameter::Reset()
 {
 	if (m_parent)
-		m_parent->m_outtasync = true;
+		m_parent->m_dataPtr->m_outtasync = true;
 	m_name.GetName().Empty();
 	m_name.GetNamespace().Empty();
-	ClearValue();
+
+	m_x_data.Clear(m_pool);
+	m_dataPtr = &m_x_data;
 }
 
 void
@@ -115,7 +129,7 @@ SOAPParameter::SetName(const char *name, const char *ns)
 		m_name.Set(name, ns);
 
 	if (m_parent)
-		m_parent->m_outtasync = true;
+		m_parent->m_dataPtr->m_outtasync = true;
 }
 
 void
@@ -127,7 +141,7 @@ SOAPParameter::SetType(const char *name, const char *ns)
 bool
 SOAPParameter::IsNull() const
 {
-	Attrs::Iterator null = m_attrs.Find(XMLSchemaInstance::nil);
+	Attrs::Iterator null = m_dataPtr->m_attrs.Find(XMLSchemaInstance::nil);
 	if (null && (*null == "true" || *null == "1"))
 		return true;
 	return false;
@@ -136,28 +150,28 @@ SOAPParameter::IsNull() const
 bool
 SOAPParameter::IsStruct() const
 {
-	return m_isstruct;
+	return m_dataPtr->m_isstruct;
 }
 
 void
 SOAPParameter::SetNull(bool isnull)
 {
 	if (isnull)
-		m_attrs[XMLSchemaInstance::nil] = "true";
+		m_dataPtr->m_attrs[XMLSchemaInstance::nil] = "true";
 	else
-		m_attrs.Remove(XMLSchemaInstance::nil);
+		m_dataPtr->m_attrs.Remove(XMLSchemaInstance::nil);
 }
 
 void
 SOAPParameter::SetIsStruct()
 {
-	m_isstruct = true;
+	m_dataPtr->m_isstruct = true;
 }
 
 SOAPQName&
 SOAPParameter::AddAttribute(const SOAPQName& name)
 {
-	return m_attrs[name];
+	return m_dataPtr->m_attrs[name];
 }
 
 void
@@ -238,7 +252,7 @@ SOAPParameter::GetString() const
 	if (IsStruct())
 		throw SOAPException("Cannot convert a struct to a string.");
 
-	return m_strval;
+	return m_dataPtr->m_strval;
 }
 
 int
@@ -277,7 +291,7 @@ const SOAPParameter&
 SOAPParameter::GetParameter(const char *name) const
 {
 	CheckStructSync();
-	Struct::Iterator i = m_struct.Find(name);
+	Struct::Iterator i = m_dataPtr->m_struct.Find(name);
 	if (!i)
 		throw SOAPException("Could not find element by name: %s", name);
 	return **i;
@@ -290,8 +304,8 @@ SOAPParameter::AddParameter(const char *name)
 	SOAPParameter *ret = m_pool.Get();
 	ret->SetParent(this);
 	ret->SetName(name);
-	m_array.Add(ret);
-	m_outtasync = true;
+	m_dataPtr->m_array.Add(ret);
+	m_dataPtr->m_outtasync = true;
 	SetIsStruct();
 
 	return *ret;
@@ -302,8 +316,8 @@ SOAPParameter::AddParameter(const SOAPParameter& p)
 {
 	SOAPParameter *ret = m_pool.Get(p);
 	ret->SetParent(this);
-	m_array.Add(ret);
-	m_outtasync = true;
+	m_dataPtr->m_array.Add(ret);
+	m_dataPtr->m_outtasync = true;
 	SetIsStruct();
 
 	return *ret;
@@ -313,27 +327,27 @@ SOAPParameter::Struct&
 SOAPParameter::GetStruct()
 {
 	CheckStructSync();
-	return m_struct;
+	return m_dataPtr->m_struct;
 }
 
 const SOAPParameter::Struct&
 SOAPParameter::GetStruct() const
 {
 	CheckStructSync();
-	return m_struct;
+	return m_dataPtr->m_struct;
 }
 
 void
 SOAPParameter::CheckStructSync() const
 {
-	if (m_outtasync)
+	if (m_dataPtr->m_outtasync)
 	{
-		m_struct.Clear();
-		for (Array::ConstIterator i = m_array.Begin(); i != m_array.End(); ++i)
+		m_dataPtr->m_struct.Clear();
+		for (Array::ConstIterator i = m_dataPtr->m_array.Begin(); i != m_dataPtr->m_array.End(); ++i)
 		{
-			m_struct[(*i)->GetName().GetName()] = (SOAPParameter *)*i;
+			m_dataPtr->m_struct[(*i)->GetName().GetName()] = (SOAPParameter *)*i;
 		}
-		m_outtasync = false;
+		m_dataPtr->m_outtasync = false;
 	}
 }
 
@@ -342,7 +356,7 @@ SOAPParameter::WriteSOAPPacket(SOAPPacketWriter& packet) const
 {
 	packet.StartTag(m_name);
 
-	for (Attrs::Iterator i = m_attrs.Begin(); i != m_attrs.End(); ++i)
+	for (Attrs::Iterator i = m_dataPtr->m_attrs.Begin(); i != m_dataPtr->m_attrs.End(); ++i)
 		packet.AddAttr(i.Key(), i.Item());
 
 	if (IsStruct())
@@ -352,7 +366,7 @@ SOAPParameter::WriteSOAPPacket(SOAPPacketWriter& packet) const
 	}
 	else
 	{
-		packet.WriteValue(m_strval);
+		packet.WriteValue(m_dataPtr->m_strval);
 	}
 
 	packet.EndTag(m_name);

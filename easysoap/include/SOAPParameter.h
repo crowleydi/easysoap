@@ -90,12 +90,12 @@ public:
 
 	Array& GetArray()
 	{
-		return m_array;
+		return m_dataPtr->m_array;
 	}
 
 	const Array& GetArray() const
 	{
-		return m_array;
+		return m_dataPtr->m_array;
 	}
 
 	Struct& GetStruct();
@@ -107,9 +107,10 @@ public:
 	const SOAPParameter& GetParameter(const char *) const;
 	const SOAPParameter& GetParameter(size_t i) const
 	{
-		if (m_array.Size() < i)
-			throw SOAPException("Array index out of bounds.");
-		return *m_array[i];
+		if (i >= m_dataPtr->m_array.Size())
+			throw SOAPException("Array index out of bounds while trying to access  element %u (out of %u) on parameter %s.",
+				i, m_dataPtr->m_array.Size(), (const char *)GetName().GetName());
+		return *m_dataPtr->m_array[i];
 	}
 
 	void SetNull(bool isnull = true);
@@ -118,32 +119,55 @@ public:
 	bool IsNull() const;
 	bool IsStruct() const;
 
-	const Attrs& GetAttributes() const {return m_attrs;}
+	const Attrs& GetAttributes() const {return m_dataPtr->m_attrs;}
 	SOAPQName& AddAttribute(const SOAPQName& name);
 
 	//
 	// Use this to get access to the underlying string.
-	SOAPString& GetStringRef()					{return m_strval;}
-	const SOAPString& GetStringRef() const		{return m_strval;}
+	SOAPString& GetStringRef()					{return m_dataPtr->m_strval;}
+	const SOAPString& GetStringRef() const		{return m_dataPtr->m_strval;}
 
 	bool WriteSOAPPacket(SOAPPacketWriter& packet) const;
+
+	void LinkTo(SOAPParameter& param)
+	{
+		m_dataPtr = param.m_dataPtr;
+	}
 
 private:
 	void SetParent(SOAPParameter *parent) {m_parent = parent;}
 	void Assign(const SOAPParameter&);
 	void CheckStructSync() const;
 
+	typedef SOAPPool<SOAPParameter> Pool;
+	class Data
+	{
+	public:
+		Data() : m_isstruct(false), m_outtasync(false) {}
+		~Data() {}
+
+		void Clear(Pool&);
+		void Assign(SOAPParameter *parent, const Data&);
+
+		bool			m_isstruct;	// true for array, struct types
+		SOAPString		m_strval;	// value legal only if m_isstruct == false
+
+		Array			m_array;
+		Attrs			m_attrs;
+		mutable Struct	m_struct;
+		mutable bool	m_outtasync;// true if we need to resynch the hashmap to the array
+	private:
+		Data& operator=(const Data&);
+		Data(const Data&);
+	};
+
+	friend Data;
+
+	Pool			m_pool;
 	SOAPParameter	*m_parent;
 	SOAPQName		m_name;
-
-	bool			m_isstruct;	// true for array, struct types
-	SOAPString		m_strval;	// value legal only if m_isstruct == false
-
-	SOAPPool<SOAPParameter>	m_pool;
-	Array			m_array;
-	Attrs			m_attrs;
-	mutable Struct	m_struct;
-	mutable bool	m_outtasync;// true if we need to resynch the hashmap to the array
+	Data			m_x_data;	// Don't use this directly!
+	Data			*m_dataPtr;
 };
 
 #include <SOAPTypeTraits.h>
