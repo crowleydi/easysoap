@@ -17,11 +17,6 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <math.h>
-#include <errno.h>
-#define RADIUS_EARTH 6367.0		// average radius of earth
-#define DEG_RAD (M_PI / 180.0)	// convert degrees -> radians
-
 class DemoCalculatorHandler : public SOAPDispatchHandler<DemoCalculatorHandler>
 {
 public:
@@ -30,7 +25,6 @@ public:
 		const char * ns = "http://easysoap.sourceforge.net/demos/calculator";
 		DispatchMethod("add", ns, &DemoCalculatorHandler::add);
 		DispatchMethod("mult", ns, &DemoCalculatorHandler::mult);
-		DispatchMethod("GreatCircle", ns, &DemoCalculatorHandler::GreatCircle);
 	}
 
 	DemoCalculatorHandler* GetTarget(const SOAPEnvelope& request)
@@ -62,28 +56,6 @@ public:
 		int n = a * b;
 
 		response.AddParameter("n") << n;
-	}
-
-	//
-	// See: http://www.fes.uwaterloo.ca/crs/geog165/gcoords.htm#Great%20Circles
-	//
-	void GreatCircle(const SOAPMethod& request, SOAPMethod& response)
-	{
-		double lata;
-		double longa;
-		double latb;
-		double longb;
-
-		request.GetParameter("lat_a") >> lata;
-		request.GetParameter("long_a") >> longa;
-		request.GetParameter("lat_b") >> latb;
-		request.GetParameter("long_b") >> longb;
-
-		double distance =
-			RADIUS_EARTH * acos(sin(lata*DEG_RAD)*sin(latb*DEG_RAD) +
-			cos(lata*DEG_RAD)*cos(latb*DEG_RAD)*cos((longa-longb)*DEG_RAD));
-
-		response.AddParameter("distance") << distance;
 	}
 };
 
