@@ -24,7 +24,6 @@
 #define AFX_SOAPBODYHANDLER_H__F011566F_10D2_4391_B8C2_C19BA6AFA822__INCLUDED_
 
 #include "SOAPMethodHandler.h"
-#include "SOAPFaultHandler.h"
 #include "SOAPParameterHandler.h"
 
 BEGIN_EASYSOAP_NAMESPACE
@@ -47,7 +46,6 @@ private:
 	SOAPBody				*m_body;
 	bool					m_gotMethod;
 	SOAPMethodHandler		m_methodHandler;
-	SOAPFaultHandler		m_faultHandler;
 	SOAPParameterHandler	m_paramHandler;
 };
 

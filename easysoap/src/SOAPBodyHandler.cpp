@@ -52,7 +52,6 @@ SOAPBodyHandler::SetBody(SOAPBody& body)
 {
 	m_body = &body;
 	m_methodHandler.SetMethod(body.GetMethod());
-	m_faultHandler.SetFault(body.GetFault());
 }
 
 SOAPParseEventHandler *
@@ -98,17 +97,17 @@ SOAPBodyHandler::startElement(SOAPParser& parser, const XML_Char *name, const XM
 			parser.SetIdParam(id, p);
 
 		m_paramHandler.SetParameter(p);
-		SOAPParseEventHandler *ret = m_paramHandler.start(parser, name, attrs);
-		return ret;
+		return m_paramHandler.start(parser, name, attrs);
+	}
+
+	if (sp_strcmp(name, SOAP_ENV PARSER_NS_SEP "Fault") == 0)
+	{
+		SOAPParameter *p = &m_body->GetFault();
+		m_paramHandler.SetParameter(p);
+		return m_paramHandler.start(parser, name, attrs);
 	}
 
 	m_gotMethod = true;
-	if (sp_strcmp(name, SOAP_ENV PARSER_NS_SEP "Fault") == 0)
-	{
-		m_body->SetIsFault(true);
-		return m_faultHandler.start(parser, name, attrs);
-	}
-
 	m_body->SetIsFault(false);
 	return m_methodHandler.start(parser, name, attrs);
 }
