@@ -86,6 +86,7 @@ public:
 	virtual int Read(char *buffer, int len);
 	virtual void Close();
 	virtual bool CanRead();
+	const SOAPString& GetRequestMessage()	{return m_httpmsg;}
 };
 
 

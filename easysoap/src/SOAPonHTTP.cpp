@@ -27,7 +27,7 @@
 #include "SOAPSecureSocketImp.h"
 
 #ifndef SOAPUSER_AGENT
-#define SOAPUSER_AGENT "EasySoap++/0.1"
+#define SOAPUSER_AGENT "EasySoap++/0.2"
 #endif // SOAPUSER_AGENT
 
 // read the payload into the buffer.
@@ -48,13 +48,37 @@ SOAPonHTTP::Write(const SOAPMethod& method, const char *payload, int payloadsize
 {
 	m_http.BeginPost(m_path);
 	m_http.WriteHeader("User-Agent", SOAPUSER_AGENT);
-	m_http.WriteHeader("Content-Type", "text/xml; charset=utf-8");
+	m_http.WriteHeader("Content-Type", "text/xml; charset=\"UTF-8\"");
 
 	m_http.Write("SOAPAction: \"");
 	m_http.Write(method.GetSoapAction());
 	m_http.WriteLine("\"");
 
-	return m_http.PostData(payload, payloadsize);
+	int ret = m_http.PostData(payload, payloadsize);
+	bool isxml = true;
+	const char *contype = m_http.GetHeader("Content-Type");
+	if (contype)
+	{
+		char *charset = sp_strchr(contype, ';');
+		if (charset)
+			*charset = 0;
+		isxml = (sp_strcmp(contype, "text/xml") == 0);
+		if (charset)
+		{
+			// TODO: Determine character set of the response.
+			// and inform the parser...
+			*charset = ';';
+		}
+	}
+
+	if (ret != 200 && !isxml)
+		throw SOAPException("Unexpected return code: %s",
+			(const char *)m_http.GetRequestMessage());
+
+	if (!isxml)
+		throw SOAPException("Unexpected return Content-Type: %s", contype);
+
+	return ret;
 }
 
 void
@@ -189,7 +213,7 @@ SOAPHTTPProtocol::GetReply()
 	char *httpretcode = sp_strchr(buff, ' ');
 	if (httpretcode)
 	{
-		m_httpmsg = httpretcode;
+		m_httpmsg = ++httpretcode;
 		httpreturn = atoi(httpretcode);
 		if (httpreturn == 0)
 			httpreturn = 500;
