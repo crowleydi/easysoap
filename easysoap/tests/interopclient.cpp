@@ -52,7 +52,11 @@ const char *httpproxy = 0; // "http://localhost:8080";
 
 const char *default_interop_namespace = "http://soapinterop.org/";
 const char *default_interop_soapaction = "urn:soapinterop";
+const char *round2_soapaction = "http://soapinterop.org/";
 SOAPPacketWriter testresults;
+
+
+bool cgimode = false;
 
 //
 // The main library doesn't include iostream,
@@ -72,10 +76,10 @@ operator<<(std::ostream& os, const SOAPQName& name)
 }
 
 void
-SetTraceFile(const char *server, const char *test)
+SetTraceFile(const char *dir, const char *test)
 {
 	char buffer[256];
-	snprintf(buffer, sizeof(buffer), "%s/%s.txt", server, test);
+	snprintf(buffer, sizeof(buffer), "%s/%s.txt", dir, test);
 	SOAPDebugger::SetFile(buffer);
 }
 
@@ -165,6 +169,7 @@ struct Endpoint
 	SOAPString soapaction;
 	bool	   needsappend;
 	SOAPString nspace;
+	SOAPString dir;
 
 	bool operator<(const Endpoint& p) const
 	{
@@ -884,15 +889,104 @@ TestEchoMap(SOAPProxy& proxy, const Endpoint& e)
 typedef void (*TestFunction)(SOAPProxy&, const Endpoint&);
 
 void
-TestForPass(SOAPProxy& proxy, const Endpoint& e, const char *testname, TestFunction func)
+BeginEndpointTesting(const Endpoint& e)
 {
-	const char *type = 0;
+	if (cgimode)
+	{
+		std::cout << "<html><head><title>"
+			<< "EasySoap++ Interop tests"
+			<< "</title></head><body>"
+			<< "<h2>EasySoap++ Interop tests<h2>"
+			<< e.name
+			<< "<table border='1'>"
+			<< "<tr><th>Test</th><th>Result</th><th>Message</th></tr>";
+	}
+	else
+	{
+		std::cout	<< "      Name: " << e.name << std::endl
+					<< "  Endpoint: " << e.endpoint.GetString() << std::endl
+					<< " Namespace: " << e.nspace << std::endl
+					<< "SOAPAction: " << e.soapaction
+					<< (e.needsappend ? "(method)" : "") <<	std::endl
+					<< std::endl;
+	}
+}
+
+void
+EndEndpointTesting(const Endpoint& e)
+{
+	if (cgimode)
+	{
+		std::cout << "</table></body></html>";
+	}
+	else
+	{
+		std::cout
+			<< std::endl
+			<< "--------------------------------------------------------------"
+			<< std::endl
+			<< std::endl;
+	}
+}
+
+void
+BeginTest(const Endpoint& e, const char *testname)
+{
+	if (cgimode)
+	{
+		std::cout << "<tr><td>"
+			<< "<a href='/interoptests/" << e.dir << "/" << testname <<".txt'>"
+			<< testname << "</a></td>";
+	}
+	else
+	{
+		std::cout << "Testing " << testname << ": ";
+	}
+}
+
+void
+EndTest(const Endpoint& e, const SOAPString& type, const SOAPString& msg)
+{
+	if (cgimode)
+	{
+		if (type == "PASS")
+		{
+			std::cout << "<td><font color='green'>" << type << "</font></td>";
+			if (msg != "PASS")
+				std::cout << "<td>" << msg << "</td></tr>";
+			else
+				std::cout << "<td></td></tr>";
+		}
+		else
+		{
+			std::cout << "<td><font color='red'>" << type << "</font></td>";
+			if (msg != "FAIL")
+				std::cout << "<td>" << msg << "</td></tr>";
+			else
+				std::cout << "<td></td></tr>";
+		}
+		std::cout << std::endl;
+		std::cout.flush();
+	}
+	else
+	{
+		std::cout << type;
+		if (!msg.IsEmpty() && msg != "PASS")
+			std::cout << ": " << msg;
+		std::cout << std::endl;
+	}
+}
+
+void
+TestForPass(SOAPProxy& proxy, const Endpoint& e, const SOAPString& testname, TestFunction func)
+{
+	SOAPString type;
 	SOAPString msg;
 
 	try
 	{
-		SetTraceFile(e.name , testname);
-		std::cout << "Testing " << testname << ": ";
+		SetTraceFile(e.dir, testname);
+		BeginTest(e, testname);
 		func(proxy, e);
 		type = "PASS";
 		msg = "PASS";
@@ -923,10 +1017,7 @@ TestForPass(SOAPProxy& proxy, const Endpoint& e, const char *testname, TestFunct
 		msg = "Unknown error, problem with EasySoap++";
 	}
 
-	std::cout << type;
-	if (msg != "PASS")
-		std::cout << ": " << msg;
-	std::cout << std::endl;
+	EndTest(e, type, msg);
 
 	testresults.StartTag("Test");
 	testresults.AddAttr("name", testname);
@@ -943,14 +1034,14 @@ TestForPass(SOAPProxy& proxy, const Endpoint& e, const char *testname, TestFunct
 }
 
 void
-TestForFault(SOAPProxy& proxy, const Endpoint& e, const char *testname, TestFunction func)
+TestForFault(SOAPProxy& proxy, const Endpoint& e, const SOAPString& testname, TestFunction func)
 {
-	const char *type;
+	SOAPString type;
 	SOAPString msg;
 	try
 	{
-		SetTraceFile(e.name , testname);
-		std::cout << "Testing " << testname << ": ";
+		SetTraceFile(e.dir, testname);
+		BeginTest(e, testname);
 		func(proxy, e);
 		type = "FAIL";
 		msg = "FAIL";
@@ -981,10 +1072,7 @@ TestForFault(SOAPProxy& proxy, const Endpoint& e, const char *testname, TestFunc
 		msg = "Unknown error, problem with EasySoap";
 	}
 
-	std::cout << type;
-	if (msg)
-		std::cout << ": " << msg;
-	std::cout << std::endl;
+	EndTest(e, type, msg);
 
 	testresults.StartTag("Test");
 	testresults.AddAttr("name", testname);
@@ -1000,8 +1088,17 @@ TestForFault(SOAPProxy& proxy, const Endpoint& e, const char *testname, TestFunc
 	testresults.EndTag("Test");
 }
 
+typedef enum
+{
+	round1,
+	round2a,
+	round2b,
+	round2c,
+	misc
+} TestType;
+
 void
-TestInterop(const Endpoint& e)
+TestInterop(const Endpoint& e, TestType test)
 {
 	SOAPProxy proxy(e.endpoint, httpproxy);
 
@@ -1020,6 +1117,8 @@ TestInterop(const Endpoint& e)
 	testresults.WriteValue(e.nspace);
 	testresults.EndTag("NameSpace");
 
+	if (test == round1 || test == round2a)
+	{
 	//
 	// Round 1
 	TestForFault(proxy, e, "BogusMethod",				TestBogusMethod);
@@ -1055,6 +1154,10 @@ TestInterop(const Endpoint& e)
 	TestForPass(proxy, e, "echoStringArray_ZeroLen",	TestEchoStringArrayZeroLen);
 	TestForPass(proxy, e, "echoStructArray_ZeroLen",	TestEchoStructArrayZeroLen);
 
+	}
+
+	if (test == round2a)
+	{
 	//
 	// Additional Round 2 base methods
 	TestForPass(proxy, e, "echoBase64",					TestEchoBase64);
@@ -1063,7 +1166,10 @@ TestInterop(const Endpoint& e)
 	TestForFault(proxy, e, "echoBoolean_junk",			TestEchoBooleanJunk);
 	// echoDate
 	// echoDecimal
+	}
 
+	if (test == round2b)
+	{
 	//
 	// Round 2/Group B methods
 	TestForPass(proxy, e, "echoStructAsSimpleTypes",	TestEchoStructAsSimpleTypes);
@@ -1071,12 +1177,76 @@ TestInterop(const Endpoint& e)
 	TestForPass(proxy, e, "echo2DStringArray",			TestEcho2DStringArray);
 	TestForPass(proxy, e, "echoNestedStruct",			TestEchoNestedStruct);
 	TestForPass(proxy, e, "echoNestedArray",			TestEchoNestedArray);
+	}
 
+	if (test == misc)
+	{
 	// Miscellaneous methods
 	TestForPass(proxy, e, "echoMap",					TestEchoMap);
 	TestForPass(proxy, e, "echoHexBinary",				TestEchoHexBinary);
+	}
 
 	testresults.EndTag("Server");
+}
+
+int
+hexval(int c)
+{
+	switch (c)
+	{
+	case '0': return 0;
+	case '1': return 1;
+	case '2': return 2;
+	case '3': return 3;
+	case '4': return 4;
+	case '5': return 5;
+	case '6': return 6;
+	case '7': return 7;
+	case '8': return 8;
+	case '9': return 9;
+	case 'A': case 'a': return 10;
+	case 'B': case 'b': return 11;
+	case 'C': case 'c': return 12;
+	case 'D': case 'd': return 13;
+	case 'E': case 'e': return 14;
+	case 'F': case 'f': return 15;
+	}
+}
+
+char *
+hexdecode(char *str)
+{
+	char *s = str;
+	char *w = str;
+	while (*w)
+	{
+		if (*w == '%')
+		{
+			++w;
+			*s++ = (hexval(*w++) << 4) | hexval(*w++);
+		}
+		else
+			*s++ = *w++;
+	}
+	*s++ = 0;
+	return str;
+}
+
+void
+ParseCGIQuery(SOAPHashMap<SOAPString,SOAPString>& jar, const char *str)
+{
+	SOAPString query = str;
+	char *n = query.Str();
+	while (n)
+	{
+		char *t = n;
+		char *v;
+		if (n = sp_strchr(n, '&'))
+			*n++ = 0;
+		if (v = sp_strchr(t, '='))
+			*v++ = 0;
+		jar[hexdecode(t)] = hexdecode(v);
+	}
 }
 
 int
@@ -1093,6 +1263,7 @@ main(int argc, char* argv[])
 		bool execute = true;
 		bool doappend = false;
 		bool makedirs = false;
+		TestType test = round1;
 
 		SOAPArray<Endpoint> endpoints;
 		SOAPPacketWriter::SetAddWhiteSpace(true);
@@ -1104,7 +1275,69 @@ main(int argc, char* argv[])
 		for (int i = 1; i < argc;)
 		{
 			SOAPString val = argv[i++];
-			if (val == "-a")
+			if (val == "-cgi")
+			{
+				//
+				// We're running as a CGI.  Get args
+				// from QUERY_STRING
+				SOAPHashMap<SOAPString,SOAPString> jar;
+				cgimode = true;
+				makedirs = true;
+				testlocal = false;
+
+				ParseCGIQuery(jar, getenv("QUERY_STRING"));
+
+				const SOAPString& type = jar["type"];
+				if (type == "round2a")
+					test = round2a;
+				else if (type == "round2b")
+					test = round2b;
+				else if (type == "round2c")
+					test = round2c;
+				else if (type == "misc")
+					test = misc;
+
+				Endpoint& e = endpoints.Add();
+				e.endpoint = jar["endpoint"];
+				e.name = e.endpoint.Hostname();
+				char buff[32];
+				sprintf(buff, "%d", rand() % 200);
+				e.dir = buff;
+
+				if (test == round1)
+				{
+					e.nspace = default_interop_namespace;
+					e.soapaction = default_interop_soapaction;
+					e.needsappend = false;
+				}
+				else
+				{
+					e.nspace = default_interop_namespace;
+					e.soapaction = round2_soapaction;
+					e.needsappend = true;
+				}
+
+			}
+			else if (val == "-2a")
+			{
+				test = round2a;
+				soapaction = round2_soapaction;
+			}
+			else if (val == "-2b")
+			{
+				test = round2b;
+				soapaction = round2_soapaction;
+			}
+			else if (val == "-2c")
+			{
+				test = round2c;
+				soapaction = round2_soapaction;
+			}
+			else if (val == "-misc")
+			{
+				test = misc;
+			}
+			else if (val == "-a")
 			{
 				doall = true;
 				testlocal = false;
@@ -1180,9 +1413,9 @@ main(int argc, char* argv[])
 //  FIX ME:
 //  Make this configurable from the makefile
 #ifdef _WIN32
-			e.endpoint = "http://localhost:80/cgi-bin/interopserver.exe";
+			e.endpoint = "http://localhost/cgi-bin/interopserver.exe";
 #else
-			e.endpoint = "http://localhost:80/cgi-bin/interopserver";
+			e.endpoint = "http://localhost/cgi-bin/interopserver";
 #endif // _WIN32
 
 			e.nspace = default_interop_namespace;
@@ -1206,29 +1439,24 @@ main(int argc, char* argv[])
 		for (size_t j = 0; j < endpoints.Size(); ++j)
 		{
 			Endpoint& e = endpoints[j];
-
-			std::cout	<< "      Name: " << e.name << std::endl
-						<< "  Endpoint: " << e.endpoint.GetString() << std::endl
-						<< " Namespace: " << e.nspace << std::endl
-						<< "SOAPAction: " << e.soapaction
-						<< (e.needsappend ? "(method)" : "") <<	std::endl
-						<< std::endl;
+			if (e.dir.IsEmpty())
+				e.dir = e.name;
 
 			if (makedirs)
+			{
 #ifdef _WIN32
-				_mkdir(e.name);
+				_mkdir(e.dir);
 #else
-				mkdir(e.name, 0755);
+				mkdir(e.dir, 0755);
 #endif
+			}
 
 			if (execute && !skips.Find(e.name))
-				TestInterop(e);
-
-			std::cout
-				<< std::endl
-				<< "----------------------------------------------------------------"
-				<< std::endl
-				<< std::endl;
+			{
+				BeginEndpointTesting(e);
+				TestInterop(e, test);
+				EndEndpointTesting(e);
+			}
 		}
 
 		testresults.EndTag("InteropTests");
