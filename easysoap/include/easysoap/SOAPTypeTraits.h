@@ -174,7 +174,11 @@ class SOAPTypeTraits< SOAPHashMap<K, V> > : public SOAPMapTypeTraits
 class SOAPArrayTypeTraits
 {
 private:
-	static void parsepos(const SOAPQName& attr, const SOAPQName& val, size_t& x)
+	//
+	// returns false if the position is []
+	// other wise it returns true and x
+	// is set to the integer value.
+	static bool parsepos(const SOAPQName& attr, const SOAPQName& val, size_t& x)
 	{
 		//
 		// arrayType should be a value like "xsd:string[2]"
@@ -183,10 +187,12 @@ private:
 		const char *s = sp_strrchr(val.GetName(), '[');
 		if (*s++ == '[')
 		{
+			if (*s == ']')
+				return false;
 			char *e = 0;
 			x = strtol(s, &e, 10);
 			if (*e == ']' && e[1] == 0)
-				return;
+				return true;
 		}
 		throw SOAPException("Invalid value for array encoding tag '%s': %s",
 			(const char *)attr.GetName(), (const char *)val.GetName());
@@ -241,7 +247,11 @@ public:
 			throw SOAPException("Cannot de-serialize array without arrayType attribute.");
 
 		size_t numvals;
-		parsepos(SOAPEnc::arrayType, *attr, numvals);
+		if (!parsepos(SOAPEnc::arrayType, *attr, numvals))
+			numvals = arr.Size();
+
+		if (arr.Size() > numvals)
+				throw SOAPException("Error de-serializing array.  Too many values in array.  Array specified %u, found %u.", numvals, arr.Size());
 
 		size_t pos = 0;
 
@@ -250,9 +260,6 @@ public:
 		attr = param.GetAttributes().Find(SOAPEnc::offset);
 		if (attr)
 			parsepos(SOAPEnc::offset, *attr, pos);
-
-		if (arr.Size() > numvals)
-				throw SOAPException("Error de-serializing array.  Too many values.");
 
 		val.resize(numvals);
 		for (SOAPParameter::Array::ConstIterator i = arr.Begin(); i != arr.End(); ++i)
