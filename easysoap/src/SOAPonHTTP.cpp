@@ -27,10 +27,10 @@
 #pragma warning (disable: 4786)
 #endif // _MSC_VER
 
-#include <SOAP.h>
-#include <SOAPonHTTP.h>
-#include <SOAPEnvelope.h>
-#include <SOAPDebugger.h>
+#include <easysoap/SOAP.h>
+#include <easysoap/SOAPonHTTP.h>
+#include <easysoap/SOAPEnvelope.h>
+#include <easysoap/SOAPDebugger.h>
 
 #include "SOAPSecureSocketImp.h"
 

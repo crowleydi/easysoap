@@ -21,7 +21,7 @@
 
 
 #include <httpext.h>
-#include <SOAPISAPIServer.h>
+#include <easysoap/SOAPISAPIServer.h>
 
 
 class SOAPISAPITransport : public SOAPTransport

@@ -20,8 +20,8 @@
  */
 
 
-#include <SOAP.h>
-#include <SOAPNamespaces.h>
+#include <easysoap/SOAP.h>
+#include <easysoap/SOAPNamespaces.h>
 
 const SOAPQName SOAPEnc::root("root", SOAP_ENC);
 const SOAPQName SOAPEnc::Array("Array", SOAP_ENC);

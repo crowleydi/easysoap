@@ -23,9 +23,9 @@
 #pragma warning (disable: 4786)
 #endif // _MSC_VER
 
-#include <SOAP.h>
-#include <SOAPParse.h>
-#include <SOAPNamespaces.h>
+#include <easysoap/SOAP.h>
+#include <easysoap/SOAPParse.h>
+#include <easysoap/SOAPNamespaces.h>
 
 #include "SOAPEnvelopeHandler.h"
 
@@ -78,7 +78,7 @@ SOAPParser::Parse(SOAPEnvelope& env, SOAPTransport& trans)
 				GetErrorMessage());
 		}
 
-		if (read != 0 && m_handler->Done())
+		if (m_handler->Done())
 		{
 			ParseBuffer(0);
 			break;

@@ -20,11 +20,11 @@
  */
 
 
-#include "SOAPHTTPServer.h"
+#include <easysoap/SOAPHTTPServer.h>
 
 
 extern "C" {
-#include "abyss.h"
+#include <abyss.h>
 }
 
 //

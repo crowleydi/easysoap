@@ -19,8 +19,8 @@
  * $Id$
  */
 
-#include <SOAPCGIServer.h>
-#include <SOAPCGITransport.h>
+#include <easysoap/SOAPCGIServer.h>
+#include <easysoap/SOAPCGITransport.h>
 
 int
 SOAPCGIServer::Handle(const char *infile)

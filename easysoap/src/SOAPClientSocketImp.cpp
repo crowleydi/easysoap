@@ -24,7 +24,7 @@
 #pragma warning (disable: 4786)
 #endif // _MSC_VER
 
-#include <SOAPDebugger.h>
+#include <easysoap/SOAPDebugger.h>
 
 #include "SOAPClientSocketImp.h"
 

@@ -24,7 +24,7 @@
 #endif // _MSC_VER
 
 #include <expat.h>
-#include <XMLParser.h>
+#include <easysoap/XMLParser.h>
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

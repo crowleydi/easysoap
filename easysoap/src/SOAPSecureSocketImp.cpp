@@ -32,8 +32,8 @@
 #include <sys/time.h>
 #endif // _WIN32
 
-#include <SOAP.h>
-#include <SOAPDebugger.h>
+#include <easysoap/SOAP.h>
+#include <easysoap/SOAPDebugger.h>
 
 #include "SOAPSecureSocketImp.h"
 

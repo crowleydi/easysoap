@@ -6,7 +6,7 @@ dnl
 AC_INIT(Makefile.am)
 
 AM_INIT_AUTOMAKE(EasySoap++, 0.5)
-AM_CONFIG_HEADER(include/es_config.h)
+AM_CONFIG_HEADER(include/easysoap/es_config.h)
 
 dnl
 dnl Include other macros we need...
@@ -96,5 +96,15 @@ AC_CHECK_FUNCS( \
 	strerror \
 )
 
-AC_OUTPUT(Makefile simpleserver/Makefile validator/Makefile tests/Makefile src/Makefile src/abyss/Makefile src/abyss/src/Makefile include/Makefile)
+AC_OUTPUT( \
+	Makefile \
+	include/Makefile \
+	include/easysoap/Makefile \
+	src/Makefile \
+	src/abyss/Makefile \
+	src/abyss/src/Makefile \
+	simpleserver/Makefile \
+	validator/Makefile \
+	tests/Makefile \
+)
 

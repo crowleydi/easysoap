@@ -25,8 +25,8 @@
 
 #include <windows.h>
 
-#include <SOAP.h>
-#include <SOAPISAPIServer.h>
+#include <easysoap/SOAP.h>
+#include <easysoap/SOAPISAPIServer.h>
 
 #include "calchandler.h"
 

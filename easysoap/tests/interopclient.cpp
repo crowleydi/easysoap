@@ -42,10 +42,10 @@
 #include <sys/stat.h>
 #endif
 
-#include <SOAP.h>
-#include <SOAPonHTTP.h>
-#include <SOAPDebugger.h>
-#include <SOAPSocket.h>
+#include <easysoap/SOAP.h>
+#include <easysoap/SOAPonHTTP.h>
+#include <easysoap/SOAPDebugger.h>
+#include <easysoap/SOAPSocket.h>
 
 #include "interopstruct.h"
 
@@ -578,7 +578,7 @@ TestEchoInteger_MostPositive(SOAPProxy& proxy, const Endpoint& e)
 void
 TestEchoInteger_MostNegative(SOAPProxy& proxy, const Endpoint& e)
 {
-	TestEchoInteger(proxy, e, -2147483648);
+	TestEchoInteger(proxy, e, -2147483647 - 1);
 }
 
 void

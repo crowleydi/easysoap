@@ -20,8 +20,8 @@
  */
 
 
-#include <SOAP.h>
-#include <SOAPPacketWriter.h>
+#include <easysoap/SOAP.h>
+#include <easysoap/SOAPPacketWriter.h>
 
 bool SOAPPacketWriter::g_makePretty = false;
 

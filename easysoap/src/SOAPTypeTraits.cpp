@@ -19,8 +19,8 @@
  * $Id$
  */
 
-#include <SOAP.h>
-#include <SOAPParameter.h>
+#include <easysoap/SOAP.h>
+#include <easysoap/SOAPParameter.h>
 
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h>

@@ -24,8 +24,8 @@
 #pragma warning (disable: 4786)
 #endif // _MSC_VER
 
-#include <SOAP.h>
-#include <SOAPHeader.h>
+#include <easysoap/SOAP.h>
+#include <easysoap/SOAPHeader.h>
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

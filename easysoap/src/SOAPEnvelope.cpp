@@ -24,10 +24,10 @@
 #pragma warning (disable: 4786)
 #endif // _MSC_VER
 
-#include <SOAP.h>
-#include <SOAPEnvelope.h>
-#include <SOAPNamespaces.h>
-#include <SOAPPacketWriter.h>
+#include <easysoap/SOAP.h>
+#include <easysoap/SOAPEnvelope.h>
+#include <easysoap/SOAPNamespaces.h>
+#include <easysoap/SOAPPacketWriter.h>
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

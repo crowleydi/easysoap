@@ -20,8 +20,8 @@
 #if !defined(AFX_WHICHTOOLKITHANDLER_H__54C64ECA_7D60_4DD8_B8B4_EEE5EAF4118A__INCLUDED_)
 #define AFX_WHICHTOOLKITHANDLER_H__54C64ECA_7D60_4DD8_B8B4_EEE5EAF4118A__INCLUDED_
 
-#include "SOAP.h"
-#include "SOAPDispatchHandler.h"
+#include <easysoap/SOAP.h>
+#include <easysoap/SOAPDispatchHandler.h>
 
 class WhichToolkitHandler :
 	public SOAPDispatchHandler<WhichToolkitHandler>

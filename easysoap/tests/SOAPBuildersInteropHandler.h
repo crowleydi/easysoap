@@ -5,7 +5,7 @@
 #if !defined(AFX_SOAPBUILDERSINTEROPHANDLER_H__C0C1D23F_D31D_4118_BB27_C85AB1FA7645__INCLUDED_)
 #define AFX_SOAPBUILDERSINTEROPHANDLER_H__C0C1D23F_D31D_4118_BB27_C85AB1FA7645__INCLUDED_
 
-#include <SOAPDispatchHandler.h>
+#include <easysoap/SOAPDispatchHandler.h>
 
 //
 // See http://www.whitemesa.com/interop.htm

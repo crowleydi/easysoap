@@ -24,7 +24,7 @@
 #pragma warning (disable: 4786)
 #endif // _MSC_VER
 
-#include <SOAPDebugger.h>
+#include <easysoap/SOAPDebugger.h>
 
 FILE *SOAPDebugger::m_file = 0;
 int SOAPDebugger::m_messageLevel = 1;

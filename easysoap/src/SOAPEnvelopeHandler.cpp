@@ -24,8 +24,8 @@
 #endif // _MSC_VER
 
 #include "SOAPEnvelopeHandler.h"
-#include <SOAPEnvelope.h>
-#include <SOAPNamespaces.h>
+#include <easysoap/SOAPEnvelope.h>
+#include <easysoap/SOAPNamespaces.h>
 
 
 //////////////////////////////////////////////////////////////////////

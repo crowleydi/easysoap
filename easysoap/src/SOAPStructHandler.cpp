@@ -27,7 +27,7 @@
 #include "SOAPStructHandler.h"
 #include "SOAPParameterHandler.h"
 
-#include <SOAPParameter.h>
+#include <easysoap/SOAPParameter.h>
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

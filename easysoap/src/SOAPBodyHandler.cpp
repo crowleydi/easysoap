@@ -25,8 +25,8 @@
 #endif // _MSC_VER
 
 #include "SOAPBodyHandler.h"
-#include <SOAPBody.h>
-#include <SOAPNamespaces.h>
+#include <easysoap/SOAPBody.h>
+#include <easysoap/SOAPNamespaces.h>
 
 
 //////////////////////////////////////////////////////////////////////

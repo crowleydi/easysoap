@@ -25,8 +25,8 @@
 #endif // _MSC_VER
 
 #include "SOAPMethodHandler.h"
-#include <SOAPMethod.h>
-#include <SOAPNamespaces.h>
+#include <easysoap/SOAPMethod.h>
+#include <easysoap/SOAPNamespaces.h>
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

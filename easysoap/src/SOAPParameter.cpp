@@ -24,10 +24,10 @@
 #pragma warning (disable: 4786)
 #endif // _MSC_VER
 
-#include <SOAP.h>
-#include <SOAPParameter.h>
-#include <SOAPNamespaces.h>
-#include <SOAPPacketWriter.h>
+#include <easysoap/SOAP.h>
+#include <easysoap/SOAPParameter.h>
+#include <easysoap/SOAPNamespaces.h>
+#include <easysoap/SOAPPacketWriter.h>
 
 SOAPParameter::SOAPParameter()
 : m_parent(0)

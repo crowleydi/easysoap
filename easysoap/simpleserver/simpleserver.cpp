@@ -24,8 +24,8 @@
 
 #include <iostream>
 
-#include <SOAP.h>
-#include <SOAPCGIServer.h>
+#include <easysoap/SOAP.h>
+#include <easysoap/SOAPCGIServer.h>
 
 #include "calchandler.h"
 

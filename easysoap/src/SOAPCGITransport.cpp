@@ -20,8 +20,8 @@
  */
 
 
-#include <SOAPCGIServer.h>
-#include <SOAPCGITransport.h>
+#include <easysoap/SOAPCGIServer.h>
+#include <easysoap/SOAPCGITransport.h>
 
 #ifdef _WIN32
 #include <fcntl.h>

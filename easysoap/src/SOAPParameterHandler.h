@@ -23,8 +23,8 @@
 #if !defined(AFX_SOAPPARAMETERHANDLER_H__124ED3B5_721D_4AB5_8B65_32D5C4F86420__INCLUDED_)
 #define AFX_SOAPPARAMETERHANDLER_H__124ED3B5_721D_4AB5_8B65_32D5C4F86420__INCLUDED_
 
-#include <SOAP.h>
-#include <SOAPParseEventHandler.h>
+#include <easysoap/SOAP.h>
+#include <easysoap/SOAPParseEventHandler.h>
 
 class SOAPStructHandler;
 class SOAPParameter;

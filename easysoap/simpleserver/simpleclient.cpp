@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <SOAP.h>
+#include <easysoap/SOAP.h>
 
 //
 //  The namespace for the methods we're calling.  This
@@ -38,7 +38,6 @@ main(int argc, const char *argv[])
 
 		SOAPProxy proxy(endpoint);
 		SOAPMethod addmethod("add", ns);
-		SOAPMethod multmethod("mult", ns);
 
 		int a = 10;
 		int b = 22;
@@ -51,11 +50,29 @@ main(int argc, const char *argv[])
 		addresp.GetReturnValue() >> n;
 		printf("%d + %d = %d\n", a, b, n);
 
+		SOAPMethod multmethod("mult", ns);
 		multmethod.AddParameter("a") << a;
 		multmethod.AddParameter("b") << b;
 		const SOAPResponse& multresp = proxy.Execute(multmethod);
 		multresp.GetReturnValue() >> n;
 		printf("%d * %d = %d\n", a, b, n);
+
+		//
+		// Compute Great Circle distance from Toronto to Tokyo
+		// Toronto: 43d40'00"N  79d25'00"W
+		// Tokyo:   35d41'10"N 139d45'09"E
+		SOAPMethod greatc("GreatCircle", ns);
+		greatc.AddParameter("lat_a") << (double)(43.+(40./60.));
+		greatc.AddParameter("long_a") << (double)-(79.+(25./60.));
+		greatc.AddParameter("lat_b") << (double)(35.+(41.+10./60.)/60.);
+		greatc.AddParameter("long_b") << (double)(139.+(45.+9./60.)/60.);
+
+		double distance;
+		const SOAPResponse& greatcresp = proxy.Execute(greatc);
+		greatcresp.GetReturnValue() >> distance;
+
+		printf("The Great Circle distance from Toronto to Tokyo is %gkm\n",
+				distance);
 
 		return 0;
 	}

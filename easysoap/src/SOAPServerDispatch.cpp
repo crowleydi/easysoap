@@ -19,8 +19,8 @@
  * $Id$
  */
 
-#include <SOAPServerDispatch.h>
-#include <SOAPDispatchHandler.h>
+#include <easysoap/SOAPServerDispatch.h>
+#include <easysoap/SOAPDispatchHandler.h>
 
 
 
