@@ -32,15 +32,18 @@ public:
 
 	typedef enum {
 		xsd_none,
-		xsd_null,
 
-		xsd_int,
-		xsd_float,
-		xsd_double,
-		xsd_string,
+		xsd_int,		// 32-bit signed integer
+		xsd_integer,	// infinite precision signed integer, -inf..+inf
+		xsd_float,		// 32-bit floating point
+		xsd_double,		// 64-bit floating point
+		xsd_string,		// a string
+		xsd_base64,		// binary encoded into base64
 
 		soap_array,
-		soap_struct
+		soap_struct,
+
+		unknown			// for custom types
 	} xsd_type;
 
 	static xsd_type GetXsdType(const char *str);

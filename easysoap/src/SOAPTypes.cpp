@@ -39,14 +39,25 @@ static TypeMap& GetTypeMap()
 		__es_typemap = new TypeMap();
 		TypeMap& typemap = *__es_typemap;
 
-		typemap["xsd:int"] = SOAPTypes::xsd_int;
-		typemap["xsd:integer"] = SOAPTypes::xsd_int;
-		typemap["xsd:float"] = SOAPTypes::xsd_float;
-		typemap["xsd:double"] = SOAPTypes::xsd_double;
-		typemap["xsd:string"] = SOAPTypes::xsd_string;
+		typemap[TAG_SOAP_XSD ":int"] = SOAPTypes::xsd_int;
+		typemap[TAG_SOAP_XSD ":integer"] = SOAPTypes::xsd_integer;
+		typemap[TAG_SOAP_XSD ":float"] = SOAPTypes::xsd_float;
+		typemap[TAG_SOAP_XSD ":double"] = SOAPTypes::xsd_double;
+		typemap[TAG_SOAP_XSD ":string"] = SOAPTypes::xsd_string;
+		typemap[TAG_SOAP_XSD ":base64"] = SOAPTypes::xsd_base64;
+
+		typemap[FULL_SOAP_XSD PARSER_NS_SEP "int"] = SOAPTypes::xsd_int;
+		typemap[FULL_SOAP_XSD PARSER_NS_SEP "integer"] = SOAPTypes::xsd_integer;
+		typemap[FULL_SOAP_XSD PARSER_NS_SEP "float"] = SOAPTypes::xsd_float;
+		typemap[FULL_SOAP_XSD PARSER_NS_SEP "double"] = SOAPTypes::xsd_double;
+		typemap[FULL_SOAP_XSD PARSER_NS_SEP "string"] = SOAPTypes::xsd_string;
+		typemap[FULL_SOAP_XSD PARSER_NS_SEP "base64"] = SOAPTypes::xsd_base64;
 
 		typemap["SOAP-ENC:SOAPStruct"] = SOAPTypes::soap_struct;
 		typemap["SOAP-ENC:Array"] = SOAPTypes::soap_array;
+
+		typemap[FULL_SOAP_ENC PARSER_NS_SEP "SOAPStruct"] = SOAPTypes::soap_struct;
+		typemap[FULL_SOAP_ENC PARSER_NS_SEP "Array"] = SOAPTypes::soap_array;
 	}
 	return *__es_typemap;
 }
@@ -77,9 +88,11 @@ SOAPTypes::GetXsdString(xsd_type type)
 	switch (type)
 	{
 	case xsd_int:		return TAG_SOAP_XSD ":int";
+	case xsd_integer:	return TAG_SOAP_XSD ":integer";
 	case xsd_float:		return TAG_SOAP_XSD ":float";
 	case xsd_double:	return TAG_SOAP_XSD ":double";
 	case xsd_string:	return TAG_SOAP_XSD ":string";
+	case xsd_base64:	return TAG_SOAP_XSD ":base64";
 
 	case soap_array:	return TAG_SOAP_ENC ":Array";
 	case soap_struct:	return TAG_SOAP_ENC ":SOAPStruct";
@@ -92,10 +105,13 @@ SOAPTypes::GetXsdString(xsd_type type)
 SOAPTypes::xsd_type
 SOAPTypes::GetXsdType(const char *str)
 {
+	if (!str)
+		return xsd_none;
+
 	TypeMap::Iterator i = GetTypeMap().Find(str);
 
 	if (i == GetTypeMap().End())
-		return xsd_none;
+		return unknown;
 
 	return *i;
 }
