@@ -95,6 +95,20 @@ public:
 	~SOAPSocketException() {}
 };
 
+class EASYSOAP_EXPORT SOAPSSLException : public SOAPException
+{
+public:
+	SOAPSSLException(const SOAPString& what)
+		: SOAPException(what) {}
+	SOAPSSLException(const char *fmt, ...)
+	{
+		va_list args;
+		va_start(args, fmt);
+		FormattedMessage(fmt, args);
+		va_end(args);
+	}
+	~SOAPSSLException() {}
+};
 
 
 

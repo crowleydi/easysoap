@@ -136,8 +136,6 @@ SOAPSecureSocketImp::HandleError(const char *context, int retcode)
 		{
 			// premature EOF, but not necessarily an error
 			SOAPDebugger::Print(2, "%s: premature close on socket\r\n", context);
-			// shouldn't we retry here?
-			retry = true;
 			break;
 		}
 		if (retcode == -1)
@@ -148,9 +146,11 @@ SOAPSecureSocketImp::HandleError(const char *context, int retcode)
 			snprintf(tmp, sizeof(tmp), "socket error, errno=%d\r\n", errno);
 			tmp[sizeof(tmp) - 1] = 0;
 #endif // HAVE_STRERROR
-			throw SOAPSocketException(context, tmp);
+			throw SOAPSSLException(context, tmp);
 		}
 		break;
+
+
 	case SSL_ERROR_SSL:
 	default:
 		SOAPString msg;
@@ -174,7 +174,7 @@ SOAPSecureSocketImp::HandleError(const char *context, int retcode)
 		} else {
 			msg = "Unkown error";
 		}
-		throw SOAPSocketException(context, msg.Str());
+		throw SOAPSSLException(context, msg.Str());
 	}
 	return retry;
 	
@@ -275,19 +275,19 @@ SOAPSecureSocketImp::VerifyCert(const char* host)
 {
 	X509* server_cert = SSL_get_peer_certificate(m_ssl);
 	if (!server_cert)
-		throw SOAPException("Error getting server certificate.");
+		throw SOAPSSLException("Error getting server certificate.");
 
 	int rc = SSL_get_verify_result(m_ssl);
 	
 	const char *msg = CheckForCertError(rc);
 	if (msg)
-		throw SOAPException("Error verifying peer certificate: %s", msg);
+		throw SOAPSSLException("Error verifying peer certificate: %s", msg);
 
 	char buf[256];
 	X509_NAME_get_text_by_NID(X509_get_subject_name(server_cert),
 							  NID_commonName, buf, sizeof(buf));
 	if (sp_strcasecmp(buf, host))
-		throw SOAPException("Server certificate hostname does not match (%s != %s)", buf, host);
+		throw SOAPSSLException("Server certificate hostname does not match (%s != %s)", buf, host);
 
 	X509_free(server_cert);
 }
@@ -349,8 +349,12 @@ SOAPSecureSocketImp::Read(char *buff, size_t bufflen)
 		bool retry = false;
 		do
 		{
-			bytes = SSL_read(m_ssl, buff, bufflen);
-			SOAPDebugger::Print(2, "SRECV: %d bytes\r\n", bytes);
+			try {
+				bytes = SSL_read(m_ssl, buff, bufflen);
+				SOAPDebugger::Print(2, "SRECV: %d bytes\r\n", bytes);
+			} catch (...) {
+				throw SOAPSSLException("Error caught while attempting to read");
+			}
 			if (bytes > 0)
 			{
 				// good, we read some bytes.
@@ -359,6 +363,7 @@ SOAPSecureSocketImp::Read(char *buff, size_t bufflen)
 			else 
 			{
 				// check for an error
+				SOAPDebugger::Print(2, "About to call HandleError...\r\n");
 				retry = HandleError("Error reading from secure socket", bytes);
 				bytes = 0;
 			}
@@ -379,8 +384,13 @@ SOAPSecureSocketImp::Write(const char *buff, size_t bufflen)
 		bool retry = false;
 		do
 		{
-			int bytes = SSL_write(m_ssl, buff, bufflen);
-			SOAPDebugger::Print(2, "SSEND: %d bytes\n", bytes);
+			int bytes = 0;
+			try {
+				bytes = SSL_write(m_ssl, buff, bufflen);
+				SOAPDebugger::Print(2, "SSEND: %d bytes\n", bytes);
+			} catch (...) {
+				throw SOAPSSLException("Exception caught while attempting to write.");
+			}
 			if (bytes > 0)
 			{
 				if ((unsigned int)bytes != bufflen)
