@@ -24,7 +24,7 @@
 #include <easysoap/SOAPISAPIServer.h>
 #include <easysoap/SOAPonHTTP.h>
 
-USING_EASYSOAP_NAMESPACE
+BEGIN_EASYSOAP_NAMESPACE
 
 class SOAPISAPITransport : public SOAPServerTransport
 {
@@ -32,17 +32,32 @@ public:
 	SOAPISAPITransport(EXTENSION_CONTROL_BLOCK* pECB)
 		: m_ecb(pECB), m_error(false), m_leftRead(0), m_ecbData(0)
 	{
+		
 		if (m_ecb)
 		{
 			if (sp_strcmp(m_ecb->lpszMethod, "POST"))
 				throw SOAPException("Invalid HTTP method '%s', only POST is supported.", m_ecb->lpszMethod);
 
-			SOAPHTTPProtocol::ParseContentType(m_charset, m_ecb->lpszContentType);
+			//
+			//  Set thread to impersonate
+			HANDLE impersonateToken = 0;
+			if (m_ecb->ServerSupportFunction(m_ecb->ConnID,
+				HSE_REQ_GET_IMPERSONATION_TOKEN,
+				&impersonateToken, 0, 0))
+			{
+				if (!ImpersonateLoggedOnUser(impersonateToken))
+				{
+					throw SOAPException("Failed to impersonate user.");
+				}
+			}
+
+
+			SOAPHTTPProtocol::ParseContentType(m_contentType, m_charset, m_ecb->lpszContentType);
 			m_leftRead = m_ecb->cbTotalBytes;
 
 			char buffer[1024];
 			DWORD bsize = sizeof(buffer);
-			pECB->GetServerVariable(pECB->ConnID, "HTTP_SOAPACTION", buffer, &bsize);
+			m_ecb->GetServerVariable(m_ecb->ConnID, "HTTP_SOAPACTION", buffer, &bsize);
 
 			const char *sa = bsize == 0 ? 0 : buffer;
 			if (sa && *sa == '\"')
@@ -65,6 +80,11 @@ public:
 			m_ecb->ServerSupportFunction(m_ecb->ConnID, HSE_REQ_DONE_WITH_SESSION, &dwState, NULL, 0);
 			m_ecb = 0;
 		}
+
+		//
+		// Clear the thread of any impersonatings it
+		// may be doing...
+		RevertToSelf();
 	}
 
 	void SetError()
@@ -75,6 +95,11 @@ public:
 	const char *GetCharset() const
 	{
 		return m_charset;
+	}
+
+	const char *GetContentType() const
+	{
+		return m_contentType;
 	}
 
 	const char *GetSoapAction() const
@@ -172,8 +197,13 @@ private:
 	bool						m_error;
 	size_t						m_leftRead;
 	SOAPString					m_charset;
+	SOAPString					m_contentType;
 	SOAPString					m_soapaction;
 };
+
+END_EASYSOAP_NAMESPACE
+
+USING_EASYSOAP_NAMESPACE
 
 int
 SOAPISAPIServer::Handle()
