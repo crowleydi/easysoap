@@ -39,6 +39,25 @@ SOAPHeader::~SOAPHeader()
 
 }
 
+SOAPParameter&
+SOAPHeader::AddHeader()
+{
+	return m_headers.Add();
+}
+
+const SOAPHeader::Headers&
+SOAPHeader::GetHeaders() const
+{
+	return m_headers;
+}
+
+SOAPHeader::Reset()
+{
+	for (Headers::Iterator i = m_headers.Begin(); i != m_headers.End(); ++i)
+		i->Reset();
+	m_headers.Resize(0);
+}
+
 bool
 SOAPHeader::WriteSOAPPacket(SOAPPacketWriter& packet) const
 {

@@ -21,7 +21,7 @@
 #if !defined(AFX_SOAPHEADERHANDLER_H__A673A39C_3468_40A3_A837_690B8A74AAE2__INCLUDED_)
 #define AFX_SOAPHEADERHANDLER_H__A673A39C_3468_40A3_A837_690B8A74AAE2__INCLUDED_
 
-#include "SOAPParseEventHandler.h"
+#include "SOAPParameterHandler.h"
 
 class SOAPHeader;
 
@@ -36,7 +36,8 @@ public:
 	virtual SOAPParseEventHandler* startElement(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs);
 
 private:
-	SOAPHeader	*m_header;
+	SOAPHeader				*m_header;
+	SOAPParameterHandler	m_paramHandler;
 };
 
 #endif // !defined(AFX_SOAPHEADERHANDLER_H__A673A39C_3468_40A3_A837_690B8A74AAE2__INCLUDED_)

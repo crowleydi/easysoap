@@ -29,13 +29,17 @@ public:
 	SOAPHeader();
 	virtual ~SOAPHeader();
 
+	typedef SOAPArray<SOAPParameter> Headers;
+
+	Reset();
+	SOAPParameter& AddHeader();
+	const Headers& GetHeaders() const;
+
 	bool WriteSOAPPacket(SOAPPacketWriter& packet) const;
 
 private:
-	// hrmmm... what can go into a header...?
-	static const char *write_tag;
-	static const char *parse_tag;
 
+	Headers	m_headers;
 };
 
 #endif // !defined(AFX_SOAPHEADER_H__9717994A_8D5C_42BE_9F48_E0B7990C59E3__INCLUDED_)
