@@ -25,7 +25,10 @@
 #pragma warning (disable: 4786)
 #pragma warning (disable: 4251)
 
-#define STDC_HEADERS
+#define HAVE_ERRNO_H
+#define HAVE_MATH_H
+#define HAVE_MALLOC_H
+#define HAVE_STDLIB_H
 #define HAVE_FLOAT_H
 #define HAVE_WCHART
 

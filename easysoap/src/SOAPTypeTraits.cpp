@@ -22,9 +22,15 @@
 #include <SOAP.h>
 #include <SOAPParameter.h>
 
-#ifdef STDC_HEADERS
+#ifdef HAVE_STDLIB_H
 #include <stdlib.h>
+#endif
+
+#ifdef HAVE_MATH_H
 #include <math.h>
+#endif
+
+#ifdef HAVE_ERRNO_H
 #include <errno.h>
 #endif
 
@@ -181,7 +187,10 @@ SOAPTypeTraits<char>::Deserialize(const SOAPParameter& param, char& val)
     if (param.IsNull() || str.IsEmpty())
         throw SOAPException("Cannot convert null value to byte.");
 
-	val = sp_strtol(str);
+	int v;
+	val = v = sp_strtol(str);
+	if (v != val)
+		throw SOAPException("Value out of range for byte: %d", v);
 	return param;
 }
 
@@ -212,7 +221,10 @@ SOAPTypeTraits<short>::Deserialize(const SOAPParameter& param, short& val)
     if (param.IsNull() || str.IsEmpty())
         throw SOAPException("Cannot convert null value to short.");
 
-	val = sp_strtol(str);
+	int v;
+	val = v = sp_strtol(str);
+	if (v != val)
+		throw SOAPException("Value out of range for short: %d", v);
 	return param;
 }
 

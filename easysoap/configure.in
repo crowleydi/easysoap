@@ -37,7 +37,25 @@ AC_CHECK_HEADER(wchar.h,
 	AC_EGREP_HEADER(wchar_t, stddef.h, 
 		AC_DEFINE(STDDEF_HAS_WCHART, 1, "Define if wchar_t is defined in the <stddef.h> header file.")))
 
-AC_CHECK_HEADERS(fcntl.h malloc.h sys/ioctl.h sys/types.h sys/socket.h netinet/in.h netinet/tcp.h arpa/inet.h resolv.h netdb.h unistd.h sys/unistd.h ieeefp.h sys/filio.h)
+AC_CHECK_HEADERS( \
+	errno.h \
+	fcntl.h \
+	ieeefp.h \
+	malloc.h \
+	math.h \
+	netdb.h \
+	resolv.h \
+	stdlib.h \
+	unistd.h \
+	arpa/inet.h \
+	netinet/in.h \
+	netinet/tcp.h \
+	sys/filio.h \
+	sys/ioctl.h \
+	sys/socket.h \
+	sys/types.h \
+	sys/unistd.h \
+)
 
 
 dnl Checks for typedefs, structures, and compiler characteristics.
