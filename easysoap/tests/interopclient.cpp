@@ -258,7 +258,7 @@ GetRound2Endpoints(SOAPArray<Endpoint>& ea, const char *groupName)
 	SOAPProxy proxy("http://www.whitemesa.net/interopInfo", httpproxy);
 	SOAPMethod getEndpointInfo("GetEndpointInfo",
 		"http://soapinterop.org/info/",
-		"http://soapinterop.org/info/#", true);
+		"http://soapinterop.org/info/", false);
 
 	getEndpointInfo.AddParameter("groupName") << groupName;
 
