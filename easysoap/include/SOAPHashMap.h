@@ -383,6 +383,16 @@ public:
 	size_t GetNumBuckets() const {return m_elements.Size();}
 	float GetFillFactor() const {return m_fillfactor;}
 
+
+	//
+	// For STL compatibility
+	typedef K key_type;
+	typedef Iterator iterator;
+	typedef Iterator const_iterator;
+
+	iterator begin() const {return Begin();}
+	iterator end() const {return End();}
+
 private:
 	// Does the actual find.  We pass in the hashcode so we don't have
 	// to recompute it since it is used in other places.
