@@ -462,7 +462,7 @@ SOAPHTTPProtocol::GetChunkLength()
 void
 SOAPHTTPProtocol::Close()
 {
-	m_canread = -1;
+	m_canread = 0;
 	m_doclose = false;
 	super::Close();
 	SOAPDebugger::Print(2, "CLOSED\n");
@@ -478,15 +478,12 @@ SOAPHTTPProtocol::CanRead()
 size_t
 SOAPHTTPProtocol::ReadChunk(char *buffer, size_t len)
 {
-	if (m_canread == 0)
+	// get chunk size, abort on empty chunk
+	if (m_canread == 0&& (m_canread = GetChunkLength()) == 0)
 	{
-		// get chunk size, abort on empty chunk
-		if ((m_canread = GetChunkLength()) == 0)
-		{
-			if (m_doclose)
-				Close();
-			return 0;
-		}
+		if (m_doclose)
+			Close();
+		return 0;
 	}
 
 	if (len > m_canread)

@@ -46,7 +46,7 @@ private:
 	SOAPString	m_httpmsg;
 	SOAPString	m_charset;
 	SOAPString	m_contentType;
-	int			m_canread;
+	size_t		m_canread;
 	bool		m_httpproxy;
 	bool		m_doclose;
 	bool		m_keepAlive;
@@ -64,7 +64,7 @@ private:
 
 public:
 	SOAPHTTPProtocol()
-		: m_canread(-1)
+		: m_canread(0)
 		, m_httpproxy(false)
 		, m_doclose(false)
 		, m_keepAlive(true)
@@ -73,7 +73,7 @@ public:
 	{}
 
 	SOAPHTTPProtocol(const SOAPUrl& endpoint)
-		: m_canread(-1)
+		: m_canread(0)
 		, m_httpproxy(false)
 		, m_doclose(false)
 		, m_keepAlive(true)
@@ -84,7 +84,7 @@ public:
 	}
 
 	SOAPHTTPProtocol(const SOAPUrl& endpoint, const SOAPUrl& proxy)
-		: m_canread(-1)
+		: m_canread(0)
 		, m_httpproxy(false)
 		, m_doclose(false)
 		, m_keepAlive(true)

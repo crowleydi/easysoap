@@ -37,7 +37,7 @@ public:
 
 
 template <typename T>
-class EASYSOAP_EXPORT SOAPDispatchHandler : public SOAPDispatchHandlerInterface
+class SOAPDispatchHandler : public SOAPDispatchHandlerInterface
 {
 private:
 	typedef void (T::*HandlerFunction)(const SOAPMethod& request, SOAPMethod& response);
@@ -45,6 +45,13 @@ private:
 
 	SOAPDispatchHandler(const SOAPDispatchHandler&);
 	SOAPDispatchHandler& operator=(const SOAPDispatchHandler&);
+
+	DispatchMap	m_dispatchMap;
+
+protected:
+	SOAPDispatchHandler()
+	{
+	}
 
 	bool ExecuteMethod(const SOAPEnvelope& request, SOAPMethod& response)
 	{
@@ -57,13 +64,6 @@ private:
 			return true;
 		}
 		return false;
-	}
-
-	DispatchMap	m_dispatchMap;
-
-protected:
-	SOAPDispatchHandler()
-	{
 	}
 
 	virtual T* GetTarget(const SOAPEnvelope& request) = 0;
@@ -89,7 +89,7 @@ public:
 
 
 template <typename T>
-class EASYSOAP_EXPORT SOAPHeaderHandler : public SOAPHeaderHandlerInterface
+class SOAPHeaderHandler : public SOAPHeaderHandlerInterface
 {
 private:
 	typedef void (T::*HandlerFunction)(const SOAPParameter& header, SOAPEnvelope& request, SOAPEnvelope& response);

@@ -498,7 +498,7 @@ TestEchoFloatArray(SOAPProxy& proxy, const Endpoint& e, int numvals)
 {
 	SOAPArray<float> inputValue;
 	for (int i = 0; i < numvals; ++i)
-		inputValue.Add(randdouble());
+		inputValue.Add((float)randdouble());
 
 	SOAPMethod method("echoFloatArray", e.nspace, e.soapaction, e.needsappend);
 	// Here I call SetArrayType() to make sure that for zero-length
@@ -580,7 +580,7 @@ TestEchoStructArray(SOAPProxy& proxy, const Endpoint& e, int numvals)
 		char buffer[256];
 		sprintf(buffer, "This is struct string #%d, rn=%d", i, rand());
 		val.varString = buffer;
-		val.varFloat = randdouble();
+		val.varFloat = (float)randdouble();
 		val.varInt = rand();
 	}
 
@@ -1050,7 +1050,7 @@ TestEchoHdrStruct(SOAPProxy& proxy, const Endpoint& e,
 	SOAPStruct str;
 
 	str.varString = "This is a string in the header";
-	str.varFloat = randdouble();
+	str.varFloat = (float)randdouble();
 	str.varInt = rand();
 
 	header << str;

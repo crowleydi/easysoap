@@ -84,7 +84,7 @@ BEGIN_EASYSOAP_NAMESPACE
 template <typename K, typename I,
 	typename H = SOAPHashCodeFunctor<K>,
 	typename E = SOAPEqualsFunctor<K> >
-class EASYSOAP_EXPORT SOAPHashMap
+class SOAPHashMap
 {
 private:
 	// structure for keeping a linked-list of elements

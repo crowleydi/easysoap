@@ -325,7 +325,7 @@ SOAPTypeTraits<float>::Deserialize(const SOAPParameter& param, float& val)
 		throw SOAPException("Cannot convert null value to float.");
 
 	double dret = sp_strtod(param.GetStringRef());
-	float ret = dret;
+	float ret = (float)dret;
 
 	if (ret == HUGE_VAL && dret != HUGE_VAL ||
         ret == -HUGE_VAL && dret != -HUGE_VAL)
