@@ -45,6 +45,7 @@ SOAPParseEventHandler *
 SOAPArrayHandler::start(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs)
 {
 	m_param->SetIsArray();
+	m_param->GetArray().Resize(0);
 	return this;
 }
 
