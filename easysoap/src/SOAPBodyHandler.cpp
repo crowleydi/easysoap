@@ -55,20 +55,20 @@ SOAPBodyHandler::SetBody(SOAPBody& body)
 }
 
 SOAPParseEventHandler *
-SOAPBodyHandler::start(SOAPParser&, const XML_Char *, const XML_Char **)
+SOAPBodyHandler::start(SOAPParser&, const char *, const char **)
 {
 	m_gotMethod = false;
 	return this;
 }
 
 SOAPParseEventHandler *
-SOAPBodyHandler::startElement(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs)
+SOAPBodyHandler::startElement(SOAPParser& parser, const char *name, const char **attrs)
 {
 	const char *id = 0;
 	const char *href = 0;
 	bool notRoot = false;
 
-	const XML_Char **cattrs = attrs;
+	const char **cattrs = attrs;
 	while (*cattrs)
 	{
 		const char *tag = *cattrs++;

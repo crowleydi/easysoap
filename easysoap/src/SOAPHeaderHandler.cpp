@@ -53,13 +53,13 @@ SOAPHeaderHandler::SetHeader(SOAPHeader& header)
 }
 
 SOAPParseEventHandler *
-SOAPHeaderHandler::start(SOAPParser&, const XML_Char *, const XML_Char **)
+SOAPHeaderHandler::start(SOAPParser&, const char *, const char **)
 {
 	return this;
 }
 
 SOAPParseEventHandler *
-SOAPHeaderHandler::startElement(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs)
+SOAPHeaderHandler::startElement(SOAPParser& parser, const char *name, const char **attrs)
 {
 	m_paramHandler.SetParameter(&m_header->AddHeader());
 	return m_paramHandler.start(parser, name, attrs);

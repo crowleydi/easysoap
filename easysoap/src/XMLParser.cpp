@@ -111,27 +111,27 @@ XMLParser::GetErrorMessage()
 }
 
 void
-XMLParser::startElement(const XML_Char *, const XML_Char **)
+XMLParser::startElement(const char *, const char **)
 {
 }
 
 void
-XMLParser::endElement(const XML_Char *)
+XMLParser::endElement(const char *)
 {
 }
 
 void
-XMLParser::characterData(const XML_Char *, int)
+XMLParser::characterData(const char *, int)
 {
 }
 
 void
-XMLParser::startNamespace(const XML_Char *, const XML_Char *)
+XMLParser::startNamespace(const char *, const char *)
 {
 }
 
 void
-XMLParser::endNamespace(const XML_Char *)
+XMLParser::endNamespace(const char *)
 {
 }
 

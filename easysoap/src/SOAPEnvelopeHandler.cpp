@@ -58,13 +58,13 @@ SOAPEnvelopeHandler::SetEnvelope(SOAPEnvelope& env)
 
 
 SOAPParseEventHandler *
-SOAPEnvelopeHandler::start(SOAPParser&, const XML_Char *, const XML_Char **)
+SOAPEnvelopeHandler::start(SOAPParser&, const char *, const char **)
 {
 	return this;
 }
 
 SOAPParseEventHandler *
-SOAPEnvelopeHandler::startElement(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs)
+SOAPEnvelopeHandler::startElement(SOAPParser& parser, const char *name, const char **attrs)
 {
 	if (sp_strcmp(name, SOAP_ENV PARSER_NS_SEP "Body") == 0)
 	{

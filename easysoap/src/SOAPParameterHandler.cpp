@@ -48,7 +48,7 @@ SOAPParameterHandler::~SOAPParameterHandler()
 }
 
 SOAPParseEventHandler *
-SOAPParameterHandler::start(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs)
+SOAPParameterHandler::start(SOAPParser& parser, const char *name, const char **attrs)
 {
 	m_param->Reset();
 	m_param->SetNull(false);
@@ -68,11 +68,11 @@ SOAPParameterHandler::start(SOAPParser& parser, const XML_Char *name, const XML_
 	m_setvalue = true;
 	m_str.Resize(0);
 
-	const XML_Char **cattrs = attrs;
+	const char **cattrs = attrs;
 	while (*cattrs)
 	{
-		const XML_Char *tag = *cattrs++;
-		const XML_Char *val = *cattrs++;
+		const char *tag = *cattrs++;
+		const char *val = *cattrs++;
 
 		const char *tsep = sp_strchr(tag, PARSER_NS_SEP[0]);
 		if (tsep)
@@ -116,7 +116,7 @@ SOAPParameterHandler::start(SOAPParser& parser, const XML_Char *name, const XML_
 }
 
 SOAPParseEventHandler *
-SOAPParameterHandler::startElement(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs)
+SOAPParameterHandler::startElement(SOAPParser& parser, const char *name, const char **attrs)
 {
 	//
 	// If a parameter has an element, then it must
@@ -129,14 +129,14 @@ SOAPParameterHandler::startElement(SOAPParser& parser, const XML_Char *name, con
 }
 
 void
-SOAPParameterHandler::characterData(const XML_Char *str, int len)
+SOAPParameterHandler::characterData(const char *str, int len)
 {
 	if (m_setvalue)
 		m_str.Add(str, len);
 }
 
 void
-SOAPParameterHandler::endElement(const XML_Char *)
+SOAPParameterHandler::endElement(const char *)
 {
 	if (m_setvalue)
 	{

@@ -38,20 +38,26 @@ public:
 	SOAPParameterHandler();
 	virtual ~SOAPParameterHandler();
 
-	void SetParameter(SOAPParameter *param)			{m_param = param;}
+	void SetParameter(SOAPParameter *param)		
+	{
+		m_param = param;
+	}
 
-	virtual SOAPParseEventHandler* start(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs);
-	virtual SOAPParseEventHandler* startElement(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs);
-	virtual void endElement(const XML_Char *name);
-	virtual void characterData(const XML_Char *str, int len);
+	virtual SOAPParseEventHandler* start(SOAPParser& parser,
+			const char *name,
+			const char **attrs);
+	virtual SOAPParseEventHandler* startElement(SOAPParser& parser,
+			const char *name,
+			const char **attrs);
+	virtual void endElement(const char *name);
+	virtual void characterData(const char *str, int len);
 
 private:
-	SOAPParameter			*m_param;
-
-	SOAPArray<XML_Char>		m_str;
-	SOAPStructHandler		*m_structHandler;
-	SOAPQName				m_attrName;
-	bool					m_setvalue;
+	SOAPParameter		*m_param;
+	SOAPArray<char>		m_str;
+	SOAPStructHandler	*m_structHandler;
+	SOAPQName			m_attrName;
+	bool				m_setvalue;
 };
 
 END_EASYSOAP_NAMESPACE

@@ -100,7 +100,7 @@ SOAPParser::Parse(SOAPEnvelope& env, SOAPTransport& trans)
 }
 
 void
-SOAPParser::startElement(const XML_Char *name, const XML_Char **attrs)
+SOAPParser::startElement(const char *name, const char **attrs)
 {
 	SOAPParseEventHandler* handler = 0;
 	if (m_handlerstack.IsEmpty())
@@ -136,24 +136,24 @@ SOAPParser::startElement(const XML_Char *name, const XML_Char **attrs)
 }
 
 void
-SOAPParser::characterData(const XML_Char *str, int len)
+SOAPParser::characterData(const char *str, int len)
 {
 	SOAPParseEventHandler* handler = m_handlerstack.Top();
 	if (handler)
-		handler->characterData(str, len);
+		handler->characterData(*this, str, len);
 }
 
 void
-SOAPParser::endElement(const XML_Char *name)
+SOAPParser::endElement(const char *name)
 {
 	SOAPParseEventHandler* handler = m_handlerstack.Top();
 	if (handler)
-		handler->endElement(name);
+		handler->endElement(*this, name);
 	m_handlerstack.Pop();
 }
 
 void
-SOAPParser::startNamespace(const XML_Char *prefix, const XML_Char *uri)
+SOAPParser::startNamespace(const char *prefix, const char *uri)
 {
 	if (prefix)
 		m_work = prefix;
@@ -164,7 +164,7 @@ SOAPParser::startNamespace(const XML_Char *prefix, const XML_Char *uri)
 }
 
 void
-SOAPParser::endNamespace(const XML_Char *prefix)
+SOAPParser::endNamespace(const char *prefix)
 {
 	if (prefix)
 		m_work = prefix;
