@@ -73,11 +73,15 @@ int SocketCreate(TSocket *s)
 
 int SocketClose(TSocket *s)
 {
+	TSocket ss = *s;
+	*s = 0;
+	if (ss)
 #ifdef _WIN32
-	RET(closesocket(*s));
+	RET(closesocket(ss));
 #else
-	RET(close(*s));
+	RET(close(ss));
 #endif	/* _WIN32 */
+	return FALSE;
 }
 
 uint32 SocketWrite(TSocket *s, char *buffer, uint32 len)
