@@ -205,6 +205,9 @@ SOAPSecureSocketImp::CheckForCertError(int rc) {
 	const char *msg = 0;
 	if (!m_context->IgnoreCertError(rc)) {
 		switch(rc) {
+			case X509_V_OK:
+				// successful certificate verification
+				break;
 			case X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT:
 				msg = "the issuer certificate could not be found";
 				break;
