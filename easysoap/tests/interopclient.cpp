@@ -209,6 +209,9 @@ TestEchoInteger(SOAPProxy& proxy, const Endpoint& e, const char *value)
 	method.AddParameter("inputInteger").SetInt(value);
 
 	const SOAPResponse& response = proxy.Execute(method);
+	SOAPString outputValue = 0;
+	response.GetReturnValue() >> outputValue;
+	throw SOAPPassException("Returned value: %s", (const char *)outputValue);
 }
 
 void
@@ -740,7 +743,7 @@ main(int argc, char* argv[])
 				testlocal = false;
 				Endpoint& e = endpoints.Add();
 				e.endpoint = argv[i];
-				e.name = servicename ? servicename : e.endpoint.Hostname();
+				e.name = servicename ? servicename : (const char *)e.endpoint.Hostname();
 				e.nspace = nspace;
 				e.soapaction = soapaction;
 				e.needsappend = doappend;
@@ -801,7 +804,7 @@ main(int argc, char* argv[])
 
 	if (xmlname)
 	{
-		FILE *xmlfile = fopen(xmlname, "w");
+		FILE *xmlfile = fopen(xmlname, "wb");
 		if (xmlfile)
 		{
 			fwrite(testresults.GetBytes(), 1, testresults.GetLength(), xmlfile);
