@@ -14,7 +14,9 @@ Packager: Blaise St-Laurent <blaise@geeky.net>
 Buildroot: /var/tmp/%{name}-root
 
 %description
-<insert description here>
+EasySoap++ is a lightweight SOAP implementation written in C++. It implements
+most of the SOAP specification, and interoperates well with many other 
+soap implementations.
 
 %package devel
 Summary: Libraries, includes and docs for development with EasySoap++
