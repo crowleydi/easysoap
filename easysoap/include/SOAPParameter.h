@@ -31,9 +31,6 @@
 #include <SOAPBase64.h>
 #include <SOAPNamespaces.h>
 
-class SOAPParameter;
-#include <SOAPTypeTraits.h>
-
 class SOAPParameterHandler;
 
 class EASYSOAP_EXPORT SOAPParameter
@@ -146,6 +143,8 @@ private:
 	mutable Struct	m_struct;
 	mutable bool	m_outtasync;// true if we need to resynch the hashmap to the array
 };
+
+#include <SOAPTypeTraits.h>
 
 template<typename T>
 inline SOAPParameter&
