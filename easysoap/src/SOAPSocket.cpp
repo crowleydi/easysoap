@@ -38,6 +38,7 @@ SOAPProtocolBase::SOAPProtocolBase()
 	, m_wpos(0)
 	, m_wend(0)
 	, m_timeout(0)
+	, m_delsocket(true)
 {
 }
 
@@ -50,8 +51,10 @@ void
 SOAPProtocolBase::Close()
 {
 	SOAPDebugger::Print(5, "SOAPProtocolBase::Close()\r\n");
-	delete m_socket;
-	m_socket = 0;
+	if (m_delsocket) {
+		delete m_socket;
+		m_socket = 0;
+	}
 	m_buff = 0;
 	m_buffend = 0;
 	m_wpos = 0;
@@ -61,8 +64,9 @@ SOAPProtocolBase::Close()
 void
 SOAPProtocolBase::SetSocket(SOAPSocketInterface *socket)
 {
-	//Close();
+	Close();
 	m_socket = socket;
+	m_delsocket = false;
 	m_wpos = m_wbuff;
 	m_wend = m_wpos + sizeof(m_wbuff);
 }
@@ -70,6 +74,7 @@ SOAPProtocolBase::SetSocket(SOAPSocketInterface *socket)
 bool
 SOAPProtocolBase::Connect(const char *host, unsigned int port)
 {
+	SOAPDebugger::Print(5, "SOAPProtocolBase::Connect\r\n");
 	Close();
 
 	m_socket = new SOAPClientSocketImp();

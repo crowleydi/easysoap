@@ -587,18 +587,19 @@ SOAPHTTPProtocol::Connect()
 			break;
 		case SOAPUrl::https_proto:
 			{
-				SOAPSecureSocketImp * socket;
 				if (m_ctx)
-					socket = new SOAPSecureSocketImp(*m_ctx);
+					m_sslsocket = new SOAPSecureSocketImp(*m_ctx);
 				else
-					socket = new SOAPSecureSocketImp();
+					m_sslsocket = new SOAPSecureSocketImp();
 
-				if (!socket)
+				if (!m_sslsocket)
 					throw SOAPMemoryException();
+				m_delsslsocket = true;
+				SOAPProtocolBase::SetSocket(m_sslsocket);
+				
+				m_sslsocket->Connect(host, port);
 
-				socket->Connect(host, port);
-
-				SOAPProtocolBase::SetSocket(socket);
+				
 				if (m_httpproxy)
 				{
 					char buffer[1024];
