@@ -91,23 +91,27 @@ struct SOAPArrayStruct
 class SOAPTypeTraits<SOAPStruct>
 {
 public:
-	void GetType(SOAPQName& qname)
+	static void GetType(SOAPQName& qname)
 	{
 		qname.Set("SOAPStruct", "http://soapinterop.org/xsd");
 	}
 
-	void Serialize(SOAPParameter& param, const SOAPStruct& val)
+	static SOAPParameter&
+	Serialize(SOAPParameter& param, const SOAPStruct& val)
 	{
 		param.AddParameter("varString") << val.varString;
 		param.AddParameter("varInt") << val.varInt;
 		param.AddParameter("varFloat") << val.varFloat;
+		return param;
 	}
 
-	void Deserialize(const SOAPParameter& param, SOAPStruct& val)
+	static const SOAPParameter&
+	Deserialize(const SOAPParameter& param, SOAPStruct& val)
 	{
 		param.GetParameter("varString") >> val.varString;
 		param.GetParameter("varInt") >> val.varInt;
 		param.GetParameter("varFloat") >> val.varFloat;
+		return param;
 	}
 };
 
@@ -118,25 +122,29 @@ class SOAPTypeTraits< SOAPArray<SOAPStruct> > : public SOAPArrayTypeTraits
 class SOAPTypeTraits<SOAPStructStruct>
 {
 public:
-	void GetType(SOAPQName& qname)
+	static void GetType(SOAPQName& qname)
 	{
 		qname.Set("SOAPStructStruct", "http://soapinterop.org/xsd");
 	}
 
-	void Serialize(SOAPParameter& param, const SOAPStructStruct& val)
+	static SOAPParameter&
+	Serialize(SOAPParameter& param, const SOAPStructStruct& val)
 	{
 		param.AddParameter("varString") << val.varString;
 		param.AddParameter("varInt") << val.varInt;
 		param.AddParameter("varFloat") << val.varFloat;
 		param.AddParameter("varStruct") << val.varStruct;
+		return param;
 	}
 
-	void Deserialize(const SOAPParameter& param, SOAPStructStruct& val)
+	static const SOAPParameter&
+	Deserialize(const SOAPParameter& param, SOAPStructStruct& val)
 	{
 		param.GetParameter("varString") >> val.varString;
 		param.GetParameter("varInt") >> val.varInt;
 		param.GetParameter("varFloat") >> val.varFloat;
 		param.GetParameter("varStruct") >> val.varStruct;
+		return param;
 	}
 };
 
@@ -144,25 +152,29 @@ public:
 class SOAPTypeTraits<SOAPArrayStruct>
 {
 public:
-	void GetType(SOAPQName& qname)
+	static void GetType(SOAPQName& qname)
 	{
 		qname.Set("SOAPArrayStruct", "http://soapinterop.org/xsd");
 	}
 
-	void Serialize(SOAPParameter& param, const SOAPArrayStruct& val)
+	static SOAPParameter&
+	Serialize(SOAPParameter& param, const SOAPArrayStruct& val)
 	{
 		param.AddParameter("varString") << val.varString;
 		param.AddParameter("varInt") << val.varInt;
 		param.AddParameter("varFloat") << val.varFloat;
 		param.AddParameter("varArray") << val.varArray;
+		return param;
 	}
 
-	void Deserialize(const SOAPParameter& param, SOAPArrayStruct& val)
+	static const SOAPParameter&
+	Deserialize(const SOAPParameter& param, SOAPArrayStruct& val)
 	{
 		param.GetParameter("varString") >> val.varString;
 		param.GetParameter("varInt") >> val.varInt;
 		param.GetParameter("varFloat") >> val.varFloat;
 		param.GetParameter("varArray") >> val.varArray;
+		return param;
 	}
 };
 

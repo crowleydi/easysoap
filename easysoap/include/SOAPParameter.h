@@ -150,7 +150,6 @@ template<typename T>
 inline SOAPParameter&
 operator<<(SOAPParameter& param, const T& val)
 {
-	SOAPTypeTraits<T> traits;
 	//
 	// If SOAPTypeTraits<> is undefined for your
 	// class then you will have to implement it.
@@ -159,25 +158,21 @@ operator<<(SOAPParameter& param, const T& val)
 
 	param.Reset();
 	// Add xsi:type attribute
-	traits.GetType(param.AddAttribute(XMLSchemaInstance::type));
+	SOAPTypeTraits<T>::GetType(param.AddAttribute(XMLSchemaInstance::type));
 	// serialize
-	traits.Serialize(param, val);
-
-	return param;
+	return SOAPTypeTraits<T>::Serialize(param, val);
 }
 
 template<typename T>
 inline const SOAPParameter&
 operator>>(const SOAPParameter& param, T& val)
 {
-	SOAPTypeTraits<T> traits;
 	//
 	// If SOAPTypeTraits<> is undefined for your
 	// class then you will have to implement it.
 	// Look in SOAPTypeTraits.h for examples.
 	//
-	traits.Deserialize(param, val);
-	return param;
+	return SOAPTypeTraits<T>::Deserialize(param, val);
 }
 
 //
@@ -187,24 +182,18 @@ operator>>(const SOAPParameter& param, T& val)
 inline SOAPParameter&
 operator<<(SOAPParameter& param, const char *val)
 {
-	SOAPTypeTraits<const char *> traits;
 	param.Reset();
-	traits.GetType(param.AddAttribute(XMLSchemaInstance::type));
-	traits.Serialize(param, val);
-
-	return param;
+	SOAPTypeTraits<const char *>::GetType(param.AddAttribute(XMLSchemaInstance::type));
+	return SOAPTypeTraits<const char *>::Serialize(param, val);
 }
 
 #ifdef HAVE_WCHART
 inline SOAPParameter&
 operator<<(SOAPParameter& param, const wchar_t *val)
 {
-	SOAPTypeTraits<const wchar_t *> traits;
 	param.Reset();
-	traits.GetType(param.AddAttribute(XMLSchemaInstance::type));
-	traits.Serialize(param, val);
-
-	return param;
+	SOAPTypeTraits<const wchar_t *>::GetType(param.AddAttribute(XMLSchemaInstance::type));
+	return SOAPTypeTraits<const wchar_t *>::Serialize(param, val);
 }
 #endif
 

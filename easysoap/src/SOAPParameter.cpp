@@ -151,83 +151,73 @@ SOAPParameter::AddAttribute(const SOAPQName& name)
 void
 SOAPParameter::SetValue(const char *val)
 {
-	SOAPTypeTraits<const char *> traits;
-	traits.GetType(AddAttribute(XMLSchemaInstance::type));
-	traits.Serialize(*this, val);
+	SOAPTypeTraits<const char *>::GetType(AddAttribute(XMLSchemaInstance::type));
+	SOAPTypeTraits<const char *>::Serialize(*this, val);
 }
 
 #ifdef HAVE_WCHART
 void
 SOAPParameter::SetValue(const wchar_t *val)
 {
-	SOAPTypeTraits<const wchar_t *> traits;
-	traits.GetType(AddAttribute(XMLSchemaInstance::type));
-	traits.Serialize(*this, val);
+	SOAPTypeTraits<const wchar_t *>::GetType(AddAttribute(XMLSchemaInstance::type));
+	SOAPTypeTraits<const wchar_t *>::Serialize(*this, val);
 }
 #endif
 
 void
 SOAPParameter::SetInt(const char *val)
 {
-	SOAPTypeTraits<int> traits;
-	traits.GetType(AddAttribute(XMLSchemaInstance::type));
-	traits.Serialize(*this, val);
+	SOAPTypeTraits<int>::GetType(AddAttribute(XMLSchemaInstance::type));
+	SOAPTypeTraits<int>::Serialize(*this, val);
 }
 
 void
 SOAPParameter::SetFloat(const char *val)
 {
-	SOAPTypeTraits<float> traits;
-	traits.GetType(AddAttribute(XMLSchemaInstance::type));
-	traits.Serialize(*this, val);
+	SOAPTypeTraits<float>::GetType(AddAttribute(XMLSchemaInstance::type));
+	SOAPTypeTraits<float>::Serialize(*this, val);
 }
 
 void
 SOAPParameter::SetDouble(const char *val)
 {
-	SOAPTypeTraits<double> traits;
-	traits.GetType(AddAttribute(XMLSchemaInstance::type));
-	traits.Serialize(*this, val);
+	SOAPTypeTraits<double>::GetType(AddAttribute(XMLSchemaInstance::type));
+	SOAPTypeTraits<double>::Serialize(*this, val);
 }
 
 void
 SOAPParameter::SetValue(int val)
 {
-	SOAPTypeTraits<int> traits;
-	traits.GetType(AddAttribute(XMLSchemaInstance::type));
-	traits.Serialize(*this, val);
+	SOAPTypeTraits<int>::GetType(AddAttribute(XMLSchemaInstance::type));
+	SOAPTypeTraits<int>::Serialize(*this, val);
 }
 
 void
 SOAPParameter::SetValue(float val)
 {
-	SOAPTypeTraits<float> traits;
-	traits.GetType(AddAttribute(XMLSchemaInstance::type));
-	traits.Serialize(*this, val);
+	SOAPTypeTraits<float>::GetType(AddAttribute(XMLSchemaInstance::type));
+	SOAPTypeTraits<float>::Serialize(*this, val);
 }
 
 void
 SOAPParameter::SetValue(double val)
 {
-	SOAPTypeTraits<double> traits;
-	traits.GetType(AddAttribute(XMLSchemaInstance::type));
-	traits.Serialize(*this, val);
+	SOAPTypeTraits<double>::GetType(AddAttribute(XMLSchemaInstance::type));
+	SOAPTypeTraits<double>::Serialize(*this, val);
 }
 
 void
 SOAPParameter::SetBoolean(const char *val)
 {
-	SOAPTypeTraits<bool> traits;
-	traits.GetType(AddAttribute(XMLSchemaInstance::type));
-	traits.Serialize(*this, val);
+	SOAPTypeTraits<bool>::GetType(AddAttribute(XMLSchemaInstance::type));
+	SOAPTypeTraits<bool>::Serialize(*this, val);
 }
 
 void
 SOAPParameter::SetValue(bool val)
 {
-	SOAPTypeTraits<bool> traits;
-	traits.GetType(AddAttribute(XMLSchemaInstance::type));
-	traits.Serialize(*this, val);
+	SOAPTypeTraits<bool>::GetType(AddAttribute(XMLSchemaInstance::type));
+	SOAPTypeTraits<bool>::Serialize(*this, val);
 }
 
 const SOAPString&
@@ -243,8 +233,7 @@ int
 SOAPParameter::GetInt() const
 {
 	int ret;
-	SOAPTypeTraits<int> traits;
-	traits.Deserialize(*this, ret);
+	SOAPTypeTraits<int>::Deserialize(*this, ret);
 	return ret;
 }
 
@@ -252,8 +241,7 @@ bool
 SOAPParameter::GetBoolean() const
 {
 	bool ret;
-	SOAPTypeTraits<bool> traits;
-	traits.Deserialize(*this, ret);
+	SOAPTypeTraits<bool>::Deserialize(*this, ret);
 	return ret;
 }
 
@@ -261,8 +249,7 @@ float
 SOAPParameter::GetFloat() const
 {
 	float ret;
-	SOAPTypeTraits<float> traits;
-	traits.Deserialize(*this, ret);
+	SOAPTypeTraits<float>::Deserialize(*this, ret);
 	return ret;
 }
 
@@ -270,8 +257,7 @@ double
 SOAPParameter::GetDouble() const
 {
 	double ret;
-	SOAPTypeTraits<double> traits;
-	traits.Deserialize(*this, ret);
+	SOAPTypeTraits<double>::Deserialize(*this, ret);
 	return ret;
 }
 

@@ -119,19 +119,24 @@ void SOAPTypeTraits<bool>::GetType(SOAPQName& type)
 	type.Set("boolean", SOAP_XSD);
 }
 
-void SOAPTypeTraits<bool>::Serialize(SOAPParameter& param, bool val)
+SOAPParameter&
+SOAPTypeTraits<bool>::Serialize(SOAPParameter& param, bool val)
 {
 	param.GetStringRef() = val ? "true" : "false";
+	return param;
 }
 
-void SOAPTypeTraits<bool>::Serialize(SOAPParameter& param, const char *val)
+SOAPParameter&
+SOAPTypeTraits<bool>::Serialize(SOAPParameter& param, const char *val)
 {
 	if (!val)
 		param.AddAttribute(XMLSchemaInstance::nil) = "true";
 	param.GetStringRef() = val;
+	return param;
 }
 
-void SOAPTypeTraits<bool>::Deserialize(const SOAPParameter& param, bool& val)
+const SOAPParameter&
+SOAPTypeTraits<bool>::Deserialize(const SOAPParameter& param, bool& val)
 {
 	const SOAPString& str = param.GetString();
     if (param.IsStruct())
@@ -146,6 +151,7 @@ void SOAPTypeTraits<bool>::Deserialize(const SOAPParameter& param, bool& val)
 		val = true;
 	else
 		throw SOAPException("Could not convert value to boolean: %s", (const char *)str);
+	return param;
 }
 
 
@@ -156,14 +162,17 @@ void SOAPTypeTraits<char>::GetType(SOAPQName& type)
 	type.Set("byte", SOAP_XSD);
 }
 
-void SOAPTypeTraits<char>::Serialize(SOAPParameter& param, char val)
+SOAPParameter&
+SOAPTypeTraits<char>::Serialize(SOAPParameter& param, char val)
 {
 	char buffer[64];
 	snprintf(buffer, sizeof(buffer), "%d", (signed char)val);
 	param.GetStringRef() = buffer;
+	return param;
 }
 
-void SOAPTypeTraits<char>::Deserialize(const SOAPParameter& param, char& val)
+const SOAPParameter&
+SOAPTypeTraits<char>::Deserialize(const SOAPParameter& param, char& val)
 {
 	const SOAPString& str = param.GetString();
     if (param.IsStruct())
@@ -173,6 +182,7 @@ void SOAPTypeTraits<char>::Deserialize(const SOAPParameter& param, char& val)
         throw SOAPException("Cannot convert null value to byte.");
 
 	val = sp_strtol(str);
+	return param;
 }
 
 
@@ -183,14 +193,17 @@ void SOAPTypeTraits<short>::GetType(SOAPQName& type)
 	type.Set("short", SOAP_XSD);
 }
 
-void SOAPTypeTraits<short>::Serialize(SOAPParameter& param, short val)
+SOAPParameter&
+SOAPTypeTraits<short>::Serialize(SOAPParameter& param, short val)
 {
 	char buffer[64];
 	snprintf(buffer, sizeof(buffer), "%d", val);
 	param.GetStringRef() = buffer;
+	return param;
 }
 
-void SOAPTypeTraits<short>::Deserialize(const SOAPParameter& param, short& val)
+const SOAPParameter&
+SOAPTypeTraits<short>::Deserialize(const SOAPParameter& param, short& val)
 {
 	const SOAPString& str = param.GetString();
     if (param.IsStruct())
@@ -200,6 +213,7 @@ void SOAPTypeTraits<short>::Deserialize(const SOAPParameter& param, short& val)
         throw SOAPException("Cannot convert null value to short.");
 
 	val = sp_strtol(str);
+	return param;
 }
 
 
@@ -210,21 +224,26 @@ void SOAPTypeTraits<int>::GetType(SOAPQName& type)
 	type.Set("int", SOAP_XSD);
 }
 
-void SOAPTypeTraits<int>::Serialize(SOAPParameter& param, int val)
+SOAPParameter&
+SOAPTypeTraits<int>::Serialize(SOAPParameter& param, int val)
 {
 	char buffer[64];
 	snprintf(buffer, sizeof(buffer), "%d", val);
 	Serialize(param, buffer);
+	return param;
 }
 
-void SOAPTypeTraits<int>::Serialize(SOAPParameter& param, const char *val)
+SOAPParameter&
+SOAPTypeTraits<int>::Serialize(SOAPParameter& param, const char *val)
 {
 	if (!val)
 		param.AddAttribute(XMLSchemaInstance::nil) = "true";
 	param.GetStringRef() = val;
+	return param;
 }
 
-void SOAPTypeTraits<int>::Deserialize(const SOAPParameter& param, int& val)
+const SOAPParameter&
+SOAPTypeTraits<int>::Deserialize(const SOAPParameter& param, int& val)
 {
 	const SOAPString& str = param.GetString();
     if (param.IsStruct())
@@ -234,6 +253,7 @@ void SOAPTypeTraits<int>::Deserialize(const SOAPParameter& param, int& val)
         throw SOAPException("Cannot convert null value to integer.");
 
 	val = sp_strtol(str);
+	return param;
 }
 
 
@@ -244,7 +264,8 @@ void SOAPTypeTraits<float>::GetType(SOAPQName& type)
 	type.Set("float", SOAP_XSD);
 }
 
-void SOAPTypeTraits<float>::Serialize(SOAPParameter& param, float val)
+SOAPParameter&
+SOAPTypeTraits<float>::Serialize(SOAPParameter& param, float val)
 {
     double dval = val;
     if (finite(dval))
@@ -262,16 +283,20 @@ void SOAPTypeTraits<float>::Serialize(SOAPParameter& param, float val)
         else
             Serialize(param, "-INF");
     }
+	return param;
 }
 
-void SOAPTypeTraits<float>::Serialize(SOAPParameter& param, const char *val)
+SOAPParameter&
+SOAPTypeTraits<float>::Serialize(SOAPParameter& param, const char *val)
 {
 	if (!val)
 		param.AddAttribute(XMLSchemaInstance::nil) = "true";
 	param.GetStringRef() = val;
+	return param;
 }
 
-void SOAPTypeTraits<float>::Deserialize(const SOAPParameter& param, float& val)
+const SOAPParameter&
+SOAPTypeTraits<float>::Deserialize(const SOAPParameter& param, float& val)
 {
 	if (param.IsStruct())
 		throw SOAPException("Cannot convert a struct to a float.");
@@ -289,6 +314,7 @@ void SOAPTypeTraits<float>::Deserialize(const SOAPParameter& param, float& val)
         throw SOAPException("Floating-point underflow: %s", (const char *)param.GetStringRef());
 
 	val = ret;
+	return param;
 }
 
 //
@@ -299,7 +325,8 @@ void SOAPTypeTraits<double>::GetType(SOAPQName& type)
 	type.Set("double", SOAP_XSD);
 }
 
-void SOAPTypeTraits<double>::Serialize(SOAPParameter& param, double val)
+SOAPParameter&
+SOAPTypeTraits<double>::Serialize(SOAPParameter& param, double val)
 {
     if (finite(val))
     {
@@ -316,16 +343,20 @@ void SOAPTypeTraits<double>::Serialize(SOAPParameter& param, double val)
         else
             Serialize(param, "-INF");
     }
+	return param;
 }
 
-void SOAPTypeTraits<double>::Serialize(SOAPParameter& param, const char *val)
+SOAPParameter&
+SOAPTypeTraits<double>::Serialize(SOAPParameter& param, const char *val)
 {
 	if (!val)
 		param.AddAttribute(XMLSchemaInstance::nil) = "true";
 	param.GetStringRef() = val;
+	return param;
 }
 
-void SOAPTypeTraits<double>::Deserialize(const SOAPParameter& param, double& val)
+const SOAPParameter&
+SOAPTypeTraits<double>::Deserialize(const SOAPParameter& param, double& val)
 {
 	if (param.IsStruct())
 		throw SOAPException("Cannot convert a struct to a double.");
@@ -334,6 +365,7 @@ void SOAPTypeTraits<double>::Deserialize(const SOAPParameter& param, double& val
 		throw SOAPException("Cannot convert null value to double.");
 
 	val = sp_strtod(param.GetStringRef());
+	return param;
 }
 
 //
@@ -343,11 +375,13 @@ void SOAPTypeTraits<const char *>::GetType(SOAPQName& type)
 	type.Set("string", SOAP_XSD);
 }
 
-void SOAPTypeTraits<const char *>::Serialize(SOAPParameter& param, const char *val)
+SOAPParameter&
+SOAPTypeTraits<const char *>::Serialize(SOAPParameter& param, const char *val)
 {
 	if (!val)
 		param.AddAttribute(XMLSchemaInstance::nil) = "true";
 	param.GetStringRef() = val;
+	return param;
 }
 
 
@@ -359,11 +393,13 @@ void SOAPTypeTraits<const wchar_t *>::GetType(SOAPQName& type)
 	type.Set("string", SOAP_XSD);
 }
 
-void SOAPTypeTraits<const wchar_t *>::Serialize(SOAPParameter& param, const wchar_t * val)
+SOAPParameter&
+SOAPTypeTraits<const wchar_t *>::Serialize(SOAPParameter& param, const wchar_t * val)
 {
 	if (!val)
 		param.AddAttribute(XMLSchemaInstance::nil) = "true";
 	param.GetStringRef() = val;
+	return param;
 }
 #endif // HAVE_WCHART
 
@@ -375,19 +411,23 @@ void SOAPTypeTraits<SOAPString>::GetType(SOAPQName& type)
 	type.Set("string", SOAP_XSD);
 }
 
-void SOAPTypeTraits<SOAPString>::Serialize(SOAPParameter& param, const SOAPString& val)
+SOAPParameter&
+SOAPTypeTraits<SOAPString>::Serialize(SOAPParameter& param, const SOAPString& val)
 {
 	if (!val)
 		param.AddAttribute(XMLSchemaInstance::nil) = "true";
 	param.GetStringRef() = val;
+	return param;
 }
 
-void SOAPTypeTraits<SOAPString>::Deserialize(const SOAPParameter& param, SOAPString& val)
+const SOAPParameter&
+SOAPTypeTraits<SOAPString>::Deserialize(const SOAPParameter& param, SOAPString& val)
 {
 	if (param.IsNull())
 		val = (const char *)0;
 	else
 		val = param.GetStringRef();
+	return param;
 }
 
 //
@@ -397,15 +437,19 @@ void SOAPTypeTraits<SOAPBase64>::GetType(SOAPQName& type)
 	type.Set("base64Binary", SOAP_XSD);
 }
 
-void SOAPTypeTraits<SOAPBase64>::Serialize(SOAPParameter& param, const SOAPBase64& val)
+SOAPParameter&
+SOAPTypeTraits<SOAPBase64>::Serialize(SOAPParameter& param, const SOAPBase64& val)
 {
 	const SOAPArray<char> *arr = val.m_arr ? val.m_arr : val.m_carr;
 	SOAPBase64::Encode(*arr, param.GetStringRef());
+	return param;
 }
 
-void SOAPTypeTraits<SOAPBase64>::Deserialize(const SOAPParameter& param, SOAPBase64& val)
+const SOAPParameter&
+SOAPTypeTraits<SOAPBase64>::Deserialize(const SOAPParameter& param, SOAPBase64& val)
 {
 	SOAPBase64::Decode(param.GetStringRef(), *val.m_arr);
+	return param;
 }
 
 
@@ -416,49 +460,19 @@ void SOAPTypeTraits<SOAPHex>::GetType(SOAPQName& type)
 	type.Set("hexBinary", SOAP_XSD);
 }
 
-void SOAPTypeTraits<SOAPHex>::Serialize(SOAPParameter& param, const SOAPHex& val)
+SOAPParameter&
+SOAPTypeTraits<SOAPHex>::Serialize(SOAPParameter& param, const SOAPHex& val)
 {
 	const SOAPArray<char> *arr = val.m_arr ? val.m_arr : val.m_carr;
 	SOAPHex::Encode(*arr, param.GetStringRef());
+	return param;
 }
 
-void SOAPTypeTraits<SOAPHex>::Deserialize(const SOAPParameter& param, SOAPHex& val)
+const SOAPParameter&
+SOAPTypeTraits<SOAPHex>::Deserialize(const SOAPParameter& param, SOAPHex& val)
 {
 	SOAPHex::Decode(param.GetStringRef(), *val.m_arr);
+	return param;
 }
 
-
-#if 0
-template<typename K, typename I, typename H, typename E>
-inline SOAPParameter&
-operator<<(SOAPParameter& param, const SOAPHashMap<K,I,H,E>& hash)
-{
-    param.SetIsStruct();
-    param.SetType("Map", "http://xml.apache.org/xml-soap");
-    for (SOAPHashMap<K,I>::Iterator i = hash.Begin(); i != hash.End(); ++i)
-    {
-        SOAPParameter& p = param.AddParameter();
-        p.SetIsStruct();
-        param.SetType("MapItem", "http://xml.apache.org/xml-soap");
-        p.AddParameter("key") << i.Key();
-        p.AddParameter("value") <<i.Item();
-    }
-    return param;
-}
-
-
-template<typename K, typename I, typename H, typename E>
-inline const SOAPParameter&
-operator>>(const SOAPParameter& param, SOAPHashMap<K,I,H,E>& hash)
-{
-    K key;
-    const SOAPParameter::Array& arr = param.GetArray();
-    for (SOAPParameter::Array::ConstIterator i = arr.Begin(); i != arr.End(); ++i)
-    {
-        (*i)->GetParameter("key") >> key;
-        (*i)->GetParameter("value") >> hash[key];
-    }
-    return param;
-}
-#endif
 

@@ -30,85 +30,86 @@ template<>
 class EASYSOAP_EXPORT SOAPTypeTraits<bool>
 {
 public:
-	void GetType(SOAPQName& type);
-	void Serialize(SOAPParameter& param, bool val);
-	void Serialize(SOAPParameter& param, const char *val);
-	void Deserialize(const SOAPParameter&, bool& val);
+	static void GetType(SOAPQName& type);
+	static SOAPParameter& Serialize(SOAPParameter& param, bool val);
+	static SOAPParameter& Serialize(SOAPParameter& param, const char *val);
+	static const SOAPParameter& Deserialize(const SOAPParameter&, bool& val);
 };
 
 template<>
 class EASYSOAP_EXPORT SOAPTypeTraits<char>
 {
 public:
-	void GetType(SOAPQName& type);
-	void Serialize(SOAPParameter& param, char val);
-	void Deserialize(const SOAPParameter&, char& val);
+	static void GetType(SOAPQName& type);
+	static SOAPParameter& Serialize(SOAPParameter& param, char val);
+	static const SOAPParameter& Deserialize(const SOAPParameter&, char& val);
 };
 
 template<>
 class EASYSOAP_EXPORT SOAPTypeTraits<unsigned char>
 {
 public:
-	void GetType(SOAPQName& type);
-	void Serialize(SOAPParameter& param, unsigned char val);
-	void Deserialize(const SOAPParameter&, unsigned char& val);
+	static void GetType(SOAPQName& type);
+	static SOAPParameter& Serialize(SOAPParameter& param, unsigned char val);
+	static const SOAPParameter& Deserialize(const SOAPParameter&, unsigned char& val);
 };
 
 template<>
 class EASYSOAP_EXPORT SOAPTypeTraits<short>
 {
 public:
-	void GetType(SOAPQName& type);
-	void Serialize(SOAPParameter& param, short val);
-	void Deserialize(const SOAPParameter&, short& val);
+	static void GetType(SOAPQName& type);
+	static SOAPParameter& Serialize(SOAPParameter& param, short val);
+	static const SOAPParameter& Deserialize(const SOAPParameter&, short& val);
 };
 
 template<>
 class EASYSOAP_EXPORT SOAPTypeTraits<int>
 {
 public:
-	void GetType(SOAPQName& type);
-	void Serialize(SOAPParameter& param, int val);
-	void Serialize(SOAPParameter& param, const char *val);
-	void Deserialize(const SOAPParameter&, int& val);
+	static void GetType(SOAPQName& type);
+	static SOAPParameter& Serialize(SOAPParameter& param, int val);
+	static SOAPParameter& Serialize(SOAPParameter& param, const char *val);
+	static const SOAPParameter& Deserialize(const SOAPParameter&, int& val);
 };
 
 template<>
 class EASYSOAP_EXPORT SOAPTypeTraits<float>
 {
 public:
-	void GetType(SOAPQName& type);
-	void Serialize(SOAPParameter& param, float val);
-	void Serialize(SOAPParameter& param, const char *val);
-	void Deserialize(const SOAPParameter&, float& val);
+	static void GetType(SOAPQName& type);
+	static SOAPParameter& Serialize(SOAPParameter& param, float val);
+	static SOAPParameter& Serialize(SOAPParameter& param, const char *val);
+	static const SOAPParameter& Deserialize(const SOAPParameter&, float& val);
 };
 
 template<>
 class EASYSOAP_EXPORT SOAPTypeTraits<double>
 {
 public:
-	void GetType(SOAPQName& type);
-	void Serialize(SOAPParameter& param, double val);
-	void Serialize(SOAPParameter& param, const char *val);
-	void Deserialize(const SOAPParameter&, double& val);
+	static void GetType(SOAPQName& type);
+	static SOAPParameter& Serialize(SOAPParameter& param, double val);
+	static SOAPParameter& Serialize(SOAPParameter& param, const char *val);
+	static const SOAPParameter& Deserialize(const SOAPParameter&, double& val);
 };
 
 template<>
 class EASYSOAP_EXPORT SOAPTypeTraits<SOAPString>
 {
 public:
-	void GetType(SOAPQName& type);
-	void Serialize(SOAPParameter& param, const SOAPString& val);
-	void Deserialize(const SOAPParameter&, SOAPString& val);
+	static void GetType(SOAPQName& type);
+	static SOAPParameter& Serialize(SOAPParameter& param, const SOAPString& val);
+	static const SOAPParameter& Deserialize(const SOAPParameter&, SOAPString& val);
 };
 
 template<>
 class EASYSOAP_EXPORT SOAPTypeTraits<const char *>
 {
 public:
-	void GetType(SOAPQName& type);
-	void Serialize(SOAPParameter& param, const char *val);
-	// Deserialize is dangerous...
+	static void GetType(SOAPQName& type);
+	static SOAPParameter& Serialize(SOAPParameter& param, const char *val);
+	// Can't deserialize into const char *
+	// and char * is just dangerous
 };
 
 #ifdef HAVE_WCHART
@@ -116,22 +117,23 @@ template<>
 class EASYSOAP_EXPORT SOAPTypeTraits<const wchar_t *>
 {
 public:
-	void GetType(SOAPQName& type);
-	void Serialize(SOAPParameter& param, const wchar_t *val);
-	// Deserialize is dangerous...
+	static void GetType(SOAPQName& type);
+	static SOAPParameter& Serialize(SOAPParameter& param, const wchar_t *val);
+	// Can't deserialize into const wchar_t *
+	// and wchar_t * is just dangerous
 };
 #endif
 
 class SOAPMapTypeTraits
 {
 public:
-	void GetType(SOAPQName& type)
+	static void GetType(SOAPQName& type)
 	{
 		type.Set("Map", "http://xml.apache.org/xml-soap");
 	}
 
 	template<typename K, typename I, typename H, typename E>
-	void Serialize(SOAPParameter& param, const SOAPHashMap<K,I,H,E>& val)
+	static SOAPParameter& Serialize(SOAPParameter& param, const SOAPHashMap<K,I,H,E>& val)
 	{
 		param.SetIsStruct();
 		for (SOAPHashMap<K,I,H,E>::Iterator i = val.Begin(); i != val.End(); ++i)
@@ -141,10 +143,11 @@ public:
 			p.AddParameter("key") << i.Key();
 			p.AddParameter("value") <<i.Item();
 		}
+		return param;
 	}
 
 	template<typename K, typename I, typename H, typename E>
-	void Deserialize(const SOAPParameter& param, SOAPHashMap<K,I,H,E>& val)
+	static const SOAPParameter& Deserialize(const SOAPParameter& param, SOAPHashMap<K,I,H,E>& val)
 	{
 		K key;
 		const SOAPParameter::Array& arr = param.GetArray();
@@ -153,6 +156,7 @@ public:
 			(*i)->GetParameter("key") >> key;
 			(*i)->GetParameter("value") >> val[key];
 		}
+		return param;
 	}
 };
 
@@ -160,24 +164,24 @@ class EASYSOAP_EXPORT SOAPTypeTraits<SOAPBase64>
 {
 public:
 	// Encode an array as base64
-	void GetType(SOAPQName& type);
-	void Serialize(SOAPParameter& param, const SOAPBase64& val);
-	void Deserialize(const SOAPParameter& param, SOAPBase64& val);
+	static void GetType(SOAPQName& type);
+	static SOAPParameter& Serialize(SOAPParameter& param, const SOAPBase64& val);
+	static const SOAPParameter& Deserialize(const SOAPParameter& param, SOAPBase64& val);
 };
 
 class EASYSOAP_EXPORT SOAPTypeTraits<SOAPHex>
 {
 public:
 	// Encode an array as hex
-	void GetType(SOAPQName& type);
-	void Serialize(SOAPParameter& param, const SOAPHex& val);
-	void Deserialize(const SOAPParameter& param, SOAPHex& val);
+	static void GetType(SOAPQName& type);
+	static SOAPParameter& Serialize(SOAPParameter& param, const SOAPHex& val);
+	static const SOAPParameter& Deserialize(const SOAPParameter& param, SOAPHex& val);
 };
 
 class SOAPArrayTypeTraits
 {
 private:
-	void parsepos(const SOAPQName& attr, const SOAPQName& val, size_t& x)
+	static void parsepos(const SOAPQName& attr, const SOAPQName& val, size_t& x)
 	{
 		//
 		// arrayType should be a value like "xsd:string[2]"
@@ -196,21 +200,20 @@ private:
 	}
 
 public:
-	void GetType(SOAPQName& type)
+	static void GetType(SOAPQName& type)
 	{
 		type = SOAPEnc::Array;
 	}
 
 	template<typename T>
-	void Serialize(SOAPParameter& param, const SOAPArray<T>& val)
+	static SOAPParameter& Serialize(SOAPParameter& param, const SOAPArray<T>& val)
 	{
 		//
 		// Add SOAP-ENC:arrayType attribute
 		char buffer[32];
-		SOAPTypeTraits<T> traits;
 
 		SOAPQName& atype = param.AddAttribute(SOAPEnc::arrayType);
-		traits.GetType(atype);
+		SOAPTypeTraits<T>::GetType(atype);
 		snprintf(buffer, sizeof(buffer), "[%d]", val.Size());
 		atype.GetName().Append(buffer);
 
@@ -218,13 +221,13 @@ public:
 		// Serialize the array values
 		param.SetIsStruct();
 		for (SOAPArray<T>::ConstIterator i = val.Begin(); i != val.End(); ++i)
-			traits.Serialize(param.AddParameter(), *i);
+			SOAPTypeTraits<T>::Serialize(param.AddParameter(), *i);
+		return param;
 	}
 
 	template<typename T>
-	void Deserialize(const SOAPParameter& param, SOAPArray<T>& val)
+	static const SOAPParameter& Deserialize(const SOAPParameter& param, SOAPArray<T>& val)
 	{
-		SOAPTypeTraits<T> traits;
 		const SOAPParameter::Array& arr = param.GetArray();
 		//
 		// parse arrayType attribute
@@ -262,8 +265,9 @@ public:
 					throw SOAPException("Cannot de-serialize array with position attribute and offset attribute.");
 				parsepos(SOAPEnc::position, *attr, pos);
 			}
-			traits.Deserialize(**i, val[pos++]);
+			SOAPTypeTraits<T>::Deserialize(**i, val[pos++]);
 		}
+		return param;
 	}
 };
 
@@ -294,7 +298,7 @@ class SOAPTypeTraits< SOAPArray<SOAPString> > : public SOAPArrayTypeTraits
 class SOAP2DArrayTypeTraits
 {
 private:
-	void parse2Dpos(const SOAPQName& attr, const SOAPQName& val, size_t& x, size_t& y)
+	static void parse2Dpos(const SOAPQName& attr, const SOAPQName& val, size_t& x, size_t& y)
 	{
 		//
 		// arrayType should be a value like "xsd:string[2,3]"
@@ -318,21 +322,20 @@ private:
 	}
 
 public:
-	void GetType(SOAPQName& type)
+	static void GetType(SOAPQName& type)
 	{
 		type = SOAPEnc::Array;
 	}
 
 	template<typename T>
-	void Serialize(SOAPParameter& param, const SOAP2DArray<T>& val)
+	static SOAPParameter& Serialize(SOAPParameter& param, const SOAP2DArray<T>& val)
 	{
 		//
 		// Add SOAP-ENC:arrayType attribute
 		char buffer[64];
-		SOAPTypeTraits<T> traits;
 
 		SOAPQName& atype = param.AddAttribute(SOAPEnc::arrayType);
-		traits.GetType(atype);
+		SOAPTypeTraits<T>::GetType(atype);
 		snprintf(buffer, sizeof(buffer), "[%d,%d]", val.GetNumRows(), val.GetNumCols());
 		atype.GetName().Append(buffer);
 
@@ -341,13 +344,13 @@ public:
 		param.SetIsStruct();
 		for (size_t r = 0; r < val.GetNumRows(); ++r)
 			for (size_t c = 0; c < val.GetNumCols(); ++c)
-				traits.Serialize(param.AddParameter(), val[r][c]);
+				SOAPTypeTraits<T>::Serialize(param.AddParameter(), val[r][c]);
+		return param;
 	}
 
 	template<typename T>
-	void Deserialize(const SOAPParameter& param, SOAP2DArray<T>& val)
+	static const SOAPParameter& Deserialize(const SOAPParameter& param, SOAP2DArray<T>& val)
 	{
-		SOAPTypeTraits<T> traits;
 		const SOAPParameter::Array& arr = param.GetArray();
 
 		//
@@ -388,13 +391,14 @@ public:
 					throw SOAPException("Cannot de-serialize array with position attribute and offset attribute.");
 				parse2Dpos(SOAPEnc::position, *attr, row, col);
 			}
-			traits.Deserialize(**i, val[row][col]);
+			SOAPTypeTraits<T>::Deserialize(**i, val[row][col]);
 			if (++col == numcols)
 			{
 				++row;
 				col = 0;
 			}
 		}
+		return param;
 	}
 };
 
