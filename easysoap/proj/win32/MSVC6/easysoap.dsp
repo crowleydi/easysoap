@@ -231,6 +231,10 @@ SOURCE=..\..\..\src\SOAPSocket.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\src\SOAPSSLContext.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\src\SOAPStructHandler.cpp
 # End Source File
 # Begin Source File
@@ -264,6 +268,10 @@ SOURCE=..\..\..\include\easysoap\es_conf.h
 # Begin Source File
 
 SOURCE=..\..\..\include\easysoap\es_msvc.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\es_namespaces.h
 # End Source File
 # Begin Source File
 
@@ -449,54 +457,6 @@ SOURCE=..\..\..\include\easysoap\XMLParser.h
 # Begin Group "Resource Files"
 
 # PROP Default_Filter "ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
-# End Group
-# Begin Group "abyss"
-
-# PROP Default_Filter ""
-# Begin Source File
-
-SOURCE=..\..\..\src\abyss\src\abyss.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\src\abyss\src\conn.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\src\abyss\src\data.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\src\abyss\src\file.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\src\abyss\src\http.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\src\abyss\src\server.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\src\abyss\src\socket.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\src\abyss\src\thread.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\src\abyss\src\threadpool.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\src\abyss\src\threadpool.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\src\abyss\src\trace.c
-# End Source File
 # End Group
 # End Target
 # End Project
