@@ -24,7 +24,6 @@
 #include <config/es_comp.h>
 
 #include <SOAPUtil.h>
-#include <SOAPTypes.h>
 #include <SOAPHashMap.h>
 #include <SOAPArray.h>
 #include <SOAPString.h>
