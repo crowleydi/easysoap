@@ -14,4 +14,4 @@ LDFLAGS = -no-install
 INCLUDES = -I@top_srcdir@/include
 
 EXTRA_DIST = README.TXT simpleclient.dsp simpleserver.dsp \
-	isapi.cpp isapi.def simpleisapi.cpp
+	simpleisapi.cpp
