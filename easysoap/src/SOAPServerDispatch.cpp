@@ -147,7 +147,7 @@ bool
 SOAPServerDispatch::HandleRequest(SOAPEnvelope& request, SOAPResponse& response)
 {
 	//
-	// TODO:  This is an O(n) lookup...
+	// TODO:  This is an O(n) lookup... but n should be small
 	bool handled = false;
 	for (Handlers::Iterator i = m_handlers.Begin(); i != m_handlers.End(); ++i)
 	{
@@ -161,6 +161,42 @@ SOAPServerDispatch::HandleRequest(SOAPEnvelope& request, SOAPResponse& response)
 	}
 
 	return handled;
+}
+
+void
+SOAPServerDispatch::HandleHeaders(SOAPEnvelope& request)
+{
+	const SOAPHeader::Headers& headers = request.GetHeader().GetHeaders();
+	for (SOAPHeader::Headers::ConstIterator h = headers.Begin(); h != headers.End(); ++h)
+	{
+		bool handled = false;
+		//
+		// TODO:  This is an O(n) lookup... but n should be small
+		for (HeaderHandlers::Iterator i = m_headerHandlers.Begin(); i != m_headerHandlers.End(); ++i)
+		{
+			//
+			// We found a handler.  Now dispatch the method
+			if ((*i)->HandleHeader(*h, request))
+			{
+				handled = true;
+				break;
+			}
+		}
+
+		//
+		//
+		// TODO: Figure out how the SOAP-ENV:actor attribute figure into all of this...
+		//
+
+		if (!handled)
+		{
+			// check for mustUnderstand = 1
+			SOAPParameter::Attrs::Iterator mu = h->GetAttributes().Find(SOAPEnvelope::MustUnderstand);
+			if (mu && *mu == "1")
+				throw SOAPException("Failed to understand header %s:%s",
+					(const char *)h->GetName().GetName(), (const char *)h->GetName().GetNamespace());
+		}
+	}
 }
 
 void

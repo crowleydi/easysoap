@@ -32,7 +32,6 @@ public:
 };
 
 
-
 template <typename T>
 class EASYSOAP_EXPORT SOAPDispatchHandler : public SOAPDispatchHandlerInterface
 {
@@ -71,6 +70,59 @@ protected:
 	}
 
 	void DispatchMethod(const SOAPQName& name, HandlerFunction func)
+	{
+		m_dispatchMap[name] = func;
+	}
+};
+
+
+class EASYSOAP_EXPORT SOAPHeaderHandlerInterface
+{
+public:
+	virtual ~SOAPHeaderHandlerInterface() {}
+	virtual bool HandleHeader(const SOAPParameter& header, SOAPEnvelope& request) = 0;
+};
+
+
+template <typename T>
+class EASYSOAP_EXPORT SOAPHeaderHandler : public SOAPHeaderHandlerInterface
+{
+private:
+	typedef bool (T::*HandlerFunction)(const SOAPParameter& header, SOAPEnvelope& request);
+	typedef SOAPHashMap<SOAPQName, HandlerFunction> DispatchMap;
+
+	SOAPHeaderHandler(const SOAPHeaderHandler&);
+	SOAPHeaderHandler& operator=(const SOAPHeaderHandler&);
+
+	bool HandleHeader(const SOAPParameter& header, SOAPEnvelope& request)
+	{
+		const SOAPMethod& method = request.GetBody().GetMethod();
+		DispatchMap::Iterator i = m_dispatchMap.Find(method.GetName());
+
+		bool handled = false;
+		if (i)
+		{
+			T *target= GetTarget(request);
+			handled = (target->*(*i))(method, response);
+		}
+		return handled;
+	}
+
+	DispatchMap	m_dispatchMap;
+
+protected:
+	SOAPHeaderHandler()
+	{
+	}
+
+	virtual T* GetTarget(const SOAPEnvelope& request) = 0;
+
+	void DispatchHeader(const char *name, const char *ns, HandlerFunction func)
+	{
+		m_dispatchMap[SOAPQName(name, ns)] = func;
+	}
+
+	void DispatchHeader(const SOAPQName& name, HandlerFunction func)
 	{
 		m_dispatchMap[name] = func;
 	}

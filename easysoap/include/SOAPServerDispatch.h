@@ -25,6 +25,7 @@
 #include <SOAP.h>
 
 class SOAPDispatchHandlerInterface;
+class SOAPHeaderHandlerInterface;
 
 class EASYSOAP_EXPORT SOAPServerDispatch
 {
@@ -33,10 +34,13 @@ public:
 	virtual ~SOAPServerDispatch();
 
 	SOAPServerDispatch& DispatchTo(SOAPDispatchHandlerInterface *disp);
+	SOAPServerDispatch& DispatchHeadersTo(SOAPHeaderHandlerInterface *disp);
+
 	int Handle(SOAPTransport& transport);
 
 protected:
 	virtual bool	HandleRequest(SOAPEnvelope& request, SOAPResponse& response);
+	virtual void	HandleHeaders(SOAPEnvelope& request);
 
 private:
 
@@ -45,8 +49,10 @@ private:
 	void WriteFault(const char *code, const char *str);
 
 	typedef SOAPArray<SOAPDispatchHandlerInterface*> Handlers;
+	typedef SOAPArray<SOAPHeaderHandlerInterface*> HeaderHandlers;
 
 	Handlers			m_handlers;
+	HeaderHandlers		m_headerHandlers;
 	SOAPTransport		*m_transport;
 	SOAPResponse		m_response;
 	SOAPEnvelope		m_request;
