@@ -171,7 +171,7 @@ SOAPSecureSocketImp::HandleError(const char *context, int retcode, bool shouldWa
 #else
 				// dangerous
 				ERR_error_string(sslerror, tmp);
-				tmp[sizeof(tmp) - 1] = \0;
+				tmp[sizeof(tmp) - 1] = 0;
 #endif // OPENSSL_VERSION_NUMBER
 				SOAPDebugger::Print(2, "Error handled.\r\ncontext: %s\r\nMsg: %s\r\n", context, tmp);
 				msg += tmp;
@@ -270,9 +270,11 @@ SOAPSecureSocketImp::CheckForCertError(int rc) {
 			case X509_V_ERR_CERT_REJECTED:
 				msg = "the root CA is marked to reject the specified purpose.";
 				break;
+#ifdef X509_V_ERR_KEYUSAGE_NO_CERTSIGN
 			case X509_V_ERR_KEYUSAGE_NO_CERTSIGN:
 				msg = "key usage does not include certificate signing.";
 				break;
+#endif
 			default:
 				msg = "Server certificate verification failed due to an unknown error";
 				break;
