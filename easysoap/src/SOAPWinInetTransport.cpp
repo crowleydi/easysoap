@@ -360,3 +360,34 @@ SOAPWinInetTransport::GetErrorInfo()
 	return m_errorString = errMessage;
 }
 
+BOOL
+SOAPWinInetTransport::_InternetSetOption(_HType htype, DWORD dwOption, LPVOID lpBuffer, DWORD dwBufferLength)
+{
+	HINTERNET hi = 0;
+	switch (htype)
+	{
+	case hInternet: hi = m_hInternet; break;
+	case hConnect: hi = m_hConnect; break;
+	case hRequest: hi = m_hRequest; break;
+	default:
+		break;
+	}
+	return InternetSetOption(hi, dwOption, lpBuffer, dwBufferLength);
+}
+
+BOOL
+SOAPWinInetTransport::_InternetQueryOption(_HType htype, DWORD dwOption, LPVOID lpBuffer, LPDWORD lpdwBufferLength)
+{
+	HINTERNET hi = 0;
+	switch (htype)
+	{
+	case hInternet: hi = m_hInternet; break;
+	case hConnect: hi = m_hConnect; break;
+	case hRequest: hi = m_hRequest; break;
+	default:
+		break;
+	}
+	return InternetQueryOption(hi, dwOption, lpBuffer, lpdwBufferLength);
+}
+
+

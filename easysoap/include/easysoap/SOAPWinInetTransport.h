@@ -72,6 +72,17 @@ public:
 	const char *GetContentEncoding() const;
 	size_t Read(char *buffer, size_t bufflen);
 	size_t Write(const SOAPMethod& method, const char *packet, size_t len);
+
+	// Extra MS Extensions
+	typedef enum {
+		hNone,
+		hInternet,
+		hConnect,
+		hRequest,
+	} _HType;
+
+	BOOL _InternetSetOption(_HType htype, DWORD dwOption, LPVOID lpBuffer, DWORD dwBufferLength);
+	BOOL _InternetQueryOption(_HType htype, DWORD dwOption, LPVOID lpBuffer, LPDWORD lpdwBufferLength);
 };
 
 END_EASYSOAP_NAMESPACE
