@@ -539,7 +539,7 @@ SOAPHTTPProtocol::Connect()
 				SOAPSecureSocketImp *socket = new SOAPSecureSocketImp();
 				// if we have information about the certificate to be used. 
 				if (!m_keyfile.IsEmpty()) {	
-						socket->SetCertificateInfo(m_keyfile.Str(), m_password.Str());
+					socket->SetCertificateInfo(m_keyfile.Str(), m_password.Str());
 				}
 				socket->SOAPClientSocketImp::Connect(host, port);
 				SOAPProtocolBase::SetSocket(socket);

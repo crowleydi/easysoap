@@ -111,24 +111,21 @@ int main(int argc, char* argv[])
 			keyfile = argv[2];
 			struct stat buf;
 			if (0 != stat(keyfile, &buf)) {
-				fprintf(stdout, "unable to open keyfile\n");
+				fprintf(stderr, "unable to open keyfile\n");
 				exit(1);
 		}
 			password = argv[3];
 	} else {
-			fprintf(stdout, "Incorrect command line params specified. Try this:\n \
-							SSLClient <endpoint> [<path-to-cert> <cert-password>]\n\n");
+			fprintf(stderr,
+					"Incorrect command line params specified. Try this:\n\n"
+					"\t%s <endpoint> [<path-to-cert> <cert-password>]\n", argv[0]);
 			exit(1);
 	}
 	try {
 		SOAPDebugger::SetFile("./soapdebug.log");
 		SOAPDebugger::SetMessageLevel(5);
-
 		SOAPDebugger::Print(3, "Keyfile: %s\n", keyfile.Str());
 
-
-	
-		
 		SOAPonHTTP http;
 		SOAPProxy proxy(&http);
 
@@ -144,15 +141,13 @@ int main(int argc, char* argv[])
 		// write some code to print out the environment variables.
 		int i = 0;
 		while (SSLEnvVars[i] != 0L) {
-				SOAPString tmp;
-				resp.GetBody().GetMethod().GetParameter(SSLEnvVars[i]) >> tmp;
-				fprintf(stdout, "%s : %s\n", SSLEnvVars[i], tmp.Str());
-				++i;
+			SOAPString tmp;
+			resp.GetBody().GetMethod().GetParameter(SSLEnvVars[i]) >> tmp;
+			fprintf(stderr, "%s : %s\n", SSLEnvVars[i], tmp.Str());
+			++i;
 		}
-	
-			
 	} catch(SOAPException &e) {
-		fprintf(stdout, "SOAPFault: %s", e.What().Str());
+		fprintf(stderr, "SOAPFault: %s", e.What().Str());
 	}
 }
 

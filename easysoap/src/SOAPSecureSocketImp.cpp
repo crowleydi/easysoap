@@ -105,9 +105,6 @@ void SOAPSecureSocketImp::SetCertificateInfo(const char* keyfile, const char* pa
 	m_password = password;
 }
 
-
-
-
 SOAPSecureSocketImp::~SOAPSecureSocketImp()
 {
 	Close();
@@ -161,17 +158,16 @@ SOAPSecureSocketImp::HandleError(const char *context, int retcode)
 	return retry;
 }
 
-// password callback function for retrieving the password. Since we can't have user interaction,
-// it will have to be stored somehow.. Gulp
+// password callback function for retrieving the password.
+// Since we can't have user interaction, it will have to be
+// stored somehow.. Gulp
 int SOAPSecureSocketImp::password_cb(char* buf, int size, int rwflag, void *userdata) 
 {
-		SOAPString password = ((SOAPSecureSocketImp*)userdata)->m_password;
-		if (size < sp_strlen(password.Str())+1)
-				throw SOAPMemoryException();
-		
-		sp_strcpy(buf, password.Str());
-		
-		return(sp_strlen(password.Str()));
+	const SOAPString& password = ((SOAPSecureSocketImp*)userdata)->m_password;
+	if (size < sp_strlen(password.Str())+1)
+		return 0;
+	sp_strcpy(buf, password.Str());
+	return(sp_strlen(password.Str()));
 }
 
 void
@@ -324,7 +320,6 @@ SOAPSecureSocketImp::Close()
 		m_ctx = 0;
 	}
 }
-
 
 #endif // EASYSOAP_SSL
 
