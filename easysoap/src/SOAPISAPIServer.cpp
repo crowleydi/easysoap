@@ -30,6 +30,9 @@ public:
 	{
 		if (m_ecb)
 		{
+			if (sp_strcmp(m_ecb->lpszMethod, "POST"))
+				throw SOAPException("Invalid HTTP method '%s', only POST is supported.", m_ecb->lpszMethod);
+
 			ParseContentType(m_charset, m_ecb->lpszContentType);
 			m_leftRead = m_ecb->cbTotalBytes;
 		}

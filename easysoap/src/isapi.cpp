@@ -42,6 +42,87 @@ const char *extensionDesc = "EasySoap++ ISAPI DLL";
 HANDLE	gWorkerThreads[numWorkerThreads];
 HANDLE	gIoPort;
 
+static const char *
+HTTPReasonByStatus(int code)
+{
+	static struct _HTTPReasons {
+		int status;
+		char *reason;
+	} *r,reasons[] = 
+	{
+		{ 100,"Continue" }, 
+		{ 101,"Switching Protocols" }, 
+		{ 200,"OK" }, 
+		{ 201,"Created" }, 
+		{ 202,"Accepted" }, 
+		{ 203,"Non-Authoritative Information" }, 
+		{ 204,"No Content" }, 
+		{ 205,"Reset Content" }, 
+		{ 206,"Partial Content" }, 
+		{ 300,"Multiple Choices" }, 
+		{ 301,"Moved Permanently" }, 
+		{ 302,"Moved Temporarily" }, 
+		{ 303,"See Other" }, 
+		{ 304,"Not Modified" }, 
+		{ 305,"Use Proxy" }, 
+		{ 400,"Bad Request" }, 
+		{ 401,"Unauthorized" }, 
+		{ 402,"Payment Required" }, 
+		{ 403,"Forbidden" }, 
+		{ 404,"Not Found" }, 
+		{ 405,"Method Not Allowed" }, 
+		{ 406,"Not Acceptable" }, 
+		{ 407,"Proxy Authentication Required" }, 
+		{ 408,"Request Timeout" }, 
+		{ 409,"Conflict" }, 
+		{ 410,"Gone" }, 
+		{ 411,"Length Required" }, 
+		{ 412,"Precondition Failed" }, 
+		{ 413,"Request Entity Too Large" }, 
+		{ 414,"Request-URI Too Long" }, 
+		{ 415,"Unsupported Media Type" }, 
+		{ 500,"Internal Server Error" }, 
+		{ 501,"Not Implemented" }, 
+		{ 502,"Bad Gateway" }, 
+		{ 503,"Service Unavailable" }, 
+		{ 504,"Gateway Timeout" }, 
+		{ 505,"HTTP Version Not Supported" },
+		{ 000, NULL }
+	};
+
+	r=reasons;
+
+	while (r->status<=code)
+		if (r->status==code)
+			return (r->reason);
+		else
+			r++;
+
+	return "No Reason";
+}
+
+static void
+WriteErrorMessage(EXTENSION_CONTROL_BLOCK *pECB, int error, const char *szBuffer)
+{
+	HSE_SEND_HEADER_EX_INFO header;
+	DWORD					dwBufLen;
+	char szStatus[128];
+	char szHeader[] = "Content-Type: text/html\r\n\r\n";
+
+	wsprintf(szStatus, "%d %s", error, HTTPReasonByStatus(error));
+
+	header.pszStatus = szStatus;
+	header.cchStatus = strlen(szStatus);
+	header.pszHeader = szHeader;
+	header.cchHeader = sizeof(szHeader);
+	header.fKeepConn = 0;
+
+	dwBufLen = strlen(szBuffer);
+
+	pECB->ServerSupportFunction(pECB->ConnID, HSE_REQ_SEND_RESPONSE_HEADER_EX,
+		&header, 0, 0);
+	pECB->WriteClient(pECB->ConnID, (void *)szBuffer, &dwBufLen, 0);
+}
 
 BOOL APIENTRY DllMain( HANDLE hModule, 
                        DWORD  ul_reason_for_call, 
@@ -92,18 +173,18 @@ HttpExtensionProc( EXTENSION_CONTROL_BLOCK *pECB )
 	if (!pECB)
 		return HSE_STATUS_ERROR;
 
+	if (lstrcmp(pECB->lpszMethod, "POST"))
+	{
+		WriteErrorMessage(pECB, 405, "<H1>Invalid method, only POST is supported.</H1>");
+		return HSE_STATUS_ERROR;
+	}
+
 	if (!PostQueuedCompletionStatus(gIoPort, (DWORD)pECB, 0, NULL))
 	{
-		DWORD	dwBufLen;
-		char	szBuffer[128] = { 0 };
+		char	szBuffer[128];
 
 		wsprintf(szBuffer, "<H1>Error posting to completion port! Win32 Error = %i</H1>", GetLastError());
-		dwBufLen = strlen(szBuffer);
-
-		pECB->ServerSupportFunction(pECB->ConnID, HSE_REQ_SEND_RESPONSE_HEADER,
-			NULL, 0, (DWORD *)"Content-Type: text/html\r\n\r\n");
-		pECB->WriteClient(pECB->ConnID, szBuffer, &dwBufLen, 0);
-
+		WriteErrorMessage(pECB, 500, szBuffer);
 		return HSE_STATUS_ERROR;
 	}
 	return HSE_STATUS_PENDING;
