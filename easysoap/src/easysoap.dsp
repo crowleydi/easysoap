@@ -246,7 +246,7 @@ SOURCE=..\include\SOAPDebugger.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\SOAPDispatchHandler.h
+SOURCE=..\include\SOAPDispatchHandler.h
 # End Source File
 # Begin Source File
 
