@@ -1,4 +1,4 @@
-noinst_PROGRAMS = interopclient interopserver
+noinst_PROGRAMS = interopserver interopclient
 
 interopserver_SOURCES = \
 	interopserver.cpp \
