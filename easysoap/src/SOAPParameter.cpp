@@ -303,7 +303,14 @@ SOAPParameter::GetInt() const
 	if (IsNull())
 		throw SOAPException("Cannot convert null value to integer.");
 
-	return atoi(m_strval);
+	int result = strtol(m_strval, 0, 10);
+	if (errno == ERANGE)
+	{
+		if (result < 0)
+			throw SOAPException("Integer underflow: %s", (const char *)m_strval);
+		throw SOAPException("Integer overflow: %s", (const char *)m_strval);
+	}
+	return result;
 }
 
 bool
@@ -331,17 +338,45 @@ SOAPParameter::GetFloat() const
 	return GetDouble();
 }
 
+//
+// TODO:  This is too tricky.  We need to find a
+// portable and nice way to return NAN.
+typedef union
+{
+	double d;
+	struct
+	{
+		int i1;
+		int i2;
+	};
+} fptricks;
+
 double
 SOAPParameter::GetDouble() const
 {
 	if (IsNull())
 		throw SOAPException("Cannot convert null value to double.");
 
-	if (m_strval == "INF")
+	if (sp_strcasecmp(m_strval, "INF") == 0)
 		return HUGE_VAL;
-	else if (m_strval == "-INF")
+	else if (sp_strcasecmp(m_strval, "-INF") == 0)
 		return -HUGE_VAL;
-	return strtod(m_strval, 0);
+	else if (sp_strcasecmp(m_strval, "NaN") == 0)
+	{
+		fptricks t;
+		t.i1 = 0xFFFFFFFF;
+		t.i2 = 0xFFFFFFFF;
+		return t.d;
+	}
+
+	double ret = strtod(m_strval, 0);
+	if (errno == ERANGE)
+	{
+		if (ret == 0.0)
+			throw SOAPException("Floating-point underflow: %s", (const char *)m_strval);
+		throw SOAPException("Floating-point overflow: %s", (const char *)m_strval);
+	}
+	return ret;
 }
 
 const SOAPParameter&
@@ -424,15 +459,16 @@ SOAPParameter::WriteSOAPPacket(SOAPPacketWriter& packet, bool writetype) const
 	else if (IsArray())
 	{
 		SOAPQName atype(m_arrayType);
+		writetype = false;
 
 		if (atype.IsUndefined())
 		{
-			writetype = false;
 			bool gottype = false;
 			if (GetArray().Size() > 0)
 			{
 				gottype = true;
 				atype = GetArray()[0].GetType();
+				writetype = false;
 
 				for (size_t i = 1; i < GetArray().Size(); ++i)
 				{
