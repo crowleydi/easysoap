@@ -3,6 +3,15 @@
  */
 
 #include <string.h>
+#include <easysoap/es_config.h>
+
+#ifdef HAVE_STRCASECMP
+#define STRICMP strcasecmp
+#elif HAVE_STRICMP
+#define STRICMP stricmp
+#else
+#error "No stricmp function."
+#endif
 
 #include "global.h"
 #include "md5.h"
@@ -52,7 +61,7 @@ void DigestCalcHA1(
       MD5Update(&Md5Ctx, ":", 1);
       MD5Update(&Md5Ctx, pszPassword, strlen(pszPassword));
       MD5Final(HA1, &Md5Ctx);
-      if (stricmp(pszAlg, "md5-sess") == 0) {
+      if (STRICMP(pszAlg, "md5-sess") == 0) {
             MD5Init(&Md5Ctx);
             MD5Update(&Md5Ctx, HA1, HASHLEN);
             MD5Update(&Md5Ctx, ":", 1);
@@ -87,7 +96,7 @@ void DigestCalcResponse(
       MD5Update(&Md5Ctx, pszMethod, strlen(pszMethod));
       MD5Update(&Md5Ctx, ":", 1);
       MD5Update(&Md5Ctx, pszDigestUri, strlen(pszDigestUri));
-      if (stricmp(pszQop, "auth-int") == 0) {
+      if (STRICMP(pszQop, "auth-int") == 0) {
             MD5Update(&Md5Ctx, ":", 1);
             MD5Update(&Md5Ctx, HEntity, HASHHEXLEN);
       };

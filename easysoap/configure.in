@@ -105,6 +105,8 @@ AC_CHECK_FUNCS( \
 	strtol \
 	snprintf \
 	strerror \
+	stricmp \
+	strcasecmp \
 )
 
 AC_OUTPUT( \
