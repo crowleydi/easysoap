@@ -74,6 +74,18 @@ SOAPonHTTP::Write(const SOAPMethod& method, const char *payload, size_t payloads
 				DEFAULT_USERAGENT : (const char *)m_userAgent);
 
 		m_http.WriteHeader("Content-Type", "text/xml; charset=\"UTF-8\"");
+		if (!m_endpoint.User().IsEmpty() || !m_endpoint.Password().IsEmpty())
+		{
+			SOAPString up = m_endpoint.User();
+			up.Append(":");
+			up.Append(m_endpoint.Password());
+			SOAPString enc;
+			SOAPBase64Base::Encode(up, up.Length(), enc);
+
+			up = "Basic ";
+			up.Append(enc);
+			m_http.WriteHeader("Authorization", (const char *)up);
+		}
 
 		m_http.Write("SOAPAction:");
 		if (method.GetSoapAction())
