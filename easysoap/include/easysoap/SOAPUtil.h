@@ -437,7 +437,7 @@ sp_UCS_UTF8(int c, char *& utf8)
 inline bool
 sp_UTF8_UCS(const char *& utf8, int& c)
 {
-	int b = *utf8++;
+	int b = (unsigned char)*utf8++;
 	if (b <= 0x7F)
 	{
 		c = b;
