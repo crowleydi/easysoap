@@ -202,4 +202,11 @@ public:
 	}
 };
 
+#ifdef HAVE_PARTIAL_SPECIALIZATION
+template <typename K, typename V>
+class SOAPTypeTraits< std::map<K, V> > : public SOAPSTLMapTypeTraits
+{
+};
+#endif // HAVE_PARTIAL_SPECIALIZATION
+
 #endif // _SOAPSTL_H_

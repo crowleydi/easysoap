@@ -162,6 +162,13 @@ public:
 	}
 };
 
+#ifdef HAVE_PARTIAL_SPECIALIZATION
+template <typename K, typename V>
+class SOAPTypeTraits< SOAPHashMap<K, V> > : public SOAPMapTypeTraits
+{
+};
+#endif // HAVE_PARTIAL_SPECIALIZATION
+
 class SOAPArrayTypeTraits
 {
 private:
