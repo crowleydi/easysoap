@@ -228,7 +228,7 @@ SOAPClientSocketImp::Read(char *buff, size_t bufflen)
 	if (bufflen > 0)
 	{
 		bytes = recv(m_socket, buff, bufflen, 0);
-		SOAPDebugger::Print("RECV: %d bytes\r\n", bytes);
+		SOAPDebugger::Print(2, "RECV: %d bytes\r\n", bytes);
 		if (bytes == 0)
 		{
 			Close(); // other side dropped the connection
@@ -238,7 +238,7 @@ SOAPClientSocketImp::Read(char *buff, size_t bufflen)
 			Close();
 			throw SOAPSocketException("Error reading socket");
 		}
-		SOAPDebugger::Write(buff, bytes);
+		SOAPDebugger::Write(1, buff, bytes);
 	}
 	return bytes;
 }
@@ -250,7 +250,7 @@ SOAPClientSocketImp::Write(const char *buff, size_t bufflen)
 	if (bufflen > 0)
 	{
 		bytes = send(m_socket, buff, bufflen, 0);
-		SOAPDebugger::Print("SEND: %d bytes\r\n", bytes);
+		SOAPDebugger::Print(2, "SEND: %d bytes\r\n", bytes);
 		if (bytes == (int)SOCKET_ERROR)
 		{
 			Close();
@@ -263,7 +263,7 @@ SOAPClientSocketImp::Write(const char *buff, size_t bufflen)
 					"tried to write %d bytes, wrote %d",
 					bufflen, bytes);
 		}
-		SOAPDebugger::Write(buff, bytes);
+		SOAPDebugger::Write(1, buff, bytes);
 	}
 	return bytes;
 }

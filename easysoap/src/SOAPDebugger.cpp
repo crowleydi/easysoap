@@ -25,11 +25,18 @@
 #include "SOAPDebugger.h"
 
 FILE *SOAPDebugger::m_file = 0;
+int SOAPDebugger::m_messageLevel = 1;
 
 void
-SOAPDebugger::Write(const char *bytes, size_t len)
+SOAPDebugger::SetMessageLevel(int level)
 {
-	if (m_file)
+	m_messageLevel = level;
+}
+
+void
+SOAPDebugger::Write(int level, const char *bytes, size_t len)
+{
+	if (level <= m_messageLevel && m_file)
 	{
 		fwrite(bytes, 1, len, m_file);
 		fflush(m_file);
@@ -37,9 +44,9 @@ SOAPDebugger::Write(const char *bytes, size_t len)
 }
 
 void
-SOAPDebugger::Print(const char *str, ...)
+SOAPDebugger::Print(int level, const char *str, ...)
 {
-	if (m_file)
+	if (level <= m_messageLevel && m_file)
 	{
 		va_list ap;
 		va_start(ap, str);

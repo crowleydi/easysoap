@@ -28,15 +28,17 @@ class EASYSOAP_EXPORT SOAPDebugger
 {
 public:
 	static void SetFile(const char *fname);
+	static void SetMessageLevel(int level);
 	static void Close();
-	static void Write(const char *bytes, size_t len);
-	static void Print(const char *str, ...);
+	static void Write(int level, const char *bytes, size_t len);
+	static void Print(int level, const char *str, ...);
 
 private:
 	SOAPDebugger();
 	//~SOAPDebugger();
 
 	static FILE	*m_file;
+	static int	m_messageLevel;
 };
 
 #endif // !defined(AFX_SOAPDEBUGGER_H__2ED6E429_A5CB_4FEB_B1B1_19E83A2F8046__INCLUDED_)
