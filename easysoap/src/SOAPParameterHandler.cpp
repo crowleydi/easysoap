@@ -149,7 +149,7 @@ SOAPParameterHandler::start(SOAPParser& parser, const XML_Char *name, const XML_
 			sep = arrayType;
 		}
 
-		char *b = sp_strchr(sep, '[');
+		char *b = sp_strrchr(sep, '[');
 		if (b)
 			*b = 0;
 		m_arrayHandler->SetArrayType(sep, typens);
