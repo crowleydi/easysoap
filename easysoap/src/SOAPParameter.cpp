@@ -77,7 +77,8 @@ SOAPParameter::Assign(const SOAPParameter& param)
 	m_type = param.m_type;
 	m_arrayType = param.m_arrayType;
 	m_strval = param.m_strval;
-	m_flags= param.m_flags;
+	m_flags = param.m_flags;
+	m_attrs = param.GetAttributes();
 
 	const Array& params = param.GetArray();
 	m_array.Resize(params.Size());
