@@ -48,14 +48,23 @@ class OpenSSLinit
 
 	OpenSSLinit()
 	{
-		// TODO: Add correct use of the /dev/random port.
-		static const char rnd_seed[] = 
-			"string to make the random number generator"
-			"think it has some entropy.";
 		SSL_library_init();
 		ERR_load_crypto_strings();
 		SSL_load_error_strings();
-		RAND_seed(rnd_seed, sizeof rnd_seed);
+
+		FILE *f = 0;
+		f = fopen("/dev/urandom", "r");
+		if (f)
+		{
+			char buff[128];
+			fread(buff, 128, 1, f);
+			fclose(f);
+			RAND_seed(buff, sizeof buff);
+		}
+		else
+		{
+		}
+
 	}
 	~OpenSSLinit()
 	{
