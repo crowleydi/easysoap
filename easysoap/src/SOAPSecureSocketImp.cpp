@@ -42,6 +42,7 @@ void SOAPSecureSocketImp::Close() { }
 int SOAPSecureSocketImp::Read(char *, int) {return 0;}
 int SOAPSecureSocketImp::Write(const char *, int) {return 0;}
 bool SOAPSecureSocketImp::WaitRead(int sec, int usec) {return false;}
+void SOAPSecureSocketImp::InitSSL() {}
 
 #else
 
