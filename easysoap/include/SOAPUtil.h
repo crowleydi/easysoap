@@ -234,5 +234,184 @@ sp_maximum(const T& a, const T& b)
 	return (a < b) ? b : a;
 }
 
+template <typename T>
+inline bool
+ConvertUCStoUTF16(int c, T& utf16)
+{
+	if (c > 0xFFFF && c < 0x00110000)
+	{ 
+		*utf16++ = (0xD7C0 + (c >> 10));
+		*utf16++ = (0xDC00 | c & 0x3FF);
+	}
+	else if (c >= 0)
+	{
+		*utf16++ = c;
+	}
+	else
+	{
+		return false;
+	}
+	return true;
+}
+
+template <typename T>
+inline bool
+ConvertUTF16toUCS(T& utf16, int& c)
+{
+	int x = utf16[0];
+
+	if (x >= 0 && x <= 0xD7FF || x >= 0xE000 && x <= 0xFFFF)
+	{
+		c = x;
+		++utf16;
+	}
+	else
+	{
+		int y = utf16[1];
+		if (x >= 0xD800 && x <= 0xDBFF && y >= 0xDC00 && y <= 0xDFFF)
+		{
+			c = (x - 0xD800) * 0x400 + y - 0xDC00;
+			++utf16; ++utf16;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+//
+// Functions to convert between
+// UTF8 and UCS character encoding.
+//
+// T is an iterator.  (or pointer)
+template <typename T>
+inline bool
+ConvertUCStoUTF8(int c, T& utf8)
+{
+	if (c <= 0x7F)
+	{
+		/* Leave ASCII encoded */
+		*utf8++ = (c);
+	}
+	else if (c <= 0x07FF)
+	{
+		/* 110xxxxx 10xxxxxx */
+		*utf8++ = (0xC0 | (c >> 6));
+		*utf8++ = (0x80 | (c & 0x3F));
+	}
+	else if (c <= 0xFFFF)
+	{
+		/* 1110xxxx + 2 */
+		*utf8++ = (0xE0 | (c >> 12));
+		*utf8++ = (0x80 | ((c >> 6) & 0x3F));
+		*utf8++ = (0x80 | (c & 0x3F));
+	}
+	else if (c <= 0x1FFFFF)
+	{
+		/* 11110xxx + 3 */
+		*utf8++ = (0xF0 | (c >> 18));
+		*utf8++ = (0x80 | ((c >> 12) & 0x3F));
+		*utf8++ = (0x80 | ((c >> 6) & 0x3F));
+		*utf8++ = (0x80 | (c & 0x3F));
+	}
+	else if (c <= 0x3FFFFFF)
+	{
+		/* 111110xx + 4 */
+		*utf8++ = (0xF8 | (c >> 24));
+		*utf8++ = (0x80 | ((c >> 18) & 0x3F));
+		*utf8++ = (0x80 | ((c >> 12) & 0x3F));
+		*utf8++ = (0x80 | ((c >> 6) & 0x3F));
+		*utf8++ = (0x80 | (c & 0x3F));
+	}
+	else if (c <= 0x7FFFFFFF)
+	{
+		/* 1111110x + 5 */
+		*utf8++ = (0xFC | (c >> 30));
+		*utf8++ = (0x80 | ((c >> 24) & 0x3F));
+		*utf8++ = (0x80 | ((c >> 18) & 0x3F));
+		*utf8++ = (0x80 | ((c >> 12) & 0x3F));
+		*utf8++ = (0x80 | ((c >> 6) & 0x3F));
+		*utf8++ = (0x80 | (c & 0x3F));
+	}
+	else
+	{
+		/* Not a valid character... */
+		return false;
+	}
+
+	return true;
+}
+
+template <typename T>
+inline bool
+ConvertUTF8toUCS(T& utf8, int& c)
+{
+	int b = *utf8++;
+	if (b <= 0x7F)
+	{
+		c = b;
+	}
+	else if ((b & 0xE0) == 0xC0)
+	{	/* 110xxxxx 10xxxxxx */
+		c = (b & 0x1F) << 6;
+		b = *utf8++;
+		c |= b & 0x3F;
+	}
+	else if ((b & 0xF0) == 0xE0)
+	{	/* 1110xxxx + 2 */
+		c = (b & 0x0F) << 12;
+		b = *utf8++;
+		c |= (b & 0x3F) << 6;
+		b = *utf8++;
+		c |= b & 0x3F;
+	}
+	else if ((b & 0xF1) == 0xF0)
+	{	/* 11110xxx + 3 */
+		c = (b & 0x0F) << 18;
+		b = *utf8++;
+		c |= (b & 0x3F) << 12;
+		b = *utf8++;
+		c |= (b & 0x3F) << 6;
+		b = *utf8++;
+		c |= b & 0x3F;
+	}
+	else if ((b & 0xFD) == 0xF8)
+	{
+		/* 111110xx + 4 */
+		c = (b & 0x0F) << 24;
+		b = *utf8++;
+		c |= (b & 0x0F) << 18;
+		b = *utf8++;
+		c |= (b & 0x3F) << 12;
+		b = *utf8++;
+		c |= (b & 0x3F) << 6;
+		b = *utf8++;
+		c |= b & 0x3F;
+	}
+	else if ((b & 0xFE) == 0xFC)
+	{	
+		/* 1111110x + 5 */
+		c = (b & 0x0F) << 30;
+		b = *utf8++;
+		c |= (b & 0x0F) << 24;
+		b = *utf8++;
+		c |= (b & 0x0F) << 18;
+		b = *utf8++;
+		c |= (b & 0x3F) << 12;
+		b = *utf8++;
+		c |= (b & 0x3F) << 6;
+		b = *utf8++;
+		c |= b & 0x3F;
+	}
+	else
+	{
+		/* Error */
+		return false;
+	}
+  	return true;
+}
+
 #endif // __SOAPUTIL_H__
 
