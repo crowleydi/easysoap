@@ -227,6 +227,8 @@ main(int argc, char* argv[], char *env[])
 		//cgi.SetLogFile("C:/validate.log");
 		//cgi.SetInFile("C:/validate.log");
 
+		w.SetAddWhiteSpace();
+
 		faultcode = "SOAP::Client";
 		p.Parse(env, cgi);
 		faultcode = "SOAP::Server";
