@@ -12,5 +12,5 @@ LDADD = ../src/libeasysoap.la
 LDFLAGS = -no-install
 INCLUDES = -I@top_srcdir@/include
 
-EXTRA_DIST = README.TXT simpleclient.dsp simpleserver.dsp \
+EXTRA_DIST = README.TXT simpleisapi.dsp simpleclient.dsp simpleserver.dsp \
 	simpleisapi.cpp
