@@ -16,7 +16,7 @@
  * License along with this library; if not, write to the Free
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- * SOAPParse.cpp,v 1.27 2001/12/11 01:53:44 dcrowley Exp
+ * $Id$
  */
 
 #ifdef _MSC_VER
