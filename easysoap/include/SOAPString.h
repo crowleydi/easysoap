@@ -30,22 +30,6 @@ private:
 	char	*m_str;
 	size_t	m_alloc;
 
-	void Ensure(size_t size)
-	{
-		if (!m_str || m_alloc < size)
-		{
-			while (m_alloc < size)
-				m_alloc *= 2;
-			char *newstr = sp_alloc<char>(m_alloc);
-			if (m_str)
-			{
-				sp_strcpy(newstr, m_str);
-				sp_free(m_str);
-			}
-			m_str = newstr;
-		}
-	}
-
 	void Assign(const char* str)
 	{
 		if (str)
@@ -67,7 +51,7 @@ private:
 
 			// we need to alloc some space
 			size_t req = sp_strlen(str) + 1;
-			Ensure(req);
+			Resize(req);
 			sp_strcpy(m_str, str);
 		}
 		else if (m_str)
@@ -117,7 +101,7 @@ public:
 	{
 		size_t tlen = sp_strlen(m_str);
 		size_t need = tlen + len + 1;
-		Ensure(need);
+		Resize(need);
 		sp_strncpy(m_str + tlen, str, len);
 		m_str[need - 1] = 0;
 		return *this;
@@ -128,12 +112,38 @@ public:
 		return Append(str);
 	}
 
+	void Resize(size_t size)
+	{
+		if (!m_str || m_alloc < size)
+		{
+			while (m_alloc < size)
+				m_alloc *= 2;
+			char *newstr = sp_alloc<char>(m_alloc);
+			if (m_str)
+			{
+				sp_strcpy(newstr, m_str);
+				sp_free(m_str);
+			}
+			m_str = newstr;
+		}
+	}
+
 	const char *Str() const
 	{
 		return m_str;
 	}
 
+	char *Str()
+	{
+		return m_str;
+	}
+
 	operator const char *() const
+	{
+		return Str();
+	}
+
+	operator char *()
 	{
 		return Str();
 	}
@@ -148,14 +158,29 @@ public:
 		return sp_strcmp(m_str, str);
 	}
 
+	bool operator==(const SOAPString& str) const
+	{
+		return Compare(str) == 0;
+	}
+
 	bool operator==(const char *str) const
 	{
 		return Compare(str) == 0;
 	}
 
+	bool operator!=(const SOAPString& str) const
+	{
+		return Compare(str) != 0;
+	}
+
 	bool operator!=(const char *str) const
 	{
 		return Compare(str) != 0;
+	}
+
+	bool operator<(const SOAPString& str) const
+	{
+		return Compare(str) < 0;
 	}
 
 	bool operator<(const char *str) const
