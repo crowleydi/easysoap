@@ -50,9 +50,9 @@
 ** Configuration Files Parsing Functions
 *********************************************************************/
 
-bool ConfReadLine(TFile *f,char *buffer,uint32 len)
+int ConfReadLine(TFile *f,char *buffer,uint32 len)
 {
-	bool r=TRUE;
+	int r=TRUE;
 	char c,*p,*z=buffer;
 
 	while ((--len)>0)
@@ -84,7 +84,7 @@ bool ConfReadLine(TFile *f,char *buffer,uint32 len)
 	return r;
 }
 
-bool ConfNextToken(char **p)
+int ConfNextToken(char **p)
 {
 	while (1)
 		switch (**p)
@@ -127,7 +127,7 @@ char *ConfGetToken(char **p)
 		};
 }
 
-bool ConfReadInt(char *p,int32 *n,int32 min,int32 max)
+int ConfReadInt(char *p,int32 *n,int32 min,int32 max)
 {
 	char *e;
 
@@ -139,7 +139,7 @@ bool ConfReadInt(char *p,int32 *n,int32 min,int32 max)
 		return (e!=p);
 }
 
-bool ConfReadBool(char *p,bool *b)
+int ConfReadBool(char *p,int *b)
 {
 	if (strcasecmp(p,"yes")==0)
 	{
@@ -160,7 +160,7 @@ bool ConfReadBool(char *p,bool *b)
 ** MIME Types File
 *********************************************************************/
 
-bool ConfReadMIMETypes(char *filename)
+int ConfReadMIMETypes(char *filename)
 {
 	TFile f;
 	char z[512],*p;
@@ -190,7 +190,7 @@ bool ConfReadMIMETypes(char *filename)
 ** Server Configuration File
 *********************************************************************/
 
-bool ConfReadServerFile(char *filename,TServer *srv)
+int ConfReadServerFile(char *filename,TServer *srv)
 {
 	TFile f;
 	char z[512],*p;
