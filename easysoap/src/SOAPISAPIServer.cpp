@@ -154,6 +154,9 @@ SOAPISAPITransport::Read(char *buffer, size_t buffsize)
 		{
 			if (!m_ecbData)
 				m_ecbData = m_ecb->lpbData;
+			DWORD remain = m_ecb->lpbData + m_ecb->cbAvailable - m_ecbData;
+			if (dwSize > remain)
+				dwSize = remain;
 			const unsigned char *end = m_ecbData + dwSize;
 			while (m_ecbData != end)
 				*buffer++ = *m_ecbData++;
