@@ -87,9 +87,8 @@ SOAPServerDispatch::Handle(SOAPTransport& trans)
 	try
 	{
 		// Parse the SOAP packet
-		SOAPParser parser;
 		faultcode = clientfault;
-		parser.Parse(m_request, trans);
+		m_parser.Parse(m_request, trans);
 		faultcode = serverfault;
 
 		const SOAPMethod& requestMethod = m_request.GetBody().GetMethod();

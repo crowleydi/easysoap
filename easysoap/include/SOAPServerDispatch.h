@@ -57,6 +57,7 @@ private:
 	SOAPResponse		m_response;
 	SOAPEnvelope		m_request;
 	SOAPPacketWriter	m_writer;
+	SOAPParser			m_parser;
 };
 
 
