@@ -16,7 +16,7 @@
  * License along with this library; if not, write to the Free
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- * $Id$
+ * SOAPEnvelopeHandler.h,v 1.8 2001/11/21 06:00:47 dcrowley Exp
  */
 
 
@@ -40,11 +40,9 @@ public:
 	virtual ~SOAPEnvelopeHandler();
 
 	void SetEnvelope(SOAPEnvelope& env);
-	bool Done()	{return m_done;}
 
 	virtual SOAPParseEventHandler* start(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs);
 	virtual SOAPParseEventHandler* startElement(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs);
-	virtual void endElement(const XML_Char *name);
 
 
 private:

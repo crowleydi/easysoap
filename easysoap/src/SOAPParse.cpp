@@ -16,7 +16,7 @@
  * License along with this library; if not, write to the Free
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- * $Id$
+ * SOAPParse.cpp,v 1.27 2001/12/11 01:53:44 dcrowley Exp
  */
 
 #ifdef _MSC_VER
@@ -90,11 +90,8 @@ SOAPParser::Parse(SOAPEnvelope& env, SOAPTransport& trans)
 				GetErrorMessage());
 		}
 
-		if (m_handler->Done())
-		{
-			ParseBuffer(0);
+		if (read == 0)
 			break;
-		}
 	}
 
 	HandleHRefs();
