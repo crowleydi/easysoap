@@ -140,7 +140,7 @@ int SocketListen(TSocket *s, uint32 backlog)
 	RET(listen(*s,backlog));
 }
 
-BOOL WaitForConnect( TSocket *s, uint32 msec)
+int WaitForConnect( TSocket *s, uint32 msec)
 {
 	if (SocketWait( s, 1, 0, msec))
 		return TRUE;
