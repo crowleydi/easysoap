@@ -36,7 +36,7 @@ private:
 		{
 			while (m_alloc < size)
 				m_alloc *= 2;
-			char *newstr = sp_alloc<char>(size);
+			char *newstr = sp_alloc<char>(m_alloc);
 			if (m_str)
 			{
 				sp_strcpy(newstr, m_str);
