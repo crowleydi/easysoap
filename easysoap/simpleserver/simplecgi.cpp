@@ -36,8 +36,8 @@ public:
 	DemoCalculatorHandler()
 	{
 		DispatchTo(this);
-		DispatchMethod("add", add);
-		DispatchMethod("mult", mult);
+		DispatchMethod("add", &DemoCalculatorHandler::add);
+		DispatchMethod("mult", &DemoCalculatorHandler::mult);
 	}
 
 	~DemoCalculatorHandler()
