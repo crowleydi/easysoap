@@ -255,17 +255,16 @@ SOAPHTTPProtocol::GetReply()
 	m_canread = GetContentLength();
 	m_doclose = false;
 	const char *keepalive = GetHeader("Connection");
+#if 0
 	if (respver > 10)
 	{
-		if (!keepalive
-			|| sp_strcasecmp(keepalive, "Close") == 0
-			|| sp_strcasecmp(keepalive, "Keep-Alive") != 0)
+		if (keepalive && sp_strcasecmp(keepalive, "Keep-Alive") != 0)
 			m_doclose = true;
 	}
 	else
+#endif
 	{
-		if (!keepalive
-			|| sp_strcasecmp(keepalive, "Keep-Alive") != 0)
+		if (!keepalive || sp_strcasecmp(keepalive, "Keep-Alive") != 0)
 			m_doclose = true;
 	}
 
