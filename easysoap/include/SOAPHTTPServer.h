@@ -21,26 +21,22 @@
 #if !defined(AFX_SOAPHTTPSERVERTRANSPORT_H__0A80D352_B75C_411D_9096_7F1CACB82BD1__INCLUDED_)
 #define AFX_SOAPHTTPSERVERTRANSPORT_H__0A80D352_B75C_411D_9096_7F1CACB82BD1__INCLUDED_
 
-#include <SOAP.h>
-#include <SOAPServerDispatch.h>
-#include <SOAPDispatchHandler.h>
+#include <SOAPServer.h>
 
 struct _TServer;
 struct _TSession;
 
-class EASYSOAP_EXPORT SOAPHTTPServer
+class EASYSOAP_EXPORT SOAPHTTPServer : public SOAPServer<SOAPHTTPServer>
 {
 public:
 	SOAPHTTPServer(int port=80);
 	~SOAPHTTPServer();
 
-	SOAPHTTPServer& DispatchTo(SOAPDispatchHandlerInterface *disp)
-	{
-		m_dispatch.DispatchTo(disp);
-		return *this;
-	}
-
 	int Handle();
+
+	void Stop();
+	void ResetFlag();
+	int IsStopped();
 
 private:
 
@@ -48,12 +44,6 @@ private:
 	void RequestHandler(struct _TSession *);
 
 	struct _TServer		*m_server;
-	SOAPServerDispatch	m_dispatch;
-
-public:
-	void Stop();
-	void ResetFlag();
-	int IsStopped();
 };
 
 #endif // !defined(AFX_SOAPHTTPSERVERTRANSPORT_H__0A80D352_B75C_411D_9096_7F1CACB82BD1__INCLUDED_)
