@@ -2,46 +2,46 @@
 #
 #
 # Where Expat is installed
-EXPAT = /usr/local
-SOAPLIBDIR = ../lib
-SOAPLIB  = $(SOAPLIBDIR)/libeasysoap.a
+EXPAT := /usr/local
+
+SOAPLIBDIR := ../lib
+STATICLIB  := $(SOAPLIBDIR)/libeasysoap.a
+SHAREDLIB  := $(SOAPLIBDIR)/libeasysoap.so
 
 #
 # flags for Linux
-CXXFLAGS = -g -fPIC -Wall
+CXXFLAGS := -g -fPIC -Wall
 
 #
 # flags for cygwin
-#CXXFLAGS = -g -Wall
+#CXXFLAGS := -g -Wall
 
-CPPFLAGS = -I../include -I$(EXPAT)/include \
+CPPFLAGS := -I../include -I$(EXPAT)/include \
 	 -DEASYSOAP_SSL # if you want https
 
-SRCS = SOAPArrayHandler.cpp SOAPBody.cpp SOAPBodyHandler.cpp \
-	SOAPDebugger.cpp SOAPPacketWriter.cpp SOAPBase64.cpp \
-	SOAPClientSocketImp.cpp SOAPEnvelope.cpp SOAPEnvelopeHandler.cpp \
+SRCS := SOAPArrayHandler.cpp SOAPBase64.cpp SOAPBody.cpp \
+	SOAPBodyHandler.cpp SOAPCGITransport.cpp SOAPClientSocketImp.cpp \
+	SOAPDebugger.cpp SOAPEnvelope.cpp SOAPEnvelopeHandler.cpp \
 	SOAPFault.cpp SOAPFaultHandler.cpp SOAPHeader.cpp \
 	SOAPHeaderHandler.cpp SOAPMethod.cpp SOAPMethodHandler.cpp \
-	SOAPParameter.cpp SOAPParameterHandler.cpp SOAPParse.cpp \
-	SOAPProxy.cpp SOAPResponse.cpp SOAPQName.cpp \
-	SOAPSecureSocketImp.cpp SOAPSocket.cpp SOAPStructHandler.cpp \
-	SOAPUrl.cpp SOAPonHTTP.cpp XMLParser.cpp SOAPServerDispatch.cpp
+	SOAPPacketWriter.cpp SOAPParameter.cpp SOAPParameterHandler.cpp \
+	SOAPParse.cpp SOAPProxy.cpp SOAPQName.cpp \
+	SOAPResponse.cpp SOAPSecureSocketImp.cpp SOAPServerDispatch.cpp \
+	SOAPSocket.cpp SOAPStructHandler.cpp SOAPUrl.cpp \
+	SOAPonHTTP.cpp XMLParser.cpp
 
-OBJS = SOAPArrayHandler.o SOAPBody.o SOAPBodyHandler.o \
-	SOAPDebugger.o SOAPPacketWriter.o SOAPBase64.o \
-	SOAPClientSocketImp.o SOAPEnvelope.o SOAPEnvelopeHandler.o \
-	SOAPFault.o SOAPFaultHandler.o SOAPHeader.o \
-	SOAPHeaderHandler.o SOAPMethod.o SOAPMethodHandler.o \
-	SOAPParameter.o SOAPParameterHandler.o SOAPParse.o \
-	SOAPProxy.o SOAPResponse.o SOAPQName.o \
-	SOAPSecureSocketImp.o SOAPSocket.o SOAPStructHandler.o \
-	SOAPUrl.o SOAPonHTTP.o XMLParser.o SOAPServerDispatch.o
+OBJS := $(SRCS:%.cpp=%.o)
 
-all : $(SOAPLIB)
+all : $(STATICLIB)
 
-$(SOAPLIB) : $(OBJS)
+$(STATICLIB) : $(OBJS)
 	mkdir -p $(SOAPLIBDIR)
 	$(AR) ru $@ $(OBJS)
+
+
+$(SHAREDLIB) : $(OBJS)
+	mkdir -p $(SOAPLIBDIR)
+	g++ -shared -o $@ $(OBJS)
 
 
 clean :
