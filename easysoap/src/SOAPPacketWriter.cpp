@@ -142,7 +142,7 @@ SOAPPacketWriter::AddAttr(const SOAPQName& tag, const char *value)
 	}
 
 	if (g_makePretty)
-		Write("\r\n\t");
+		Write("\n\t");
 	else
 		Write(" ");
 	Write(nstag);
@@ -192,7 +192,7 @@ SOAPPacketWriter::AddAttr(const SOAPQName& tag, const SOAPQName& value)
 	}
 
 	if (g_makePretty)
-		Write("\r\n\t");
+		Write("\n\t");
 	else
 		Write(" ");
 
@@ -218,7 +218,7 @@ SOAPPacketWriter::AddAttr(const char *attr, const char *value)
 		throw SOAPException("XML serialization error.  Adding attribute when not in start tag.");
 
 	if (g_makePretty)
-		Write("\r\n\t");
+		Write("\n\t");
 	else
 		Write(" ");
 
@@ -237,7 +237,7 @@ SOAPPacketWriter::AddXMLNS(const char *prefix, const char *ns)
 		m_nsmap[ns] = prefix;
 
 		if (g_makePretty)
-			Write("\r\n\t");
+			Write("\n\t");
 		else
 			Write(" ");
 
@@ -260,7 +260,7 @@ SOAPPacketWriter::EndTag(const char *tag)
 	{
 		Write("/>");
 		if (g_makePretty)
-			Write("\r\n");
+			Write("\n");
 		m_instart = false;
 	}
 	else
@@ -269,7 +269,7 @@ SOAPPacketWriter::EndTag(const char *tag)
 		Write(tag);
 		Write(">");
 		if (g_makePretty)
-			Write("\r\n");
+			Write("\n");
 	}
 }
 
@@ -286,7 +286,7 @@ SOAPPacketWriter::EndTag(const SOAPQName& tag)
 	{
 		Write("/>");
 		if (g_makePretty)
-			Write("\r\n");
+			Write("\n");
 		m_instart = false;
 	}
 	else
@@ -303,7 +303,7 @@ SOAPPacketWriter::EndTag(const SOAPQName& tag)
 		Write(tag.GetName());
 		Write(">");
 		if (g_makePretty)
-			Write("\r\n");
+			Write("\n");
 	}
 }
 
@@ -325,7 +325,7 @@ SOAPPacketWriter::EndStart()
 	{
 		Write(">");
 		if (g_makePretty)
-			Write("\r\n");
+			Write("\n");
 		m_instart = false;
 	}
 }
