@@ -35,13 +35,23 @@
 //
 static class WinSockInit
 {
+private:
+	bool didinit;
 public:
-	WinSockInit()
+	WinSockInit() : didinit(false)
 	{
-		WSADATA wsaData;
-		// Is version 0x0202 appropriate?
-		// I have no idea...
-		WSAStartup( 0x0202, &wsaData );
+	}
+
+	void Init()
+	{
+		if (!didinit)
+		{
+			WSADATA wsaData;
+			// Is version 0x0202 appropriate?
+			// I have no idea...
+			WSAStartup( 0x0202, &wsaData );
+			didinit = true;
+		}
 	}
 
 	~WinSockInit()
@@ -84,6 +94,9 @@ public:
 SOAPClientSocketImp::SOAPClientSocketImp()
 : m_socket(INVALID_SOCKET)
 {
+#if defined (_WIN32)
+	__winsockinit.Init();
+#endif;
 }
 
 SOAPClientSocketImp::~SOAPClientSocketImp()
