@@ -60,7 +60,7 @@ private:
 						return;
 				}
 				// we didn't have enough room to copy..
-				*m_str = 0;
+				sp_free(m_str);
 			}
 
 			// we need to alloc some space
