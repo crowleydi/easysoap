@@ -65,6 +65,12 @@ SOAPParser::Parse(SOAPResponse& resp, SOAPTransport& trans)
 	XML_SetCharacterDataHandler(m_parser,
 			SOAPParser::_characterData);
 
+	XML_SetStartNamespaceDeclHandler(m_parser,
+			SOAPParser::_startNamespace);
+
+	XML_SetEndNamespaceDeclHandler(m_parser,
+			SOAPParser::_endNamespace);
+
 	SOAPResponseHandler response(resp);
 	m_response = &response;
 
@@ -124,20 +130,73 @@ SOAPParser::start(const XML_Char *name, const XML_Char **attrs)
 SOAPParseEventHandler *
 SOAPParser::startElement(const XML_Char *name, const XML_Char **attrs)
 {
+	SOAPParseEventHandler* handler = 0;
 	if (m_handlerstack.IsEmpty())
 	{
 		if (sp_strcmp(name, SOAPResponseHandler::start_tag) == 0)
 		{
-			return m_handlerstack.Push(m_response->start(name, attrs));
+			handler = m_response;
 		}
-		throw SOAPException("Unknown SOAP response tag: %s", name);
+		else
+		{
+			//
+			// FIXME:
+			// Probably what we should do instead of throw is set
+			// a flag that says the response is invalid.  We usually
+			// get in here when the HTTP response code is 500 and it
+			// gives us back some HTML instead of a SOAP Fault.
+			throw SOAPException("Unknown SOAP response tag: %s", name);
+		}
+	}
+	else
+	{
+		handler = m_handlerstack.Top();
 	}
 
-	SOAPParseEventHandler* handler = m_handlerstack.Top();
 	if (handler)
+	{
+		const XML_Char **cattrs = attrs;
+		while (*cattrs)
+		{
+			const char *tag = *cattrs++;
+			const char *val = *cattrs;
+			if (sp_strcmp(tag, FULL_SOAP_XSI PARSER_NS_SEP "type") == 0)
+			{
+				NamespaceMap::Iterator i = m_nsmap.Find(val);
+				if (i)
+				{
+					// we already mapped it!
+					*cattrs = *i;
+				}
+				else
+				{
+					char *colon = sp_strchr(val, ':');
+					if (colon)
+					{
+						*colon++ = 0;
+						NamespaceMap::Iterator i = m_nsmap.Find(val);
+						if (i)
+						{
+							m_work = *i;
+							m_work.Append(PARSER_NS_SEP);
+							m_work.Append(colon);
+							*--colon = ':';
+							*cattrs = m_nsmap[val] = m_work;
+						}
+						else
+						{
+							// TODO:
+							// this is probably an error...
+						}
+					}
+				}
+			}
+			++cattrs;
+		}
 		return m_handlerstack.Push(handler->startElement(name, attrs));
-	else
-		return m_handlerstack.Push(0);
+	}
+
+	return m_handlerstack.Push(0);
 }
 
 void
@@ -155,6 +214,18 @@ SOAPParser::endElement(const XML_Char *name)
 	if (handler)
 		handler->endElement(name);
 	m_handlerstack.Pop();
+}
+
+void
+SOAPParser::startNamespace(const XML_Char *prefix, const XML_Char *uri)
+{
+	m_nsmap[prefix] = uri;
+}
+
+void
+SOAPParser::endNamespace(const XML_Char *prefix)
+{
+	m_nsmap.Remove(prefix);
 }
 
 //
@@ -180,6 +251,20 @@ SOAPParser::_characterData(void *userData, const XML_Char *str, int len)
 {
 	SOAPParser *parser = (SOAPParser *)userData;
 	parser->characterData(str, len);
+}
+
+void
+SOAPParser::_startNamespace(void *userData, const XML_Char *prefix, const XML_Char *uri)
+{
+	SOAPParser *parser = (SOAPParser *)userData;
+	parser->startNamespace(prefix, uri);
+}
+
+void
+SOAPParser::_endNamespace(void *userData, const XML_Char *prefix)
+{
+	SOAPParser *parser = (SOAPParser *)userData;
+	parser->endNamespace(prefix);
 }
 
 

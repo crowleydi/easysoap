@@ -42,6 +42,8 @@ private:
 	SOAPParseEventHandler* startElement(const XML_Char *name, const XML_Char **attrs);
 	void endElement(const XML_Char *name);
 	void characterData(const XML_Char *str, int len);
+	void startNamespace(const XML_Char *prefix, const XML_Char *uri);
+	void endNamespace(const XML_Char *prefix);
 
 	//
 	// the C based XML parser calls through to these methods
@@ -50,6 +52,8 @@ private:
 	static void _startElement(void *userData, const XML_Char *name, const XML_Char **attrs);
 	static void _endElement(void *userData, const XML_Char *name);
 	static void _characterData(void *userData, const XML_Char *str, int len);
+	static void _startNamespace(void *userData, const XML_Char *prefix, const XML_Char *uri);
+	static void _endNamespace(void *userData, const XML_Char *prefix);
 
 	XML_Parser							m_parser;
 
@@ -62,6 +66,9 @@ private:
 	// our parsing stack
 	//
 	SOAPStack<SOAPParseEventHandler *>	m_handlerstack;
+	typedef SOAPHashMap<SOAPString,SOAPString> NamespaceMap;
+	NamespaceMap	m_nsmap;
+	SOAPString		m_work;
 
 };
 
