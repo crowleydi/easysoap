@@ -252,14 +252,6 @@ public:
 	static SOAPParameter& Serialize(SOAPParameter& param, const V& val)
 	{
 		//
-		// Check for zero length arrays
-		if (val.size() == 0)
-		{
-			param.AddAttribute(XMLSchema2001::nil) = "true";
-			return param;
-		}
-
-		//
 		// Add SOAP-ENC:arrayType attribute
 		char buffer[32];
 
@@ -567,14 +559,6 @@ public:
 	template<typename V>
 	static SOAPParameter& Serialize(SOAPParameter& param, const V& val)
 	{
-		//
-		// Check for zero length arrays
-		if (val.GetNumRows() == 0 || val.GetNumCols() == 0)
-		{
-			param.AddAttribute(XMLSchema2001::nil) = "true";
-			return param;
-		}
-
 		//
 		// Add SOAP-ENC:arrayType attribute
 		char buffer[64];
