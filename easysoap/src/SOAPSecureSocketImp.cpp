@@ -277,7 +277,7 @@ SOAPSecureSocketImp::VerifyCert(const char* host)
 	int rc = SSL_get_verify_result(m_ssl);
 	
 	SOAPString msg = CheckForCertError(rc);
-	if (msg == "")
+	if (msg != "")
 		throw SOAPException("Error verifying peer certificate: %s", msg.Str());
 
 	char buf[256];
