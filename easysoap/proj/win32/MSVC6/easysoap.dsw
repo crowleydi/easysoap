@@ -3,7 +3,55 @@ Microsoft Developer Studio Workspace File, Format Version 6.00
 
 ###############################################################################
 
+Project: "all"=.\all.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name easysoap
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name interopclient
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name interopserver
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name simpleclient
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name simpleisapi
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name simpleserver
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name validator
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name google
+    End Project Dependency
+}}}
+
+###############################################################################
+
 Project: "easysoap"=.\easysoap.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "google"=.\google.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
