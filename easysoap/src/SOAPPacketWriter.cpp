@@ -171,7 +171,7 @@ SOAPPacketWriter::AddAttr(const SOAPQName& tag, const char *value)
 void
 SOAPPacketWriter::AddAttr(const SOAPQName& tag, const SOAPQName& value)
 {
-	const char *tnstag = 0;
+	const char *tnstag;
 	const char *vnstag = 0;
 	bool addtns = false;
 	bool addvns = false;
