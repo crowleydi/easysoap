@@ -6,4 +6,6 @@ EXTRA_DIST = \
 	simpleclient.dsp \
 	simpleisapi.dsp \
 	simpleserver.dsp \
-	validator.dsp
+	validator.dsp \
+	all.dsp \
+	google.dsp
