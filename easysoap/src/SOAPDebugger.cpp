@@ -63,7 +63,7 @@ SOAPDebugger::Close()
 {
 	if (m_file)
 	{
-		fwrite("\n", 1, 2, m_file);
+		fwrite("\r\n", 1, 2, m_file);
 		fclose(m_file);
 		m_file = 0;
 	}
