@@ -76,7 +76,7 @@ SetTraceFile(const char *server, const char *test)
 {
 	char buffer[256];
 	snprintf(buffer, sizeof(buffer), "%s/%s.txt", server, test);
-	//SOAPDebugger::SetFile(buffer);
+	SOAPDebugger::SetFile(buffer);
 }
 
 double
