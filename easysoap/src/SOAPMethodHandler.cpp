@@ -93,37 +93,36 @@ SOAPMethodHandler::startElement(SOAPParser& parser, const XML_Char *name, const 
 		}
 	}
 
-	SOAPParameter *param = 0;
+	SOAPParameter *param = &m_method->AddParameter(name);
+	if (href)
+	{
+		// set attrs and name
+		m_paramHandler.SetParameter(param);
+		m_paramHandler.start(parser, name, attrs);
 
+		// link to existing "id", if any
+		SOAPParameter *p = parser.GetHRefParam(++href);
+		if (p)
+			param->LinkTo(*p);
+		else
+			parser.SetHRefParam(href, param);
+
+		// don't parse anything else!
+		// we don't want to blow away
+		// existing data structure from
+		// true parameter.
+		return 0;
+	}
 	if (id)
 	{
-		if (!(param = parser.GetHRefParam(id)))
-		{
-			param = &m_method->AddParameter();
+		SOAPParameter *p = parser.GetHRefParam(id);
+		if (p)
+			param->LinkTo(*p);
+		else
 			parser.SetHRefParam(id, param);
-		}
-		else
-		{
-		}
-	}
-	else if (href)
-	{
-		++href;
-		if (!(param = parser.GetHRefParam(href)))
-		{
-			param = &m_method->AddParameter();
-			parser.SetHRefParam(href, param);
-		}
-		else
-		{
-		}
-	}
-	else
-	{
-		param = &m_method->AddParameter();
 	}
 
-	m_paramHandler.SetParameter(*param);
+	m_paramHandler.SetParameter(param);
 	return m_paramHandler.start(parser, name, attrs);
 }
 
