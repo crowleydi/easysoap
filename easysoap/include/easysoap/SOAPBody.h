@@ -53,10 +53,14 @@ public:
 
 private:
 
-	SOAPMethod					m_method;
-	SOAPFault					m_fault;
-	SOAPArray<SOAPParameter>	m_params;
-	bool						m_isfault;
+	typedef SOAPPool<SOAPParameter> Pool;
+	typedef SOAPArray<SOAPParameter*> Array;
+
+	SOAPMethod	m_method;
+	SOAPFault	m_fault;
+	Pool		m_pool;
+	Array		m_params;
+	bool		m_isfault;
 };
 
 END_EASYSOAP_NAMESPACE

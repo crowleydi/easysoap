@@ -51,13 +51,19 @@ SOAPBody::Reset()
 	m_method.Reset();
 	m_fault.Reset();
 	m_isfault = false;
+	for (Array::Iterator i = m_params.Begin(); i != m_params.End(); ++i)
+	{
+		(*i)->Reset();
+		m_pool.Return(*i);
+	}
 	m_params.Resize(0);
 }
 
 SOAPParameter&
 SOAPBody::AddParameter()
 {
-	return m_params.Add();
+	SOAPParameter *ret = m_pool.Get();
+	return *m_params.Add(ret);
 }
 
 bool
@@ -71,7 +77,7 @@ SOAPBody::WriteSOAPPacket(SOAPPacketWriter& packet) const
 	{
 		m_method.WriteSOAPPacket(packet);
 		for (size_t i = 0; i < m_params.Size(); ++i)
-			m_params[i].WriteSOAPPacket(packet);
+			m_params[i]->WriteSOAPPacket(packet);
 	}
 
 	packet.EndTag(SOAPEnv::Body);
