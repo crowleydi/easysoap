@@ -70,7 +70,7 @@ SOAPMethodHandler::startElement(const XML_Char *name, const XML_Char **attrs)
 
 			if (type == SOAPTypes::soap_array ||
 				// this is hack because we don't disambiguate
-				(type == SOAPTypes::xsd_none && strstr(val, ":Array") != 0))
+				(type == SOAPTypes::xsd_none && sp_strstr(val, ":Array") != 0))
 			{
 				m_arrayHandler.SetParameter(m_method->AddParameter());
 				return m_arrayHandler.start(name, attrs);
@@ -78,7 +78,7 @@ SOAPMethodHandler::startElement(const XML_Char *name, const XML_Char **attrs)
 
 			if (type == SOAPTypes::soap_struct ||
 				// this is hack because we don't disambiguate
-				(type == SOAPTypes::xsd_none && strstr(val, ":Struct") != 0))
+				(type == SOAPTypes::xsd_none && sp_strstr(val, ":Struct") != 0))
 			{
 				m_structHandler.SetParameter(m_method->AddParameter());
 				return m_structHandler.start(name, attrs);

@@ -156,14 +156,14 @@ SOAPClientSocketImp::Connect(const char *server, unsigned int port)
 		throw SOAPSocketException("Error creating socket");
 
 	struct sockaddr_in sockAddr;
-	memset(&sockAddr, 0, sizeof(sockAddr));
+	sp_memset(&sockAddr, 0, sizeof(sockAddr));
 	sockAddr.sin_family = AF_INET;
 	sockAddr.sin_addr.s_addr = htonl(INADDR_ANY);
 
 	if (bind(m_socket, (struct sockaddr*)&sockAddr, sizeof(sockAddr)) == SOCKET_ERROR)
 		throw SOAPSocketException("Error binding socket");
 
-	memset(&sockAddr, 0, sizeof(sockAddr));
+	sp_memset(&sockAddr, 0, sizeof(sockAddr));
 	sockAddr.sin_family = AF_INET;
 	sockAddr.sin_addr.s_addr = inet_addr(server);
 	sockAddr.sin_port = htons((u_short)port);

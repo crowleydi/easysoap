@@ -182,7 +182,7 @@ SOAPHTTPProtocol::GetReply()
 		throw SOAPException("Couldn't read response.");
 	}
 
-	char *httpretcode = strchr(buff, ' ');
+	char *httpretcode = sp_strchr(buff, ' ');
 	if (httpretcode)
 	{
 		httpreturn = atoi(httpretcode);
@@ -197,7 +197,7 @@ SOAPHTTPProtocol::GetReply()
 
 		if (buff[0] == 0)
 			break;
-		char *c = strchr(buff, ':');
+		char *c = sp_strchr(buff, ':');
 		if (c)
 		{
 			*c++ = 0;
