@@ -17,28 +17,9 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#ifndef __ES_GCC_H_
+#define __ES_GCC_H_
 
-#ifndef __SOAP_h__
-#define __SOAP_h__
+#define EASYSOAP_EXPORT
 
-#define EASYSOAP_STRING			"EasySoap++"
-#define EASYSOAP_HOMEPAGE		"http://easysoap.sourceforge.net/"
-#define EASYSOAP_VERSION_STRING	"0.3"
-#define EASYSOAP_VERSION		30
-
-#include <es_comp.h>
-
-#include <SOAPUtil.h>
-#include <SOAPHashMap.h>
-#include <SOAPArray.h>
-#include <SOAPString.h>
-#include <SOAPQName.h>
-#include <SOAPException.h>
-
-class SOAPPacketWriter;
-
-#include <SOAPParseEventHandler.h>
-#include <SOAPProxy.h>
-
-#endif // __SOAP_h__
-
+#endif // __ES_GCC_H_

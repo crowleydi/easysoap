@@ -1,0 +1,9 @@
+noinst_PROGRAMS = simplecgi
+
+simplecgi_SOURCES = simplecgi.cpp
+simplecgi_LDADD = $(STATIC_EASYSOAP_LIBS)
+simplecgi_DEPENDENCIES = $(STATIC_EASYSOAP_LIBS)
+
+INCLUDES = $(EASYSOAP_INCLUDES)
+
+EXTRA_DIST = README.TXT
