@@ -37,8 +37,6 @@ main(int argc, const char* argv[], const char *env[])
 {
 	SOAPCGIServer server;
 
-	void *leak = malloc(10);
-
 	SOAPBuildersInteropHandler interopHandler;
 	SOAPBuildersHeaderHandler headerHandler;
 
