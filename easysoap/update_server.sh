@@ -1,5 +1,5 @@
 #!/bin/sh
-scp src/.libs/libeasysoap.so.0 \
+scp src/.libs/libeasysoap*so* \
 	tests/.libs/interopserver \
 	tests/.libs/interopclient \
 	validator/.libs/validator \
