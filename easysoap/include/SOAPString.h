@@ -197,14 +197,6 @@ struct SOAPHashCodeFunctor<SOAPString>
 	}
 };
 
-struct SOAPEqualsFunctor<SOAPString>
-{
-	bool operator()(const SOAPString& a, const SOAPString& b) const
-	{
-		return sp_strcmp(a, b) == 0;
-	}
-};
-
 struct SOAPHashCodeFunctorNoCase<SOAPString>
 {
 	size_t operator()(const SOAPString& str) const
