@@ -21,6 +21,8 @@
 #ifndef __SOAPSTRING_H__
 #define __SOAPSTRING_H__
 
+#include <wchar.h>
+
 #include "SOAP.h"
 #include "SOAPUtil.h"
 
@@ -184,6 +186,53 @@ public:
 	bool operator<(const char *str) const
 	{
 		return Compare(str) < 0;
+	}
+
+	void Assign(const wchar_t *str)
+	{
+		Assign("");
+		Append(str);
+	}
+
+	void Append(const wchar_t *str)
+	{
+		if (str)
+		{
+			char buffer[1024];
+			char *b = buffer;
+			const char *const end = b + 1000;
+			while (*str)
+			{
+				int c = 0;
+#ifdef _MSVC
+				ConvertUTF16toUCS(str, c);
+#else
+				c = *str++;
+#endif
+				ConvertUCStoUTF8(c, b);
+
+				if (b >= end)
+				{
+					*b = 0;
+					Append(buffer);
+					b = buffer;
+				}
+			}
+			*b = 0;
+			Append(buffer);
+		}
+	}
+
+	SOAPString& operator=(const wchar_t *str)
+	{
+		Assign(str);
+		return *this;
+	}
+
+	SOAPString& operator+=(const wchar_t *str)
+	{
+		Append(str);
+		return *this;
 	}
 };
 

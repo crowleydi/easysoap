@@ -211,6 +211,20 @@ SOAPParameter::SetValue(const char *val)
 }
 
 void
+SOAPParameter::SetValue(const wchar_t *val)
+{
+	SetType("string");
+	if (val)
+	{
+		SetNull(false);
+		m_strval = val;
+		m_flags = 0;
+	}
+	else
+		SetNull();
+}
+
+void
 SOAPParameter::SetFloat(const char *val)
 {
 	SetType("float");
