@@ -176,9 +176,10 @@ void
 SOAPBuildersInteropHandler::echoBase64(const SOAPMethod& req, SOAPMethod& resp)
 {
 	SOAPArray<char> val;
+	SOAPBase64 base64(val);
 
-	req.GetParameter("inputBase64") >> SOAPBase64(val);
-	resp.AddParameter("return") << SOAPBase64(val);
+	req.GetParameter("inputBase64") >> base64;
+	resp.AddParameter("return") << base64;
 }
 
 
@@ -186,9 +187,10 @@ void
 SOAPBuildersInteropHandler::echoHexBinary(const SOAPMethod& req, SOAPMethod& resp)
 {
 	SOAPArray<char> val;
+	SOAPHex hex(val);
 
-	req.GetParameter("inputHexBinary") >> SOAPHex(val);
-	resp.AddParameter("return") << SOAPHex(val);
+	req.GetParameter("inputHexBinary") >> hex;
+	resp.AddParameter("return") << hex;
 }
 
 
@@ -284,7 +286,7 @@ void
 SOAPBuildersInteropHandler::echoMap(const SOAPMethod& req, SOAPMethod& resp)
 {
 	SOAPHashMap<SOAPString, int> val;
-	req.GetParameter((int)0) >> val;
+	req.GetParameter((size_t)0) >> val;
 	resp.AddParameter("return") << val;
 }
 

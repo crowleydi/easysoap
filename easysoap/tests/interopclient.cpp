@@ -673,7 +673,10 @@ TestEchoBase64(SOAPProxy& proxy, const Endpoint& e)
 	SOAPMethod method("echoBase64", e.nspace, e.soapaction, e.needsappend);
 	method.AddParameter("inputBase64") << SOAPBase64(inputBinary);
 	const SOAPResponse& response = proxy.Execute(method);
-	response.GetReturnValue() >> SOAPBase64(outputBinary);
+
+	SOAPBase64 base64(outputBinary);
+	response.GetReturnValue() >> base64;
+
 	if (inputBinary != outputBinary)
 		throw SOAPException("Values are not equal");
 }
@@ -691,7 +694,10 @@ TestEchoHexBinary(SOAPProxy& proxy, const Endpoint& e)
 	SOAPMethod method("echoHexBinary", e.nspace, e.soapaction, e.needsappend);
 	method.AddParameter("inputHexBinary") << SOAPHex(inputBinary);
 	const SOAPResponse& response = proxy.Execute(method);
-	response.GetReturnValue() >> SOAPHex(outputBinary);
+
+	SOAPHex hex(outputBinary);
+	response.GetReturnValue() >> hex;
+
 	if (inputBinary != outputBinary)
 		throw SOAPException("Values are not equal");
 }
