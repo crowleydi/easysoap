@@ -51,6 +51,7 @@ SOAPHeader::GetHeaders() const
 	return m_headers;
 }
 
+void
 SOAPHeader::Reset()
 {
 	for (Headers::Iterator i = m_headers.Begin(); i != m_headers.End(); ++i)

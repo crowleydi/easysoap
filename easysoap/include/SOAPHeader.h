@@ -31,7 +31,7 @@ public:
 
 	typedef SOAPArray<SOAPParameter> Headers;
 
-	Reset();
+	void Reset();
 	SOAPParameter& AddHeader();
 	const Headers& GetHeaders() const;
 
