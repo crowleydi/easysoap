@@ -28,6 +28,7 @@
 class EASYSOAP_EXPORT SOAPDispatchHandlerInterface
 {
 public:
+	virtual ~SOAPDispatchHandlerInterface() {}
 	virtual void ExecuteMethod(const SOAPMethod& request, SOAPMethod& response) = 0;
 };
 
