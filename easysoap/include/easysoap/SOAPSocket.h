@@ -66,6 +66,7 @@ private:
 	char		*m_wpos;
 	const char  *m_wend;
 	size_t		m_timeout;
+	bool		m_delsocket;
 
 	bool	Readbuff();
 

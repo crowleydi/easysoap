@@ -55,6 +55,8 @@ private:
 	bool		m_keepAlive;
 	bool		m_chunked;
 	SOAPSSLContext	*m_ctx;
+	SOAPSocketInterface * m_sslsocket;
+	bool		m_delsslsocket;
 
 	int		GetReply();
 	size_t	GetChunkLength();
@@ -73,6 +75,8 @@ public:
 		, m_keepAlive(true)
 		, m_chunked(false)
 		, m_ctx(0)
+		, m_sslsocket(0)
+		, m_delsslsocket(false)
 	{}
 
 	SOAPHTTPProtocol(const SOAPUrl& endpoint)
@@ -82,6 +86,9 @@ public:
 		, m_keepAlive(true)
 		, m_chunked(false)
 		, m_ctx(0)
+		, m_sslsocket(0)
+		, m_delsslsocket(false)
+
 	{
 		ConnectTo(endpoint);
 	}
@@ -93,12 +100,18 @@ public:
 		, m_keepAlive(true)
 		, m_chunked(false)
 		, m_ctx(0)
+		, m_sslsocket(0)
+		, m_delsslsocket(false)
+
 	{
 		ConnectTo(endpoint, proxy);
 	}
 
 	~SOAPHTTPProtocol()
-	{}
+	{
+		if (m_delsslsocket && m_sslsocket)
+			delete m_sslsocket;
+	}
 
 	void	SetKeepAlive(bool keepAlive = true)	{m_keepAlive = keepAlive;}
 	void 	SetContext(SOAPSSLContext& context) { m_ctx = &context; }
