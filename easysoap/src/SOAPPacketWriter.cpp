@@ -384,6 +384,7 @@ SOAPPacketWriter::WriteEscaped(const char *str)
 				case '>':	Write("&gt;");		break;
 				case '\'':	Write("&apos;");	break;
 				case '\"':	Write("&quot;");	break;
+				case '\r':	Write("&#xd;");		break;
 				default:
 					*m_buffptr++ = c;
 					break;
