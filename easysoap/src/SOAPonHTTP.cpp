@@ -127,6 +127,12 @@ SOAPonHTTP::GetCharset() const
 	return m_http.GetCharset();
 }
 
+const char *
+SOAPonHTTP::GetContentType() const
+{
+	return m_http.GetContentType();
+}
+
 void
 SOAPonHTTP::ConnectTo(const SOAPUrl& endpoint)
 {
@@ -328,29 +334,9 @@ SOAPHTTPProtocol::GetReply()
 	}
 
 	//
-	// Save charset info
+	// Get charset/content-type info
 	//
-	// Per some RFC, encoding is us-ascii if it's not
-	// specifief in HTTP header.
-	m_charset = "US-ASCII";
-	const char *contype = GetHeader("Content-Type");
-	if (contype)
-	{
-		const char *charset = charset = sp_strstr(contype, "charset=");
-		if (charset)
-		{
-			charset += 8;
-			if (*charset == '\"')
-				++charset;
-			const char *end = charset;
-
-			while (*end && *end != '\"' && *end != ';' && *end != ' ')
-				++end;
-
-			m_charset = "";
-			m_charset.Append(charset, end - charset);
-		}
-	}
+	ParseContentType(m_charset, m_contentType, GetHeader("Content-Type"));
 
 	//
 	// Get some information so we can close the
@@ -563,6 +549,10 @@ SOAPHTTPProtocol::Connect()
 void
 SOAPHTTPProtocol::ParseContentType(SOAPString& contentType, SOAPString& charset, const char *ctype)
 {
+	//
+	// Per some RFC, encoding is us-ascii if it's not
+	// specified in HTTP header.
+	//
 	charset = "US-ASCII";
 	contentType = "text/xml";
 

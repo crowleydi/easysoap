@@ -43,6 +43,7 @@ private:
 	SOAPUrl		m_proxy;
 	SOAPString	m_httpmsg;
 	SOAPString	m_charset;
+	SOAPString	m_contentType;
 	int			m_canread;
 	bool		m_httpproxy;
 	bool		m_doclose;
@@ -100,6 +101,7 @@ public:
 	void	WriteHeader(const char *header, int value);
 
 	const char *GetCharset() const {return m_charset;}
+	const char *GetContentType() const {return m_contentType;}
 	const char *GetHeader(const char *header) const;
 	int		GetContentLength() const;
 	bool	IsChunked() const {return m_chunked;}
@@ -139,6 +141,7 @@ public:
 	//
 	//  Return charset if we know it
 	virtual const char *GetCharset() const;
+	virtual const char *GetContentType() const;
 
 	// read the payload into the buffer.
 	// can be called multiple times.
