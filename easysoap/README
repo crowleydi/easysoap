@@ -52,3 +52,15 @@ For Win32 :
 	unpacked EasySoap++-0.4 into C:\code\EasySoap++-0.4 then install
 	Expat into C:\code\Expat-1.95.2.  Otherwise you will have to modify
 	the project settings to find the necessary include files.
+
+	Before running any of the example programs, you will need to make sure
+	that the file Expat.DLL is in your PATH.  You can do this in any
+	several ways:
+
+	1)  Copy Expat.DLL to the EasySoap++-0.4\win32\Release directory
+		(or Debug directory).
+	2)  Change your PATH environment variable to include the
+		Expat-1.95.2\libs directory.  The easiest way to do this is
+		to go to right click on "My Computer/Properties," select the
+		"Advacned" tab, then press the "Environment Variables..." button.
+		In there edit the value for PATH.
