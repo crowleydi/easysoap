@@ -39,3 +39,6 @@ easysoap_HEADERS = \
     es_conf.h \
     es_msvc.h \
     es_mwerks.h 
+
+EXTRA_DIST = SOAPISAPIServer.h
+

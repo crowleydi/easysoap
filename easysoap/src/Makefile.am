@@ -26,5 +26,5 @@ libeasysoap_la_LIBADD = abyss/src/libabyss.la
 
 libeasysoap_a_LIBADD = abyss/src/libabyss.la
 
-EXTRA_DIST = easysoap.dsp isapi.cpp isapi.def
+EXTRA_DIST = easysoap.dsp SOAPISAPIServer.cpp isapi.cpp isapi.def
 
