@@ -30,6 +30,22 @@ private:
 	char	*m_str;
 	size_t	m_alloc;
 
+	void Ensure(size_t size)
+	{
+		if (!m_str || m_alloc < size)
+		{
+			while (m_alloc < size)
+				m_alloc *= 2;
+			char *newstr = sp_alloc<char>(size);
+			if (m_str)
+			{
+				sp_strcpy(newstr, m_str);
+				sp_free(m_str);
+			}
+			m_str = newstr;
+		}
+	}
+
 	void Assign(const char* str)
 	{
 		if (str)
@@ -40,9 +56,8 @@ private:
 				size_t rem = m_alloc;
 				const char *work = str;
 				char *dest = m_str;
-				while (rem)
+				while (rem--)
 				{
-					--rem;
 					if ((*dest++ = *work++) == 0)
 						return;
 				}
@@ -51,11 +66,9 @@ private:
 
 			// we need to alloc some space
 			size_t req = sp_strlen(str) + 1;
-			while (m_alloc < req)
-				m_alloc *= 2;
-
-			sp_free(m_str);
-			m_str = sp_alloc<char>(m_alloc);
+			if (m_str)
+				*m_str = 0;
+			Ensure(req);
 			sp_strcpy(m_str, str);
 		}
 		else if (m_str)
@@ -105,15 +118,7 @@ public:
 	{
 		size_t tlen = sp_strlen(m_str);
 		size_t need = tlen + len + 1;
-		if (m_alloc < need)
-		{
-			while (m_alloc < need)
-				m_alloc *= 2;
-			char *newstr = sp_alloc<char>(m_alloc);
-			sp_strcpy(newstr, m_str);
-			sp_free(m_str);
-			m_str = newstr;
-		}
+		Ensure(need);
 		sp_strncpy(m_str + tlen, str, len);
 		m_str[need - 1] = 0;
 		return *this;
