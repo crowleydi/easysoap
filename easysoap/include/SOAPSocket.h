@@ -65,8 +65,8 @@ class EASYSOAP_EXPORT SOAPProtocolBase
 {
 private:
 
-	char		m_buffer[1500];
-	char		m_wbuff[1500];
+	char		m_buffer[1024];
+	char		m_wbuff[1460];
 
 	SOAPSocketInterface	*m_socket;
 	const char	*m_buff;

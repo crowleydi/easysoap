@@ -21,5 +21,6 @@
 #define __ES_GCC_H_
 
 #define EASYSOAP_EXPORT
+#define HAS_STRTOF
 
 #endif // __ES_GCC_H_
