@@ -76,7 +76,8 @@ public:
 
 	SOAPMethod& SetMethod(const char *name, const char *ns)
 	{
-		return m_method.SetName(name, ns);
+		m_method.SetName(name, ns);
+		return m_method;
 	}
 
 	const SOAPResponse& Execute()

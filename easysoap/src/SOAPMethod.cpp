@@ -57,31 +57,21 @@ SOAPMethod::SetSoapAction(const char *sa, bool appendName)
 	{
 		m_action = sa;
 		if (appendName)
-			m_action.Append(m_name);
+			m_action.Append(GetName().GetName());
 	}
 	else
 		m_action = "";
 }
 
-void
-SOAPMethod::Reset()
-{
-	m_params.Resize(0);
-}
-
-
 bool
 SOAPMethod::WriteSOAPPacket(SOAPPacketWriter& packet) const
 {
-	if (m_namespace.Length() == 0)
-		throw SOAPException("Namespace is required for the SOAP method.");
+	packet.StartTag(GetName(), "m");
 
-	packet.StartNSTag(m_namespace, m_name, "m");
+	for (size_t i = 0; i < GetArray().Size(); ++i)
+		GetArray()[i].WriteSOAPPacket(packet);
 
-	for (size_t i = 0; i < m_params.Size(); ++i)
-		m_params[i].WriteSOAPPacket(packet);
-
-	packet.EndNSTag(m_namespace, m_name);
+	packet.EndTag(GetName());
 
 	return true;
 }

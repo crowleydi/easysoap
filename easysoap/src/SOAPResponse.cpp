@@ -41,10 +41,9 @@ SOAPResponse::~SOAPResponse()
 void
 SOAPResponse::SetMethod(const SOAPMethod& method)
 {
-	SOAPString responseName = method.GetName();
-	responseName += "Response";
+	SOAPQName responseName = method.GetName();
+	responseName.GetName() += "Response";
 	GetBody().GetMethod().SetName(responseName);
-	GetBody().GetMethod().SetNamespace(method.GetNamespace());
 }
 
 

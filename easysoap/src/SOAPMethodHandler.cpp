@@ -45,6 +45,7 @@ SOAPParseEventHandler *
 SOAPMethodHandler::start(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs)
 {
 	m_method->Reset();
+	m_method->SetName(name);
 	return this;
 }
 

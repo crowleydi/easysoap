@@ -61,7 +61,7 @@ void
 SOAPProxy::SetEndpoint(const SOAPUrl& endpoint)
 {
 	// Assume it's an HTTP protocol.
-	// What we need here is a factory.
+	// TODO: What we need here is a factory.
 	SetEndpoint(new SOAPonHTTP(endpoint), true);
 }
 
@@ -69,7 +69,7 @@ void
 SOAPProxy::SetEndpoint(const SOAPUrl& endpoint, const SOAPUrl& proxy)
 {
 	// Assume it's an HTTP protocol.
-	// What we need here is a factory.
+	// TODO: What we need here is a factory.
 	SetEndpoint(new SOAPonHTTP(endpoint, proxy), true);
 }
 

@@ -27,6 +27,8 @@
 #include "SOAPPacketWriter.h"
 #include "SOAPNamespaces.h"
 
+const SOAPQName BodyTag("Body", SOAP_ENV);
+
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -44,14 +46,14 @@ SOAPBody::~SOAPBody()
 bool
 SOAPBody::WriteSOAPPacket(SOAPPacketWriter& packet) const
 {
-	packet.StartNSTag(SOAP_ENV, "Body");
+	packet.StartTag(BodyTag);
 
 	if (m_isfault)
 		m_fault.WriteSOAPPacket(packet);
 	else
 		m_method.WriteSOAPPacket(packet);
 
-	packet.EndNSTag(SOAP_ENV, "Body");
+	packet.EndTag(BodyTag);
 
 	return true;
 }

@@ -24,59 +24,16 @@
 #include "SOAP.h"
 #include "SOAPParameter.h"
 
-class EASYSOAP_EXPORT SOAPMethod
+class EASYSOAP_EXPORT SOAPMethod : public SOAPParameter
 {
 public:
-	SOAPMethod(const char *name = 0, const char *ns = 0, const char *soapAction = 0, bool appendName = true);
+	SOAPMethod() {}
+	SOAPMethod(const char *name, const char *ns, const char *soapAction = 0, bool appendName = true);
 	virtual ~SOAPMethod();
-
-	SOAPMethod& SetName(const char *name, const char *ns = 0)
-	{
-		if (name) m_name = name;
-		if (ns) m_namespace = ns;
-		return *this;
-	}
-
-	SOAPMethod& SetNamespace(const char *ns)
-	{
-		m_namespace = ns;
-		return *this;
-	}
-
-	const SOAPString& GetName() const
-	{
-		return m_name;
-	}
-
-	const SOAPString& GetNamespace() const
-	{
-		return m_namespace;
-	}
-
-	void Reset();
 
 	size_t GetNumParameters() const
 	{
-		return m_params.Size();
-	}
-
-	SOAPParameter& AddParameter(const char *name = 0)
-	{
-		SOAPParameter& p = m_params.Add();
-		if (name)
-			p.SetName(name);
-		return p;
-	}
-
-	SOAPParameter& AddParameter(const SOAPParameter& param)
-	{
-		SOAPParameter& p = m_params.Add(param);
-		return p;
-	}
-
-	const SOAPParameter& GetParameter(size_t i) const
-	{
-		return m_params[i];
+		return GetArray().Size();
 	}
 
 	void SetSoapAction(const char *sa, bool appendName = true);
@@ -88,9 +45,6 @@ public:
 	bool WriteSOAPPacket(SOAPPacketWriter& packet) const;
 private:
 
-	SOAPParameter::Array	m_params;
-	SOAPString				m_name;
-	SOAPString				m_namespace;
 	SOAPString				m_action;
 };
 
