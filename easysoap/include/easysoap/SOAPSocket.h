@@ -25,23 +25,9 @@
 
 #include <easysoap/SOAP.h>
 #include <easysoap/SOAPUrl.h>
+#include <easysoap/SOAPException.h>
 
 BEGIN_EASYSOAP_NAMESPACE
-
-class EASYSOAP_EXPORT SOAPSocketException : public SOAPException
-{
-public:
-	SOAPSocketException(const SOAPString& what)
-		: SOAPException(what) {}
-	SOAPSocketException(const char *fmt, ...)
-	{
-		va_list args;
-		va_start(args, fmt);
-		FormattedMessage(fmt, args);
-		va_end(args);
-	}
-	~SOAPSocketException() {}
-};
 
 class SOAPSocketInterface
 {

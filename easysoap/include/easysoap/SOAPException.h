@@ -71,6 +71,25 @@ public:
 	~SOAPMemoryException() {}
 };
 
+
+class EASYSOAP_EXPORT SOAPSocketException : public SOAPException
+{
+public:
+	SOAPSocketException(const SOAPString& what)
+		: SOAPException(what) {}
+	SOAPSocketException(const char *fmt, ...)
+	{
+		va_list args;
+		va_start(args, fmt);
+		FormattedMessage(fmt, args);
+		va_end(args);
+	}
+	~SOAPSocketException() {}
+};
+
+
+
+
 END_EASYSOAP_NAMESPACE
 
 #endif // !defined(AFX_SOAPEXCEPTION_H__18828772_7674_41DA_A39A_14D5CCB77E75__INCLUDED_)
