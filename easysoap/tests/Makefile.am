@@ -1,4 +1,4 @@
-noinst_PROGRAMS = interopserver interopclient
+noinst_PROGRAMS = interopserver interopclient SSLClient SSLServer
 
 interopserver_SOURCES = \
 	interopstruct.h \
@@ -13,6 +13,12 @@ interopserver_SOURCES = \
 interopclient_SOURCES = \
 	interopclient.cpp \
 	interopstruct.h
+
+SSLClient_SOURCES = \
+	SSLClient.cpp
+
+SSLServer_SOURCES = \
+	SSLServer.cpp
 
 LDADD = ../src/libeasysoap.la
 INCLUDES = -I@top_srcdir@/include
