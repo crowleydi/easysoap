@@ -88,9 +88,12 @@ sp_strncmp(const char *a, const char *b, unsigned int n)
 	int ret = 0;
 	if (a && b)
 	{
-		while (n-- > 0 && *a && *b && *a == *b)
-			++a, ++b;
-		ret = *a - *b;
+		while (n > 0 && *a && *b && *a == *b)
+			++a, ++b, --n;
+		if (n == 0)
+			ret = 0;
+		else
+			ret = *a - *b;
 	}
 	else if (a)
 		ret = 1;
