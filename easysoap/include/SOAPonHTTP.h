@@ -120,6 +120,8 @@ public:
 
 	virtual ~SOAPonHTTP() {}
 
+	void	SetTimeout(size_t secs) {m_http.SetTimeout(secs);}
+
 	void	SetKeepAlive(bool keepAlive = false)	{m_http.SetKeepAlive(keepAlive);}
 	virtual void SetError();
 	//

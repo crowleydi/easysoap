@@ -75,6 +75,7 @@ private:
 	const char	*m_buffend;
 	char		*m_wpos;
 	const char  *m_wend;
+	size_t		m_timeout;
 
 	bool	Readbuff();
 
@@ -91,6 +92,7 @@ public:
 	virtual bool IsOpen() {return m_socket && m_socket->IsOpen();}
 	virtual void Close();
 	virtual bool Connect(const char *host, unsigned int port, bool secure = false);
+	virtual void SetTimeout(size_t secs) {m_timeout = secs;}
 
 	// read up to len chars
 	virtual size_t Read(char *buffer, size_t len);

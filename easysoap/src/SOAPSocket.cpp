@@ -91,6 +91,10 @@ SOAPProtocolBase::Readbuff()
 	Flush(); // in case we haven't sent everything
 	m_buff = 0;
 	m_buffend = 0;
+
+	if (m_timeout > 0 && !m_socket->WaitRead(m_timeout))
+		throw SOAPSocketException("Timed out waiting for socket read.");
+
 	int bytes = m_socket->Read(m_buffer, sizeof(m_buffer));
 	if (bytes > 0)
 	{
@@ -118,6 +122,10 @@ SOAPProtocolBase::Read(char *buffer, size_t len)
 		}
 		return numread;
 	}
+
+	if (m_timeout > 0 && !m_socket->WaitRead(m_timeout))
+		throw SOAPSocketException("Timed out waiting for socket read.");
+
 	return m_socket->Read(buffer, len);
 }
 
