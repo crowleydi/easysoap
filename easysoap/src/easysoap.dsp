@@ -263,27 +263,27 @@ SOURCE=.\XMLParser.cpp
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
 # Begin Source File
 
-SOURCE=..\include\es_conf.h
+SOURCE=..\include\easysoap\es_conf.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\es_msvc.h
+SOURCE=..\include\easysoap\es_msvc.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\SOAP.h
+SOURCE=..\include\easysoap\SOAP.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\SOAPArray.h
+SOURCE=..\include\easysoap\SOAPArray.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\SOAPBase64.h
+SOURCE=..\include\easysoap\SOAPBase64.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\SOAPBody.h
+SOURCE=..\include\easysoap\SOAPBody.h
 # End Source File
 # Begin Source File
 
@@ -291,11 +291,11 @@ SOURCE=.\SOAPBodyHandler.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\SOAPCGIServer.h
+SOURCE=..\include\easysoap\SOAPCGIServer.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\SOAPCGITransport.h
+SOURCE=..\include\easysoap\SOAPCGITransport.h
 # End Source File
 # Begin Source File
 
@@ -303,15 +303,15 @@ SOURCE=.\SOAPClientSocketImp.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\SOAPDebugger.h
+SOURCE=..\include\easysoap\SOAPDebugger.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\SOAPDispatchHandler.h
+SOURCE=..\include\easysoap\SOAPDispatchHandler.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\SOAPEnvelope.h
+SOURCE=..\include\easysoap\SOAPEnvelope.h
 # End Source File
 # Begin Source File
 
@@ -319,11 +319,11 @@ SOURCE=.\SOAPEnvelopeHandler.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\SOAPException.h
+SOURCE=..\include\easysoap\SOAPException.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\SOAPFault.h
+SOURCE=..\include\easysoap\SOAPFault.h
 # End Source File
 # Begin Source File
 
@@ -331,11 +331,11 @@ SOURCE=.\SOAPFaultHandler.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\SOAPHashMap.h
+SOURCE=..\include\easysoap\SOAPHashMap.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\SOAPHeader.h
+SOURCE=..\include\easysoap\SOAPHeader.h
 # End Source File
 # Begin Source File
 
@@ -343,15 +343,15 @@ SOURCE=.\SOAPHeaderHandler.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\SOAPHTTPServer.h
+SOURCE=..\include\easysoap\SOAPHTTPServer.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\SOAPISAPIServer.h
+SOURCE=..\include\easysoap\SOAPISAPIServer.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\SOAPMethod.h
+SOURCE=..\include\easysoap\SOAPMethod.h
 # End Source File
 # Begin Source File
 
@@ -359,19 +359,19 @@ SOURCE=.\SOAPMethodHandler.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\SOAPNamespaces.h
+SOURCE=..\include\easysoap\SOAPNamespaces.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\SOAPonHTTP.h
+SOURCE=..\include\easysoap\SOAPonHTTP.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\SOAPPacketWriter.h
+SOURCE=..\include\easysoap\SOAPPacketWriter.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\SOAPParameter.h
+SOURCE=..\include\easysoap\SOAPParameter.h
 # End Source File
 # Begin Source File
 
@@ -379,27 +379,27 @@ SOURCE=.\SOAPParameterHandler.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\SOAPParse.h
+SOURCE=..\include\easysoap\SOAPParse.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\SOAPParseEventHandler.h
+SOURCE=..\include\easysoap\SOAPParseEventHandler.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\SOAPPool.h
+SOURCE=..\include\easysoap\SOAPPool.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\SOAPProxy.h
+SOURCE=..\include\easysoap\SOAPProxy.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\SOAPQName.h
+SOURCE=..\include\easysoap\SOAPQName.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\SOAPResponse.h
+SOURCE=..\include\easysoap\SOAPResponse.h
 # End Source File
 # Begin Source File
 
@@ -407,27 +407,27 @@ SOURCE=.\SOAPSecureSocketImp.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\SOAPServer.h
+SOURCE=..\include\easysoap\SOAPServer.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\SOAPServerDispatch.h
+SOURCE=..\include\easysoap\SOAPServerDispatch.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\SOAPSocket.h
+SOURCE=..\include\easysoap\SOAPSocket.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\SOAPStack.h
+SOURCE=..\include\easysoap\SOAPStack.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\SOAPSTL.h
+SOURCE=..\include\easysoap\SOAPSTL.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\SOAPString.h
+SOURCE=..\include\easysoap\SOAPString.h
 # End Source File
 # Begin Source File
 
@@ -435,23 +435,23 @@ SOURCE=.\SOAPStructHandler.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\SOAPTransport.h
+SOURCE=..\include\easysoap\SOAPTransport.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\SOAPTypeTraits.h
+SOURCE=..\include\easysoap\SOAPTypeTraits.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\SOAPUrl.h
+SOURCE=..\include\easysoap\SOAPUrl.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\SOAPUtil.h
+SOURCE=..\include\easysoap\SOAPUtil.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\XMLParser.h
+SOURCE=..\include\easysoap\XMLParser.h
 # End Source File
 # End Group
 # Begin Group "Resource Files"
