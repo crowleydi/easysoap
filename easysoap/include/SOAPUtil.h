@@ -124,23 +124,26 @@ sp_strcasecmp(const char *a, const char *b)
 inline char*
 sp_strstr(const char *haystack, const char *needle)
 {
-	if (*needle == 0)
-		return (char *)haystack;
-
-	// step along the main string
-	while (*haystack)
+	if (haystack && needle)
 	{
-		const char *nn = needle;
-		const char *hh = haystack;
-		// see if substring characters match
-		while (*nn++ == *hh++)
+		if (*needle == 0)
+			return (char *)haystack;
+
+		// step along the main string
+		while (*haystack)
 		{
-			if (*nn == 0)
-				// we got all the way to the end of the substring
-				// so we must've won
-				return (char *)haystack;
+			const char *nn = needle;
+			const char *hh = haystack;
+			// see if substring characters match
+			while (*nn++ == *hh++)
+			{
+				if (*nn == 0)
+					// we got all the way to the end of the substring
+					// so we must've won
+					return (char *)haystack;
+			}
+			++haystack;
 		}
-		++haystack;
 	}
 	return 0;
 }
@@ -162,12 +165,15 @@ sp_isspace(char c)
 inline char*
 sp_strchr(const char *s, char c)
 {
-	do
+	if (s)
 	{
-		if (*s == c)
-			return (char*)s;
+		do
+		{
+			if (*s == c)
+				return (char*)s;
+		}
+		while (*s++);
 	}
-	while (*s++);
 	return 0;
 }
 
@@ -175,8 +181,11 @@ inline void *
 sp_memset(void *s, int c, size_t n)
 {
 	unsigned char *ptr = (unsigned char *)s;
-	while (n--)
-		*ptr++ = c;
+	if (ptr)
+	{
+		while (n--)
+			*ptr++ = c;
+	}
 	return s;
 }
 
@@ -185,9 +194,12 @@ sp_hashcode(const char *key)
 {
 	unsigned char* ptr = (unsigned char*)key;
 	unsigned int h = 0;
-	unsigned int c;
-	while ((c = *ptr++))
-		h = 31 * h + c;
+	if (ptr)
+	{
+		unsigned int c;
+		while ((c = *ptr++))
+			h = 31 * h + c;
+	}
 	return h;
 }
 
@@ -196,9 +208,12 @@ sp_hashcodecase(const char *key)
 {
 	unsigned char* ptr = (unsigned char*)key;
 	unsigned int h = 0;
-	unsigned int c;
-	while ((c = sp_toupper(*ptr++)))
-		h = 31 * h + c;
+	if (ptr)
+	{
+		unsigned int c;
+		while ((c = sp_toupper(*ptr++)))
+			h = 31 * h + c;
+	}
 	return h;
 }
 
