@@ -34,7 +34,8 @@ template<typename T>
 class SOAPPool
 {
 private:
-	SOAPStack<T*> m_stack;
+	SOAPStack<T*>	m_stack;
+	int				m_out;
 
 	//
 	// Hide default stuff which doesnt make sense
@@ -43,7 +44,7 @@ private:
 
 public:
 
-	SOAPPool() {}
+	SOAPPool() : m_out(0) {}
 
 	~SOAPPool()
 	{
@@ -66,11 +67,13 @@ public:
 			T *ret = new T();
 			if (!ret)
 				throw SOAPMemoryException();
+			++m_out;
 			return ret;
 		}
 
 		T* ret = m_stack.Top();
 		m_stack.Pop();
+		++m_out;
 		return ret;
 	}
 
@@ -81,17 +84,22 @@ public:
 			T *ret = new T(t);
 			if (!ret)
 				throw SOAPMemoryException();
+			++m_out;
 			return ret;
 		}
 
 		T* ret = m_stack.Top();
 		m_stack.Pop();
 		*ret = t;
+		++m_out;
 		return ret;
 	}
 
 	void Return(T*& ptr)
 	{
+		if (m_out == 0)
+			throw SOAPException("Object leak, object being returned to pool when none were outstanding...");
+		--m_out;
 		m_stack.Push(ptr);
 		ptr = 0;
 	}
