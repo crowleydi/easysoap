@@ -26,7 +26,6 @@
 template<typename T>
 class SOAPTypeTraits;
 
-template<>
 class EASYSOAP_EXPORT SOAPTypeTraits<bool>
 {
 public:
@@ -36,7 +35,6 @@ public:
 	static const SOAPParameter& Deserialize(const SOAPParameter&, bool& val);
 };
 
-template<>
 class EASYSOAP_EXPORT SOAPTypeTraits<char>
 {
 public:
@@ -45,16 +43,6 @@ public:
 	static const SOAPParameter& Deserialize(const SOAPParameter&, char& val);
 };
 
-template<>
-class EASYSOAP_EXPORT SOAPTypeTraits<unsigned char>
-{
-public:
-	static void GetType(SOAPQName& type);
-	static SOAPParameter& Serialize(SOAPParameter& param, unsigned char val);
-	static const SOAPParameter& Deserialize(const SOAPParameter&, unsigned char& val);
-};
-
-template<>
 class EASYSOAP_EXPORT SOAPTypeTraits<short>
 {
 public:
@@ -63,7 +51,6 @@ public:
 	static const SOAPParameter& Deserialize(const SOAPParameter&, short& val);
 };
 
-template<>
 class EASYSOAP_EXPORT SOAPTypeTraits<int>
 {
 public:
@@ -73,7 +60,14 @@ public:
 	static const SOAPParameter& Deserialize(const SOAPParameter&, int& val);
 };
 
-template<>
+class EASYSOAP_EXPORT SOAPTypeTraits<long>
+{
+public:
+	static void GetType(SOAPQName& type);
+	static SOAPParameter& Serialize(SOAPParameter& param, long val);
+	static const SOAPParameter& Deserialize(const SOAPParameter&, long& val);
+};
+
 class EASYSOAP_EXPORT SOAPTypeTraits<float>
 {
 public:
@@ -83,7 +77,6 @@ public:
 	static const SOAPParameter& Deserialize(const SOAPParameter&, float& val);
 };
 
-template<>
 class EASYSOAP_EXPORT SOAPTypeTraits<double>
 {
 public:
@@ -93,7 +86,6 @@ public:
 	static const SOAPParameter& Deserialize(const SOAPParameter&, double& val);
 };
 
-template<>
 class EASYSOAP_EXPORT SOAPTypeTraits<SOAPString>
 {
 public:
@@ -102,7 +94,6 @@ public:
 	static const SOAPParameter& Deserialize(const SOAPParameter&, SOAPString& val);
 };
 
-template<>
 class EASYSOAP_EXPORT SOAPTypeTraits<const char *>
 {
 public:
@@ -113,7 +104,6 @@ public:
 };
 
 #ifdef HAVE_WCHART
-template<>
 class EASYSOAP_EXPORT SOAPTypeTraits<const wchar_t *>
 {
 public:
@@ -132,11 +122,11 @@ public:
 		type.Set("Map", "http://xml.apache.org/xml-soap");
 	}
 
-	template<typename K, typename I, typename H, typename E>
-	static SOAPParameter& Serialize(SOAPParameter& param, const SOAPHashMap<K,I,H,E>& val)
+	template <typename V>
+	static SOAPParameter& Serialize(SOAPParameter& param, const V& val)
 	{
 		param.SetIsStruct();
-		for (SOAPHashMap<K,I,H,E>::Iterator i = val.Begin(); i != val.End(); ++i)
+		for (V::const_iterator i = val.begin(); i != val.end(); ++i)
 		{
 			SOAPParameter& p = param.AddParameter();
 			p.SetIsStruct();
@@ -146,10 +136,10 @@ public:
 		return param;
 	}
 
-	template<typename K, typename I, typename H, typename E>
-	static const SOAPParameter& Deserialize(const SOAPParameter& param, SOAPHashMap<K,I,H,E>& val)
+	template <typename V>
+	static const SOAPParameter& Deserialize(const SOAPParameter& param, V& val)
 	{
-		K key;
+		V::key_type key;
 		const SOAPParameter::Array& arr = param.GetArray();
 		for (SOAPParameter::Array::ConstIterator i = arr.Begin(); i != arr.End(); ++i)
 		{
@@ -205,28 +195,28 @@ public:
 		type = SOAPEnc::Array;
 	}
 
-	template<typename T>
-	static SOAPParameter& Serialize(SOAPParameter& param, const SOAPArray<T>& val)
+	template <typename V>
+	static SOAPParameter& Serialize(SOAPParameter& param, const V& val)
 	{
 		//
 		// Add SOAP-ENC:arrayType attribute
 		char buffer[32];
 
 		SOAPQName& atype = param.AddAttribute(SOAPEnc::arrayType);
-		SOAPTypeTraits<T>::GetType(atype);
-		snprintf(buffer, sizeof(buffer), "[%d]", val.Size());
+		SOAPTypeTraits<V::value_type>::GetType(atype);
+		snprintf(buffer, sizeof(buffer), "[%d]", val.size());
 		atype.GetName().Append(buffer);
 
 		//
 		// Serialize the array values
 		param.SetIsStruct();
-		for (SOAPArray<T>::ConstIterator i = val.Begin(); i != val.End(); ++i)
-			SOAPTypeTraits<T>::Serialize(param.AddParameter(), *i);
+		for (V::const_iterator i = val.begin(); i != val.end(); ++i)
+			SOAPTypeTraits<V::value_type>::Serialize(param.AddParameter(), *i);
 		return param;
 	}
 
-	template<typename T>
-	static const SOAPParameter& Deserialize(const SOAPParameter& param, SOAPArray<T>& val)
+	template <typename V>
+	static const SOAPParameter& Deserialize(const SOAPParameter& param, V& val)
 	{
 		const SOAPParameter::Array& arr = param.GetArray();
 		//
@@ -253,7 +243,7 @@ public:
 		if (arr.Size() > numvals)
 				throw SOAPException("Error de-serializing array.  Too many values.");
 
-		val.Resize(numvals);
+		val.resize(numvals);
 		for (SOAPParameter::Array::ConstIterator i = arr.Begin(); i != arr.End(); ++i)
 		{
 			//
@@ -265,7 +255,7 @@ public:
 					throw SOAPException("Cannot de-serialize array with position attribute and offset attribute.");
 				parsepos(SOAPEnc::position, *attr, pos);
 			}
-			SOAPTypeTraits<T>::Deserialize(**i, val[pos++]);
+			SOAPTypeTraits<V::value_type>::Deserialize(**i, val[pos++]);
 		}
 		return param;
 	}
@@ -280,6 +270,10 @@ class SOAPTypeTraits< SOAPArray<short> > : public SOAPArrayTypeTraits
 };
 
 class SOAPTypeTraits< SOAPArray<int> > : public SOAPArrayTypeTraits
+{
+};
+
+class SOAPTypeTraits< SOAPArray<long> > : public SOAPArrayTypeTraits
 {
 };
 
@@ -327,15 +321,15 @@ public:
 		type = SOAPEnc::Array;
 	}
 
-	template<typename T>
-	static SOAPParameter& Serialize(SOAPParameter& param, const SOAP2DArray<T>& val)
+	template<typename V>
+	static SOAPParameter& Serialize(SOAPParameter& param, const V& val)
 	{
 		//
 		// Add SOAP-ENC:arrayType attribute
 		char buffer[64];
 
 		SOAPQName& atype = param.AddAttribute(SOAPEnc::arrayType);
-		SOAPTypeTraits<T>::GetType(atype);
+		SOAPTypeTraits<V::value_type>::GetType(atype);
 		snprintf(buffer, sizeof(buffer), "[%d,%d]", val.GetNumRows(), val.GetNumCols());
 		atype.GetName().Append(buffer);
 
@@ -344,12 +338,12 @@ public:
 		param.SetIsStruct();
 		for (size_t r = 0; r < val.GetNumRows(); ++r)
 			for (size_t c = 0; c < val.GetNumCols(); ++c)
-				SOAPTypeTraits<T>::Serialize(param.AddParameter(), val[r][c]);
+				SOAPTypeTraits<V::value_type>::Serialize(param.AddParameter(), val[r][c]);
 		return param;
 	}
 
-	template<typename T>
-	static const SOAPParameter& Deserialize(const SOAPParameter& param, SOAP2DArray<T>& val)
+	template<typename V>
+	static const SOAPParameter& Deserialize(const SOAPParameter& param, V& val)
 	{
 		const SOAPParameter::Array& arr = param.GetArray();
 
@@ -379,7 +373,7 @@ public:
 		if (arr.Size() > numrows * numcols)
 				throw SOAPException("Error de-serializing 2D array.  Too many values.");
 
-		val.Resize(numrows, numcols);
+		val.resize(numrows, numcols);
 		for (SOAPParameter::Array::ConstIterator i = arr.Begin(); i != arr.End(); ++i)
 		{
 			//
@@ -391,7 +385,7 @@ public:
 					throw SOAPException("Cannot de-serialize array with position attribute and offset attribute.");
 				parse2Dpos(SOAPEnc::position, *attr, row, col);
 			}
-			SOAPTypeTraits<T>::Deserialize(**i, val[row][col]);
+			SOAPTypeTraits<V::value_type>::Deserialize(**i, val[row][col]);
 			if (++col == numcols)
 			{
 				++row;
@@ -411,6 +405,10 @@ class SOAPTypeTraits< SOAP2DArray<char> > : public SOAP2DArrayTypeTraits
 };
 
 class SOAPTypeTraits< SOAP2DArray<int> > : public SOAP2DArrayTypeTraits
+{
+};
+
+class SOAPTypeTraits< SOAP2DArray<long> > : public SOAP2DArrayTypeTraits
 {
 };
 
