@@ -83,6 +83,23 @@ sp_strcmp(const char *a, const char *b)
 }
 
 inline int
+sp_strncmp(const char *a, const char *b, unsigned int n)
+{
+	int ret = 0;
+	if (a && b)
+	{
+		while (n-- > 0 && *a && *b && *a == *b)
+			++a, ++b;
+		ret = *a - *b;
+	}
+	else if (a)
+		ret = 1;
+	else if (b)
+		ret = -1;
+	return ret;
+}
+
+inline int
 sp_strcasecmp(const char *a, const char *b)
 {
 	int ret = 0;
