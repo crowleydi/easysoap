@@ -11,9 +11,11 @@
 #pragma warning (disable: 4786)
 #endif // _WIN32
 
+#include <iostream>
 #include "SOAP.h"
 
-#include <iostream>
+
+
 
 inline std::ostream&
 operator<<(std::ostream& os, const SOAPString& str)
@@ -21,6 +23,8 @@ operator<<(std::ostream& os, const SOAPString& str)
 	const char *s = str;
 	return os << (s ? s : "(null)");
 }
+
+
 
 //
 // Little helper function
@@ -101,31 +105,9 @@ operator>>(const SOAPParameter& param, SOAPInteropStruct& val)
 }
 
 
-//
-// Define how we load up arrays
-template<typename T>
-inline const SOAPParameter&
-operator<<(SOAPParameter& param, const SOAPArray<T>& val)
-{
-	param.SetType(SOAPTypes::soap_array);
-	for (SOAPArray<T>::ConstIterator i = val.Begin(); i != val.End(); ++i)
-		param.AddParameter() << *i;
-	return param;
-}
 
-//
-// Define how we read arrays
-template <typename T>
-inline const SOAPParameter&
-operator>>(const SOAPParameter& param, SOAPArray<T>& val)
-{
-	val.Resize(0);
-	for (SOAPArray<SOAPParameter>::ConstIterator i = param.GetArray().Begin();
-		i != param.GetArray().End();
-		++i)
-		*i >> val.Add();
-	return param;
-}
+
+
 
 bool
 TestEchoVoid(SOAPProxy& proxy,
@@ -495,6 +477,8 @@ void TestInterop(const char *name,
 
 	SOAPProxy proxy(endpoint);//, "http://localhost:8080");
 	TestInterop(proxy, nspace, soapaction, appendMethod);
+
+	std::cout << "Done." << std::endl << std::endl;
 }
 
 int
@@ -502,19 +486,22 @@ main(int argc, char* argv[])
 {
 	try
 	{
+		//
 		// See: http://www.xmethods.net/ilab/ilab.html
+		// This information changes frequently.
+		//
 		TestInterop("4s4c 1.3",
 			"http://soap.4s4c.com/ilab/soap.asp",
 			"urn:soapinterop", false,
 			"http://soapinterop.org/");/**/
 
-		/*TestInterop(
-			"Apache 2.1 RC",
+		TestInterop(
+			"Apache 2.1",
 			"http://services.xmethods.net:8080/soap/servlet/rpcrouter",
 			"urn:soapinterop", false,
 			"http://soapinterop.org/");/**/
 
-		TestInterop("Frontier 7.0 (Userland)",
+		TestInterop("Frontier 7.0b26 (Userland)",
 			"http://www.soapware.org:80/xmethodsInterop",
 			//"http://localhost:8080/xmethodsInterop",
 			"/xmethodsInterop", false,
@@ -525,6 +512,21 @@ main(int argc, char* argv[])
 			"urn:soapinterop", false,
 			"http://soapinterop.org/");/**/
 
+		TestInterop("MS SOAP Toolkit 2.0",
+			"http://131.107.72.13/stk/InteropTypedService.asp",
+			"urn:soapinterop", false,
+			"http://soapinterop.org/");/**/
+
+		TestInterop("MS .NET Beta 2",
+			"http://131.107.72.13/test/typed.asmx",
+			"http://soapinterop.org/", true,
+			"http://soapinterop.org/");/**/
+
+		TestInterop("SOAP RMI",
+			"http://rainier.extreme.indiana.edu:1568",
+			"urn:soapinterop", false,
+			"http://soapinterop.org/");/**/
+
 		TestInterop("SOAP::Lite 0.47",
 			"http://services.soaplite.com/interop.cgi",
 			"urn:soapinterop", false,
@@ -532,56 +534,13 @@ main(int argc, char* argv[])
 
 		TestInterop("SQLData SOAP Server",
 			"http://www.soapclient.com/interop/sqldatainterop.wsdl",
-			//"http://localhost:8080/interop/sqldatainterop.wsdl",
 			"/soapinterop", false,
 			"http://tempuri.org/message/");/**/
 
 		TestInterop("White Mesa SOAP RPC 1.4",
 			"http://services2.xmethods.net:8080/interop",
-			"urn:interopLab#", true,
-			"urn:xmethodsInterop");/**/
-
-		/*  Doesn't work:  No name resolution for ranier.extreme.indiana.edu*/
-		/*TestInterop("SOAP RMI",
-			"http://ranier.extreme.indiana.edu:1568",
-			"urn:soapinterop", false,
+			"urn:soapinterop#", true,
 			"http://soapinterop.org/");/**/
-
-		/*  Doesn't work.  Crappy namespaces.*/
-		/*TestInterop("MS SOAP Toolkit 2.0",
-			"http://131.107.72.13/stk/InteropTypedService.asp",
-			"urn:soapinterop", false,
-			"http://soapinterop.org/");/**/
-
-		/*  Doesn't work.  CRASHES HARD!  BOM*/
-		/*TestInterop("MS .NET Beta 2",
-			"http://131.107.72.13/test/typed.asmx",
-			"http://soapinterop.org/", true,
-			"http://soapinterop.org/");/**/
-
-		// Lets go over the internet and make some calls
-		// some methods from www.xmethods.com
-		/* Is lemurlabs.com gone?
-		GetInternetTime();
-		Fortune();
-		FortuneDictionaryList();
-		Fortune("linuxcookie");
-		*/
-
-
-		//Whois("scitegic.com");
-
-		/*
-		std::cout << "Temperature in La Jolla, CA: ";
-		std::cout.flush();
-		std::cout << GetTemperature("92122") << std::endl;
-
-		std::cout << "Delayed quotes: " << std::endl;
-		std::cout.flush();
-		std::cout << "MSFT " << StockQuote("MSFT") << std::endl;
-		std::cout << "IBM  " << StockQuote("IBM") << std::endl;
-		std::cout << "DELL " << StockQuote("DELL") << std::endl;
-		*/
 	}
 	catch (const SOAPMemoryException&)
 	{
