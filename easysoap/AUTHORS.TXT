@@ -2,3 +2,5 @@
 People who have contributed to EasySoap++:
 
 David Crowley <dcrowley at scitegic.com>
+Ward Fuller <wfuller at mercator.com>
+
