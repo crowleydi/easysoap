@@ -35,9 +35,9 @@
 #include <SOAP.h>
 #include <SOAPDebugger.h>
 
-#ifndef HAVE_LIBSSL
-
 #include "SOAPSecureSocketImp.h"
+
+#ifndef HAVE_LIBSSL
 
 SOAPSecureSocketImp::SOAPSecureSocketImp()
 {
@@ -62,8 +62,6 @@ extern "C" {
 #include <openssl/err.h>
 #include <openssl/rand.h>
 };
-
-#include "SOAPSecureSocketImp.h"
 
 //
 // Initialize OpenSSH
