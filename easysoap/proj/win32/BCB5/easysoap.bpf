@@ -41,6 +41,6 @@ USEUNIT("..\..\..\src\abyss\src\thread.c");
 USEUNIT("..\..\..\src\abyss\src\threadpool.cpp");
 USEUNIT("..\..\..\src\abyss\src\trace.c");
 USE("..\..\..\src\vctobpr.log", File);
-USELIB("..\..\..\..\Expat-1.95.2\Libs\expatrel.lib");
+USELIB("..\..\..\..\Expat-1.95.2\Libs\expat.lib");
 //---------------------------------------------------------------------------
 #define DllEntryPoint
