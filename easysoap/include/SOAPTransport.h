@@ -49,6 +49,11 @@ public:
 	// send the payload.  can only be called ONCE per
 	// payload. 
 	virtual size_t Write(const SOAPMethod& method, const char *payload, size_t payloadsize) = 0;
+
+	virtual const char *GetSoapAction() const
+	{
+		return 0;
+	}
 };
 
 

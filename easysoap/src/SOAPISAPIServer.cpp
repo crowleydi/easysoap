@@ -37,6 +37,18 @@ public:
 
 			ParseContentType(m_charset, m_ecb->lpszContentType);
 			m_leftRead = m_ecb->cbTotalBytes;
+
+			char buffer[1024];
+			DWORD bsize = sizeof(buffer);
+			pECB->GetServerVariable(pECB->ConnID, "HTTP_SOAPACTION", buffer, &bsize);
+
+			const char *sa = bsize == 0 ? 0 : buffer;
+			if (sa && *sa == '\"')
+				++sa;
+			m_soapaction = sa;
+			size_t len = m_soapaction.Length();
+			if (len > 0 && m_soapaction[len - 1] == '\"')
+				m_soapaction.Str()[len - 1] = 0;
 		}
 	}
 
@@ -61,6 +73,11 @@ public:
 	const char *GetCharset() const
 	{
 		return m_charset;
+	}
+
+	const char *GetSoapAction() const
+	{
+		return m_soapaction;
 	}
 
 	size_t Read(char *buffer, size_t buffsize)
@@ -144,6 +161,7 @@ private:
 	bool						m_error;
 	size_t						m_leftRead;
 	SOAPString					m_charset;
+	SOAPString					m_soapaction;
 };
 
 int

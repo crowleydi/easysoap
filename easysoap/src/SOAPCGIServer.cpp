@@ -41,6 +41,7 @@ public:
 
 	void SetError();
 	const char *GetCharset() const;
+	const char *GetSoapAction() const;
 	size_t Read(char *buffer, size_t buffsize);
 	size_t Write(const SOAPMethod& method, const char *payload, size_t payloadsize);
 
@@ -60,6 +61,7 @@ private:
 	FILE		*m_infile;
 	int			m_canread;
 	SOAPString	m_charset;
+	SOAPString	m_soapaction;
 };
 
 SOAPCGITransport::SOAPCGITransport()
@@ -77,6 +79,15 @@ SOAPCGITransport::SOAPCGITransport()
 		m_canread = atoi(contentlen);
 
 	ParseContentType(m_charset, getenv("CONTENT_TYPE"));
+
+	const char *sa = getenv("HTTP_SOAPACTION");
+
+	if (sa && *sa == '\"')
+		++sa;
+	m_soapaction = sa;
+	size_t len = m_soapaction.Length();
+	if (len > 0 && m_soapaction[len - 1] == '\"')
+		m_soapaction.Str()[len - 1] = 0;
 }
 
 SOAPCGITransport::~SOAPCGITransport()
@@ -127,6 +138,12 @@ SOAPCGITransport::GetCharset() const
 	return m_charset;
 }
 
+const char *
+SOAPCGITransport::GetSoapAction() const
+{
+	return m_soapaction;
+}
+
 size_t
 SOAPCGITransport::Read(char *buffer, size_t buffsize)
 {
@@ -168,6 +185,14 @@ int
 SOAPCGIServer::Handle()
 {
 	SOAPCGITransport	cgi;
+	return m_dispatch.Handle(cgi);
+}
+
+
+SOAPCGIServer::Handle(const char *infile)
+{
+	SOAPCGITransport	cgi;
+	cgi.SetInFile(infile);
 	return m_dispatch.Handle(cgi);
 }
 
