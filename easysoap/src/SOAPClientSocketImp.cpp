@@ -48,9 +48,7 @@ public:
 		if (!didinit)
 		{
 			WSADATA wsaData;
-			// Is version 0x0202 appropriate?
-			// I have no idea...
-			WSAStartup( 0x0202, &wsaData );
+			WSAStartup( MAKEWORD(2,0), &wsaData );
 			didinit = true;
 		}
 	}
