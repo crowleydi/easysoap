@@ -43,6 +43,14 @@ SOAPBody::~SOAPBody()
 
 }
 
+void
+SOAPBody::Reset()
+{
+	m_method.Reset();
+	m_fault.Reset();
+	m_isfault = false;
+}
+
 bool
 SOAPBody::WriteSOAPPacket(SOAPPacketWriter& packet) const
 {
