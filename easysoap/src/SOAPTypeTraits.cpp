@@ -36,9 +36,6 @@
 #include <float.h>
 #endif
 
-
-const SOAPQName	xsitype("type", SOAP_XSI);
-
 static int
 sp_strtol(const char *str)
 {
