@@ -23,6 +23,7 @@
 #define __ES_CONF_H_
 
 #define EASYSOAP_EXPORT
+#define MEMBER_TYPE(T) typename T
 
 #ifdef HAVE_CONFIG_H
 #include <es_config.h>
