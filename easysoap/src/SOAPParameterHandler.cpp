@@ -51,6 +51,7 @@ SOAPParseEventHandler *
 SOAPParameterHandler::start(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs)
 {
 	m_param->Reset();
+	m_param->SetNull(false);
 
 	const char *ns = sp_strchr(name, PARSER_NS_SEP[0]);
 	if (ns)
@@ -139,7 +140,6 @@ SOAPParameterHandler::endElement(const XML_Char *)
 {
 	if (m_setvalue)
 	{
-		m_param->SetNull(false);
 		m_str.Add(0); // null terminate
 		m_param->GetStringRef() = m_str.Ptr();
 	}
