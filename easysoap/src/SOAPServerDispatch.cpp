@@ -230,30 +230,27 @@ SOAPServerDispatch::HandleHeaders(SOAPEnvelope& request, SOAPResponse& response)
 			// TODO: Be able to specify/check for a custom QName for this endpoint
 			if (!actor || (*actor == SOAP_ACTOR_NEXT))
 			{
-				bool handled = false;
 				//
 				// TODO:  This is an O(n) lookup... but n is (hopefully!) small
-				for (HeaderHandlers::Iterator i = m_headerHandlers.Begin(); i != m_headerHandlers.End(); ++i)
+				HeaderHandlers::Iterator i;
+				for (i = m_headerHandlers.Begin();
+					i != m_headerHandlers.End(); ++i)
 				{
 					//
 					// We found a handler.  Now dispatch the method
 					if ((*i)->HandleHeader(header, request, response))
-					{
-						handled = true;
 						break;
-					}
 				}
 
-				if (!handled)
+				//
+				// check for mustUnderstand == 1
+				if (i == m_headerHandlers.End() && mu && *mu == "1")
 				{
-					//
-					// check for mustUnderstand == 1
-					if (mu && *mu == "1")
-						// TODO:  Special MustUnderstand exception so the
-						// actor(?) in the SOAPFault can be set correctly.
-						throw SOAPMustUnderstandException("Failed to understand header \"{%s}:%s\"",
-							(const char *)header.GetName().GetNamespace(),
-							(const char *)header.GetName().GetName());
+					// TODO:  Special MustUnderstand exception so the
+					// actor(?) in the SOAPFault can be set correctly.
+					throw SOAPMustUnderstandException("Failed to understand header \"{%s}:%s\"",
+						(const char *)header.GetName().GetNamespace(),
+						(const char *)header.GetName().GetName());
 				}
 			}
 		}
