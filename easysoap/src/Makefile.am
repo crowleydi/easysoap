@@ -1,4 +1,3 @@
-SUBDIRS = abyss
 lib_LTLIBRARIES = libeasysoap.la
 lib_LIBRARIES = libeasysoap.a
 THESOURCES = \
@@ -46,12 +45,10 @@ noinst_HEADERS = \
 	SOAPStructHandler.h \
 	es_namespaces.h
 
-INCLUDES=-I@top_srcdir@/include -I@top_srcdir@/src/abyss/src
+INCLUDES=-I@top_srcdir@/include 
 
 libeasysoap_la_LDFLAGS = -no-undefined
-libeasysoap_la_LIBADD = abyss/src/libabyss.la
 
-libeasysoap_a_LIBADD = abyss/src/libabyss.la
 
 EXTRA_DIST = \
 	SOAPWinInetTransport.cpp \
