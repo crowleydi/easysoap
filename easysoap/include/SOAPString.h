@@ -154,6 +154,11 @@ public:
 		return Compare(str) == 0;
 	}
 
+	bool operator!=(const char *str) const
+	{
+		return Compare(str) != 0;
+	}
+
 	bool operator<(const char *str) const
 	{
 		return Compare(str) < 0;
