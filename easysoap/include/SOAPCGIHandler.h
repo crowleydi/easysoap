@@ -25,23 +25,24 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
+#include "SOAPServerDispatch.h"
 //
 //
 //  A simple Transport class for CGI
 //
-class SOAPCGIHandler : public SOAPTransport
+class SOAPCGITransport : public SOAPTransport
 {
 private:
 	FILE *m_logfile;
 	FILE *m_infile;
 
 public:
-	SOAPCGIHandler()
+	SOAPCGITransport()
 		: m_logfile(0), m_infile(0)
 	{
 	}
 
-	~SOAPCGIHandler()
+	~SOAPCGITransport()
 	{
 		SetLogFile(0);
 		SetInFile(0);
@@ -91,13 +92,30 @@ public:
 
 	size_t Write(const SOAPMethod& method, const char *payload, size_t payloadsize)
 	{
-		printf("SOAPServer: %s/%s\n", EASYSOAP_STRING, EASYSOAP_VERSION_STRING);
-		printf("Content-Length: %d\n", payloadsize);
-		printf("Content-Type: text/xml; charset=\"UTF-8\"\n\n");
+		fprintf(stdout, "SOAPServer: %s/%s\n", EASYSOAP_STRING, EASYSOAP_VERSION_STRING);
+		fprintf(stdout, "Content-Length: %d\n", payloadsize);
+		fprintf(stdout, "Content-Type: text/xml; charset=\"UTF-8\"\n\n");
 
 		fwrite(payload, 1, payloadsize, stdout);
 
 		return payloadsize;
+	}
+};
+
+class SOAPCGIDispatch : public SOAPServerDispatch
+{
+private:
+	SOAPCGITransport	m_cgi;
+
+public:
+	SOAPCGIDispatch()
+		: SOAPServerDispatch(m_cgi)
+	{
+	}
+
+
+	~SOAPCGIDispatch()
+	{
 	}
 };
 

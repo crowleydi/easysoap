@@ -461,7 +461,7 @@ main(int argc, char* argv[], char *env[])
 		SOAPResponse resp;
 		SOAPEnvelope env;
 		SOAPPacketWriter w;
-		SOAPCGIHandler cgi;
+		SOAPCGITransport cgi;
 		//cgi.SetLogFile("C:/validate.log");
 		//cgi.SetInFile("C:/validate.log");
 
