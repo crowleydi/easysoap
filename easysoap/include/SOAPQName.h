@@ -103,6 +103,15 @@ private:
 	SOAPString	m_namespace;
 };
 
+struct SOAPHashCodeFunctor<SOAPQName>
+{
+	size_t operator()(const SOAPQName& val) const
+	{
+		return sp_hashcode(val.GetName()) ^ sp_hashcode(val.GetNamespace());
+	}
+};
+
+
 #endif // !defined(AFX_SOAPQNAME_H__E392FAB3_3022_11D5_B3F3_000000000000__INCLUDED_)
 
 
