@@ -374,7 +374,16 @@ SOAPParameter::GetFloat() const
 	if (IsNull() || m_strval.Str() == 0)
 		throw SOAPException("Cannot convert null value to float.");
 
-	return GetDouble();
+	double dret = GetDouble();
+	float ret = dret;
+
+	if (ret == HUGE_VAL && dret != HUGE_VAL ||
+		ret == -HUGE_VAL && dret != -HUGE_VAL)
+		throw SOAPException("Floating-point overflow: %s", (const char *)m_strval);
+	if (ret == 0.0 && dret != 0.0)
+		throw SOAPException("Floating-point underflow: %s", (const char *)m_strval);
+
+	return ret;
 }
 
 //
@@ -418,8 +427,8 @@ SOAPParameter::GetDouble() const
 	if (errno == ERANGE)
 	{
 		if (ret == 0.0)
-			throw SOAPException("Floating-point underflow: %s", (const char *)m_strval);
-		throw SOAPException("Floating-point overflow: %s", (const char *)m_strval);
+			throw SOAPException("Double floating-point underflow: %s", (const char *)m_strval);
+		throw SOAPException("Double floating-point overflow: %s", (const char *)m_strval);
 	}
 	return ret;
 }
