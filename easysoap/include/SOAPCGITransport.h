@@ -20,12 +20,6 @@
  */
 
 #include <stdio.h>
-
-#ifdef _WIN32
-#include <fcntl.h>
-#include <io.h>
-#endif // _WIN32
-
 #include <SOAPCGIServer.h>
 
 //
