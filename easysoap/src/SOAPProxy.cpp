@@ -24,7 +24,12 @@
 #endif // _MSC_VER
 
 #include <easysoap/SOAPProxy.h>
+
+#ifdef EASYSOAP_USE_WININET
+#include <easysoap/SOAPWinInetTransport.h>
+#else
 #include <easysoap/SOAPonHTTP.h>
+#endif
 
 USING_EASYSOAP_NAMESPACE
 
@@ -74,7 +79,13 @@ SOAPProxy::SetEndpoint(const SOAPUrl& endpoint)
 {
 	// Assume it's an HTTP protocol.
 	// TODO: What we need here is a factory.
-	SetEndpoint(new SOAPonHTTP(endpoint), true);
+#ifdef EASYSOAP_USE_WININET
+	SOAPWinInetTransport *transport = new SOAPWinInetTransport();
+#else
+	SOAPonHTTP *transport = new SOAPonHTTP();
+#endif
+	SetEndpoint(transport, true);
+	transport->ConnectTo(endpoint);
 }
 
 void
@@ -82,7 +93,13 @@ SOAPProxy::SetEndpoint(const SOAPUrl& endpoint, const SOAPUrl& proxy)
 {
 	// Assume it's an HTTP protocol.
 	// TODO: What we need here is a factory.
-	SetEndpoint(new SOAPonHTTP(endpoint, proxy), true);
+#ifdef EASYSOAP_USE_WININET
+	SOAPWinInetTransport *transport = new SOAPWinInetTransport();
+#else
+	SOAPonHTTP *transport = new SOAPonHTTP();
+#endif
+	SetEndpoint(transport, true);
+	transport->ConnectTo(endpoint, proxy);
 }
 
 void

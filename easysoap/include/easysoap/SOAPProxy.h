@@ -60,10 +60,15 @@ public:
 	}
 
 	SOAPProxy(SOAPTransport *transport, bool deltrans = false) :
-		m_transport(0),
+		m_transport(transport),
+		m_deltrans(deltrans)
+	{
+	}
+
+	SOAPProxy(SOAPTransport& transport) :
+		m_transport(&transport),
 		m_deltrans(false)
 	{
-		SetEndpoint(transport, deltrans);
 	}
 
 	virtual ~SOAPProxy()
@@ -75,8 +80,6 @@ public:
 	void SetEndpoint(const SOAPUrl& endpoint);
 
 	void SetEndpoint(const SOAPUrl& endpoint, const SOAPUrl& proxy);
-
-	void SetEndpoint(SOAPTransport *trans, bool deltrans = false);
 
 	SOAPMethod& SetMethod(const char *name, const char *ns)
 	{
@@ -100,6 +103,8 @@ private:
 
 	SOAPProxy(const SOAPProxy& proxy);
 	SOAPProxy& operator=(const SOAPProxy& proxy);
+
+	void SetEndpoint(SOAPTransport *trans, bool deltrans);
 
 	SOAPEnvelope		m_message;
 	SOAPResponse		m_response;
