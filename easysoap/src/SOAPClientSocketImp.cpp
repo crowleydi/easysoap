@@ -107,7 +107,7 @@ public:
 #include <string.h>
 #endif
 
-#ifdef HAVE_STRING_H
+#ifdef HAVE_STRINGS_H
 #include <strings.h>
 #endif
 
