@@ -17,9 +17,9 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifdef _WIN32
+#ifdef _MSC_VER
 #pragma warning (disable: 4786)
-#endif // _WIN32
+#endif // _MSC_VER
 
 #include "SOAPProxy.h"
 #include "SOAPonHTTP.h"

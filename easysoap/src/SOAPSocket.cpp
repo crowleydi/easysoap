@@ -23,9 +23,9 @@
 //  #define or make static const char *'s all the hard coded strings
 //
 
-#ifdef _WIN32
+#ifdef _MSC_VER
 #pragma warning (disable: 4786)
-#endif // _WIN32
+#endif // _MSC_VER
 
 #include <stdio.h>
 

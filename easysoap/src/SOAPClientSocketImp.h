@@ -26,7 +26,7 @@
 class SOAPClientSocketImp : public SOAPSocketInterface
 {
 protected:
-	int	m_socket;
+	unsigned int	m_socket;
 
 public:
 	SOAPClientSocketImp();

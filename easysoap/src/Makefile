@@ -6,7 +6,14 @@ EXPAT = /usr/local
 SOAPLIBDIR = ../lib
 SOAPLIB  = $(SOAPLIBDIR)/libeasysoap.a
 
+#
+# flags for Linux
 CXXFLAGS = -g -fPIC -Wall
+
+#
+# flags for cygwin
+#CXXFLAGS = -g -Wall
+
 CPPFLAGS = -I../include -I$(EXPAT)/include \
 	 -DEASYSOAP_SSL # if you want https
 

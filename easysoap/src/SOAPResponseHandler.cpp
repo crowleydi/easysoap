@@ -18,9 +18,9 @@
  */
 
 
-#ifdef _WIN32
+#ifdef MSC_VER
 #pragma warning (disable: 4786)
-#endif // _WIN32
+#endif // MSC_VER
 
 #include "SOAPResponseHandler.h"
 #include "SOAPResponse.h"

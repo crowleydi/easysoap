@@ -18,9 +18,9 @@
  */
 
 
-#ifdef _WIN32
+#ifdef _MSC_VER
 #pragma warning (disable: 4786)
-#endif // _WIN32
+#endif // _MSC_VER
 
 #include "SOAP.h"
 #include "SOAPMethod.h"

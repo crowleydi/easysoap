@@ -18,8 +18,11 @@
  */
 
 
-#ifdef _WIN32
+#ifdef _MSC_VER
 #pragma warning (disable: 4786)
+#endif // _MSC_VER
+
+#ifdef _WIN32
 #include <winsock2.h>
 #else // not _WIN32
 #include <sys/time.h>
@@ -47,8 +50,10 @@ void SOAPSecureSocketImp::InitSSL() {}
 
 #else
 
+extern "C" {
 #include <openssl/ssl.h>
 #include <openssl/err.h>
+};
 
 #include "SOAPSecureSocketImp.h"
 
@@ -118,8 +123,15 @@ SOAPSecureSocketImp::HandleError(const char *context, int retcode)
 	case SSL_ERROR_SSL:
 	default:
 		{
-		char msg[256];
+		char msg[512];
+
+#if OPENSSL_VERSION_NUMBER >= 0x00906000L
 		ERR_error_string_n(err, msg, sizeof(msg) - 1);
+#else
+		// dangerous
+		ERR_error_string(err, msg);
+#endif // OPENSSL_VERSION_NUMBER
+
 		msg[sizeof(msg) - 1] = 0;
 		throw SOAPSocketException(context, msg);
 		}

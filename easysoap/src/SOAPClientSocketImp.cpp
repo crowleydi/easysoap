@@ -18,16 +18,15 @@
  */
 
 
-#ifdef _WIN32
+#ifdef _MSC_VER
 #pragma warning (disable: 4786)
-#endif // _WIN32
+#endif // _MSC_VER
 
 #include "SOAPClientSocketImp.h"
 
 
 
-#ifdef _WIN32
-
+#if defined (_WIN32)
 #include <winsock2.h>
 //
 // Initialize Windows socket library
@@ -40,18 +39,27 @@ public:
 		WSADATA wsaData;
 		// Is version 0x0202 appropriate?
 		// I have no idea...
-		int err = WSAStartup( 0x0202, &wsaData );
+		WSAStartup( 0x0202, &wsaData );
 	}
 
 	~WinSockInit()
 	{
-		int err = WSACleanup();
+		WSACleanup();
 	}
 } __winsockinit;
-
 #define SOL_TCP IPPROTO_TCP
-#else // not _WIN32
 
+#elif defined(__CYGWIN__)
+#include <sys/socket.h>
+#include <netdb.h>
+#include <netinet/in.h>
+#include <sys/unistd.h>
+#include <arpa/inet.h>
+#define INVALID_SOCKET 0xFFFFFFFF
+#define SOCKET_ERROR -1
+#define closesocket close
+
+#else // not _WIN32
 #include <sys/types.h>
 #include <sys/time.h>
 #include <sys/socket.h>
@@ -62,14 +70,9 @@ public:
 #include <netdb.h>
 #include <unistd.h>
 
-#define INVALID_SOCKET -1
+#define INVALID_SOCKET 0xFFFFFFFF
 #define SOCKET_ERROR -1
 #define closesocket close
-
-#define SOCKADDR struct sockaddr
-#define SOCKADDR_IN struct sockaddr_in
-#define LPHOSTENT struct hostent*
-#define LPIN_ADDR struct in_addr
 
 #endif // _WIN32
 
