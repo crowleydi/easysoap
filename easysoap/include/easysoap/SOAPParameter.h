@@ -168,7 +168,7 @@ private:
 		Data(const Data&);
 	};
 
-	friend Data;
+	friend class EASYSOAP_NAMESPACE(SOAPParameter::Data);
 
 	Pool			m_pool;
 	SOAPParameter	*m_parent;
