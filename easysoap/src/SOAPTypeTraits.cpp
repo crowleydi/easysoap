@@ -124,7 +124,7 @@ sp_strtod(const char *str)
 //  Trait info for bool
 void SOAPTypeTraits<bool>::GetType(SOAPQName& type)
 {
-	type.Set("boolean", XMLSchema2001::xsd);
+	type = XMLSchema2001::boolean;
 }
 
 SOAPParameter&
@@ -167,7 +167,7 @@ SOAPTypeTraits<bool>::Deserialize(const SOAPParameter& param, bool& val)
 //  Trait info for char
 void SOAPTypeTraits<char>::GetType(SOAPQName& type)
 {
-	type.Set("byte", XMLSchema2001::xsd);
+	type = XMLSchema2001::byte;
 }
 
 SOAPParameter&
@@ -201,7 +201,7 @@ SOAPTypeTraits<char>::Deserialize(const SOAPParameter& param, char& val)
 //  Trait info for short
 void SOAPTypeTraits<short>::GetType(SOAPQName& type)
 {
-	type.Set("short", XMLSchema2001::xsd);
+	type = XMLSchema2001::short_;
 }
 
 SOAPParameter&
@@ -235,7 +235,7 @@ SOAPTypeTraits<short>::Deserialize(const SOAPParameter& param, short& val)
 //  Trait info for int
 void SOAPTypeTraits<int>::GetType(SOAPQName& type)
 {
-	type.Set("int", XMLSchema2001::xsd);
+	type = XMLSchema2001::int_;
 }
 
 SOAPParameter&
@@ -273,7 +273,7 @@ SOAPTypeTraits<int>::Deserialize(const SOAPParameter& param, int& val)
 
 void SOAPTypeTraits<long>::GetType(SOAPQName& type)
 {
-	type.Set("int", XMLSchema2001::xsd);
+	type = XMLSchema2001::long_;
 }
 
 SOAPParameter&
@@ -304,7 +304,7 @@ SOAPTypeTraits<long>::Deserialize(const SOAPParameter& param, long& val)
 //  Trait info for float
 void SOAPTypeTraits<float>::GetType(SOAPQName& type)
 {
-	type.Set("float", XMLSchema2001::xsd);
+	type = XMLSchema2001::float_;
 }
 
 SOAPParameter&
@@ -365,7 +365,7 @@ SOAPTypeTraits<float>::Deserialize(const SOAPParameter& param, float& val)
 
 void SOAPTypeTraits<double>::GetType(SOAPQName& type)
 {
-	type.Set("double", XMLSchema2001::xsd);
+	type = XMLSchema2001::double_;
 }
 
 SOAPParameter&
@@ -415,7 +415,7 @@ SOAPTypeTraits<double>::Deserialize(const SOAPParameter& param, double& val)
 //  Trait info for const char *
 void SOAPTypeTraits<const char *>::GetType(SOAPQName& type)
 {
-	type.Set("string", XMLSchema2001::xsd);
+	type = XMLSchema2001::string;
 }
 
 SOAPParameter&
@@ -433,7 +433,7 @@ SOAPTypeTraits<const char *>::Serialize(SOAPParameter& param, const char *val)
 //  Trait info for const wchar_t *
 void SOAPTypeTraits<const wchar_t *>::GetType(SOAPQName& type)
 {
-	type.Set("string", XMLSchema2001::xsd);
+	type = XMLSchema2001::string;
 }
 
 SOAPParameter&
@@ -451,7 +451,7 @@ SOAPTypeTraits<const wchar_t *>::Serialize(SOAPParameter& param, const wchar_t *
 //  Trait info for SOAPString
 void SOAPTypeTraits<SOAPString>::GetType(SOAPQName& type)
 {
-	type.Set("string", XMLSchema2001::xsd);
+	type = XMLSchema2001::string;
 }
 
 SOAPParameter&

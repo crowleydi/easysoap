@@ -338,7 +338,7 @@ class SOAPBase64Traits : public SOAPByteArrayEncodingTraits
 public:
 	static void GetType(SOAPQName& type)
 	{
-		type.Set("base64binary", XMLSchema2001::xsd);
+		type = XMLSchema2001::base64Binary;
 	}
 };
 
@@ -371,7 +371,7 @@ class SOAPHexTraits : public SOAPByteArrayEncodingTraits
 public:
 	static void GetType(SOAPQName& type)
 	{
-		type.Set("hexBinary", XMLSchema2001::xsd);
+		type = XMLSchema2001::hexBinary;
 	}
 };
 
