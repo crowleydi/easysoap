@@ -179,10 +179,6 @@ SOURCE=.\SOAPHeaderHandler.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\SOAPHTTPServer.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=.\SOAPISAPIServer.cpp
 # End Source File
 # Begin Source File
@@ -336,10 +332,6 @@ SOURCE=..\include\easysoap\SOAPHeader.h
 # Begin Source File
 
 SOURCE=.\SOAPHeaderHandler.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\easysoap\SOAPHTTPServer.h
 # End Source File
 # Begin Source File
 
