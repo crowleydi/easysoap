@@ -66,6 +66,13 @@ public:
 	static SOAPParameter& Serialize(SOAPParameter& param, int val);
 	static SOAPParameter& Serialize(SOAPParameter& param, const char *val);
 	static const SOAPParameter& Deserialize(const SOAPParameter&, int& val);
+	static const SOAPParameter& Deserialize(const SOAPParameter& param, long& val)
+	{
+		int tval;
+		Deserialize(param, tval);
+		val = tval;
+		return param;
+	}
 };
 
 //
