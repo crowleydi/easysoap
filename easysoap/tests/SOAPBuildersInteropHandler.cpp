@@ -296,8 +296,11 @@ const char *SOAPBuildersHeaderHandler::echoHeaderNamespace ="http://soapinterop.
 
 SOAPBuildersHeaderHandler::SOAPBuildersHeaderHandler()
 {
-	DispatchHeader("echoMeStringRequest", echoHeaderNamespace, echoHdrString);
-	DispatchHeader("echoMeStructRequest", echoHeaderNamespace, echoHdrStruct);
+	DispatchHeader("echoMeStringRequest", echoHeaderNamespace,
+			&SOAPBuildersHeaderHandler::echoHdrString);
+
+	DispatchHeader("echoMeStructRequest", echoHeaderNamespace,
+			&SOAPBuildersHeaderHandler::echoHdrStruct);
 }
 
 SOAPBuildersHeaderHandler::~SOAPBuildersHeaderHandler()
