@@ -22,12 +22,17 @@ EASYSOAPLIB = $(EASYDIR)/libeasysoap.a
 
 CPPFLAGS = -I../include
 
-tests : tests.o $(EASYSOAPLIB)
+all: interopserver interopclient
+
+interopclient : interopclient.o $(EASYSOAPLIB)
+	g++ -g -o $@ $< $(LDFLAGS)
+
+interopserver : interopserver.o $(EASYSOAPLIB)
 	g++ -g -o $@ $< $(LDFLAGS)
 
 $(EASYSOAPLIB) :
 	cd ../src; make
 
 clean:
-	rm -f *.o tests
+	rm -f *.o interopclient interopserver
 
