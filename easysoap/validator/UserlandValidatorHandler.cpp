@@ -71,7 +71,6 @@ UserlandValidatorHandler::countTheEntities(const SOAPMethod& req, SOAPMethod& re
 		}
 	}
 
-	resp.SetName("countTheEntitiesResponse");
 	SOAPParameter& result = resp.AddParameter("Result");
 	result.AddParameter("ctAmpersands") << ctAmpersands;
 	result.AddParameter("ctApostrophes") << ctApostrophes;
@@ -102,7 +101,6 @@ UserlandValidatorHandler::easyStructTest(const SOAPMethod& req, SOAPMethod& resp
 
 	int sum = st.moe + st.curly + st.larry;
 
-	resp.SetName("easyStructTestResponse");
 	resp.AddParameter("Result") << sum;
 }
 
@@ -128,7 +126,6 @@ UserlandValidatorHandler::echoStructTest(const SOAPMethod& req, SOAPMethod& resp
 
 	p >> st;
 
-	resp.SetName("echoStructTestResponse");
 	resp.AddParameter("Result") << st;
 }
 
@@ -158,8 +155,6 @@ UserlandValidatorHandler::manyTypesTest(const SOAPMethod& req, SOAPMethod& resp)
 	req.GetParameter("doub") >> doub;
 	req.GetParameter("dat") >> dat;
 	req.GetParameter("bin") >> bin;
-
-	resp.SetName("manyTypesTestResponse");
 
 	SOAPParameter& result = resp.AddParameter("Result");
 	result.AddParameter() << num;
@@ -198,7 +193,6 @@ UserlandValidatorHandler::moderateSizeArrayCheck(const SOAPMethod& req, SOAPMeth
 	result += p.GetArray()[0].GetString();
 	result += p.GetArray()[numels - 1].GetString();
 
-	resp.SetName("moderateSizeArrayCheckResponse");
 	resp.AddParameter("Result") << result;
 }
 
@@ -229,7 +223,6 @@ UserlandValidatorHandler::nestedStructTest(const SOAPMethod& req, SOAPMethod& re
 
 	int sum = st.curly + st.larry + st.moe;
 
-	resp.SetName("nestedStructTestResponse");
 	resp.AddParameter("Result") << sum;
 }
 
@@ -246,8 +239,6 @@ UserlandValidatorHandler::simpleStructReturnTest(const SOAPMethod& req, SOAPMeth
 {
 	int myNumber;
 	req.GetParameter("myNumber") >> myNumber;
-
-	resp.SetName("simpleStructReturnTestResponse");
 
 	SOAPParameter& result = resp.AddParameter("Result");
 	result.AddParameter("times10") << myNumber * 10;

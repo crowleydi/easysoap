@@ -35,7 +35,7 @@
 void
 WhichToolkitHandler::whichToolkit(const SOAPMethod& request, SOAPMethod& response)
 {
-	response.SetName("whichToolkitResult");
+	//response.SetName("whichToolkitResult");
 	SOAPParameter& param = response.AddParameter("Result");
 
 	param.AddParameter("toolkitDocsUrl") << EASYSOAP_HOMEPAGE;

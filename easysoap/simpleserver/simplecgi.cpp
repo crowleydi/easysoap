@@ -59,7 +59,6 @@ public:
 		int n = a + b;
 
 		response.AddParameter("n") << n;
-		response.SetName("addResponse", request.GetNamespace());
 	}
 
 	void mult(const SOAPMethod& request, SOAPMethod& response)
@@ -73,7 +72,6 @@ public:
 		int n = a * b;
 
 		response.AddParameter("n") << n;
-		response.SetName("addResponse", request.GetNamespace());
 	}
 };
 
