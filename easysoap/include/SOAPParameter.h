@@ -78,9 +78,12 @@ public:
 	double GetDouble() const;
 	operator double() const					{return GetDouble();}
 
-	SOAPString& GetString()					{return m_strval;}
 	const SOAPString& GetString() const;
 	operator const SOAPString&() const		{return GetString();}
+
+	//
+	// Use this to get access to the underlying string.
+	SOAPString& GetStringRef()					{return m_strval;}
 
 	Array& GetArray()
 	{
@@ -271,10 +274,8 @@ inline const SOAPParameter&
 operator<<(SOAPParameter& param, const SOAPArray<char>& val)
 {
 	param.SetValue(""); // coerce it to a string
-	SOAPBase64::Encode(val, param.GetString());
-	param.SetType("base64", SOAP_ENC);
-	// Or, you could use this
-	// param.SetType("base64Binary", SOAP_XSD_2001);
+	SOAPBase64::Encode(val, param.GetStringRef());
+	param.SetType("base64Binary");
 	return param;
 }
 
@@ -292,8 +293,8 @@ operator>>(const SOAPParameter& param, SOAPArray<char>& val)
 	}
 	else
 	{
-		//
-		// Could also check for Hex encoding.
+		// Assume it's a base64 encoded string.
+		// Could also check for hex encoding.
 		SOAPBase64::Decode(param.GetString(), val);
 	}
 	return param;
