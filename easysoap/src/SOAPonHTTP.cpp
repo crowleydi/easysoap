@@ -171,7 +171,6 @@ SOAPHTTPProtocol::GetReply()
 	char buff[2048];
 	m_headers.clear();
 
-	bool ver11 = false;
 	int httpreturn = 500;
 
 	// This should read a line that is something like:
@@ -180,9 +179,6 @@ SOAPHTTPProtocol::GetReply()
 	{
 		throw SOAPException("Couldn't read response.");
 	}
-
-	if (strncmp(buff, "HTTP/1.1", 8) == 0)
-		ver11 = true;
 
 	char *httpretcode = strchr(buff, ' ');
 	if (httpretcode)
@@ -213,25 +209,6 @@ SOAPHTTPProtocol::GetReply()
 		}
 	}
 
-	//
-	// TODO:  The map and the strcmps need to be
-	// case insensitive
-	//
-	const char *keepalive = GetHeader("Connection");
-	if (keepalive)
-	{
-		if (ver11)
-		{
-			if (strcmp(keepalive, "close") == 0 ||
-				strcmp(keepalive, "Keep-Alive") != 0)
-				Close();
-		}
-		else
-		{
-			if (strcmp(keepalive, "Keep-Alive") != 0)
-				Close();
-		}
-	}
 	return httpreturn;
 }
 
