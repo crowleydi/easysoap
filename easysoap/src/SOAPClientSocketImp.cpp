@@ -63,6 +63,10 @@ public:
 
 #else // not _WIN32
 
+#ifdef HAVE_ERRNO_H
+#include <errno.h>
+#endif
+
 #ifdef HAVE_SYS_TYPES_H
 #include <sys/types.h>
 #endif
@@ -229,7 +233,13 @@ SOAPClientSocketImp::Connect(const char *server, unsigned int port)
 	m_socket = 0;
 	m_socket = socket(PF_INET, SOCK_STREAM, 0);
 	if (m_socket == INVALID_SOCKET)
+	{
+#ifdef HAVE_STRERROR
+		throw SOAPSocketException("Error creating socket: %s", strerror(errno));
+#else
 		throw SOAPSocketException("Error creating socket");
+#endif
+	}
 
 	struct sockaddr_in sockAddr;
 	sp_memset(&sockAddr, 0, sizeof(sockAddr));
@@ -237,7 +247,13 @@ SOAPClientSocketImp::Connect(const char *server, unsigned int port)
 	sockAddr.sin_addr.s_addr = htonl(INADDR_ANY);
 
 	if (bind(m_socket, (struct sockaddr*)&sockAddr, sizeof(sockAddr)) == (int)SOCKET_ERROR)
+	{
+#ifdef HAVE_STRERROR
+		throw SOAPSocketException("Error binding socket: %s", strerror(errno));
+#else
 		throw SOAPSocketException("Error binding socket");
+#endif
+	}
 
 	sp_memset(&sockAddr, 0, sizeof(sockAddr));
 	sockAddr.sin_family = AF_INET;
@@ -260,19 +276,32 @@ SOAPClientSocketImp::Connect(const char *server, unsigned int port)
 	if (connect(m_socket, (struct sockaddr*)&sockAddr, sizeof(sockAddr)) == (int)SOCKET_ERROR)
 	{
 		Close();
-		throw SOAPSocketException("Connection refused to host: %s:%d", server, port);
+#ifdef HAVE_STRERROR
+		throw SOAPSocketException("Failed to connect to host %s, port %d: %s", server, port, strerror(errno));
+#else
+		throw SOAPSocketException("Failed to connect to host %s, port %d", server, port);
+#endif
 	}
 
 	int nodelay = 1;
 	struct protoent *tcpproto = getprotobyname("tcp");
 	if (!tcpproto)
 	{
-		throw SOAPSocketException("Could not get TCP proto struct.");
+		//
+		// Couldn't get the struct by name (/etc/protocols missing?)
+		// So lets try by number.  TCP should always be 6, we hope...
+		tcpproto = getprotobynumber(6);
+		if (!tcpproto)
+			throw SOAPSocketException("Could not get TCP protocol struct.");
 	}
 
 	if (setsockopt(m_socket, tcpproto->p_proto, TCP_NODELAY, (const char *)&nodelay, sizeof(nodelay)) == -1)
 	{
-		throw SOAPSocketException("Could not set TCP_NODELAY");
+#ifdef HAVE_STRERROR
+		throw SOAPSocketException("Error setting TCP_NODELAY: %s", strerror(errno));
+#else
+		throw SOAPSocketException("Error setting TCP_NODELAY");
+#endif
 	}
 
 	return true;
