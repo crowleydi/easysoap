@@ -35,8 +35,6 @@ unsigned int SOAPParameter::m_gensym = 0;
 
 SOAPParameter::~SOAPParameter()
 {
-	delete m_struct;
-	delete m_array;
 }
 
 SOAPParameter::SOAPParameter(const SOAPParameter& param)
@@ -44,18 +42,10 @@ SOAPParameter::SOAPParameter(const SOAPParameter& param)
 	m_name = param.m_name;
 	m_type = param.m_type;
 
-	m_intval = param.m_intval;
-	m_fltval = param.m_fltval;
-	m_dblval = param.m_dblval;
 	m_strval = param.m_strval;
 
-	m_array = 0;
-	m_struct = 0;
-
-	if (param.m_array)
-		GetArray() = param.GetArray();
-	if (param.m_struct)
-		GetStruct() = param.GetStruct();
+	GetArray() = param.GetArray();
+	GetStruct() = param.GetStruct();
 }
 
 SOAPParameter&
@@ -64,15 +54,10 @@ SOAPParameter::operator=(const SOAPParameter& param)
 	m_name = param.m_name;
 	m_type = param.m_type;
 
-	m_intval = param.m_intval;
-	m_fltval = param.m_fltval;
-	m_dblval = param.m_dblval;
 	m_strval = param.m_strval;
 
-	if (param.m_array)
-		GetArray() = param.GetArray();
-	if (param.m_struct)
-		GetStruct() = param.GetStruct();
+	GetArray() = param.GetArray();
+	GetStruct() = param.GetStruct();
 
 	return *this;
 }
@@ -81,6 +66,59 @@ const char *
 SOAPParameter::GetXsdString() const
 {
 	return SOAPTypes::GetXsdString(m_type);
+}
+
+void
+SOAPParameter::Reset()
+{
+	SetType(SOAPTypes::xsd_none);
+	m_array.Resize(0);
+	m_struct.Clear();
+}
+
+void
+SOAPParameter::SetInteger(const char *val)
+{
+	m_strval = val;
+	m_type = SOAPTypes::xsd_int;
+}
+
+void
+SOAPParameter::SetValue(int val)
+{
+	char buffer[32];
+	snprintf(buffer, sizeof(buffer), "%d", val);
+	SetInteger(buffer);
+}
+
+void
+SOAPParameter::SetFloat(const char *val)
+{
+	m_strval = val;
+	m_type = SOAPTypes::xsd_float;
+}
+
+void
+SOAPParameter::SetValue(float val)
+{
+	char buffer[32];
+	snprintf(buffer, sizeof(buffer), "%f", val);
+	SetFloat(buffer);
+}
+
+void
+SOAPParameter::SetDouble(const char *val)
+{
+	m_strval = val;
+	m_type = SOAPTypes::xsd_double;
+}
+
+void
+SOAPParameter::SetValue(double val)
+{
+	char buffer[32];
+	snprintf(buffer, sizeof(buffer), "%f", val);
+	SetDouble(buffer);
 }
 
 bool
@@ -92,9 +130,9 @@ SOAPParameter::WriteSOAPPacket(SOAPPacketWriter& packet) const
 	if (m_type == SOAPTypes::xsd_none)
 		throw SOAPException("Cannot serialize undefined parameter value");
 
-	if (!m_name.empty())
+	if (m_name.Length() > 0)
 	{
-		sym = m_name.c_str();
+		sym = m_name;
 	}
 	else if (m_type == SOAPTypes::soap_array)
 	{
@@ -117,19 +155,10 @@ SOAPParameter::WriteSOAPPacket(SOAPPacketWriter& packet) const
 	switch (m_type)
 	{
 	case SOAPTypes::xsd_int:
-		packet.WriteValue(m_intval);
-		break;
-
 	case SOAPTypes::xsd_float:
-		packet.WriteValue(m_fltval);
-		break;
-
 	case SOAPTypes::xsd_double:
-		packet.WriteValue(m_dblval);
-		break;
-
 	case SOAPTypes::xsd_string:
-		packet.WriteValue(m_strval.c_str());
+		packet.WriteValue(m_strval);
 		break;
 
 	case SOAPTypes::soap_array:
@@ -138,9 +167,9 @@ SOAPParameter::WriteSOAPPacket(SOAPPacketWriter& packet) const
 			// and check their type.  If they're not all the same, use 'variant'
 			// or whatever the xsd type is...
 			char typebuff[128];
-			if (GetArray().size() > 0)
+			if (GetArray().Size() > 0)
 			{
-				snprintf(typebuff, sizeof(typebuff), "%s[%d]", GetArray()[0].GetXsdString(), GetArray().size());
+				snprintf(typebuff, sizeof(typebuff), "%s[%d]", GetArray()[0].GetXsdString(), GetArray().Size());
 				packet.AddAttr(TAG_SOAP_ENC ":arrayType", typebuff);
 			}
 			else
@@ -148,7 +177,7 @@ SOAPParameter::WriteSOAPPacket(SOAPPacketWriter& packet) const
 				packet.AddAttr(TAG_SOAP_ENC ":arrayType", TAG_SOAP_XSD ":int[0]");
 			}
 
-			for (size_t i = 0; i < GetArray().size(); ++i)
+			for (size_t i = 0; i < GetArray().Size(); ++i)
 				GetArray()[i].WriteSOAPPacket(packet);
 
 		}
@@ -156,8 +185,8 @@ SOAPParameter::WriteSOAPPacket(SOAPPacketWriter& packet) const
 
 	case SOAPTypes::soap_struct:
 		{
-			for (Struct::const_iterator i = GetStruct().begin(); i != GetStruct().end(); ++i)
-				i->second.WriteSOAPPacket(packet);
+			for (Struct::Iterator i = GetStruct().Begin(); i != GetStruct().End(); ++i)
+				i->WriteSOAPPacket(packet);
 		}
 		break;
 
