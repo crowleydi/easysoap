@@ -189,20 +189,72 @@ SOAPWinInetTransport::Write(const SOAPMethod& method, const char *packet, size_t
 	char headers[256];
 	snprintf(headers, sizeof(headers), "Content-Type: text/xml; charset=\"UTF-8\"\r\n"
 			"SOAPAction: \"%s\"\r\n", (const char *)method.GetSoapAction());
-	if (!HttpSendRequestA(m_hRequest, headers, -1, (void *)packet, packetlen))
-		throw SOAPSocketException("Failed to send request: %s", GetErrorInfo());
 
-	DWORD index = 0;
+	bool sentCert = false;
+	DWORD dwCode = 0;
+	DWORD dwSize = sizeof(dwCode);
+
+	while (!HttpSendRequestA(m_hRequest, headers, -1, (void *)packet, packetlen))
+	{
+		if (sentCert)
+		{
+			if ( !HttpQueryInfoA(m_hRequest,
+					HTTP_QUERY_STATUS_CODE |
+					HTTP_QUERY_FLAG_NUMBER, &dwCode, &dwSize, NULL))
+			{
+				throw SOAPException("Failed to get back server status code.");
+			}
+
+			if (dwCode == 403)
+			{
+				//
+				// Okay, we tried once already to send a certificate
+				// and it failed.  This means the user hit "cancel"
+				throw SOAPException("Endpoint requires a client certificate.");
+			}
+		}
+
+		DWORD dwError = GetLastError();
+		if (dwError == ERROR_INTERNET_CLIENT_AUTH_CERT_NEEDED)
+		{
+			if( InternetErrorDlg(	GetDesktopWindow(), 
+									m_hRequest,
+									ERROR_INTERNET_CLIENT_AUTH_CERT_NEEDED,
+									FLAGS_ERROR_UI_FILTER_FOR_ERRORS       |
+									FLAGS_ERROR_UI_FLAGS_GENERATE_DATA     |
+									FLAGS_ERROR_UI_FLAGS_CHANGE_OPTIONS, 
+									NULL) != ERROR_SUCCESS )
+			{
+				throw SOAPException("Failed to select client authentication certificate.");
+			}
+			sentCert = true;
+		}
+		else
+			throw SOAPSocketException("Failed to send request: %s", GetErrorInfo());
+	}
+
+	if ( !HttpQueryInfo (m_hRequest,
+			HTTP_QUERY_STATUS_CODE |
+			HTTP_QUERY_FLAG_NUMBER, &dwCode, &dwSize, NULL))
+	{
+		throw SOAPException("Failed to get back server status code.");
+	}
+
+	if (dwCode != 500 && dwCode != 200)
+	{
+		throw SOAPException("Unexpected server response code: %d", dwCode);
+	}
+
 	DWORD qsize = sizeof(m_canRead);
 
-	if (!HttpQueryInfoA(m_hRequest, HTTP_QUERY_CONTENT_LENGTH | HTTP_QUERY_FLAG_NUMBER,
-			&m_canRead, &qsize, &index))
+	if (!HttpQueryInfo (m_hRequest,
+			HTTP_QUERY_CONTENT_LENGTH |
+			HTTP_QUERY_FLAG_NUMBER,	&m_canRead, &qsize, NULL))
 			m_canRead = -1;
 
 	char contenttype[256];
-	index = 0;
 	qsize = sizeof(contenttype);
-	if (!HttpQueryInfoA(m_hRequest, HTTP_QUERY_CONTENT_TYPE, contenttype, &qsize, &index))
+	if (!HttpQueryInfoA(m_hRequest, HTTP_QUERY_CONTENT_TYPE, contenttype, &qsize, NULL))
 		contenttype[0] = 0;
 	SOAPHTTPProtocol::ParseContentType(m_contentType, m_charset, contenttype);
 
