@@ -13,6 +13,13 @@
 class SOAPBuildersInteropHandler :
 	public SOAPDispatchHandler<SOAPBuildersInteropHandler>
 {
+private:
+	static const char *interop_namespace;
+
+	void RegisterBasic();
+	void RegisterArray();
+	void RegisterMiscellaneous();
+
 public:
 	SOAPBuildersInteropHandler();
 	virtual ~SOAPBuildersInteropHandler();
@@ -55,27 +62,6 @@ public:
 	void echoDouble(const SOAPMethod& req, SOAPMethod& response);
 	void echoDoubleArray(const SOAPMethod& req, SOAPMethod& response);
 	void echoHexBinary(const SOAPMethod& req, SOAPMethod& response);
-};
-
-class SOAPBuildersHeaderHandler
-: public SOAPHeaderHandler<SOAPBuildersHeaderHandler>
-{
-private:
-	static const char *echoHeaderNamespace;
-
-public:
-	SOAPBuildersHeaderHandler();
-	virtual ~SOAPBuildersHeaderHandler();
-
-	SOAPBuildersHeaderHandler* GetTarget(const SOAPEnvelope& request)
-	{
-		return this;
-	}
-
-	//
-	// Group C header handlers
-	void echoHdrString(const SOAPParameter& header, SOAPEnvelope& request, SOAPEnvelope& response);
-	void echoHdrStruct(const SOAPParameter& header, SOAPEnvelope& request, SOAPEnvelope& response);
 };
 
 #endif // !defined(AFX_SOAPBUILDERSINTEROPHANDLER_H__C0C1D23F_D31D_4118_BB27_C85AB1FA7645__INCLUDED_)

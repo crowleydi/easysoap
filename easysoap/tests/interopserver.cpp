@@ -30,6 +30,7 @@
 #include <SOAPCGIServer.h>
 
 #include "SOAPBuildersInteropHandler.h"
+#include "SOAPBuildersHeaderHandler.h"
 
 int
 main(int argc, const char* argv[], const char *env[])

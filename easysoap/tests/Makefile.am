@@ -1,10 +1,14 @@
 noinst_PROGRAMS = interopserver interopclient
 
 interopserver_SOURCES = \
-	interopserver.cpp \
-	SOAPBuildersInteropHandler.cpp \
+	interopstruct.h \
 	SOAPBuildersInteropHandler.h \
-	interopstruct.h
+	SOAPBuildersInteropHandler.cpp \
+	SOAPBuildersInteropHandlerA.cpp \
+	SOAPBuildersInteropHandlerB.cpp \
+	SOAPBuildersHeaderHandler.h \
+	SOAPBuildersHeaderHandler.cpp \
+	interopserver.cpp
 
 interopclient_SOURCES = \
 	interopclient.cpp \
