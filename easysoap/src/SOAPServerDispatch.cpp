@@ -163,3 +163,26 @@ SOAPServerDispatch::HandleRequest(SOAPEnvelope& request, SOAPResponse& response)
 	return handled;
 }
 
+void
+SOAPTransport::ParseContentType(SOAPString& str, const char *contenttype)
+{
+	str = "US-ASCII";
+	if (contenttype)
+	{
+		const char *charset = sp_strstr(contenttype, "charset=");
+		if (charset)
+		{
+			charset += 8;
+			if (*charset == '\"')
+				++charset;
+			const char *end = charset;
+
+			while (*end && *end != '\"' && *end != ';' && *end != ' ')
+				++end;
+
+			str = "";
+			str.Append(charset, end - charset);
+		}
+	}
+}
+

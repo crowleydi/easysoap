@@ -70,24 +70,7 @@ SOAPHTTPServerTransport::SOAPHTTPServerTransport(struct _TSession *session)
 	if (contlen)
 		m_bytestoread = atoi(contlen);
 
-	m_charset = "US-ASCII";
-	if (contype)
-	{
-		const char *charset = charset = sp_strstr(contype, "charset=");
-		if (charset)
-		{
-			charset += 8;
-			if (*charset == '\"')
-				++charset;
-			const char *end = charset;
-
-			while (*end && *end != '\"' && *end != ';' && *end != ' ')
-				++end;
-
-			m_charset = "";
-			m_charset.Append(charset, end - charset);
-		}
-	}
+	ParseContentType(m_charset, contype);
 }
 
 SOAPHTTPServerTransport::~SOAPHTTPServerTransport()

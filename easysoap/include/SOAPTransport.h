@@ -29,6 +29,8 @@ class EASYSOAP_EXPORT SOAPTransport
 {
 protected:
 	SOAPTransport() {}
+	static void ParseContentType(SOAPString& charset, const char *contenttype);
+
 public:
 	virtual ~SOAPTransport() {}
 

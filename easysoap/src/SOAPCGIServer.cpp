@@ -54,9 +54,10 @@ private:
 	SOAPCGITransport(const SOAPCGITransport&);
 	SOAPCGITransport& operator=(const SOAPCGITransport&);
 
-	FILE	*m_logfile;
-	FILE	*m_infile;
-	int		m_canread;
+	FILE		*m_logfile;
+	FILE		*m_infile;
+	int			m_canread;
+	SOAPString	m_charset;
 };
 
 SOAPCGITransport::SOAPCGITransport()
@@ -73,6 +74,7 @@ SOAPCGITransport::SOAPCGITransport()
 	if (contentlen)
 		m_canread = atoi(contentlen);
 
+	ParseContentType(m_charset, getenv("CONTENT_TYPE"));
 }
 
 SOAPCGITransport::~SOAPCGITransport()
@@ -120,7 +122,7 @@ SOAPCGITransport::SetError()
 const char *
 SOAPCGITransport::GetCharset() const
 {
-	return 0;
+	return m_charset;
 }
 
 size_t
