@@ -56,10 +56,8 @@
 #ifndef __ES_COMP_H
 # define __ES_COMP_H
 
-#ifdef HAVE_CONFIG_H 
-#  include "es_config.h"
 /* distinguish real MSC from Metrowerks and Intel */
-# elif defined(_MSC_VER) && !defined(__MWERKS__) && !defined (__ICL) && !defined (__COMO__)
+#if defined(_MSC_VER) && !defined(__MWERKS__) && !defined (__ICL) && !defined (__COMO__)
 /* Microsoft Visual C++ 4.0, 4.1, 4.2, 5.0 */
 #  include "es_msvc.h"
 # elif defined (__MWERKS__)
@@ -69,7 +67,7 @@
 /* Borland */
 #  include "es_borl.h"
 # else
-# error "No configuration file found."
+#  include "es_config.h"
 #endif
 
 
