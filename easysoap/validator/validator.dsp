@@ -44,7 +44,7 @@ RSC=rc.exe
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /Yu"stdafx.h" /FD /c
 # ADD CPP /nologo /MD /W3 /GX /O2 /I "../include" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /FD /c
-# SUBTRACT CPP /Z<none> /YX /Yc /Yu
+# SUBTRACT CPP /YX /Yc /Yu
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
 # ADD RSC /l 0x409 /d "NDEBUG"
 BSC32=bscmake.exe
@@ -105,7 +105,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 ../win32/Release/easysoap.lib /nologo /subsystem:console /machine:I386
-# ADD LINK32 ../win32/Release/easysoap.lib /nologo /subsystem:console /debug /machine:I386
+# ADD LINK32 ../win32/ReleaseSymbols/easysoap.lib /nologo /subsystem:console /debug /machine:I386
 
 !ENDIF 
 

@@ -106,7 +106,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 ../win32/Release/easysoap.lib /nologo /subsystem:console /machine:I386
-# ADD LINK32 ../win32/Release/easysoap.lib /nologo /subsystem:console /debug /machine:I386
+# ADD LINK32 ../win32/ReleaseSymbols/easysoap.lib /nologo /subsystem:console /debug /machine:I386
 
 !ENDIF 
 
