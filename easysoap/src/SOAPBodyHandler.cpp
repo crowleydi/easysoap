@@ -104,6 +104,7 @@ SOAPBodyHandler::startElement(SOAPParser& parser, const XML_Char *name, const XM
 	{
 		SOAPParameter *p = &m_body->GetFault();
 		m_paramHandler.SetParameter(p);
+		m_body->SetIsFault(true);
 		return m_paramHandler.start(parser, name, attrs);
 	}
 
