@@ -136,7 +136,10 @@ SOAPProtocolBase::ReadLine(char *buff, size_t bufflen)
 	if (!m_socket)
 		throw SOAPSocketException("Protocol doesn't have a socket.");
 
-	buff[bufflen - 1] = 0;
+	if (bufflen == 0)
+		return 0;
+
+	buff[--bufflen] = 0;
 	char *end = buff + bufflen;
 	size_t numread = 0;
 	char c;
