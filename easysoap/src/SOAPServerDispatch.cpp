@@ -82,6 +82,8 @@ SOAPServerDispatch::WriteFault(const SOAPFault& fault)
 	m_writer.Reset();
 	m_writer.StartTag("SOAP-ENV:Envelope");
 	m_writer.AddXMLNS("SOAP-ENV", SOAP_ENV);
+	m_writer.AddXMLNS("xsi", SOAP_XSI);
+	m_writer.AddXMLNS("xsd", SOAP_XSD);
 	m_writer.StartTag("SOAP-ENV:Body");
 	fault.WriteSOAPPacket(m_writer);
 	m_writer.EndTag("SOAP-ENV:Body");
