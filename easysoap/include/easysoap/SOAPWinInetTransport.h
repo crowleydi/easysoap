@@ -47,6 +47,7 @@ private:
 	HINTERNET		m_hRequest;
 
 	const char * GetErrorInfo();
+	void Close();
 
 public:
 	SOAPWinInetTransport();

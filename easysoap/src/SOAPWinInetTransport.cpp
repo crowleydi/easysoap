@@ -62,6 +62,12 @@ SOAPWinInetTransport::SOAPWinInetTransport(const SOAPUrl& endpoint, const SOAPUr
 
 SOAPWinInetTransport::~SOAPWinInetTransport()
 {
+	Close();
+}
+
+void
+SOAPWinInetTransport::Close()
+{
 	if (m_hRequest != NULL)
 		InternetCloseHandle(m_hRequest);
 
@@ -75,6 +81,7 @@ SOAPWinInetTransport::~SOAPWinInetTransport()
 void
 SOAPWinInetTransport::ConnectTo(const SOAPUrl& endpoint)
 {
+	Close();
 	m_endpoint = endpoint;
 
 	if (m_endpoint.Protocol() != SOAPUrl::http_proto && m_endpoint.Protocol() != SOAPUrl::https_proto)
@@ -90,6 +97,7 @@ SOAPWinInetTransport::ConnectTo(const SOAPUrl& endpoint)
 void
 SOAPWinInetTransport::ConnectTo(const SOAPUrl& endpoint, const SOAPUrl& proxy)
 {
+	Close();
 	m_endpoint = endpoint;
 
 	if (m_endpoint.Protocol() != SOAPUrl::http_proto && m_endpoint.Protocol() != SOAPUrl::https_proto)
