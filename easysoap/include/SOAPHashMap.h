@@ -27,14 +27,24 @@
 #pragma warning(disable: 4284)
 #endif // _MSC_VER
 
-// pre-decalure some functors
+/**
+ * Functor used by SOAPHashMap class to generate
+ * a hashcode for an object of type T.
+ *
+ * It must be specialized for your own class.
+ *
+ * Specialized only for SOAPString.
+ */
 template<typename T>
 struct SOAPHashCodeFunctor;
-template<typename T>
-struct SOAPHashCodeFunctorNoCase;
-template<typename T>
-struct SOAPEqualsFunctorNoCase;
 
+/**
+ * Functor used by SOAPHashMap class to compare
+ * for equality two objects of type T.
+ *
+ * It can be specialized for your own class, by
+ * default it simply uses operator==.
+ */
 template<typename T>
 struct SOAPEqualsFunctor
 {
@@ -45,10 +55,27 @@ struct SOAPEqualsFunctor
 };
 
 
+/**
+ * Functor to be specialized for use with SOAPHashMapNoCase.
+ * Specialized only for SOAPString.
+ */
+template<typename T>
+struct SOAPHashCodeFunctorNoCase;
+
+/**
+ * Functor to be specialized for use with SOAPHashMapNoCase.
+ * Specialized only for SOAPString.
+ */
+template<typename T>
+struct SOAPEqualsFunctorNoCase;
+
 #include <SOAPUtil.h>
 #include <SOAPPool.h>
 
 
+/**
+ * SOAPHashMap is a general purpose templated hash table class.
+ */
 template <typename K, typename I,
 	typename H = SOAPHashCodeFunctor<K>,
 	typename E = SOAPEqualsFunctor<K> >
@@ -57,7 +84,7 @@ class EASYSOAP_EXPORT SOAPHashMap
 private:
 	// structure for keeping a linked-list of elements
 	struct HashElement {
-		HashElement(): m_hash(0), m_next(0)
+		HashElement(): m_next(0), m_hash(0)
 		{
 		}
 
@@ -78,7 +105,9 @@ private:
 	float					m_fillfactor;
 	size_t					m_resizeThreshold;
 
-	// our Iterator class
+	/**
+	 * Iterator class for SOAPHashMap
+	 */
 	class ForwardHashMapIterator
 	{
 	private:
@@ -106,19 +135,25 @@ private:
 		}
 
 	public:
-		// default constructor
+		/**
+		 * Default constructor for the SOAPHashMap iterator.
+		 */
 		ForwardHashMapIterator()
 			: m_map(0), m_index(0)
 		{
 		}
 
-		//copy constructor
+		/**
+		 * Copy constructor for the SOAPHashMap iterator.
+		 */
 		ForwardHashMapIterator(const ForwardHashMapIterator& r)
 			: m_map(r.m_map), m_index(r.m_index), m_he(r.m_he)
 		{
 		}
 
-		// assignment operator
+		/**
+		 * Assignment operator for the SOAPHashMap iterator.
+		 */
 		ForwardHashMapIterator& operator=(const ForwardHashMapIterator& r)
 		{
 			m_map = r.m_map;
@@ -127,21 +162,34 @@ private:
 			return *this;
 		}
 
-		// equals operator
+		/**
+		 * Equals operator for the SOAPHashMap iterator.
+		 *
+		 * Returns true iff the two iterators point at the
+		 * same object in the same hash table.
+		 */
 		bool operator==(const ForwardHashMapIterator& r) const
 		{
 			// make sure we're pointing to the exact same element
 			return m_he == r.m_he;
 		}
 
-		// not equals operator
+		/**
+		 * Not equals operator for the SOAPHashMap iterator.
+		 *
+		 * Returns false iff the two iterators point at the
+		 * same object in the same hash table.
+		 */
 		bool operator!=(const ForwardHashMapIterator& r) const
 		{
 			// can't be pointing to the same element...
 			return m_he != r.m_he;
 		}
 
-		// Move to next element
+		/**
+		 * Increment iterator to point at the next element
+		 * in the SOAPHashMap.
+		 */
 		ForwardHashMapIterator& Next()
 		{
 			if (m_index != m_map->m_elements.End() && !(m_he = m_he->m_next))
@@ -150,13 +198,17 @@ private:
 			return *this;
 		}
 
-		// prefix-increment
+		/**
+		 * Pre-increment
+		 */
 		ForwardHashMapIterator& operator++()
 		{
 			return Next();
 		}
 
-		// postfix-increment
+		/**
+		 * Post-increment
+		 */
 		ForwardHashMapIterator operator++(int)
 		{
 			// copy our current position
@@ -167,24 +219,47 @@ private:
 			return ret;
 		}
 
-		// some boolean operators
+		/**
+		 * operator bool returns true if the iterator
+		 * points to a valid element in the SOAPHashMap
+		 *
+		 * This is so you can do tests like this:
+		 *
+		 * SOAPHashMap<SOAPString,int>::Iterator i = map.Find("Hello");
+		 * if (i)
+		 * {
+		 *    // we found the element
+		 * }
+		 */
 		operator bool()
 		{
 			return m_index != m_map->m_elements.End();
 		}
 
+		/**
+		 * operator ! returns true if the iterator
+		 * does not point to a valid element in the SOAPHashMap.
+		 *
+		 * This is so you can do tests like this:
+		 *
+		 * SOAPHashMap<SOAPString,int>::Iterator i = map.Find("Hello");
+		 * if (!i)
+		 * {
+		 *    // We didn't find the element
+		 * }
+		 */
 		bool operator!()
 		{
 			return m_index == m_map->m_elements.End();
 		}
 
-		// access the hash key.  can't modify it!
-		const K& Key() const
-		{
-			return m_he->m_key;
-		}
-
-		// access the data item.
+		/**
+		 * The iterator can be used like a pointer
+		 * which points to the value portion of
+		 * the element.  Thus *i returns a reference
+		 * to the value and i->member can be used to
+		 * access a member of the value.
+		 */
 		I& operator*()
 		{
 			return m_he->m_item;
@@ -205,7 +280,12 @@ private:
 			return &m_he->m_item;
 		}
 
-		// maybe get rid of these since we can use *
+		/**
+		 *
+		 * Explicit method used to access the value
+		 * portion of the current element pointed to
+		 * by the iterator.
+		 */
 		const I& Item() const
 		{
 			return m_he->m_item;
@@ -215,22 +295,44 @@ private:
 		{
 			return m_he->m_item;
 		}
+
+		/**
+		 * Explicit method to access the key portion of the current
+		 * element.  The key cannot be modified!
+		 */
+		const K& Key() const
+		{
+			return m_he->m_key;
+		}
 	};
 
 public:
 	typedef ForwardHashMapIterator Iterator;
 
+	/**
+	 * Destructor
+	 */
 	~SOAPHashMap()
 	{
 		Empty();
 	}
 	
-	SOAPHashMap(size_t size = 31, float fillfactor = 0.75) :
+	/**
+	 * Default constructor
+	 *
+	 * @param s Initial number of buckets in the hash table.
+	 * @param fillfactor As a percentage how full hash table must
+	 * become before the size is increased.
+	 */
+	SOAPHashMap(size_t s = 31, float fillfactor = 0.75) :
 		m_numElements(0), m_fillfactor(fillfactor), m_resizeThreshold(0)
 	{
-		Resize(size); // this sets m_resizeThreshold
+		Resize(s); // this sets m_resizeThreshold
 	}
 
+	/**
+	 * Copy constructor
+	 */
 	template<typename A, typename B, typename C, typename D>
 	SOAPHashMap(const SOAPHashMap<A,B,C,D>& r) :
 		m_numElements(0), m_fillfactor(r.GetFillFactor()), m_resizeThreshold(0)
@@ -239,6 +341,9 @@ public:
 		*this = r;
 	}
 
+	/**
+	 * Copy constructor
+	 */
 	SOAPHashMap(const SOAPHashMap& r) :
 		m_numElements(0), m_fillfactor(r.GetFillFactor()), m_resizeThreshold(0)
 	{
@@ -246,6 +351,9 @@ public:
 		*this = r;
 	}
 
+	/**
+	 * Assignment operator.
+	 */
 	template<typename A, typename B, typename C, typename D>
 	SOAPHashMap& operator=(const SOAPHashMap<A,B,C,D>& r)
 	{
@@ -253,38 +361,60 @@ public:
 		{
 			Clear();
 			Resize(r.GetNumBuckets());
-			SOAPHashMap<A,B,C,D>::Iterator end = r.End();
-			for (SOAPHashMap<A,B,C,D>::Iterator it = r.Begin(); it != end; ++it)
+			SOAPHashMap<A,B,C,D>::Iterator e = r.End();
+			for (SOAPHashMap<A,B,C,D>::Iterator it = r.Begin(); it != e; ++it)
 				Add(it.Key(), it.Item());
 		}
 		return *this;
 	}
 
+	/**
+	 * Assignment operator.
+	 */
 	SOAPHashMap& operator=(const SOAPHashMap& r)
 	{
 		if (this != &r)
 		{
 			Clear();
 			Resize(r.GetNumBuckets());
-			Iterator end = r.End();
-			for (Iterator it = r.Begin(); it != end; ++it)
+			Iterator e = r.End();
+			for (Iterator it = r.Begin(); it != e; ++it)
 				Add(it.Key(), it.Item());
 		}
 		return *this;
 	}
 
+	/**
+	 * Returns an iterator which points to the
+	 * first element in the hash table.  As the
+	 * iterator is incremented elements are returned
+	 * in hash order, not sorted like an STL map.
+	 */
 	Iterator Begin() const
 	{
 		return Iterator(this, (Elements::Iterator)m_elements.Begin());
 	}
 
+	/**
+	 * Returns an iterator which points to
+	 * an invalid element, one past the last
+	 * valid element.
+	 */
 	Iterator End() const
 	{
 		return Iterator(this, (Elements::Iterator)m_elements.End());
 	}
 
 
-	// find & set or add
+	/**
+	 * Adds an element to the SOAPHashMap with the
+	 * given key and value.  If an element with the
+	 * given key already exists then the value is
+	 * changed to the given value.
+	 *
+	 * @param key The key lookup value.
+	 * @param item The value associated with the key.
+	 */
 	template <typename X, typename Y>
 	I& Add(const X& key, const Y& item)
 	{
@@ -296,7 +426,15 @@ public:
 		return Put(hash, key, item);
 	}
 
-	// find or add
+	/**
+	 * Returns a reference to the the value in the
+	 * SOAPHashMap with the give key.  If the key
+	 * value does not exist then one is inserted
+	 * and a (potentially) uninitialized value
+	 * is returned.
+	 *
+	 * @param key The key lookup value.
+	 */
 	template <typename X>
 	I& operator[](const X& key)
 	{
@@ -309,7 +447,12 @@ public:
 	}
 
 
-	// returns true if we found the key and removed it.
+	/**
+	 * Removes the value with the give key
+	 * from the SOAPHashMap and returns true
+	 * or returns false if no value with the
+	 * given key was found.
+	 */
 	template <typename X>
 	bool Remove(const X& key)
 	{
@@ -334,7 +477,13 @@ public:
 		return false;
 	}
 
-	// clear all elements.
+	/**
+	 * Clears out the SOAPHashTable and
+	 * all values are removed.
+	 *
+	 * Actual instances of objects are NOT
+	 * deleted but saved to be reused later.
+	 */
 	void Clear()
 	{
 		for (Elements::Iterator i = m_elements.Begin(); i != m_elements.End(); ++i)
@@ -350,6 +499,12 @@ public:
 		}
 	}
 
+	/**
+	 * Clears out the SOAPHashTable and
+	 * all values are removed.
+	 *
+	 * Actual instances of objects are deleted.
+	 */
 	void Empty()
 	{
 		Elements::Iterator i;
@@ -367,13 +522,20 @@ public:
 		m_pool.Empty();
 	}
 
+	/**
+	 * Returns the number of elements in the SOAPHashTable.
+	 */
 	size_t Size() const
 	{
 		return m_numElements;
 	}
 
-	// find the item associated with the given key.
-	// returns null if we can't find the key.
+	/**
+	 * Finds and returns an iterator which points
+	 * to the element with the given key value.
+	 * If no element with the given key is found
+	 * then the value of End() is returned.
+	 */
 	template <typename X>
 	Iterator Find(const X& key) const
 	{
@@ -381,16 +543,30 @@ public:
 		return Find(key, hash);
 	}
 
+	/**
+	 * Returns how many internal hash buckets
+	 * are being used.
+	 */
 	size_t GetNumBuckets() const {return m_elements.Size();}
+
+	/**
+	 * Returns the fill factor.
+	 */
 	float GetFillFactor() const {return m_fillfactor;}
 
 
-	//
-	// For STL compatibility
+	/**
+	 * These typedefs are supplied to make
+	 * the SOAPHashMap class more STL friendly.
+	 */
 	typedef K key_type;
 	typedef Iterator iterator;
 	typedef Iterator const_iterator;
 
+	/**
+	 * These methods are supplied to make
+	 * the SOAPHashMap class more STL friendly.
+	 */
 	iterator begin() const {return Begin();}
 	iterator end() const {return End();}
 
@@ -499,9 +675,21 @@ private:
 };
 
 
-////////////////////////////////
-///  Make it easier to use no case
-////////////////////////////////
+/**
+ * This class is used to easily create a case insensitive
+ * SOAPHashMap container.
+ *
+ * This class overides the the default hashcode functor (template
+ * parameter H) and equals functor (template parameter E) which
+ * of the SOAPHashMap class to SOAPHashCodeFunctorNoCase<K> and
+ * SOAPEqualsFunctorNoCase<K> respectively.
+ *
+ * These functors are only implemented for the SOAPString class.
+ *
+ * @see SOAPHashCodeFunctorNoCase<SOAPString>
+ * @see SOAPEqualsFunctorNoCase<SOAPString>
+ *
+ */
 template<typename K, typename I>
 class SOAPHashMapNoCase : public SOAPHashMap<K, I,
 				SOAPHashCodeFunctorNoCase<K>,
@@ -513,8 +701,8 @@ private:
 				SOAPEqualsFunctorNoCase<K> > super;
 
 public:
-	SOAPHashMapNoCase(size_t size = 31, float fillfactor = 0.75)
-		: super(size, fillfactor)
+	SOAPHashMapNoCase(size_t s = 31, float fillfactor = 0.75)
+		: super(s, fillfactor)
 	{
 	}
 };
