@@ -21,7 +21,7 @@
 
 //
 //  The namespace for the methods we're calling.  This
-//  is the same namespace defined in simpleserver.cpp.
+//  is the same namespace defined in calchandler.h.
 static const char *ns = "http://easysoap.sourceforge.net/demos/calculator";
 
 
