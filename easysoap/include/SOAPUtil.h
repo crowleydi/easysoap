@@ -327,7 +327,7 @@ sp_itoa(L a, T *const buffer)
 // UTF16 and UCS character encoding.
 template <typename T>
 inline bool
-ConvertUCStoUTF16(int c, T& utf16)
+sp_UCS_UTF16(int c, T& utf16)
 {
 	if (c > 0xFFFF && c < 0x00110000)
 	{ 
@@ -347,7 +347,7 @@ ConvertUCStoUTF16(int c, T& utf16)
 
 template <typename T>
 inline bool
-ConvertUTF16toUCS(T& utf16, int& c)
+sp_UTF16_UCS(T& utf16, int& c)
 {
 	int x = utf16[0];
 
@@ -378,7 +378,7 @@ ConvertUTF16toUCS(T& utf16, int& c)
 //
 // T is an iterator.  (or pointer)
 inline bool
-ConvertUCStoUTF8(int c, char *& utf8)
+sp_UCS_UTF8(int c, char *& utf8)
 {
 	if (c <= 0x7F)
 	{
@@ -435,7 +435,7 @@ ConvertUCStoUTF8(int c, char *& utf8)
 }
 
 inline bool
-ConvertUTF8toUCS(const char *& utf8, int& c)
+sp_UTF8_UCS(const char *& utf8, int& c)
 {
 	int b = *utf8++;
 	if (b <= 0x7F)

@@ -222,11 +222,11 @@ public:
 			{
 				int c = 0;
 #ifdef _WIN32
-				ConvertUTF16toUCS(str, c);
+				sp_UTF16_UCS(str, c);
 #else
 				c = *str++;
 #endif
-				ConvertUCStoUTF8(c, b);
+				sp_UCS_UTF8(c, b);
 
 				if (b >= end)
 				{
