@@ -19,12 +19,14 @@
 
 //
 //
-//   A Simple CGI Program for EasySoap++
+//   A Simple EasySoap++ SOAP server 
 //
 //   Just place this file in your cgi-bin directory (or similar)
 //   of your web server and go.
 //
 //
+
+#include <iostream>
 
 #include <SOAP.h>
 #include <SOAPHTTPServer.h>
@@ -73,15 +75,31 @@ public:
 
 //
 //
-// main for the CGI handler;
+// main for the server
 //
 int
-main(int argc, char* argv[], char *env[])
+main(int argc, const char* argv[])
 {
-	SOAPHTTPServer server;
+	int port = 0;
 
-	DemoCalculatorHandler calchandle;
+	if (argc > 1)
+		port = atoi(argv[1]);
+	if (port == 0)
+		port = 6060;
 
-	return server.DispatchTo(&calchandle).Handle();
+	try
+	{
+		SOAPHTTPServer server(port);
+		DemoCalculatorHandler calchandle;
+
+		std::cout << "Starting SOAP server on port " << port << "." << std::endl
+			<< "Hit CTRL-C to stop." << std::endl;
+
+		return server.DispatchTo(&calchandle).Handle();
+	}
+	catch (SOAPException&)
+	{
+		return 1;
+	}
 }
 
