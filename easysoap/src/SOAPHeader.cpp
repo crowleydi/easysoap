@@ -25,6 +25,8 @@
 #include <SOAP.h>
 #include <SOAPHeader.h>
 
+const SOAPQName HeaderTag("Header", SOAP_ENV);
+
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -62,7 +64,15 @@ SOAPHeader::Reset()
 bool
 SOAPHeader::WriteSOAPPacket(SOAPPacketWriter& packet) const
 {
-	// Nothing to do yet...
+	if (m_headers.Size() > 0)
+	{
+		packet.StartTag(HeaderTag);
+
+		for (Headers::ConstIterator i = m_headers.Begin(); i != m_headers.End(); ++i)
+			i->WriteSOAPPacket(packet);
+
+		packet.EndTag(HeaderTag);
+	}
 	return true;
 }
 
