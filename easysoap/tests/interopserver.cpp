@@ -231,8 +231,6 @@ main(int argc, char* argv[], char *env[])
 		p.Parse(env, cgi);
 		faultactor = "SOAP::Server";
 
-		const SOAPMethod& m = env.GetBody().GetMethod();
-
 		//
 		// TODO: Test SOAPAction, method namespace
 		//
