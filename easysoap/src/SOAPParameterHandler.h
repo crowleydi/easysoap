@@ -36,8 +36,6 @@ public:
 	SOAPParameterHandler();
 	virtual ~SOAPParameterHandler();
 
-	void SetIgnoreName(bool val = true)				{m_ignoreName = val;}
-	void SetIgnoreId(bool val = true)				{m_ignoreId = val;}
 	void SetParameter(SOAPParameter& param)			{m_param = &param;}
 
 	virtual SOAPParseEventHandler* start(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs);
@@ -52,8 +50,6 @@ private:
 	SOAPStructHandler		*m_structHandler;
 	SOAPQName				m_attrName;
 	bool					m_setvalue;
-	bool					m_ignoreId;
-	bool					m_ignoreName;
 };
 
 #endif // !defined(AFX_SOAPPARAMETERHANDLER_H__124ED3B5_721D_4AB5_8B65_32D5C4F86420__INCLUDED_)

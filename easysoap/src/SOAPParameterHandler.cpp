@@ -37,8 +37,6 @@ SOAPParameterHandler::SOAPParameterHandler()
 : m_param(0)
 , m_structHandler(0)
 , m_setvalue(false)
-, m_ignoreId(false)
-, m_ignoreName(false)
 {
 }
 
@@ -50,21 +48,20 @@ SOAPParameterHandler::~SOAPParameterHandler()
 SOAPParseEventHandler *
 SOAPParameterHandler::start(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs)
 {
-	if (!m_ignoreName)
-	{
-		const char *ns = sp_strchr(name, PARSER_NS_SEP[0]);
-		if (ns)
-		{
-			m_param->GetName().GetNamespace() = "";
-			m_param->GetName().GetNamespace().Append(name, ns - name);
-			m_param->GetName().GetName() = ++ns;
-		}
-		else
-		{
-			m_param->SetName(name);
-		}
-	}
 	m_param->Reset();
+
+	const char *ns = sp_strchr(name, PARSER_NS_SEP[0]);
+	if (ns)
+	{
+		m_param->GetName().GetNamespace() = "";
+		m_param->GetName().GetNamespace().Append(name, ns - name);
+		m_param->GetName().GetName() = ++ns;
+	}
+	else
+	{
+		m_param->SetName(name);
+	}
+
 	m_setvalue = true;
 	m_str = "";
 
