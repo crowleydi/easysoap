@@ -22,6 +22,7 @@
 
 #include <easysoap/SOAPCGIServer.h>
 #include <easysoap/SOAPCGITransport.h>
+#include <easysoap/SOAPonHTTP.h>
 
 #ifdef _WIN32
 #include <fcntl.h>
@@ -44,7 +45,7 @@ SOAPCGITransport::SOAPCGITransport()
 	if (contentlen)
 		m_canread = atoi(contentlen);
 
-	ParseContentType(m_charset, getenv("CONTENT_TYPE"));
+	SOAPHTTPProtocol::ParseContentType(m_charset, getenv("CONTENT_TYPE"));
 
 	const char *sa = getenv("HTTP_SOAPACTION");
 

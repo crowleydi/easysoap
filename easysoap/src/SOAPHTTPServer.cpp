@@ -21,6 +21,7 @@
 
 
 #include <easysoap/SOAPHTTPServer.h>
+#include <easysoap/SOAPonHTTP.h>
 
 extern "C" {
 #include <abyss.h>
@@ -46,7 +47,7 @@ public:
 // Class for reading the socket/session the web server
 // hands to us.
 //
-class SOAPHTTPServerTransport : public SOAPTransport
+class SOAPHTTPServerTransport : public SOAPServerTransport
 {
 public:
 	SOAPHTTPServerTransport(struct _TSession *session);
@@ -54,6 +55,7 @@ public:
 
 	void SetError();
 	const char *GetCharset() const;
+	const char *GetSoapAction() const;
 	size_t Read(char *buffer, size_t buffsize);
 	size_t Write(const SOAPMethod& method, const char *payload, size_t payloadsize);
 
@@ -73,7 +75,7 @@ SOAPHTTPServerTransport::SOAPHTTPServerTransport(struct _TSession *session)
 	if (contlen)
 		m_bytestoread = atoi(contlen);
 
-	ParseContentType(m_charset, contype);
+	SOAPHTTPProtocol::ParseContentType(m_charset, contype);
 }
 
 SOAPHTTPServerTransport::~SOAPHTTPServerTransport()
@@ -90,6 +92,12 @@ const char *
 SOAPHTTPServerTransport::GetCharset() const
 {
 	return m_charset;
+}
+
+const char *
+SOAPHTTPServerTransport::GetSoapAction() const
+{
+	return TableFind(&m_session->request_headers, "soapaction");
 }
 
 size_t

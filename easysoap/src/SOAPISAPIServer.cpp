@@ -22,10 +22,11 @@
 
 #include <httpext.h>
 #include <easysoap/SOAPISAPIServer.h>
+#include <easysoap/SOAPonHTTP.h>
 
 USING_EASYSOAP_NAMESPACE
 
-class SOAPISAPITransport : public SOAPTransport
+class SOAPISAPITransport : public SOAPServerTransport
 {
 public:
 	SOAPISAPITransport(EXTENSION_CONTROL_BLOCK* pECB)
@@ -36,7 +37,7 @@ public:
 			if (sp_strcmp(m_ecb->lpszMethod, "POST"))
 				throw SOAPException("Invalid HTTP method '%s', only POST is supported.", m_ecb->lpszMethod);
 
-			ParseContentType(m_charset, m_ecb->lpszContentType);
+			SOAPHTTPProtocol::ParseContentType(m_charset, m_ecb->lpszContentType);
 			m_leftRead = m_ecb->cbTotalBytes;
 
 			char buffer[1024];
