@@ -45,6 +45,10 @@ SOAPParameter::SOAPParameter(const SOAPParameter& param)
 
 SOAPParameter::~SOAPParameter()
 {
+	for (Array::Iterator i = m_dataPtr->m_array.Begin(); i != m_dataPtr->m_array.End(); ++i)
+	{
+		(*i)->SetParent(0);
+	}
 	Reset();
 }
 
@@ -97,6 +101,7 @@ SOAPParameter::Data::Clear(Pool& pool)
 	for (Array::Iterator i = m_array.Begin(); i != m_array.End(); ++i)
 	{
 		(*i)->Reset();
+		(*i)->SetParent(0);
 		pool.Return(*i);
 	}
 
@@ -111,7 +116,7 @@ SOAPParameter::Data::Clear(Pool& pool)
 void
 SOAPParameter::Reset()
 {
-	if (m_parent)
+	if (m_parent && m_parent->m_dataPtr)
 		m_parent->m_dataPtr->m_outtasync = true;
 	m_name.GetName().Empty();
 	m_name.GetNamespace().Empty();
