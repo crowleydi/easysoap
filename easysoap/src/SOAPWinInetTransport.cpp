@@ -24,21 +24,40 @@
 #endif // _MSC_VER
 
 #include <easysoap/SOAP.h>
-#include <easysoap/SOAPSocket.h>
+#include <easysoap/SOAPonHTTP.h>
 #include <easysoap/SOAPWinInetTransport.h>
+
+#define DEFAULT_USERAGENT EASYSOAP_STRING "/" EASYSOAP_VERSION_STRING
 
 USING_EASYSOAP_NAMESPACE
 
-SOAPWinInetTransport::SOAPWinInetTransport(const char *app)
+SOAPWinInetTransport::SOAPWinInetTransport()
 : m_keepAlive(true)
-, m_hInternet(0)
-, m_hConnect(0)
-, m_hRequest(0)
+, m_hInternet(NULL)
+, m_hConnect(NULL)
+, m_hRequest(NULL)
 , m_canRead(0)
-, m_appName(app)
 {
-	if (!app)
-		m_appName = EASYSOAP_STRING "/" EASYSOAP_VERSION_STRING;
+}
+
+SOAPWinInetTransport::SOAPWinInetTransport(const SOAPUrl& endpoint)
+: m_keepAlive(true)
+, m_hInternet(NULL)
+, m_hConnect(NULL)
+, m_hRequest(NULL)
+, m_canRead(0)
+{
+	ConnectTo(endpoint);
+}
+
+SOAPWinInetTransport::SOAPWinInetTransport(const SOAPUrl& endpoint, const SOAPUrl& proxy)
+: m_keepAlive(true)
+, m_hInternet(NULL)
+, m_hConnect(NULL)
+, m_hRequest(NULL)
+, m_canRead(0)
+{
+	ConnectTo(endpoint, proxy);
 }
 
 SOAPWinInetTransport::~SOAPWinInetTransport()
@@ -54,7 +73,22 @@ SOAPWinInetTransport::~SOAPWinInetTransport()
 }
 
 void
-SOAPWinInetTransport::Connect(const char *endpoint, const char *proxy)
+SOAPWinInetTransport::ConnectTo(const SOAPUrl& endpoint)
+{
+	m_endpoint = endpoint;
+
+	if (m_endpoint.Protocol() != SOAPUrl::http_proto && m_endpoint.Protocol() != SOAPUrl::https_proto)
+		throw SOAPSocketException("Invalid protocol specified.  Only http and https are supported.");
+
+	m_hInternet = InternetOpenA(m_userAgent.IsEmpty() ? DEFAULT_USERAGENT : m_userAgent,
+		INTERNET_OPEN_TYPE_PRECONFIG, NULL, NULL, 0);
+
+	if (m_hInternet == NULL)
+		throw SOAPSocketException("Could not initialize internet connection: %s", GetErrorInfo());
+}
+
+void
+SOAPWinInetTransport::ConnectTo(const SOAPUrl& endpoint, const SOAPUrl& proxy)
 {
 	m_endpoint = endpoint;
 
@@ -62,10 +96,9 @@ SOAPWinInetTransport::Connect(const char *endpoint, const char *proxy)
 		throw SOAPSocketException("Invalid protocol specified.  Only http and https are supported.");
 
 	DWORD ptype = INTERNET_OPEN_TYPE_PRECONFIG;
-	if (proxy)
-		ptype = INTERNET_OPEN_TYPE_PROXY;
 
-	m_hInternet = InternetOpenA(m_appName, ptype, proxy, 0, 0);
+	m_hInternet = InternetOpenA(m_userAgent.IsEmpty() ? DEFAULT_USERAGENT : m_userAgent,
+		INTERNET_OPEN_TYPE_PROXY, (const char *)proxy.GetString(), NULL, 0);
 
 	if (m_hInternet == NULL)
 		throw SOAPSocketException("Could not initialize internet connection: %s", GetErrorInfo());
@@ -77,11 +110,6 @@ SOAPWinInetTransport::Connect(const char *endpoint, const char *proxy)
 
 	if (m_hConnect == NULL)
 		throw SOAPSocketException("Failed to create connection to %s: %s", endpoint, GetErrorInfo());
-}
-
-void
-SOAPWinInetTransport::SetError()
-{
 }
 
 const char *
@@ -115,6 +143,18 @@ size_t
 SOAPWinInetTransport::Write(const SOAPMethod& method, const char *packet, size_t packetlen)
 {
 	DWORD cflags = 0;
+
+	if (!m_hConnect)
+	{
+		m_hConnect = InternetConnectA(m_hInternet,
+			m_endpoint.Hostname(), m_endpoint.Port(),
+			m_endpoint.User(), m_endpoint.Password(),
+			INTERNET_SERVICE_HTTP, 0, 0);
+	}
+
+	if (m_hConnect == NULL)
+		throw SOAPSocketException("Failed to create connection to %s: %s",
+			(const char *)m_endpoint.GetString(), GetErrorInfo());
 
 	if (m_keepAlive)
 		cflags |= INTERNET_FLAG_KEEP_CONNECTION;
@@ -150,7 +190,7 @@ SOAPWinInetTransport::Write(const SOAPMethod& method, const char *packet, size_t
 	qsize = sizeof(contenttype);
 	if (!HttpQueryInfoA(m_hRequest, HTTP_QUERY_CONTENT_TYPE, contenttype, &qsize, &index))
 		contenttype[0] = 0;
-	ParseContentType(m_charset, contenttype);
+	SOAPHTTPProtocol::ParseContentType(m_charset, contenttype);
 
 	return packetlen;
 }

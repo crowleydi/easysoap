@@ -108,34 +108,33 @@ public:
 	virtual void Close();
 	virtual bool CanRead();
 	const SOAPString& GetRequestMessage()	{return m_httpmsg;}
+
+	static void ParseContentType(SOAPString& charset, const char *contenttype);
 };
 
 
 class EASYSOAP_EXPORT SOAPonHTTP : public SOAPTransport
 {
 private:
+	SOAPonHTTP(const SOAPonHTTP&);
+	SOAPonHTTP& operator=(const SOAPonHTTP&);
+
 	SOAPHTTPProtocol	m_http;
-	SOAPUrl				m_url;
+	SOAPString			m_userAgent;
+	SOAPUrl				m_endpoint;
 
 public:
-	SOAPonHTTP() {}
-
-	SOAPonHTTP(const SOAPUrl& endpoint)
-		: m_http(endpoint)
-		, m_url(endpoint)
-	{}
-
-	SOAPonHTTP(const SOAPUrl& endpoint, const SOAPUrl& proxy)
-		: m_http(endpoint, proxy)
-		, m_url(endpoint)
-	{}
+	SOAPonHTTP(const SOAPUrl& endpoint);
+	SOAPonHTTP(const SOAPUrl& endpoint, const SOAPUrl& proxy);
 
 	virtual ~SOAPonHTTP() {}
 
-	void	SetTimeout(size_t secs) {m_http.SetTimeout(secs);}
+	void ConnectTo(const SOAPUrl& endpoint);
+	void ConnectTo(const SOAPUrl& endpoint, const SOAPUrl& proxy);
 
-	void	SetKeepAlive(bool keepAlive = false)	{m_http.SetKeepAlive(keepAlive);}
-	virtual void SetError();
+	void SetUserAgent(const char *userAgent);
+	void SetTimeout(size_t secs) {m_http.SetTimeout(secs);}
+	void SetKeepAlive(bool keepAlive = false)	{m_http.SetKeepAlive(keepAlive);}
 	//
 	//  Return charset if we know it
 	virtual const char *GetCharset() const;

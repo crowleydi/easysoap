@@ -34,11 +34,19 @@
 
 #include "SOAPSecureSocketImp.h"
 
-#ifndef SOAPUSER_AGENT
-#define SOAPUSER_AGENT EASYSOAP_STRING "/" EASYSOAP_VERSION_STRING
-#endif // SOAPUSER_AGENT
+#define DEFAULT_USERAGENT EASYSOAP_STRING "/" EASYSOAP_VERSION_STRING
 
 USING_EASYSOAP_NAMESPACE
+
+SOAPonHTTP::SOAPonHTTP(const SOAPUrl& endpoint)
+{
+	ConnectTo(endpoint);
+}
+
+SOAPonHTTP::SOAPonHTTP(const SOAPUrl& endpoint, const SOAPUrl& proxy)
+{
+	ConnectTo(endpoint, proxy);
+}
 
 // read the payload into the buffer.
 // can be called multiple times.
@@ -60,8 +68,8 @@ SOAPonHTTP::Write(const SOAPMethod& method, const char *payload, size_t payloads
 	int ret = 0;
 	while (retry--)
 	{
-		m_http.BeginPost(m_url.Path());
-		m_http.WriteHeader("User-Agent", SOAPUSER_AGENT);
+		m_http.BeginPost(m_endpoint.Path());
+		m_http.WriteHeader("User-Agent", m_userAgent.IsEmpty() ? DEFAULT_USERAGENT : m_userAgent);
 		m_http.WriteHeader("Content-Type", "text/xml; charset=\"UTF-8\"");
 
 		m_http.Write("SOAPAction: \"");
@@ -78,15 +86,15 @@ SOAPonHTTP::Write(const SOAPMethod& method, const char *payload, size_t payloads
 			if (!location)
 				throw SOAPException("HTTP code %d did not return a Location header.", ret);
 
-			SOAPUrl newurl = location;
+			SOAPUrl newendpoint = location;
 
 			// If only the path changed, we don't
 			// need to re-connect.
-			if (newurl.Hostname() != m_url.Hostname() ||
-				newurl.Port() != m_url.Port())
-				m_http.ConnectTo(m_url);
+			if (newendpoint.Hostname() != m_endpoint.Hostname() ||
+				newendpoint.Port() != m_endpoint.Port())
+				m_http.ConnectTo(newendpoint);
 
-			m_url = newurl;
+			m_endpoint = newendpoint;
 		}
 		else
 			break;
@@ -109,15 +117,24 @@ SOAPonHTTP::Write(const SOAPMethod& method, const char *payload, size_t payloads
 	return ret;
 }
 
-void
-SOAPonHTTP::SetError()
-{
-}
-
 const char *
 SOAPonHTTP::GetCharset() const
 {
 	return m_http.GetCharset();
+}
+
+void
+SOAPonHTTP::ConnectTo(const SOAPUrl& endpoint)
+{
+	m_endpoint = endpoint;
+	m_http.ConnectTo(endpoint);
+}
+
+void
+SOAPonHTTP::ConnectTo(const SOAPUrl& endpoint, const SOAPUrl& proxy)
+{
+	m_endpoint = endpoint;
+	m_http.ConnectTo(endpoint, proxy);
 }
 
 void
@@ -538,3 +555,27 @@ SOAPHTTPProtocol::Connect()
 
 	return true;
 }
+
+void
+SOAPHTTPProtocol::ParseContentType(SOAPString& str, const char *contenttype)
+{
+	str = "US-ASCII";
+	if (contenttype)
+	{
+		const char *charset = sp_strstr(contenttype, "charset=");
+		if (charset)
+		{
+			charset += 8;
+			if (*charset == '\"')
+				++charset;
+			const char *end = charset;
+
+			while (*end && *end != '\"' && *end != ';' && *end != ' ')
+				++end;
+
+			str = "";
+			str.Append(charset, end - charset);
+		}
+	}
+}
+

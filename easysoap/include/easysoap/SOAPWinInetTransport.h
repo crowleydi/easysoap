@@ -38,7 +38,7 @@ private:
 
 	SOAPString		m_charset;
 	SOAPString		m_errorString;
-	SOAPString		m_appName;
+	SOAPString		m_userAgent;
 	size_t			m_canRead;
 	bool			m_keepAlive;
 	SOAPUrl			m_endpoint;
@@ -49,13 +49,17 @@ private:
 	const char * GetErrorInfo();
 
 public:
-	SOAPWinInetTransport(const char *appName = 0);
+	SOAPWinInetTransport();
+	SOAPWinInetTransport(const SOAPUrl& endpoint);
+	SOAPWinInetTransport(const SOAPUrl& endpoint, const SOAPUrl& proxy);
 	~SOAPWinInetTransport();
 
-	void Connect(const char *endpoint, const char *proxy = 0);
+	void ConnectTo(const SOAPUrl& endpoint);
+	void ConnectTo(const SOAPUrl& endpoint, const SOAPUrl& proxy);
+
+	void SetUserAgent(const char *userAgent);
 	void SetKeepAlive(bool keepAlive = true);
 
-	void SetError();
 	const char *GetCharset() const;
 	size_t Read(char *buffer, size_t bufflen);
 	size_t Write(const SOAPMethod& method, const char *packet, size_t len);
