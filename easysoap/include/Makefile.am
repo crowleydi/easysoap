@@ -29,6 +29,7 @@ easysoap_HEADERS = \
     SOAPTransport.h \
     SOAPUrl.h \
     SOAPUtil.h \
+    SOAPonHTTP.h \
     XMLParser.h \
     es_comp.h \
     es_gcc.h \
