@@ -35,8 +35,8 @@
 // can be called multiple times.
 // returns 0 if entire payload has been read.
 
-int
-SOAPonHTTP::Read(char *buffer, int buffsize)
+size_t
+SOAPonHTTP::Read(char *buffer, size_t buffsize)
 {
 	return m_http.Read(buffer, buffsize);
 }
@@ -44,8 +44,8 @@ SOAPonHTTP::Read(char *buffer, int buffsize)
 // send the payload.  can only be called ONCE per
 // payload. 
 //
-int
-SOAPonHTTP::Write(const SOAPMethod& method, const char *payload, int payloadsize)
+size_t
+SOAPonHTTP::Write(const SOAPMethod& method, const char *payload, size_t payloadsize)
 {
 	m_http.BeginPost(m_path);
 	m_http.WriteHeader("User-Agent", SOAPUSER_AGENT);
@@ -305,10 +305,10 @@ SOAPHTTPProtocol::CanRead()
 	return super::CanRead() && m_canread != 0;
 }
 
-int
+size_t
 SOAPHTTPProtocol::Read(char *buffer, int len)
 {
-	int ret = 0;
+	size_t ret = 0;
 	if (m_canread != 0)
 	{
 		ret = super::Read(buffer, len);

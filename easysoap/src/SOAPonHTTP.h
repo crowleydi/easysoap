@@ -83,7 +83,7 @@ public:
 	const char *GetHeader(const char *header);
 	int		GetContentLength();
 
-	virtual int Read(char *buffer, int len);
+	virtual size_t Read(char *buffer, int len);
 	virtual void Close();
 	virtual bool CanRead();
 	const SOAPString& GetRequestMessage()	{return m_httpmsg;}
@@ -114,11 +114,11 @@ public:
 	// read the payload into the buffer.
 	// can be called multiple times.
 	// returns 0 if entire payload has been read.
-	virtual int Read(char *buffer, int buffsize);
+	virtual size_t Read(char *buffer, size_t buffsize);
 
 	// send the payload.  can only be called ONCE per
 	// payload.
-	virtual int Write(const SOAPMethod& method, const char *payload, int payloadsize);
+	virtual size_t Write(const SOAPMethod& method, const char *payload, size_t payloadsize);
 };
 
 

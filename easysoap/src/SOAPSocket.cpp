@@ -105,13 +105,13 @@ SOAPProtocolBase::Readbuff()
 	return bytes > 0;
 }
 
-int
-SOAPProtocolBase::Read(char *buffer, int len)
+size_t
+SOAPProtocolBase::Read(char *buffer, size_t len)
 {
 	Flush(); // in case we haven't sent everything
 	if (m_buff != m_buffend)
 	{
-		int numread = 0;
+		size_t numread = 0;
 		while (m_buff != m_buffend && numread < len)
 		{
 			*buffer++ = *m_buff++;
@@ -122,11 +122,11 @@ SOAPProtocolBase::Read(char *buffer, int len)
 	return m_socket->Read(buffer, len);
 }
 
-int
-SOAPProtocolBase::ReadLine(char *buff, int bufflen)
+size_t
+SOAPProtocolBase::ReadLine(char *buff, size_t bufflen)
 {
 	char *end = buff + bufflen;
-	int numread = 0;
+	size_t numread = 0;
 	char c;
 	while (buff != end)
 	{
@@ -167,8 +167,8 @@ SOAPProtocolBase::Flush()
 	}
 }
 
-int
-SOAPProtocolBase::Write(const char *buff, int bufflen)
+size_t
+SOAPProtocolBase::Write(const char *buff, size_t bufflen)
 {
 	const char *bend = buff + bufflen;
 	while (buff != bend)
@@ -180,21 +180,21 @@ SOAPProtocolBase::Write(const char *buff, int bufflen)
 	return bufflen;
 }
 
-int
+size_t
 SOAPProtocolBase::Write(const char *str)
 {
 	if (str)
 	{
-		int len = sp_strlen(str);
+		size_t len = sp_strlen(str);
 		return Write(str, len);
 	}
 	return 0;
 }
 
-int
+size_t
 SOAPProtocolBase::WriteLine(const char *str)
 {
-	int ret = 0;
+	size_t ret = 0;
 	if (str)
 		ret = Write(str);
 	ret += Write("\r\n", 2);

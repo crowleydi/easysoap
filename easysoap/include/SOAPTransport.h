@@ -35,11 +35,11 @@ public:
 	// read the payload into the buffer.
 	// can be called multiple times.
 	// returns 0 if entire payload has been read.
-	virtual int Read(char *buffer, int buffsize) = 0;
+	virtual size_t Read(char *buffer, size_t buffsize) = 0;
 
 	// send the payload.  can only be called ONCE per
 	// payload. 
-	virtual int Write(const SOAPMethod& method, const char *payload, int payloadsize) = 0;
+	virtual size_t Write(const SOAPMethod& method, const char *payload, size_t payloadsize) = 0;
 };
 
 

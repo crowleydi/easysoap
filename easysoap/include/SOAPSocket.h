@@ -52,8 +52,8 @@ public:
 	virtual bool IsOpen() = 0;
 	virtual void Close() = 0;
 	virtual bool Connect(const char *host, unsigned int port) = 0;
-	virtual int Read(char *buffer, int len) = 0;
-	virtual int Write(const char *buffer, int len) = 0;
+	virtual size_t Read(char *buffer, size_t len) = 0;
+	virtual size_t Write(const char *buffer, size_t len) = 0;
 
 protected:
 	SOAPSocketInterface() {}
@@ -91,19 +91,19 @@ public:
 	virtual bool Connect(const char *host, unsigned int port, bool secure = false);
 
 	// read up to len chars
-	virtual int Read(char *buffer, int len);
+	virtual size_t Read(char *buffer, size_t len);
 
 	// reads up to \r\n but doesn't add it to string
-	virtual int ReadLine(char *buff, int bufflen);
+	virtual size_t ReadLine(char *buff, size_t bufflen);
 
 	// write up to terminating null
-	virtual int Write(const char *buffer);
+	virtual size_t Write(const char *buffer);
 
 	// write len chars
-	virtual int Write(const char *buffer, int len);
+	virtual size_t Write(const char *buffer, size_t len);
 
 	// write string plus \r\n
-	virtual int WriteLine(const char *str = 0);
+	virtual size_t WriteLine(const char *str = 0);
 };
 
 #endif // !defined(AFX_SIMPLESOCKET_H__10CE9068_BA2E_4BE4_8AE2_D48D2FCA40AF__INCLUDED_)

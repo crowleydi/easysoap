@@ -45,8 +45,8 @@ SOAPSecureSocketImp::~SOAPSecureSocketImp()
 
 bool SOAPSecureSocketImp::Connect(const char *, unsigned int) {return false;}
 void SOAPSecureSocketImp::Close() { }
-int SOAPSecureSocketImp::Read(char *, int) {return 0;}
-int SOAPSecureSocketImp::Write(const char *, int) {return 0;}
+size_t SOAPSecureSocketImp::Read(char *, size_t) {return 0;}
+size_t SOAPSecureSocketImp::Write(const char *, size_t) {return 0;}
 bool SOAPSecureSocketImp::WaitRead(int sec, int usec) {return false;}
 void SOAPSecureSocketImp::InitSSL() {}
 
@@ -193,8 +193,8 @@ SOAPSecureSocketImp::WaitRead(int sec, int usec)
 	return SSL_pending(m_ssl) > 0;
 }
 
-int
-SOAPSecureSocketImp::Read(char *buff, int bufflen)
+size_t
+SOAPSecureSocketImp::Read(char *buff, size_t bufflen)
 {
 	if (!m_ssl)
 		return super::Read(buff, bufflen);
@@ -222,8 +222,8 @@ SOAPSecureSocketImp::Read(char *buff, int bufflen)
 	return bytes;
 }
 
-int
-SOAPSecureSocketImp::Write(const char *buff, int bufflen)
+size_t
+SOAPSecureSocketImp::Write(const char *buff, size_t bufflen)
 {
 	if (!m_ssl)
 		return super::Write(buff, bufflen);
