@@ -53,7 +53,6 @@ SOAPEnvelope::WriteSOAPPacket(SOAPPacketWriter& packet) const
 	packet.AddXMLNS("A", SOAP_ENC);
 	packet.AddXMLNS("s", SOAP_XSI);
 	packet.AddXMLNS("y", SOAP_XSD);
-	packet.SetNamespace("___easysoap_default_ns", "y");
 
 	// TODO: allow user to set custom encoding style
 	packet.AddAttr(SOAPEnv::encodingStyle, SOAP_ENC);
