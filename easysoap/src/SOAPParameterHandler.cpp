@@ -75,7 +75,7 @@ SOAPParameterHandler::start(SOAPParser& parser, const XML_Char *name, const XML_
 		{
 			arrayType = val;
 		}
-		else if (AttrXsiType1999 == tag || AttrXsiType2001 == tag)
+		else if (AttrXsiType2001 == tag || AttrXsiType1999 == tag)
 		{
 			elementType = val;
 			char *sep = sp_strchr(val, ':');
@@ -98,7 +98,7 @@ SOAPParameterHandler::start(SOAPParser& parser, const XML_Char *name, const XML_
 				throw SOAPException("Typename is not namespace qualified for element %s: %s", name, val);
 			}
 		}
-		else if (AttrXsiNull1999 == tag || AttrXsiNull2001 == tag)
+		else if (AttrXsiNull2001 == tag || AttrXsiNull1999 == tag)
 		{
 			if (sp_strcmp(val, "1") == 0 || sp_strcasecmp(val, "true") == 0)
 			{
@@ -187,6 +187,6 @@ SOAPParameterHandler::endElement(const XML_Char *name)
 	if (m_setvalue)
 	{
 		m_param->SetNull(false);
-		m_param->GetString() = m_str;
+		m_param->GetStringRef() = m_str;
 	}
 }
