@@ -221,6 +221,7 @@ SOAPClientSocketImp::Read(char *buff, size_t bufflen)
 		}
 		else if (bytes == SOCKET_ERROR)
 		{
+			Close();
 			throw SOAPSocketException("Error reading socket");
 		}
 		SOAPDebugger::Write(buff, bytes);
@@ -237,10 +238,12 @@ SOAPClientSocketImp::Write(const char *buff, size_t bufflen)
 		bytes = send(m_socket, buff, bufflen, 0);
 		if (bytes == SOCKET_ERROR)
 		{
+			Close();
 			throw SOAPSocketException("Error writing to socket");
 		}
 		else if (bytes != (int)bufflen)
 		{
+			Close();
 			throw SOAPSocketException("Error writing to socket, "
 					"tried to write %d bytes, wrote %d",
 					bufflen, bytes);
