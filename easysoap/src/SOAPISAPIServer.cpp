@@ -116,7 +116,16 @@ public:
 		m_ecb->dwHttpStatusCode = httpstatuscode;
 		m_ecb->lpszContentType = "text/xml; charset=\"UTF-8\"";
 		m_ecb->ServerSupportFunction(m_ecb->ConnID, HSE_REQ_SEND_RESPONSE_HEADER_EX, &header, NULL, 0);
-		m_ecb->WriteClient(m_ecb->ConnID, (void *)payload, &dwSize, HSE_IO_SYNC);
+		m_ecb->WriteClient(m_ecb->ConnID,
+			(void *)payload,
+			&dwSize,
+// Disable Nagling for IIS >= 5.0
+#if HSE_VERSION_MAJOR < 5
+			HSE_IO_SYNC | 0x00001000
+#else
+			HSE_IO_SYNC | HSE_IO_NODELAY
+#endif
+			);
 
 		return dwSize;
 	}
