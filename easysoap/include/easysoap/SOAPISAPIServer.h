@@ -31,12 +31,14 @@ BEGIN_EASYSOAP_NAMESPACE
 class EASYSOAP_EXPORT SOAPISAPIServer : public SOAPServer<SOAPISAPIServer>
 {
 public:
+	SOAPISAPIServer() : m_ioport(NULL) {}
 	SOAPISAPIServer(HANDLE ioport) : m_ioport(ioport) {}
+
 	int Handle();
+	int Handle(EXTENSION_CONTROL_BLOCK *pECB);
 
 private:
 
-	SOAPISAPIServer();
 	SOAPISAPIServer(const SOAPISAPIServer&);
 	SOAPISAPIServer& operator=(const SOAPISAPIServer&);
 

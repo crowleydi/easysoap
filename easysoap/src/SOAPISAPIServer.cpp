@@ -186,6 +186,13 @@ END_EASYSOAP_NAMESPACE
 USING_EASYSOAP_NAMESPACE
 
 int
+SOAPISAPIServer::Handle(EXTENSION_CONTROL_BLOCK *pECB)
+{
+	SOAPISAPITransport isapi(pECB);
+	return m_dispatch.Handle(isapi);
+}
+
+int
 SOAPISAPIServer::Handle()
 {
 	unsigned long	pN1, pN2; 
@@ -202,8 +209,7 @@ SOAPISAPIServer::Handle()
 			SOAPISAPIImpersonateUser impersonate(pECB);
 			if (pN2 == 0)
 			{
-				SOAPISAPITransport isapi(pECB);
-				m_dispatch.Handle(isapi);
+				Handle(pECB);
 			}
 			else
 			{
