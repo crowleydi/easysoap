@@ -107,7 +107,8 @@ public:
 	Struct& GetStruct();
 	const Struct& GetStruct() const;
 
-	SOAPParameter& AddParameter(const char *name = "item");
+	SOAPParameter& AddParameter(const char *name = "item", const char *ns = 0);
+	SOAPParameter& AddParameter(const SOAPQName& name);
 	SOAPParameter& AddParameter(const SOAPParameter& p);
 
 	const SOAPParameter& GetParameter(const char *) const;

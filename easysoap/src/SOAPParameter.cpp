@@ -311,7 +311,20 @@ SOAPParameter::GetParameter(const char *name) const
 
 
 SOAPParameter&
-SOAPParameter::AddParameter(const char *name)
+SOAPParameter::AddParameter(const char *name, const char *ns)
+{
+	SOAPParameter *ret = m_pool.Get();
+	ret->SetParent(this);
+	ret->SetName(name, ns);
+	m_dataPtr->m_array.Add(ret);
+	m_dataPtr->m_outtasync = true;
+	SetIsStruct();
+
+	return *ret;
+}
+
+SOAPParameter&
+SOAPParameter::AddParameter(const SOAPQName& name)
 {
 	SOAPParameter *ret = m_pool.Get();
 	ret->SetParent(this);
