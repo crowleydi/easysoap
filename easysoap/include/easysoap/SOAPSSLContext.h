@@ -41,7 +41,7 @@ public:
 		throw SOAPException("HTTPS NOT SUPPORTED WITHOUT OpenSSL");
 	}
 
-	ssl_ctx_st*	GetContext() {}
+	ssl_ctx_st*	GetContext() {return 0;}
 	void SetCertInfo(const char* certfile, const char* keyfile, const char* password) {}
 	~SOAPSSLContext() {}
 };
