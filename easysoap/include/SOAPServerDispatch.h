@@ -42,7 +42,7 @@ public:
 
 protected:
 	virtual bool	HandleRequest(SOAPEnvelope& request, SOAPResponse& response);
-	virtual void	HandleHeaders(SOAPEnvelope& request);
+	virtual void	HandleHeaders(SOAPEnvelope& request, SOAPResponse& response);
 
 private:
 
