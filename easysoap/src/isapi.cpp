@@ -113,12 +113,12 @@ WriteErrorMessage(EXTENSION_CONTROL_BLOCK *pECB, int error, const char *szBuffer
 	wsprintf(szStatus, "%d %s", error, HTTPReasonByStatus(error));
 
 	header.pszStatus = szStatus;
-	header.cchStatus = strlen(szStatus);
+	header.cchStatus = lstrlen(szStatus);
 	header.pszHeader = szHeader;
 	header.cchHeader = sizeof(szHeader);
 	header.fKeepConn = 0;
 
-	dwBufLen = strlen(szBuffer);
+	dwBufLen = lstrlen(szBuffer);
 
 	pECB->ServerSupportFunction(pECB->ConnID, HSE_REQ_SEND_RESPONSE_HEADER_EX,
 		&header, 0, 0);
@@ -173,6 +173,18 @@ HttpExtensionProc( EXTENSION_CONTROL_BLOCK *pECB )
 {
 	if (!pECB)
 		return HSE_STATUS_ERROR;
+
+	if (lstrcmp(pECB->lpszMethod, "GET") == 0)
+	{
+		char buffer[1024];
+		DWORD bsize = sizeof(buffer);
+		char mbuff[1200];
+
+		pECB->GetServerVariable(pECB->ConnID, pECB->lpszQueryString, buffer, &bsize);
+		wsprintf(mbuff, "<H1>%d: %s</H1>", bsize, buffer);
+		WriteErrorMessage(pECB, 405, mbuff);
+		return HSE_STATUS_ERROR;
+	}
 
 	if (lstrcmp(pECB->lpszMethod, "POST"))
 	{
