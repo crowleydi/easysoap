@@ -87,26 +87,32 @@ SOAPBodyHandler::startElement(SOAPParser& parser, const XML_Char *name, const XM
 
 	if (m_gotMethod || notRoot)
 	{
-		SOAPParameter *p = 0;
+		SOAPParameter *p = &m_body->AddParameter();
+		SOAPParameter *pid = 0;
+
+		if (href)
+		{
+			pid = parser.GetHRefParam(++href);
+			if (pid)
+				p->LinkTo(*pid);
+			else
+				parser.SetHRefParam(href, p);
+
+			return 0;
+		}
+
 		if (id)
 		{
-			p = parser.GetHRefParam(id);
-			if (!p)
-				throw SOAPException("Body handler: unknown element, id=%s", id);
-		}
-		else if (href)
-		{
-			p = parser.GetHRefParam(++href);
-			if (!p)
-				throw SOAPException("Body handler: unknown element, href=%s", href);
-		}
-		else if (notRoot)
-		{
-			p = &m_body->GetMethod().AddParameter(name);
+			pid = parser.GetHRefParam(id);
+			if (!pid)
+				parser.SetHRefParam(id, p);
 		}
 
 		m_paramHandler.SetParameter(p);
-		return m_paramHandler.start(parser, name, attrs);
+		SOAPParseEventHandler *ret = m_paramHandler.start(parser, name, attrs);
+		if (pid)
+			p->LinkTo(*pid);
+		return ret;
 	}
 
 	m_gotMethod = true;

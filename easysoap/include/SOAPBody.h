@@ -47,11 +47,14 @@ public:
 
 	void Reset();
 
+	SOAPParameter& AddParameter();
+
 private:
 
-	SOAPMethod	m_method;
-	SOAPFault	m_fault;
-	bool		m_isfault;
+	SOAPMethod					m_method;
+	SOAPFault					m_fault;
+	SOAPArray<SOAPParameter>	m_params;
+	bool						m_isfault;
 };
 
 #endif // !defined(AFX_SOAPBODY_H__2ED6E429_A5CB_4FEB_B1B1_19E83A2F8046__INCLUDED_)

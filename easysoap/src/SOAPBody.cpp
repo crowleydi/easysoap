@@ -49,6 +49,13 @@ SOAPBody::Reset()
 	m_method.Reset();
 	m_fault.Reset();
 	m_isfault = false;
+	m_params.Resize(0);
+}
+
+SOAPParameter&
+SOAPBody::AddParameter()
+{
+	return m_params.Add();
 }
 
 bool
@@ -59,7 +66,11 @@ SOAPBody::WriteSOAPPacket(SOAPPacketWriter& packet) const
 	if (m_isfault)
 		m_fault.WriteSOAPPacket(packet);
 	else
+	{
 		m_method.WriteSOAPPacket(packet);
+		for (size_t i = 0; i < m_params.Size(); ++i)
+			m_params[i].WriteSOAPPacket(packet);
+	}
 
 	packet.EndTag(SOAPEnv::Body);
 
