@@ -599,12 +599,10 @@ void ServerFunc(TConn *c)
 	int treated;
 	URIHandler *hl=(URIHandler *)(c->server)->handlers.item;
 
-	ka=c->server->keepalivemaxconn;
-
 /* GWK: change to resolve memory leak */
 	RequestInit(&r,c);
 /* GWK: end change */
-	while (ka--)
+	for (ka=c->server->keepalivemaxconn; ka > 0; --ka)
 	{
 /* GWK: change to resolve memory leak */
 		RequestFree(&r);
