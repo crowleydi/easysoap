@@ -395,6 +395,10 @@ SOURCE=.\SOAPSecureSocketImp.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\include\SOAPServer.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\include\SOAPServerDispatch.h
 # End Source File
 # Begin Source File
