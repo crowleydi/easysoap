@@ -290,6 +290,19 @@ public:
 	{
 		return !(*this == x);
 	}
+
+	//
+	// For some STL compatibility
+	typedef T* iterator;
+	typedef const T* const_iterator;
+	typedef T value_type;
+
+	const_iterator begin() const	{return Begin();}
+	const_iterator end() const		{return End();}
+	iterator begin()				{return Begin();}
+	iterator end()					{return End();}
+	size_t size() const				{return Size();}
+	void resize(size_t size)		{Resize(size);}
 };
 
 template <typename T>
@@ -352,6 +365,12 @@ public:
 	{
 		return !(*this == other);
 	}
+
+
+	//
+	// For some STL compatibilty
+	typedef T value_type;
+	void resize(size_t rows, size_t cols)	{Resize(rows, cols);}
 };
 
 #endif // __SOAPARRAY_H__
