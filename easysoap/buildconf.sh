@@ -7,10 +7,9 @@ echo "Copying libtool helper files ..."
 
 #
 # --force to ensure that we replace with current files
-# --copy to avoid symlinks; we want originals for the distro
 # --automake to make it shut up about "things to do"
 #
-libtoolize --force --copy --automake
+libtoolize --force --automake
 
 #
 # Generate the autoconf header template (config.h.in) and ./configure
