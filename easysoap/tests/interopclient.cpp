@@ -967,6 +967,8 @@ TestEchoHdrString(SOAPProxy& proxy, const Endpoint& e,
 	SOAPString str = "This is a string in the header";
 	header << str;
 
+
+	header.AddAttribute(SOAPEnv::mustUnderstand) = mustUnderstand ? "1" : "0";
 	if (actor == 1)
 		header.AddAttribute(SOAPEnv::actor) = SOAP_ACTOR_NEXT;
 	else if (actor == 2)
@@ -1015,6 +1017,7 @@ TestEchoHdrStruct(SOAPProxy& proxy, const Endpoint& e,
 
 	header << str;
 
+	header.AddAttribute(SOAPEnv::mustUnderstand) = mustUnderstand ? "1" : "0";
 	if (actor == 1)
 		header.AddAttribute(SOAPEnv::actor) = SOAP_ACTOR_NEXT;
 	else if (actor == 2)
@@ -1477,7 +1480,7 @@ TestInterop(const Endpoint& e, TestType test)
 					snprintf(stringbuff, sizeof(stringbuff), "echoHdrString mu=%d understandable=%d actor=%s",
 						mu, und, (actor == 0 ? "default" : (actor == 1 ? "next" : "other")));
 
-					snprintf(structbuff, sizeof(structbuff), "echoHdrStructg mu=%d understandable=%d actor=%s",
+					snprintf(structbuff, sizeof(structbuff), "echoHdrStruct mu=%d understandable=%d actor=%s",
 						mu, und, (actor == 0 ? "default" : (actor == 1 ? "next" : "other")));
 
 					HeaderMustUnderstand = (mu != 0);
