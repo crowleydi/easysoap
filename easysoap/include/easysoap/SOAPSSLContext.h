@@ -91,10 +91,12 @@ public:
 
 	SOAPSSLContext(MethodType methodType=SSL_v23);
 	SOAPSSLContext(const char* cafile, MethodType methodType=SSL_v23);
-	SOAPSSLContext(const char* certfile, const char* keyfile, const char* password, const char* cafile=0, MethodType methodType=SSL_v23);
+	SOAPSSLContext(const char* certfile,
+					const char* keyfile,
+					const char* password,
+					const char* cafile=0,
+					MethodType methodType=SSL_v23);
 	~SOAPSSLContext();
-	//SOAPSSLContext(const SOAPSSLContext& ctx);
-	//SOAPSSLContext& operator=(const SOAPSSLContext& ctx);
 
 	ssl_ctx_st*	GetContext();
 	void SetCAInfo(const char* cafile);
@@ -132,6 +134,9 @@ private:
 	SOAPArray<int> 		m_certerrors;
         VerifyPeerCallback      m_verifycb;
 
+
+	SOAPSSLContext(const SOAPSSLContext& ctx);
+	SOAPSSLContext& operator=(const SOAPSSLContext& ctx);
 
 	void sslinit();
         ssl_method_st* getMethod(MethodType methodType);
