@@ -49,22 +49,22 @@ private:
 public:
 	SOAPHTTPProtocol()
 		: m_canread(-1)
-		, m_doclose(false)
 		, m_httpproxy(false)
+		, m_doclose(false)
 	{}
 
 	SOAPHTTPProtocol(const SOAPUrl& endpoint)
 		: m_canread(-1)
-		, m_doclose(false)
 		, m_httpproxy(false)
+		, m_doclose(false)
 	{
 		ConnectTo(endpoint);
 	}
 
 	SOAPHTTPProtocol(const SOAPUrl& endpoint, const SOAPUrl& proxy)
 		: m_canread(-1)
-		, m_doclose(false)
 		, m_httpproxy(false)
+		, m_doclose(false)
 	{
 		ConnectTo(endpoint, proxy);
 	}

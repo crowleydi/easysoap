@@ -54,7 +54,7 @@ SOAPParameter::Assign(const SOAPParameter& param)
 	m_strval = param.m_strval;
 
 	const Array& params = param.GetArray();
-	for (int i = 0; i < params.Size(); ++i)
+	for (size_t i = 0; i < params.Size(); ++i)
 		AddParameter(params[i].GetName()) = params[i];
 }
 

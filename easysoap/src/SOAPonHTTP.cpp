@@ -182,7 +182,7 @@ SOAPHTTPProtocol::GetReply()
 	if (vers)
 	{
 		respver += atoi(++vers) * 10;
-		if (vers = sp_strchr(vers, '.'))
+		if ((vers = sp_strchr(vers, '.')))
 			respver += atoi(++vers);
 	}
 
