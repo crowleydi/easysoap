@@ -39,6 +39,11 @@ $(EASYSOAPLIB) :
 interop.html: interop.xsl interop.xml
 	sabcmd interop.xsl interop.xml interop.html
 
+interop.tar.gz: .FORCE interop.html
+	tar czf interop.tar.gz interop.html */*.txt
+
 clean:
 	rm -f core *.o interopclient interopserver interop.html
+
+.FORCE:
 
