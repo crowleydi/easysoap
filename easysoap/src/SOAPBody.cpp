@@ -42,7 +42,7 @@ SOAPBody::SOAPBody()
 
 SOAPBody::~SOAPBody()
 {
-
+	Reset();
 }
 
 void
