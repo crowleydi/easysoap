@@ -37,6 +37,8 @@
 
 #include "SOAPSecureSocketImp.h"
 
+USING_EASYSOAP_NAMESPACE
+
 #ifndef HAVE_LIBSSL
 
 SOAPSecureSocketImp::SOAPSecureSocketImp()
@@ -89,8 +91,6 @@ public:
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-
-USING_EASYSOAP_NAMESPACE
 
 SOAPSecureSocketImp::SOAPSecureSocketImp()
 : m_ssl(0)
