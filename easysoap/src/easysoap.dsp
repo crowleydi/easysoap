@@ -171,10 +171,6 @@ SOURCE=.\SOAPFault.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\SOAPFaultHandler.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=.\SOAPHeader.cpp
 # End Source File
 # Begin Source File
@@ -324,10 +320,6 @@ SOURCE=..\include\easysoap\SOAPException.h
 # Begin Source File
 
 SOURCE=..\include\easysoap\SOAPFault.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\SOAPFaultHandler.h
 # End Source File
 # Begin Source File
 
