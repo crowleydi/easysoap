@@ -1,4 +1,4 @@
-SUBDIRS = include src proj tests validator simpleserver google
+SUBDIRS = proj include src tests validator simpleserver google
 EXTRA_DIST = \
 	README \
 	README.borland \
