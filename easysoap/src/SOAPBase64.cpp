@@ -61,9 +61,9 @@ initializeBase64Tables()
 	for (i = '0'; i <= '9'; ++i)
 		base64decode[i] = 52 + i - '0';
 
-	base64decode['+'] = 62;
-	base64decode['/'] = 63;
-	base64decode[base64pad] = 0;
+	base64decode[(int)'+'] = 62;
+	base64decode[(int)'/'] = 63;
+	base64decode[(int)base64pad] = 0;
 
 	return 1;
 }
