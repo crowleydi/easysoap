@@ -13,6 +13,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "simpleserver", "simpleserve
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "validator", "validator.vcproj", "{07FDA48B-DF35-43EC-9BF2-0A3920F742AE}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "google", "google.vcproj", "{581A7626-58C8-4AB0-BDF7-A0E792574BC1}"
+EndProject
 Global
 	GlobalSection(SolutionConfiguration) = preSolution
 		ConfigName.0 = Debug
@@ -27,6 +29,7 @@ Global
 		{E330086E-26F2-47A0-A1D5-74A041466584}.0 = {773D434E-C802-4322-9C38-4A0B17D71AA9}
 		{5274D66D-DA4D-4EDF-AEA2-3EDABEF6475B}.0 = {773D434E-C802-4322-9C38-4A0B17D71AA9}
 		{07FDA48B-DF35-43EC-9BF2-0A3920F742AE}.0 = {773D434E-C802-4322-9C38-4A0B17D71AA9}
+		{581A7626-58C8-4AB0-BDF7-A0E792574BC1}.0 = {773D434E-C802-4322-9C38-4A0B17D71AA9}
 	EndGlobalSection
 	GlobalSection(ProjectConfiguration) = postSolution
 		{773D434E-C802-4322-9C38-4A0B17D71AA9}.Debug.ActiveCfg = Debug|Win32
@@ -71,6 +74,12 @@ Global
 		{07FDA48B-DF35-43EC-9BF2-0A3920F742AE}.Release.Build.0 = Release|Win32
 		{07FDA48B-DF35-43EC-9BF2-0A3920F742AE}.ReleaseSymbols.ActiveCfg = ReleaseSymbols|Win32
 		{07FDA48B-DF35-43EC-9BF2-0A3920F742AE}.ReleaseSymbols.Build.0 = ReleaseSymbols|Win32
+		{581A7626-58C8-4AB0-BDF7-A0E792574BC1}.Debug.ActiveCfg = Debug|Win32
+		{581A7626-58C8-4AB0-BDF7-A0E792574BC1}.Debug.Build.0 = Debug|Win32
+		{581A7626-58C8-4AB0-BDF7-A0E792574BC1}.Release.ActiveCfg = Release|Win32
+		{581A7626-58C8-4AB0-BDF7-A0E792574BC1}.Release.Build.0 = Release|Win32
+		{581A7626-58C8-4AB0-BDF7-A0E792574BC1}.ReleaseSymbols.ActiveCfg = ReleaseSymbols|Win32
+		{581A7626-58C8-4AB0-BDF7-A0E792574BC1}.ReleaseSymbols.Build.0 = ReleaseSymbols|Win32
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection
