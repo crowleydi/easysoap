@@ -148,7 +148,10 @@ void
 SOAPParameter::SetNull(bool isnull)
 {
 	if (isnull)
-		Reset();
+	{
+		m_flags = NULL_FLAG;
+		m_strval = (const char *)0;
+	}
 	else
 	{
 		m_flags = 0;
