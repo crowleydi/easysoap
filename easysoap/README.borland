@@ -6,9 +6,8 @@ Borland project and makefiles are included to build EasySoap version 0.6
 using Borland C++ Builder version 5.0 Update Pack 1 or the C++ compiler 5.5.
 You can probably use BCB6 too.
 
-I havent tested the makefiles with the free stand-alone comiler you can download
-from Borland. It should work, perhaps with some tweaks. It does work with
-the command line make that is part of BCB5.
+I have done limited tests with the makefiles with the free stand-alone 
+comiler you can download from Borland. It seems to work ok.
 
 win9x DOS commands are used in the main makefile makefile.mak and in 
 setup.bat (which is used also by the projects). Adapting them to NT 
@@ -52,4 +51,3 @@ run 2 of the test programs: interopclient.exe and simpletest.exe. Both of these
 communicate with a soap server at sourceforge so you need your internet hookup 
 open.4. FeedbackPost feedback to the EasySoap discussion Forum on sourceforge or 
 email me at pmcconnell@users.sourceforge.net
-
