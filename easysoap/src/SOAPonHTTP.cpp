@@ -28,7 +28,7 @@
 #include "SOAPDebugger.h"
 
 #ifndef SOAPUSER_AGENT
-#define SOAPUSER_AGENT "EasySoap++/0.2"
+#define SOAPUSER_AGENT EASYSOAP_STRING "/" EASYSOAP_VERSION_STRING
 #endif // SOAPUSER_AGENT
 
 // read the payload into the buffer.
