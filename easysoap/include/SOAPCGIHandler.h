@@ -21,102 +21,51 @@
 #if !defined(AFX_SOAPCGIHANDLER_H__E392FAB3_3022_11D5_B3F3_000000000000__INCLUDED_)
 #define AFX_SOAPCGIHANDLER_H__E392FAB3_3022_11D5_B3F3_000000000000__INCLUDED_
 
-#if _MSC_VER > 1000
-#pragma once
-#endif // _MSC_VER > 1000
-
+#include <stdio.h>
+#include "SOAP.h"
 #include "SOAPServerDispatch.h"
 //
 //
 //  A simple Transport class for CGI
 //
-class SOAPCGITransport : public SOAPTransport
+class EASYSOAP_EXPORT SOAPCGITransport : public SOAPTransport
 {
-private:
-	FILE *m_logfile;
-	FILE *m_infile;
-
 public:
-	SOAPCGITransport()
-		: m_logfile(0), m_infile(0)
-	{
-	}
+	SOAPCGITransport();
+	~SOAPCGITransport();
 
-	~SOAPCGITransport()
-	{
-		SetLogFile(0);
-		SetInFile(0);
-	}
+	const char *GetCharset() const;
+	size_t Read(char *buffer, size_t buffsize);
+	size_t Write(const SOAPMethod& method, const char *payload, size_t payloadsize);
 
-	//
 	// Log requests to this file.  Used for debugging
 	// (copies stdin to this file)
-	void SetLogFile(const char *logfile)
-	{
-		if (m_logfile)
-			fclose(m_logfile);
-		if (logfile)
-			m_logfile = fopen(logfile, "ab");
-	}
-
-	//
+	void SetLogFile(const char *logfile);
 	// Read input from this file.  Used for debugging.
 	// (reads this file instead of stdin)
-	void SetInFile(const char *infile)
-	{
-		if (m_infile)
-			fclose(m_infile);
-		if (infile)
-			m_infile = fopen(infile, "rb");
-	}
+	void SetInFile(const char *infile);
 
-	const char *GetCharset() const
-	{
-		return 0;
-	}
+private:
 
-	size_t Read(char *buffer, size_t buffsize)
-	{
-		int read = 0;
+	SOAPCGITransport(const SOAPCGITransport&);
+	SOAPCGITransport& operator=(const SOAPCGITransport&);
 
-		if (m_infile)
-			read = fread(buffer, 1, buffsize, m_infile);
-		else
-			read = fread(buffer, 1, buffsize, stdin);
-
-		if (read >0 && m_logfile)
-			fwrite(buffer, 1, read, m_logfile);
-
-		return read;
-	}
-
-	size_t Write(const SOAPMethod& method, const char *payload, size_t payloadsize)
-	{
-		fprintf(stdout, "SOAPServer: %s/%s\n", EASYSOAP_STRING, EASYSOAP_VERSION_STRING);
-		fprintf(stdout, "Content-Length: %d\n", payloadsize);
-		fprintf(stdout, "Content-Type: text/xml; charset=\"UTF-8\"\n\n");
-
-		fwrite(payload, 1, payloadsize, stdout);
-
-		return payloadsize;
-	}
+	FILE	*m_logfile;
+	FILE	*m_infile;
+	int		m_canread;
 };
 
 class SOAPCGIDispatch : public SOAPServerDispatch
 {
-private:
-	SOAPCGITransport	m_cgi;
-
 public:
-	SOAPCGIDispatch()
-		: SOAPServerDispatch(m_cgi)
-	{
-	}
+	SOAPCGIDispatch() : SOAPServerDispatch(m_cgi) {}
 
+private:
 
-	~SOAPCGIDispatch()
-	{
-	}
+	SOAPCGIDispatch(const SOAPCGIDispatch&);
+	SOAPCGIDispatch& operator=(const SOAPCGIDispatch&);
+
+	SOAPCGITransport	m_cgi;
 };
 
 
