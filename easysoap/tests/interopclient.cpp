@@ -161,6 +161,31 @@ almostequal(const SOAPArray<float>& a, const SOAPArray<float>& b)
 }
 
 bool
+TestBogusMethod(SOAPProxy& proxy,
+			const char *uri,
+			const char *soapAction,
+			bool appendMethod)
+{
+	try
+	{
+		SOAPMethod method("BogusMethod", uri, soapAction, appendMethod);
+		std::cout << "Testing " << method.GetName() << ": ";
+		proxy.Execute(method);
+		std::cout << "FAIL" << std::endl;
+		return true;
+	}
+	catch (SOAPException& sex)
+	{
+		std::cout << "PASS: " << sex.What() << std::endl;
+	}
+	catch (...)
+	{
+		std::cout << "FAILED (badly)" << std::endl;
+	}
+	return false;
+}
+
+bool
 TestEchoVoid(SOAPProxy& proxy,
 			const char *uri,
 			const char *soapAction,
@@ -672,6 +697,8 @@ void TestInterop(const Endpoint& e)
 
 	SOAPProxy proxy(endpoint, httpproxy);
 
+	SetTraceFile(name, "BogusMethod");
+	TestBogusMethod(proxy, uri, soapAction, appendMethod);
 	SetTraceFile(name, "echoVoid");
 	TestEchoVoid(proxy, uri, soapAction, appendMethod);
 
