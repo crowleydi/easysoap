@@ -48,6 +48,10 @@
 #endif // EASYSOAP_EXPORTS
 #endif // EASYSOAP_STATIC
 
+#ifdef HAVE_TEMPLATE_KEYWORD_QUALIFIER
+#define MEMBER_TYPE(T) typename T
+#else
 #define MEMBER_TYPE(T) T
+#endif
 
 #endif // __ES_MSVC_H_

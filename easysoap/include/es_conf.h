@@ -23,10 +23,15 @@
 #define __ES_CONF_H_
 
 #define EASYSOAP_EXPORT
-#define MEMBER_TYPE(T) typename T
 
 #ifdef HAVE_CONFIG_H
 #include <es_config.h>
+#endif
+
+#ifdef HAVE_TEMPLATE_KEYWORD_QUALIFIER
+#define MEMBER_TYPE(T) typename T
+#else
+#define MEMBER_TYPE(T) T
 #endif
 
 #endif // __ES_CONF_H_
