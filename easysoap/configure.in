@@ -52,6 +52,7 @@ AC_CHECK_HEADERS( \
 	string.h \
 	unistd.h \
 	arpa/inet.h \
+	arpa/nameser.h \
 	netinet/in.h \
 	netinet/tcp.h \
 	sys/filio.h \
