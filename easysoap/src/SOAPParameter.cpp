@@ -27,10 +27,19 @@
 #include <SOAPNamespaces.h>
 #include <SOAPPacketWriter.h>
 
-#include <float.h>
+#ifdef STDC_HEADERS
 #include <stdlib.h>
 #include <math.h>
 #include <errno.h>
+#endif
+
+#ifdef HAVE_IEEEFP_H
+#include <ieeefp.h>
+#endif
+
+#ifdef HAVE_FLOAT_H
+#include <float.h>
+#endif
 
 #define NULL_FLAG   1
 #define ARRAY_FLAG  2
