@@ -39,7 +39,7 @@ RSC=rc.exe
 # PROP Use_MFC 0
 # PROP Use_Debug_Libraries 0
 # PROP Output_Dir "../win32/Release"
-# PROP Intermediate_Dir "../win32/Release"
+# PROP Intermediate_Dir "../win32/Release/obj"
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "EASYSOAP_DLL" /YX /FD /c
@@ -65,7 +65,7 @@ LINK32=link.exe
 # PROP Use_MFC 0
 # PROP Use_Debug_Libraries 1
 # PROP Output_Dir "../win32/Debug"
-# PROP Intermediate_Dir "../win32/Debug"
+# PROP Intermediate_Dir "../win32/Debug/obj"
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "../include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "EASYSOAP_DLL" /YX /FD /GZ /c
@@ -172,11 +172,11 @@ SOURCE=.\SOAPProxy.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\SOAPResponse.cpp
+SOURCE=.\SOAPQName.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\SOAPResponseHandler.cpp
+SOURCE=.\SOAPResponse.cpp
 # End Source File
 # Begin Source File
 
@@ -225,6 +225,10 @@ SOURCE=..\include\SOAPBody.h
 # Begin Source File
 
 SOURCE=.\SOAPBodyHandler.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\SOAPCGIHandler.h
 # End Source File
 # Begin Source File
 
@@ -308,11 +312,11 @@ SOURCE=..\include\SOAPProxy.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\SOAPResponse.h
+SOURCE=..\include\SOAPQName.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\SOAPResponseHandler.h
+SOURCE=..\include\SOAPResponse.h
 # End Source File
 # Begin Source File
 
