@@ -1,5 +1,11 @@
 
-0.1.3
+0.1.4, aka Foot and Mouth 23-Mar-2001
+	No real new features.  Added some stuff for configuring on
+	a per compiler basis.  I don't like it.  I really need to
+	do autoconf.  Now compiles on Cygwin32, MS VC++, Linux, FreeBSD
+	Sun Solaris 5.8 (gcc), Compaq Tru64 (gcc), and maybe Codewarrior.
+	
+0.1.3, aka Roadkill 5-Feb-2001
 	Abstracted the transport mechanism by creating SOAPTransport
 	class and SOAPonHTTP class.  It should be trivial (easier) to
 	implement your own transport and add new ones.
@@ -12,7 +18,7 @@
 	See http://www.xmethods.net/detail.html?id=11 and
 	http://www.xmethods.net/detail.html?id=10
 
-0.1.2, aka Groundhog
+0.1.2, aka Groundhog 2-Feb-2001
 	Fixed SSL, wasn't handling SSL_ERROR_WANT_READ/WRITE return codes.
 	Compiles cleanly with -Wall.
 	Fixed bug with error message for XML_Parse.
@@ -25,10 +31,10 @@
 	Fixed User-Agent.
 	Use streams in tests.cpp.
 
-0.1.1, aka Burnt Chicken
+0.1.1, aka Burnt Chicken, 26-Jan-2001
 	A bit of cleanup to make it easier to compile.
 	Compiles on Linux.
 
-0.1
+0.1 25-Jan-2001
 	Initial Release.
 
