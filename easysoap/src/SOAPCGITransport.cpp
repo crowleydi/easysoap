@@ -19,17 +19,16 @@
  * $Id$
  */
 
-#include <stdio.h>
+
+#include <SOAPCGIServer.h>
+#include <SOAPCGITransport.h>
 
 #ifdef _WIN32
 #include <fcntl.h>
 #include <io.h>
 #endif // _WIN32
 
-#include <SOAPCGIServer.h>
-#include <SOAPCGITransport.h>
-
-		
+	
 		
 SOAPCGITransport::SOAPCGITransport()
 : m_logfile(0)
