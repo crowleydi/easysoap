@@ -36,8 +36,9 @@ public:
 	typedef SOAPHashMap<SOAPString, SOAPParameter>	Struct;
 
 	SOAPParameter()
+		: m_type(SOAPTypes::xsd_none)
+		, m_struct(0)
 	{
-		init();
 	}
 
 	SOAPParameter(const SOAPParameter& param);
@@ -109,13 +110,21 @@ public:
 	{
 		return m_array;
 	}
-	const Array& GetArray() const	{return m_array;}
+
+	const Array& GetArray() const
+	{
+		return m_array;
+	}
 
 	Struct& GetStruct()
 	{
-		return m_struct;
+		return *m_struct;
 	}
-	const Struct& GetStruct() const	{return m_struct;}
+
+	const Struct& GetStruct() const
+	{
+		return *m_struct;
+	}
 
 
 	SOAPParameter& AddParameter()
@@ -138,13 +147,6 @@ public:
 
 private:
 	const char *GetXsdString() const;
-	void init()
-	{
-		m_type = SOAPTypes::xsd_none;
-		m_strval = "";
-		m_struct = 0;
-		m_array = 0;
-	}
 
 	static unsigned int		m_gensym;
 
@@ -153,7 +155,8 @@ private:
 
 	SOAPString		m_strval;
 	Array			m_array;
-	Struct			m_struct;
+	// MS compiler SUCKS
+	Struct			*m_struct;
 };
 
 #endif // !defined(AFX_SOAPPARAMETER_H__30811BAD_D6A1_4535_B256_9EEB56A84026__INCLUDED_)

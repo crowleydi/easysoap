@@ -35,6 +35,7 @@ unsigned int SOAPParameter::m_gensym = 0;
 
 SOAPParameter::~SOAPParameter()
 {
+	delete m_struct;
 }
 
 SOAPParameter::SOAPParameter(const SOAPParameter& param)
@@ -43,9 +44,11 @@ SOAPParameter::SOAPParameter(const SOAPParameter& param)
 	m_type = param.m_type;
 
 	m_strval = param.m_strval;
+	m_struct = 0;
 
 	GetArray() = param.GetArray();
-	GetStruct() = param.GetStruct();
+	if (param.m_struct)
+		GetStruct() = param.GetStruct();
 }
 
 SOAPParameter&
@@ -57,7 +60,8 @@ SOAPParameter::operator=(const SOAPParameter& param)
 	m_strval = param.m_strval;
 
 	GetArray() = param.GetArray();
-	GetStruct() = param.GetStruct();
+	if (param.m_struct)
+		GetStruct() = param.GetStruct();
 
 	return *this;
 }
@@ -73,7 +77,8 @@ SOAPParameter::Reset()
 {
 	SetType(SOAPTypes::xsd_none);
 	m_array.Resize(0);
-	m_struct.Clear();
+	if (m_struct)
+		m_struct->Clear();
 }
 
 void
