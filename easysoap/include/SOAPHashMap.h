@@ -426,7 +426,7 @@ private:
 			}
 		}
 
-		m_resizeThreshold = m_fillfactor * newsize;
+		m_resizeThreshold = (size_t)(m_fillfactor * newsize);
 		m_elements.AttachTo(newelements);
 	}
 
