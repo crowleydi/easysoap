@@ -135,6 +135,22 @@ SOURCE=..\src\isapi.def
 
 SOURCE=.\simpleisapi.cpp
 # End Source File
+# Begin Source File
+
+SOURCE=..\tests\SOAPBuildersHeaderHandler.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\tests\SOAPBuildersInteropHandler.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\tests\SOAPBuildersInteropHandlerA.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\tests\SOAPBuildersInteropHandlerB.cpp
+# End Source File
 # End Group
 # Begin Group "Header Files"
 
@@ -142,6 +158,18 @@ SOURCE=.\simpleisapi.cpp
 # Begin Source File
 
 SOURCE=.\calchandler.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\tests\interopstruct.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\tests\SOAPBuildersHeaderHandler.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\tests\SOAPBuildersInteropHandler.h
 # End Source File
 # End Group
 # Begin Group "Resource Files"
