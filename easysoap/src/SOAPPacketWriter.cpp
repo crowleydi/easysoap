@@ -77,14 +77,12 @@ SOAPPacketWriter::StartTag(const char *tag)
 }
 
 void
-SOAPPacketWriter::StartNSTag(const char *ns,
-							 const char *tag,
-							 const char *prefix)
+SOAPPacketWriter::StartTag(const SOAPQName& tag, const char *prefix)
 {
 	const char *nstag = 0;
 	bool addxmlns = false;
 	char buffer[64];
-	NamespaceMap::Iterator i = m_nsmap.Find(ns);
+	NamespaceMap::Iterator i = m_nsmap.Find(tag.GetNamespace());
 	if (!i)
 	{
 		addxmlns = true;
@@ -102,16 +100,15 @@ SOAPPacketWriter::StartNSTag(const char *ns,
 	Write("<");
 	Write(nstag);
 	Write(":");
-	Write(tag);
+	Write(tag.GetName());
 	m_instart = true;
 
 	if (addxmlns)
-		AddXMLNS(nstag, ns);
+		AddXMLNS(nstag, tag.GetNamespace());
 }
 
 void
-SOAPPacketWriter::AddNSAttr(const char *ns, const char *tag,
-							const char *value)
+SOAPPacketWriter::AddAttr(const SOAPQName& tag, const char *value)
 {
 	const char *nstag = 0;
 	bool addxmlns = false;
@@ -120,7 +117,7 @@ SOAPPacketWriter::AddNSAttr(const char *ns, const char *tag,
 	if (!m_instart)
 		throw SOAPException("XML serialization error.  Adding attribute when not in start tag.");
 
-	NamespaceMap::Iterator i = m_nsmap.Find(ns);
+	NamespaceMap::Iterator i = m_nsmap.Find(tag.GetNamespace());
 	if (!i)
 	{
 		addxmlns = true;
@@ -138,18 +135,17 @@ SOAPPacketWriter::AddNSAttr(const char *ns, const char *tag,
 #endif
 	Write(nstag);
 	Write(":");
-	Write(tag);
+	Write(tag.GetName());
 	Write("=\"");
 	WriteEscaped(value);
 	Write("\"");
 
 	if (addxmlns)
-		AddXMLNS(nstag, ns);
+		AddXMLNS(nstag, tag.GetNamespace());
 }
 
 void
-SOAPPacketWriter::AddNSAttr(const char *tns, const char *tag,
-							const char *vns, const char *value)
+SOAPPacketWriter::AddAttr(const SOAPQName& tag, const SOAPQName& value)
 {
 	const char *tnstag = 0;
 	const char *vnstag = 0;
@@ -161,7 +157,7 @@ SOAPPacketWriter::AddNSAttr(const char *tns, const char *tag,
 	if (!m_instart)
 		throw SOAPException("XML serialization error.  Adding attribute when not in start tag.");
 
-	NamespaceMap::Iterator i = m_nsmap.Find(tns);
+	NamespaceMap::Iterator i = m_nsmap.Find(tag.GetNamespace());
 	if (!i)
 	{
 		addtns = true;
@@ -172,7 +168,7 @@ SOAPPacketWriter::AddNSAttr(const char *tns, const char *tag,
 		tnstag = i->Str();
 	}
 
-	i = m_nsmap.Find(vns);
+	i = m_nsmap.Find(value.GetNamespace());
 	if (!i)
 	{
 		addvns = true;
@@ -190,17 +186,17 @@ SOAPPacketWriter::AddNSAttr(const char *tns, const char *tag,
 #endif
 	Write(tnstag);
 	Write(":");
-	Write(tag);
+	Write(tag.GetName());
 	Write("=\"");
 	Write(vnstag);
 	Write(":");
-	WriteEscaped(value);
+	WriteEscaped(value.GetName());
 	Write("\"");
 
 	if (addtns)
-		AddXMLNS(tnstag, tns);
+		AddXMLNS(tnstag, tag.GetNamespace());
 	if (addvns)
-		AddXMLNS(vnstag, vns);
+		AddXMLNS(vnstag, value.GetNamespace());
 }
 
 void
@@ -268,7 +264,7 @@ SOAPPacketWriter::EndTag(const char *tag)
 }
 
 void
-SOAPPacketWriter::EndNSTag(const char *ns, const char *tag)
+SOAPPacketWriter::EndTag(const SOAPQName& tag)
 {
 	if (m_instart)
 	{
@@ -280,15 +276,16 @@ SOAPPacketWriter::EndNSTag(const char *ns, const char *tag)
 	}
 	else
 	{
-		NamespaceMap::Iterator i = m_nsmap.Find(ns);
+		NamespaceMap::Iterator i = m_nsmap.Find(tag.GetNamespace());
 		if (!i)
-			throw SOAPException("EndTag: Could not find tag for namespace: %s", ns);
+			throw SOAPException("EndTag: Could not find tag for namespace: %s",
+				(const char *)tag.GetNamespace());
 
 		const char *nstag = i->Str();
 		Write("</");
 		Write(nstag);
 		Write(":");
-		Write(tag);
+		Write(tag.GetName());
 		Write(">");
 #if ADD_WHITESPACE
 		Write("\r\n");
@@ -342,35 +339,41 @@ SOAPPacketWriter::Resize()
 void
 SOAPPacketWriter::Write(const char *str)
 {
-	while (*str)
+	if (str)
 	{
-		if (m_buffptr == m_buffend)
-			Resize();
-		else
-			*m_buffptr++ = *str++;
+		while (*str)
+		{
+			if (m_buffptr == m_buffend)
+				Resize();
+			else
+				*m_buffptr++ = *str++;
+		}
 	}
 }
 
 void
 SOAPPacketWriter::WriteEscaped(const char *str)
 {
-	while (*str)
+	if (str)
 	{
-		if (m_buffptr == m_buffend)
-			Resize();
-		else
+		while (*str)
 		{
-			char c = *str++;
-			switch (c)
+			if (m_buffptr == m_buffend)
+				Resize();
+			else
 			{
-			case '&':	Write("&amp;");		break;
-			case '<':	Write("&lt;");		break;
-			case '>':	Write("&gt;");		break;
-			case '\'':	Write("&apos;");	break;
-			case '\"':	Write("&quot;");	break;
-			default:
-				*m_buffptr++ = c;
-				break;
+				char c = *str++;
+				switch (c)
+				{
+				case '&':	Write("&amp;");		break;
+				case '<':	Write("&lt;");		break;
+				case '>':	Write("&gt;");		break;
+				case '\'':	Write("&apos;");	break;
+				case '\"':	Write("&quot;");	break;
+				default:
+					*m_buffptr++ = c;
+					break;
+				}
 			}
 		}
 	}
@@ -389,4 +392,9 @@ SOAPPacketWriter::Write(const char *str, int len)
 	}
 }
 
+void
+SOAPPacketWriter::SetNamespace(const char *ns, const char *tag)
+{
+	m_nsmap[ns] = tag;
+}
 

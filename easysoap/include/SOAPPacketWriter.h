@@ -35,16 +35,21 @@ public:
 	unsigned int GetLength();
 
 	void StartTag(const char *tag);
-	void StartNSTag(const char *ns, const char *tag, const char *prefix = 0);
+	void StartTag(const SOAPQName& tag, const char *prefix = 0);
+
 	void AddAttr(const char *attr, const char *value);
-	void AddNSAttr(const char *ns, const char *tag, const char *value);
-	void AddNSAttr(const char *ns, const char *tag, const char *vns, const char *value);
+	void AddAttr(const SOAPQName& attr, const char *value);
+	void AddAttr(const SOAPQName& attr, const SOAPQName& value);
+
 	void AddXMLNS(const char *prefix, const char *ns);
+
 	void EndTag(const char *tag);
-	void EndNSTag(const char *ns, const char *tag);
+	void EndTag(const SOAPQName& tag);
+
 	void WriteValue(const char *val);
 	const char *GetSymbol(char *buff, const char *prefix);
 
+	void SetNamespace(const char *ns, const char *tag);
 private:
 	void EndStart();
 	void Resize();
@@ -52,7 +57,7 @@ private:
 	void WriteEscaped(const char *str);
 	void Write(const char *str, int len);
 
-	typedef SOAPHashMap<SOAPString,SOAPString> NamespaceMap;
+	typedef SOAPHashMap<SOAPString, SOAPString> NamespaceMap;
 
 	bool			m_instart;
 	char			*m_buffer;
