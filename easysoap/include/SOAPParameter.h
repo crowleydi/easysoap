@@ -37,7 +37,7 @@ public:
 
 	typedef SOAPArray<SOAPParameter>				Array;
 	typedef SOAPHashMap<SOAPString, SOAPParameter*>	Struct;
-	typedef SOAPHashMap<SOAPString, SOAPString>		Attrs;
+	typedef SOAPHashMap<SOAPQName, SOAPString>		Attrs;
 
 	SOAPParameter();
 	SOAPParameter(const SOAPParameter& param);
@@ -78,7 +78,7 @@ public:
 	operator double() const					{return GetDouble();}
 
 	SOAPString& GetString()					{return m_strval;}
-	const SOAPString& GetString() const		{return m_strval;}
+	const SOAPString& GetString() const;
 	operator const SOAPString&() const		{return GetString();}
 
 	Array& GetArray()
@@ -115,6 +115,9 @@ public:
 	bool IsStruct() const;
 	bool IsArray() const;
 
+	const Attrs& GetAttributes() const {return m_attrs;}
+	void AddAttribute(const SOAPQName& name, const char *val);
+
 	bool WriteSOAPPacket(SOAPPacketWriter& packet, bool writetype = true) const;
 
 private:
@@ -122,17 +125,17 @@ private:
 	void Assign(const SOAPParameter&);
 	void CheckStructSync() const;
 
-	friend class SOAPParameterHandler;
-
 	SOAPParameter	*m_parent;
 	SOAPQName		m_name;
-	SOAPQName		m_type;
-	SOAPQName		m_arrayType;
+
+	SOAPQName		m_type;			// This could be moved to an attr..
+	SOAPQName		m_arrayType;	// This could be moved to an attr..
 
 	int				m_flags;
 
 	SOAPString		m_strval;
 	Array			m_array;
+	Attrs			m_attrs;
 	mutable Struct	m_struct;
 	mutable bool	m_outtasync;
 

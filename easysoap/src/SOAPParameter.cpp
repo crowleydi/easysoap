@@ -90,6 +90,9 @@ SOAPParameter::operator=(const SOAPParameter& param)
 void
 SOAPParameter::Reset()
 {
+	for (Array::Iterator i = m_array.Begin(); i != m_array.End(); ++i)
+		i->Reset();
+
 	m_array.Resize(0);
 	m_struct.Clear();
 	m_type.Clear();
@@ -146,6 +149,12 @@ SOAPParameter::SetNull(bool isnull)
 		m_flags = 0;
 		m_strval = "";
 	}
+}
+
+void
+SOAPParameter::AddAttribute(const SOAPQName& name, const char *val)
+{
+	m_attrs[name] = val;
 }
 
 void
@@ -297,11 +306,28 @@ SOAPParameter::SetValue(bool val)
 		SetBoolean("false");
 }
 
+const SOAPString&
+SOAPParameter::GetString() const
+{
+	if (IsArray())
+		throw SOAPException("Cannot convert an array to a string.");
+
+	if (IsStruct())
+		throw SOAPException("Cannot convert a struct to a string.");
+
+	return m_strval;
+}
 
 int
 SOAPParameter::GetInt() const
 {
-	if (IsNull())
+	if (IsArray())
+		throw SOAPException("Cannot convert an array to an int.");
+
+	if (IsStruct())
+		throw SOAPException("Cannot convert a struct to an int.");
+
+	if (IsNull() || m_strval.Str() == 0)
 		throw SOAPException("Cannot convert null value to integer.");
 
 	int result = strtol(m_strval, 0, 10);
@@ -317,7 +343,13 @@ SOAPParameter::GetInt() const
 bool
 SOAPParameter::GetBoolean() const
 {
-	if (IsNull())
+	if (IsArray())
+		throw SOAPException("Cannot convert an array to a boolean.");
+
+	if (IsStruct())
+		throw SOAPException("Cannot convert a struct to a boolean.");
+
+	if (IsNull() || m_strval.Str() == 0)
 		throw SOAPException("Cannot convert null value to boolean.");
 
 	if (sp_strcasecmp(m_strval, "true") == 0 ||
@@ -333,7 +365,13 @@ SOAPParameter::GetBoolean() const
 float
 SOAPParameter::GetFloat() const
 {
-	if (IsNull())
+	if (IsArray())
+		throw SOAPException("Cannot convert an array to a float.");
+
+	if (IsStruct())
+		throw SOAPException("Cannot convert a struct to a float.");
+
+	if (IsNull() || m_strval.Str() == 0)
 		throw SOAPException("Cannot convert null value to float.");
 
 	return GetDouble();
@@ -355,7 +393,13 @@ typedef union
 double
 SOAPParameter::GetDouble() const
 {
-	if (IsNull())
+	if (IsArray())
+		throw SOAPException("Cannot convert an array to a double.");
+
+	if (IsStruct())
+		throw SOAPException("Cannot convert a struct to a double.");
+
+	if (IsNull() || m_strval.Str() == 0)
 		throw SOAPException("Cannot convert null value to double.");
 
 	if (sp_strcasecmp(m_strval, "INF") == 0)
