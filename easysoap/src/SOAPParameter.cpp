@@ -384,12 +384,15 @@ SOAPParameter::CheckStructSync() const
 const SOAPQName xsitype("type", SOAP_XSI);
 const SOAPQName xsinull("null", SOAP_XSI);
 const SOAPQName arrayType("arrayType", SOAP_ENC);
+
 bool
-SOAPParameter::WriteSOAPPacket(SOAPPacketWriter& packet) const
+SOAPParameter::WriteSOAPPacket(SOAPPacketWriter& packet, bool writetype) const
 {
 	packet.StartTag(m_name);
 
-	packet.AddAttr(xsitype, m_type);
+	if (writetype)
+		packet.AddAttr(xsitype, m_type);
+
 	if (IsNull())
 	{
 		packet.AddAttr(xsinull, "1");
@@ -397,6 +400,7 @@ SOAPParameter::WriteSOAPPacket(SOAPPacketWriter& packet) const
 	else if (IsArray())
 	{
 		SOAPQName atype;
+		writetype = false;
 		if (GetArray().Size() > 0)
 		{
 			atype = GetArray()[0].GetType();
@@ -406,6 +410,7 @@ SOAPParameter::WriteSOAPPacket(SOAPPacketWriter& packet) const
 				if (atype != GetArray()[i].GetType())
 				{
 					atype.Set("ur-type", SOAP_XSD);
+					writetype = true;
 					break;
 				}
 			}
@@ -425,7 +430,7 @@ SOAPParameter::WriteSOAPPacket(SOAPPacketWriter& packet) const
 		packet.AddAttr(arrayType, atype);
 
 		for (size_t i = 0; i < GetArray().Size(); ++i)
-			GetArray()[i].WriteSOAPPacket(packet);
+			GetArray()[i].WriteSOAPPacket(packet, writetype);
 	}
 	else if (IsStruct())
 	{

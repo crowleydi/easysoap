@@ -105,14 +105,14 @@ public:
 		return m_array[i];
 	}
 
-	bool WriteSOAPPacket(SOAPPacketWriter& packet) const;
-
 	void SetIsArray();
 	void SetIsStruct();
 	void SetNull(bool isnull = true);
 	bool IsNull() const;
 	bool IsStruct() const;
 	bool IsArray() const;
+
+	bool WriteSOAPPacket(SOAPPacketWriter& packet, bool writetype = true) const;
 
 private:
 	void SetParent(SOAPParameter *parent) {m_parent = parent;}
