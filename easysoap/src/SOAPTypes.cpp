@@ -40,6 +40,7 @@ static TypeMap& GetTypeMap()
 		TypeMap& typemap = *__es_typemap;
 
 		typemap["xsd:int"] = SOAPTypes::xsd_int;
+		typemap["xsd:integer"] = SOAPTypes::xsd_int;
 		typemap["xsd:float"] = SOAPTypes::xsd_float;
 		typemap["xsd:double"] = SOAPTypes::xsd_double;
 		typemap["xsd:string"] = SOAPTypes::xsd_string;
