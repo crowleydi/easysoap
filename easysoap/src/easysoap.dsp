@@ -131,10 +131,6 @@ SOURCE=.\isapi.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\SOAPArrayHandler.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=.\SOAPBase64.cpp
 # End Source File
 # Begin Source File
@@ -199,6 +195,10 @@ SOURCE=.\SOAPMethodHandler.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\SOAPNamespaces.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\SOAPonHTTP.cpp
 # End Source File
 # Begin Source File
@@ -223,10 +223,6 @@ SOURCE=.\SOAPProxy.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\SOAPQName.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=.\SOAPResponse.cpp
 # End Source File
 # Begin Source File
@@ -244,6 +240,10 @@ SOURCE=.\SOAPSocket.cpp
 # Begin Source File
 
 SOURCE=.\SOAPStructHandler.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\SOAPTypeTraits.cpp
 # End Source File
 # Begin Source File
 
@@ -272,10 +272,6 @@ SOURCE=..\include\SOAP.h
 # Begin Source File
 
 SOURCE=..\include\SOAPArray.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\SOAPArrayHandler.h
 # End Source File
 # Begin Source File
 
@@ -416,6 +412,10 @@ SOURCE=.\SOAPStructHandler.h
 # Begin Source File
 
 SOURCE=..\include\SOAPTransport.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\SOAPTypeTraits.h
 # End Source File
 # Begin Source File
 
