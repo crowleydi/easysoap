@@ -123,7 +123,7 @@ private:
 		friend class SOAPHashMap<K,I,H,E>;
 
 		// private constuctor that can only be called by SOAPHashMap
-		ForwardHashMapIterator(const SOAPHashMap *map, Elements::Iterator index)
+		ForwardHashMapIterator(const SOAPHashMap *map, typename Elements::Iterator index)
 			: m_map(map), m_index(index), m_he(0)
 		{
 			if (m_map)
@@ -134,7 +134,7 @@ private:
 			}
 		}
 
-		ForwardHashMapIterator(const SOAPHashMap *map, Elements::Iterator index, HashElement *he)
+		ForwardHashMapIterator(const SOAPHashMap *map, typename Elements::Iterator index, HashElement *he)
 			: m_map(map), m_index(index), m_he(he)
 		{
 		}
@@ -366,8 +366,8 @@ public:
 		{
 			Clear();
 			Resize(r.GetNumBuckets());
-			SOAPHashMap<A,B,C,D>::Iterator e = r.End();
-			for (SOAPHashMap<A,B,C,D>::Iterator it = r.Begin(); it != e; ++it)
+			typename SOAPHashMap<A,B,C,D>::Iterator e = r.End();
+			for (typename SOAPHashMap<A,B,C,D>::Iterator it = r.Begin(); it != e; ++it)
 				Add(it.Key(), it.Item());
 		}
 		return *this;
@@ -397,7 +397,7 @@ public:
 	 */
 	Iterator Begin() const
 	{
-		return Iterator(this, (Elements::Iterator)m_elements.Begin());
+		return Iterator(this, (typename Elements::Iterator)m_elements.Begin());
 	}
 
 	/**
@@ -407,7 +407,7 @@ public:
 	 */
 	Iterator End() const
 	{
-		return Iterator(this, (Elements::Iterator)m_elements.End());
+		return Iterator(this, (typename Elements::Iterator)m_elements.End());
 	}
 
 
@@ -505,7 +505,7 @@ public:
 	 */
 	void Clear()
 	{
-		for (Elements::Iterator i = m_elements.Begin(); i != m_elements.End(); ++i)
+		for (typename Elements::Iterator i = m_elements.Begin(); i != m_elements.End(); ++i)
 		{
 			HashElement *he = *i;
 			while (he)
@@ -526,7 +526,7 @@ public:
 	 */
 	void Empty()
 	{
-		Elements::Iterator i;
+		typename Elements::Iterator i;
 		for (i = m_elements.Begin(); i != m_elements.End(); ++i)
 		{
 			HashElement *he = *i;
@@ -602,7 +602,7 @@ private:
 			while (he)
 			{
 				if (he->m_hash == hash && equals(he->m_key, key))
-					return Iterator(this, (Elements::Iterator)m_elements.Begin() + index, he);
+					return Iterator(this, (typename Elements::Iterator)m_elements.Begin() + index, he);
 				he = he->m_next;
 			}
 		}
@@ -617,7 +617,7 @@ private:
 
 		Elements newelements;
 		newelements.Resize(newsize);
-		Elements::Iterator i;
+		typename Elements::Iterator i;
 
 		for (i = newelements.Begin(); i != newelements.End(); ++i)
 			*i = 0;
@@ -669,7 +669,7 @@ private:
 		he->m_next = m_elements[index];
 		m_elements[index] = he;
 
-		return Iterator(this, (Elements::Iterator)m_elements.Begin() + index, he);
+		return Iterator(this, (typename Elements::Iterator)m_elements.Begin() + index, he);
 	}
 
 	// This method actually puts an object into the hashtable.
@@ -687,7 +687,7 @@ private:
 		he->m_next = m_elements[index];
 		m_elements[index] = he;
 
-		return Iterator(this, (Elements::Iterator)m_elements.Begin() + index, he);
+		return Iterator(this, (typename Elements::Iterator)m_elements.Begin() + index, he);
 	}
 
 	friend class ForwardHashMapIterator;
