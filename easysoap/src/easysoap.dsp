@@ -55,7 +55,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /machine:I386
-# ADD LINK32 ../../Expat-1.95.2/Libs/expat.lib wsock32.lib /nologo /dll /machine:I386
+# ADD LINK32 ../../Expat-1.95.2/Libs/expat.lib wsock32.lib wininet.lib /nologo /dll /machine:I386
 # SUBTRACT LINK32 /debug
 
 !ELSEIF  "$(CFG)" == "easysoap - Win32 Debug"
@@ -83,7 +83,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 ../../Expat-1.95.2/Libs/expat.lib wsock32.lib /nologo /dll /debug /machine:I386 /pdbtype:sept
+# ADD LINK32 ../../Expat-1.95.2/Libs/expat.lib wsock32.lib wininet.lib /nologo /dll /debug /machine:I386 /pdbtype:sept
 
 !ELSEIF  "$(CFG)" == "easysoap - Win32 ReleaseSymbols"
 
@@ -112,7 +112,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 ../win32/Release/expat.lib ws2_32.lib /nologo /dll /machine:I386
-# ADD LINK32 ../../Expat-1.95.2/Libs/expat.lib wsock32.lib /nologo /dll /debug /machine:I386
+# ADD LINK32 ../../Expat-1.95.2/Libs/expat.lib wsock32.lib wininet.lib /nologo /dll /debug /machine:I386
 
 !ENDIF 
 
@@ -248,6 +248,10 @@ SOURCE=.\SOAPTypeTraits.cpp
 # Begin Source File
 
 SOURCE=.\SOAPUrl.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\SOAPWinInetTransport.cpp
 # End Source File
 # Begin Source File
 
@@ -440,6 +444,10 @@ SOURCE=..\include\easysoap\SOAPUrl.h
 # Begin Source File
 
 SOURCE=..\include\easysoap\SOAPUtil.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\easysoap\SOAPWinInetTransport.h
 # End Source File
 # Begin Source File
 
