@@ -48,8 +48,11 @@ static int
 sp_strtol(const char *str)
 {
     char *endptr = 0;
-    const char *startptr = str;
-    int ret = strtol(startptr, &endptr, 10);
+	const char *startptr = str;
+	int ret;
+
+	errno = 0;
+	ret	= strtol(startptr, &endptr, 10);
 
     if (endptr)
     {
@@ -100,7 +103,10 @@ sp_strtod(const char *str)
 
 	char *endptr = 0;
 	const char *startptr = str;
-	double ret = strtod(startptr, &endptr);
+	double ret;
+
+	errno = 0;
+	ret = strtod(startptr, &endptr);
 
 	if (endptr)
 	{
