@@ -466,6 +466,9 @@ SOAPTypeTraits<SOAPString>::Serialize(SOAPParameter& param, const SOAPString& va
 const SOAPParameter&
 SOAPTypeTraits<SOAPString>::Deserialize(const SOAPParameter& param, SOAPString& val)
 {
+	if (param.IsStruct())
+		throw SOAPException("Can't de-serialize a complex type into a string.");
+
 	if (param.IsNull())
 		val = (const char *)0;
 	else
