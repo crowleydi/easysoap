@@ -148,7 +148,6 @@ TestEchoString(SOAPProxy& proxy,
 	try
 	{
 		SOAPString inputValue = value;
-		SOAPString outputValue;
 
 		SOAPMethod method("echoString", uri, soapAction, appendMethod);
 		method.AddParameter("inputString") << inputValue;
@@ -156,6 +155,7 @@ TestEchoString(SOAPProxy& proxy,
 		std::cout << "Testing " << method.GetName() << ": ";
 
 		const SOAPResponse& response = proxy.Execute(method);
+		SOAPString outputValue;
 		response.GetReturnValue() >> outputValue;
 		if (inputValue != outputValue)
 			throw SOAPException("Values are not equal");
@@ -183,7 +183,6 @@ TestEchoInteger(SOAPProxy& proxy,
 	try
 	{
 		int inputValue = value;
-		int outputValue = 0;
 
 		SOAPMethod method("echoInteger", uri, soapAction, appendMethod);
 		method.AddParameter("inputInteger") << inputValue;
@@ -191,6 +190,7 @@ TestEchoInteger(SOAPProxy& proxy,
 		std::cout << "Testing " << method.GetName() << ": ";
 
 		const SOAPResponse& response = proxy.Execute(method);
+		int outputValue = 0;
 		response.GetReturnValue() >> outputValue;
 		if (inputValue != outputValue)
 			throw SOAPException("Values are not equal");
@@ -250,7 +250,6 @@ TestEchoFloat(SOAPProxy& proxy,
 	try
 	{
 		float inputValue = value;
-		float outputValue = 0;
 
 		SOAPMethod method("echoFloat", uri, soapAction, appendMethod);
 		SOAPParameter& inputParam = method.AddParameter("inputFloat");
@@ -260,6 +259,7 @@ TestEchoFloat(SOAPProxy& proxy,
 
 		const SOAPResponse& response = proxy.Execute(method);
 		const SOAPParameter& outputParam = response.GetReturnValue();
+		float outputValue = 0;
 		outputParam >> outputValue;
 
 		if (inputValue != outputValue)
@@ -352,7 +352,6 @@ TestEchoStruct(SOAPProxy& proxy,
 	try
 	{
 		SOAPInteropStruct inputValue("This is a struct string.", 68, (float)25.2456);
-		SOAPInteropStruct outputValue;
 
 		SOAPMethod method("echoStruct", uri, soapAction, appendMethod);
 		method.AddParameter("inputStruct") << inputValue;
@@ -360,6 +359,7 @@ TestEchoStruct(SOAPProxy& proxy,
 		std::cout << "Testing " << method.GetName() << ": ";
 
 		const SOAPResponse& response = proxy.Execute(method);
+		SOAPInteropStruct outputValue;
 		response.GetReturnValue() >> outputValue;
 		if (inputValue != outputValue)
 			throw SOAPException("Values are not equal");
@@ -431,13 +431,16 @@ TestEchoFloatArray(SOAPProxy& proxy,
 	try
 	{
 		SOAPArray<float> inputValue;
-		SOAPArray<float> outputValue;
 
 		inputValue.Add(1.3);
 		inputValue.Add(6.6535);
 		inputValue.Add(73.235);
 		inputValue.Add(92735.3e2);
 		inputValue.Add(-16e30);
+		inputValue.Add(-16e-30);
+		inputValue.Add(-16e30);
+		inputValue.Add(-163.0);
+		inputValue.Add(-0.1);
 
 		SOAPMethod method("echoFloatArray", uri, soapAction, appendMethod);
 		method.AddParameter("inputFloatArray") << inputValue;
@@ -445,7 +448,10 @@ TestEchoFloatArray(SOAPProxy& proxy,
 		std::cout << "Testing " << method.GetName() << ": ";
 
 		const SOAPResponse& response = proxy.Execute(method);
+
+		SOAPArray<float> outputValue;
 		response.GetReturnValue() >> outputValue;
+
 		if (inputValue != outputValue)
 			throw SOAPException("Values are not equal");
 
@@ -473,7 +479,6 @@ TestEchoStringArray(SOAPProxy& proxy,
 	try
 	{
 		SOAPArray<SOAPString> inputValue;
-		SOAPArray<SOAPString> outputValue;
 
 		inputValue.Add("String 1");
 		inputValue.Add("String 2");
@@ -486,6 +491,7 @@ TestEchoStringArray(SOAPProxy& proxy,
 		std::cout << "Testing " << method.GetName() << ": ";
 
 		const SOAPResponse& response = proxy.Execute(method);
+		SOAPArray<SOAPString> outputValue;
 		response.GetReturnValue() >> outputValue;
 		if (inputValue != outputValue)
 			throw SOAPException("Values are not equal");
@@ -514,7 +520,6 @@ TestEchoStructArray(SOAPProxy& proxy,
 	try
 	{
 		SOAPArray<SOAPInteropStruct> inputValue;
-		SOAPArray<SOAPInteropStruct> outputValue;
 
 		SOAPInteropStruct& val1 = inputValue.Add();
 		SOAPInteropStruct& val2 = inputValue.Add();
@@ -538,6 +543,7 @@ TestEchoStructArray(SOAPProxy& proxy,
 		std::cout << "Testing " << method.GetName() << ": ";
 
 		const SOAPResponse& response = proxy.Execute(method);
+		SOAPArray<SOAPInteropStruct> outputValue;
 		response.GetReturnValue() >> outputValue;
 		if (inputValue != outputValue)
 			throw SOAPException("Values are not equal");
@@ -566,7 +572,7 @@ TestInterop(SOAPProxy& proxy,
 	TestEchoVoid(proxy, uri, soapAction, appendMethod);
 
 	TestEchoInteger(proxy, uri, soapAction, appendMethod, 464);
-	TestEchoFloat(proxy, uri, soapAction, appendMethod, (float)35.2);
+	TestEchoFloat(proxy, uri, soapAction, appendMethod, -3.6e-6);
 	TestEchoString(proxy, uri, soapAction, appendMethod, "This is a test string from EasySOAP++");
 	TestEchoStruct(proxy, uri, soapAction, appendMethod);
 
@@ -576,6 +582,8 @@ TestInterop(SOAPProxy& proxy,
 	TestEchoStructArray(proxy, uri, soapAction, appendMethod);
 
 	// Lets test some boundry cases...
+	//TestEchoFloat(proxy, uri, soapAction, appendMethod, -35.6e-22);
+	//TestEchoFloat(proxy, uri, soapAction, appendMethod, -35.6e22);
 	//TestEchoIntegerInvalid(proxy, uri, soapAction, appendMethod, "2147483648");
 	//TestEchoIntegerInvalid(proxy, uri, soapAction, appendMethod, "-2147483649");
 	//TestEchoFloat(proxy, uri, soapAction, appendMethod, "NaN");
@@ -662,8 +670,8 @@ main(int argc, char* argv[])
 
 		/****** These have problems... ******/
 
-		TestInterop("White Mesa SOAP RPC 1.4",
-			"http://services2.xmethods.net:8080/interop",
+		TestInterop("White Mesa SOAP RPC 2.0",
+			"http://services3.xmethods.net:8080/interop",
 			"urn:soapinterop#", true,
 			"http://soapinterop.org/");/**/
 
