@@ -127,13 +127,14 @@ sp_strcasecmp(const char *a, const char *b)
 	int ret = 0;
 	if (a && b)
 	{
-		int ua = sp_toupper(*a++);
-		int ub = sp_toupper(*b++);
-		while (ua && ub && ua == ub)
+		int ua;
+		int ub;
+		do
 		{
 			ua = sp_toupper(*a++);
 			ub = sp_toupper(*b++);
 		}
+		while (ua && ub && ua == ub);
 		ret = ua - ub;
 	}
 	else if (a)
@@ -175,10 +176,12 @@ sp_isspace(char c)
 {
 	switch (c)
 	{
-	case '\r':
-	case '\n':
-	case '\t':
-	case ' ':
+	case '\r':	// carriage return
+	case '\n':	// newline
+	case '\t':	// tab
+	case '\v':	// vertical tab
+	case '\f':	// form feed
+	case ' ':   // space
 		return true;
 	}
 	return false;
@@ -190,10 +193,8 @@ sp_strchr(const char *s, char c)
 	if (s)
 	{
 		do
-		{
 			if (*s == c)
 				return (char*)s;
-		}
 		while (*s++);
 	}
 	return 0;
@@ -208,11 +209,9 @@ sp_strrchr(const char *s, char c)
 		while (*w++)
 			;
 
-		while (w != s)
-		{
-			if (*--w == c)
+		while (w-- != s)
+			if (*w == c)
 				return (char*)w;
-		}
 	}
 	return 0;
 }
@@ -271,6 +270,10 @@ sp_maximum(const T& a, const T& b)
 	return (a < b) ? b : a;
 }
 
+
+//
+// Functions to convert between
+// UTF16 and UCS character encoding.
 template <typename T>
 inline bool
 ConvertUCStoUTF16(int c, T& utf16)
@@ -323,9 +326,8 @@ ConvertUTF16toUCS(T& utf16, int& c)
 // UTF8 and UCS character encoding.
 //
 // T is an iterator.  (or pointer)
-template <typename T>
 inline bool
-ConvertUCStoUTF8(int c, T& utf8)
+ConvertUCStoUTF8(int c, char *& utf8)
 {
 	if (c <= 0x7F)
 	{
@@ -381,9 +383,8 @@ ConvertUCStoUTF8(int c, T& utf8)
 	return true;
 }
 
-template <typename T>
 inline bool
-ConvertUTF8toUCS(T& utf8, int& c)
+ConvertUTF8toUCS(const char *& utf8, int& c)
 {
 	int b = *utf8++;
 	if (b <= 0x7F)
