@@ -202,7 +202,7 @@ SOAPSecureSocketImp::InitSSL()
 
 const char*  
 SOAPSecureSocketImp::CheckForCertError(int rc) {
-	SOAPString msg = "";
+	const char *msg = 0;
 	if (!m_context->IgnoreCertError(rc)) {
 		switch(rc) {
 			case X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT:
@@ -264,7 +264,7 @@ SOAPSecureSocketImp::CheckForCertError(int rc) {
 				break;
 		}
 	}
-	return msg.Str();
+	return msg;
 }
 
 void
@@ -276,9 +276,9 @@ SOAPSecureSocketImp::VerifyCert(const char* host)
 
 	int rc = SSL_get_verify_result(m_ssl);
 	
-	SOAPString msg = CheckForCertError(rc);
-	if (msg != "")
-		throw SOAPException("Error verifying peer certificate: %s", msg.Str());
+	const char *msg = CheckForCertError(rc);
+	if (msg)
+		throw SOAPException("Error verifying peer certificate: %s", msg);
 
 	char buf[256];
 	X509_NAME_get_text_by_NID(X509_get_subject_name(server_cert),
