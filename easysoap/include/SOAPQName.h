@@ -119,6 +119,7 @@ private:
 	SOAPString	m_namespace;
 };
 
+template <>
 struct SOAPHashCodeFunctor<SOAPQName>
 {
 	size_t operator()(const SOAPQName& val) const

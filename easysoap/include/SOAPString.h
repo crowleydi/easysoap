@@ -256,6 +256,7 @@ public:
 
 #ifdef __SOAPHASHMAP_H__
 
+template <>
 struct SOAPHashCodeFunctor<SOAPString>
 {
 	size_t operator()(const SOAPString& str) const
@@ -269,6 +270,7 @@ struct SOAPHashCodeFunctor<SOAPString>
 	}
 };
 
+template <>
 struct SOAPHashCodeFunctorNoCase<SOAPString>
 {
 	size_t operator()(const SOAPString& str) const
@@ -283,6 +285,7 @@ struct SOAPHashCodeFunctorNoCase<SOAPString>
 };
 
 
+template <>
 struct SOAPEqualsFunctor<SOAPString>
 {
 	bool operator()(const SOAPString& a, const SOAPString& b) const
@@ -297,6 +300,7 @@ struct SOAPEqualsFunctor<SOAPString>
 };
 
 
+template <>
 struct SOAPEqualsFunctorNoCase<SOAPString>
 {
 	bool operator()(const SOAPString& a, const SOAPString& b) const
