@@ -49,7 +49,7 @@
 ** File
 *********************************************************************/
 
-bool FileOpen(TFile *f, char *name,uint32 attrib)
+int FileOpen(TFile *f, char *name,uint32 attrib)
 {
 #ifdef _WIN32
 	return ((*f=_open(name,attrib))!=(-1));
@@ -58,7 +58,7 @@ bool FileOpen(TFile *f, char *name,uint32 attrib)
 #endif
 }
 
-bool FileOpenCreate(TFile *f, char *name,uint32 attrib)
+int FileOpenCreate(TFile *f, char *name,uint32 attrib)
 {
 #ifdef _WIN32
 	return ((*f=_open(name,attrib | O_CREAT,_S_IWRITE | _S_IREAD))!=(-1));
@@ -67,7 +67,7 @@ bool FileOpenCreate(TFile *f, char *name,uint32 attrib)
 #endif
 }
 
-bool FileWrite(TFile *f, void *buffer, uint32 len)
+int FileWrite(TFile *f, void *buffer, uint32 len)
 {
 #ifdef _WIN32
 	return (_write(*f,buffer,len)==(int32)len);
@@ -85,7 +85,7 @@ int32 FileRead(TFile *f, void *buffer, uint32 len)
 #endif
 }
 
-bool FileSeek(TFile *f, uint64 pos, uint32 attrib)
+int FileSeek(TFile *f, uint64 pos, uint32 attrib)
 {
 #ifdef _WIN32
 	return (_lseek(*f,pos,attrib)!=(-1));
@@ -106,7 +106,7 @@ uint64 FileSize(TFile *f)
 #endif	
 }
 
-bool FileClose(TFile *f)
+int FileClose(TFile *f)
 {
 #ifdef _WIN32
 	return (_close(*f)!=(-1));
@@ -115,7 +115,7 @@ bool FileClose(TFile *f)
 #endif
 }
 
-bool FileStat(char *filename,TFileStat *filestat)
+int FileStat(char *filename,TFileStat *filestat)
 {
 #ifdef _WIN32
 	return (_stati64(filename,filestat)!=(-1));
@@ -124,10 +124,10 @@ bool FileStat(char *filename,TFileStat *filestat)
 #endif
 }
 
-bool FileFindFirst(TFileFind *filefind,char *path,TFileInfo *fileinfo)
+int FileFindFirst(TFileFind *filefind,char *path,TFileInfo *fileinfo)
 {
 #ifdef _WIN32
-	bool ret;
+	int ret;
 	char *p=path+strlen(path);
 
 	*p='\\';
@@ -146,7 +146,7 @@ bool FileFindFirst(TFileFind *filefind,char *path,TFileInfo *fileinfo)
 #endif
 }
 
-bool FileFindNext(TFileFind *filefind,TFileInfo *fileinfo)
+int FileFindNext(TFileFind *filefind,TFileInfo *fileinfo)
 {
 #ifdef _WIN32
 	return (_findnext(*filefind,fileinfo)!=(-1));

@@ -58,7 +58,7 @@ uint32 ConnJob(TConn *c)
 	return 0;
 }
 
-bool ConnCreate(TConn *c, TSocket *s, void (*func)(TConn *))
+int ConnCreate(TConn *c, TSocket *s, void (*func)(TConn *))
 {
 	c->socket=*s;
 	c->buffersize=c->bufferpos=0;
@@ -68,7 +68,7 @@ bool ConnCreate(TConn *c, TSocket *s, void (*func)(TConn *))
 	return ThreadCreate(&(c->thread),(TThreadProc)ConnJob,c);
 }
 
-bool ConnProcess(TConn *c)
+int ConnProcess(TConn *c)
 {
 /******* Must check this undef *****/
 #ifndef _WIN32
@@ -77,7 +77,7 @@ bool ConnProcess(TConn *c)
 	return ThreadRun(&(c->thread));
 }
 
-bool ConnKill(TConn *c)
+int ConnKill(TConn *c)
 {
 	c->connected=FALSE;
 	return ThreadKill(&(c->thread));
@@ -97,7 +97,7 @@ void ConnReadInit(TConn *c)
 	c->inbytes=c->outbytes=0;
 }
 
-bool ConnRead(TConn *c,uint32 timeout)
+int ConnRead(TConn *c,uint32 timeout)
 {
 	while (SocketWait(&(c->socket),TRUE,FALSE,timeout*1000)==1)
 	{
@@ -137,14 +137,44 @@ bool ConnRead(TConn *c,uint32 timeout)
 
 	return FALSE;
 }
-			
-bool ConnWrite(TConn *c,void *buffer,uint32 size)
+
+int ConnReadRaw(TConn *c, char *buffer, uint32 len, uint32 timeout, uint32 *read)
+{
+	int bufflen = c->buffersize - c->bufferpos;
+	uint32 toread = len;
+	if (bufflen > 0)
+	{
+		if (toread > (size_t)bufflen)
+			toread = bufflen;
+		memcpy(buffer, c->buffer + c->bufferpos, toread);
+		c->bufferpos += toread;
+		*read = toread;
+		return TRUE;
+	}
+	else
+	{
+		/* we have to read from the socket */
+		if (SocketWait(&(c->socket),TRUE,FALSE,timeout*1000)==1)
+		{
+			uint32 avail=SocketAvailableReadBytes(&(c->socket));
+			if (avail < toread)
+				toread = avail;
+			*read = SocketRead(&(c->socket), buffer, toread);
+			if (*read > 0)
+				return TRUE;
+		}
+		*read = 0;
+		return FALSE;
+	}
+}
+
+int ConnWrite(TConn *c,void *buffer,uint32 size)
 {
 	c->outbytes+=size;
 	return SocketWrite(&(c->socket),buffer,size);
 }
 
-bool ConnWriteFromFile(TConn *c,TFile *file,uint64 start,uint64 end,
+int ConnWriteFromFile(TConn *c,TFile *file,uint64 start,uint64 end,
 			void *buffer,uint32 buffersize,uint32 rate)
 {
 	uint64 y,bytesread=0;
@@ -185,10 +215,10 @@ bool ConnWriteFromFile(TConn *c,TFile *file,uint64 start,uint64 end,
 	return (bytesread>end-start);
 }
 
-bool ConnReadLine(TConn *c,char **z,uint32 timeout)
+int ConnReadLine(TConn *c,char **z,uint32 timeout)
 {
 	char *p,*t;
-	bool first=TRUE;
+	int first=TRUE;
 	uint32 to,start;
 
 	p=*z=c->buffer+c->bufferpos;
@@ -232,7 +262,9 @@ bool ConnReadLine(TConn *c,char **z,uint32 timeout)
 					*(p++)=' ';
 					continue;
 				};
-			};
+			}
+			else if (*p == CR)
+				++c->bufferpos;
 
 			c->bufferpos+=p+1-*z;
 

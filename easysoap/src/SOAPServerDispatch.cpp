@@ -11,34 +11,13 @@
 
 SOAPServerDispatch::SOAPServerDispatch()
 	: m_transport(0)
-	, m_deltrans(false)
 {
 }
 
-SOAPServerDispatch::SOAPServerDispatch(SOAPTransport& transport, bool deltrans)
-	: m_transport(0)
-	, m_deltrans(false)
-{
-	SetTransport(transport, deltrans);
-}
 
 SOAPServerDispatch::~SOAPServerDispatch()
 {
-	if (m_deltrans)
-		delete m_transport;
 }
-
-
-SOAPServerDispatch&
-SOAPServerDispatch::SetTransport(SOAPTransport& transport, bool deltrans)
-{
-	if (m_deltrans)
-		delete m_transport;
-	m_transport = &transport;
-	m_deltrans = deltrans;
-	return *this;
-}
-
 
 
 SOAPServerDispatch&
@@ -47,7 +26,6 @@ SOAPServerDispatch::DispatchTo(SOAPDispatchHandlerInterface *disp)
 	m_handlers.Add(disp);
 	return *this;
 }
-
 
 
 //
@@ -82,18 +60,21 @@ SOAPServerDispatch::WriteFault(const char *code, const char *str)
 
 
 int
-SOAPServerDispatch::Handle()
+SOAPServerDispatch::Handle(SOAPTransport& trans)
 {
 	int retval = 0;
 	const char *serverfault = "SOAP-ENV:Server";
 	const char *clientfault = "SOAP-ENV:Client";
 	const char *faultcode = serverfault;
+
+	m_transport = &trans;
+
 	try
 	{
 		// Parse the SOAP packet
 		SOAPParser parser;
 		faultcode = clientfault;
-		parser.Parse(m_request, *m_transport);
+		parser.Parse(m_request, trans);
 		faultcode = serverfault;
 
 		const SOAPMethod& requestMethod = m_request.GetBody().GetMethod();
@@ -118,6 +99,7 @@ SOAPServerDispatch::Handle()
 		//
 		// Compose our SOAP packet response
 		m_response.WriteSOAPPacket(m_writer);
+		m_response.GetBody().GetMethod().Reset();
 
 		//
 		// Send back the repsonse.
@@ -156,8 +138,7 @@ SOAPServerDispatch::HandleRequest(SOAPEnvelope& request, SOAPResponse& response)
 	{
 		//
 		// We found a handler.  Now dispatch the method
-		if ((*i)->ExecuteMethod(request.GetBody().GetMethod(),
-			response.GetBody().GetMethod()))
+		if ((*i)->ExecuteMethod(request, response.GetBody().GetMethod()))
 		{
 			handled = true;
 			break;

@@ -142,7 +142,7 @@ SOURCE=.\SOAPBodyHandler.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\SOAPCGITransport.cpp
+SOURCE=.\SOAPCGIServer.cpp
 # End Source File
 # Begin Source File
 
@@ -175,6 +175,10 @@ SOURCE=.\SOAPHeader.cpp
 # Begin Source File
 
 SOURCE=.\SOAPHeaderHandler.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\SOAPHTTPServer.cpp
 # End Source File
 # Begin Source File
 
@@ -270,7 +274,7 @@ SOURCE=.\SOAPBodyHandler.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\SOAPCGIHandler.h
+SOURCE=..\include\SOAPCGIServer.h
 # End Source File
 # Begin Source File
 
@@ -315,6 +319,10 @@ SOURCE=..\include\SOAPHeader.h
 # Begin Source File
 
 SOURCE=.\SOAPHeaderHandler.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\SOAPHTTPServer.h
 # End Source File
 # Begin Source File
 
@@ -404,6 +412,46 @@ SOURCE=..\include\XMLParser.h
 # Begin Group "Resource Files"
 
 # PROP Default_Filter "ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
+# End Group
+# Begin Group "abyss"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=.\abyss\src\abyss.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\abyss\src\conn.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\abyss\src\data.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\abyss\src\file.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\abyss\src\http.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\abyss\src\server.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\abyss\src\socket.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\abyss\src\thread.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\abyss\src\trace.c
+# End Source File
 # End Group
 # End Target
 # End Project

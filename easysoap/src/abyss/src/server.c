@@ -70,7 +70,7 @@ int cmpfiledates(const TFileInfo **f1,const TFileInfo **f2)
 	return ((*f1)->time_write-(*f2)->time_write);
 }
 
-bool ServerDirectoryHandler(TSession *r,char *z,TDate *dirdate)
+int ServerDirectoryHandler(TSession *r,char *z,TDate *dirdate)
 {
 	TFileInfo fileinfo,*fi;
 	TFileFind findhandle;
@@ -78,8 +78,8 @@ bool ServerDirectoryHandler(TSession *r,char *z,TDate *dirdate)
 	TList list;
 	int16 i;
 	uint32 k;
-	bool text=FALSE;
-	bool ascending=TRUE;
+	int text=FALSE;
+	int ascending=TRUE;
 	uint16 sort=1;	/* 1=by name, 2=by date */
 	struct tm ftm;
 	TPool pool;
@@ -323,7 +323,7 @@ bool ServerDirectoryHandler(TSession *r,char *z,TDate *dirdate)
 	return TRUE;
 }
 
-bool ServerFileHandler(TSession *r,char *z,TDate *filedate)
+int ServerFileHandler(TSession *r,char *z,TDate *filedate)
 {
 	char *mediatype;
 	TFile file;
@@ -428,12 +428,12 @@ bool ServerFileHandler(TSession *r,char *z,TDate *filedate)
 	return TRUE;
 }
 
-bool ServerDefaultHandlerFunc(TSession *r)
+int ServerDefaultHandlerFunc(TSession *r)
 {
 	char *p,z[4096];
 	TFileStat fs;
 	uint16 i;
-	bool endingslash=FALSE;
+	int endingslash=FALSE;
 	TDate objdate;
 
 	if (!RequestValidURIPath(r))
@@ -543,7 +543,7 @@ bool ServerDefaultHandlerFunc(TSession *r)
 			return ServerFileHandler(r,z,NULL);
 }
 
-bool ServerCreate(TServer *srv,char *name,uint16 port,char *filespath,
+int ServerCreate(TServer *srv,char *name,uint16 port,char *filespath,
 				  char *logfilename)
 {
 	srv->name=strdup(name);
@@ -554,6 +554,7 @@ bool ServerCreate(TServer *srv,char *name,uint16 port,char *filespath,
 	srv->keepalivemaxconn=30;
 	srv->timeout=15;
 	srv->advertise=TRUE;
+	srv->userdata=0;
 #ifdef _UNIX
 	srv->pidfile=srv->uid=srv->gid=(-1);
 #endif	/* _UNIX */
@@ -570,6 +571,16 @@ bool ServerCreate(TServer *srv,char *name,uint16 port,char *filespath,
 	};
 }
 
+void ServerSetUserData(TServer *srv, void *userdata)
+{
+	srv->userdata = userdata;
+}
+
+void *ServerGetUserData(TServer *srv)
+{
+	return srv->userdata;
+}
+
 void ServerFree(TServer *srv)
 {
 	free(srv->name);
@@ -583,7 +594,7 @@ void ServerFunc(TConn *c)
 {
 	TSession r;
 	uint32 i,ka;
-	bool treated;
+	int treated;
 	URIHandler *hl=(URIHandler *)(c->server)->handlers.item;
 
 	ka=c->server->keepalivemaxconn;
@@ -747,7 +758,7 @@ void ServerRun(TServer *srv)
 
 
 
-bool ServerAddHandler(TServer *srv,URIHandler handler)
+int ServerAddHandler(TServer *srv,URIHandler handler)
 {
 	return ListAdd(&srv->handlers,handler);
 }
@@ -757,7 +768,7 @@ void ServerDefaultHandler(TServer *srv,URIHandler handler)
 	srv->defaulthandler=handler;
 }
 
-bool LogOpen(TServer *srv, char *filename)
+int LogOpen(TServer *srv, char *filename)
 {
 	if (FileOpenCreate(&(srv->logfile),filename,O_WRONLY | O_APPEND))
 		if (MutexCreate(&(srv->logmutex)))
@@ -795,7 +806,7 @@ void LogClose(TServer *srv)
 	MutexFree(&(srv->logmutex));
 }
 
-bool SessionLog(TSession *s)
+int SessionLog(TSession *s)
 {
 	char z[1024];
 	uint32 n;

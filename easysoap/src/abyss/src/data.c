@@ -70,7 +70,7 @@ void ListFree(TList *sl)
 	ListInit(sl);
 }
 
-bool ListAdd(TList *sl,void *str)
+int ListAdd(TList *sl,void *str)
 {
 	if (sl->size>=sl->maxsize)
 	{
@@ -95,7 +95,7 @@ bool ListAdd(TList *sl,void *str)
 void NextToken(char **c);
 char *GetToken(char **c);
 
-bool ListAddFromString(TList *list,char *c)
+int ListAddFromString(TList *list,char *c)
 {
 	char *t,*p;
 
@@ -123,7 +123,7 @@ bool ListAddFromString(TList *list,char *c)
 	return TRUE;
 }
 
-bool ListFindString(TList *sl,char *str,uint16 *index)
+int ListFindString(TList *sl,char *str,uint16 *index)
 {
 	uint16 i;
 
@@ -142,7 +142,7 @@ bool ListFindString(TList *sl,char *str,uint16 *index)
 ** Buffer
 *********************************************************************/
 
-bool BufferAlloc(TBuffer *buf,uint32 memsize)
+int BufferAlloc(TBuffer *buf,uint32 memsize)
 {
 	/* ************** Implement the static buffers ***/
 	buf->staticid=0;
@@ -172,7 +172,7 @@ void BufferFree(TBuffer *buf)
 	buf->staticid=0;
 }
 
-bool BufferRealloc(TBuffer *buf,uint32 memsize)
+int BufferRealloc(TBuffer *buf,uint32 memsize)
 {
 	if (buf->staticid)
 	{
@@ -209,7 +209,7 @@ bool BufferRealloc(TBuffer *buf,uint32 memsize)
 ** String
 *********************************************************************/
 
-bool StringAlloc(TString *s)
+int StringAlloc(TString *s)
 {
 	s->size=0;
 	if (BufferAlloc(&(s->buffer),256))
@@ -221,7 +221,7 @@ bool StringAlloc(TString *s)
 		return FALSE;
 }
 
-bool StringConcat(TString *s,char *s2)
+int StringConcat(TString *s,char *s2)
 {
 	uint32 len=strlen(s2);
 
@@ -234,7 +234,7 @@ bool StringConcat(TString *s,char *s2)
 	return TRUE;
 }
 
-bool StringBlockConcat(TString *s,char *s2,char **ref)
+int StringBlockConcat(TString *s,char *s2,char **ref)
 {
 	uint32 len=strlen(s2)+1;
 
@@ -302,7 +302,7 @@ void TableFree(TTable *t)
 	TableInit(t);
 }
 
-bool TableFindIndex(TTable *t,char *name,uint16 *index)
+int TableFindIndex(TTable *t,char *name,uint16 *index)
 {
 	uint16 i,hash=Hash16(name);
 
@@ -320,7 +320,7 @@ bool TableFindIndex(TTable *t,char *name,uint16 *index)
 	return FALSE;
 }
 
-bool TableAddReplace(TTable *t,char *name,char *value)
+int TableAddReplace(TTable *t,char *name,char *value)
 {
 	uint16 i=0;
 
@@ -342,7 +342,7 @@ bool TableAddReplace(TTable *t,char *name,char *value)
 		return TableAdd(t,name,value);
 }
 
-bool TableAdd(TTable *t,char *name,char *value)
+int TableAdd(TTable *t,char *name,char *value)
 {
 	if (t->size>=t->maxsize)
 	{
@@ -396,7 +396,7 @@ TPoolZone *PoolZoneAlloc(uint32 zonesize)
 	return pz;
 }
 
-bool PoolCreate(TPool *p,uint32 zonesize)
+int PoolCreate(TPool *p,uint32 zonesize)
 {
 	p->zonesize=zonesize;
 	if (MutexCreate(&p->mutex))

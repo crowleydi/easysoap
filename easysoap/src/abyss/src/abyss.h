@@ -43,17 +43,17 @@
 ** Paths and so on...
 *********************************************************************/
 
-#ifdef _WIN32
-#define DEFAULT_ROOT		"c:\\abyss"
-#define DEFAULT_DOCS		DEFAULT_ROOT"\\htdocs"
-#define DEFAULT_CONF_FILE	DEFAULT_ROOT"\\conf\\abyss.conf"
-#define DEFAULT_LOG_FILE	DEFAULT_ROOT"\\log\\abyss.log"
-#else
-#define DEFAULT_ROOT		"/usr/local/abyss"
-#define DEFAULT_DOCS		DEFAULT_ROOT"/htdocs"
-#define DEFAULT_CONF_FILE	DEFAULT_ROOT"/conf/abyss.conf"
-#define DEFAULT_LOG_FILE	DEFAULT_ROOT"/log/abyss.log"
-#endif
+//#ifdef _WIN32
+//#define DEFAULT_ROOT		"c:\\abyss"
+//#define DEFAULT_DOCS		DEFAULT_ROOT"\\htdocs"
+//#define DEFAULT_CONF_FILE	DEFAULT_ROOT"\\conf\\abyss.conf"
+//#define DEFAULT_LOG_FILE	DEFAULT_ROOT"\\log\\abyss.log"
+//#else
+//#define DEFAULT_ROOT		"/usr/local/abyss"
+//#define DEFAULT_DOCS		DEFAULT_ROOT"/htdocs"
+//#define DEFAULT_CONF_FILE	DEFAULT_ROOT"/conf/abyss.conf"
+//#define DEFAULT_LOG_FILE	DEFAULT_ROOT"/log/abyss.log"
+//#endif
 
 /*********************************************************************
 ** Maximum numer of simultaneous connections
@@ -120,8 +120,6 @@ typedef unsigned char byte;
 typedef unsigned char uint8;
 typedef char int8;
 
-typedef int bool;
-
 /*********************************************************************
 ** Buffer
 *********************************************************************/
@@ -133,8 +131,8 @@ typedef struct
 	uint32 staticid;
 } TBuffer;
 
-bool BufferAlloc(TBuffer *buf,uint32 memsize);
-bool BufferRealloc(TBuffer *buf,uint32 memsize);
+int BufferAlloc(TBuffer *buf,uint32 memsize);
+int BufferRealloc(TBuffer *buf,uint32 memsize);
 void BufferFree(TBuffer *buf);
 
 
@@ -148,9 +146,9 @@ typedef struct
 	uint32 size;
 } TString;
 
-bool StringAlloc(TString *s);
-bool StringConcat(TString *s,char *s2);
-bool StringBlockConcat(TString *s,char *s2,char **ref);
+int StringAlloc(TString *s);
+int StringConcat(TString *s,char *s2);
+int StringBlockConcat(TString *s,char *s2,char **ref);
 void StringFree(TString *s);
 char *StringData(TString *s);
 
@@ -163,15 +161,15 @@ typedef struct
 {
 	void **item;
 	uint16 size,maxsize;
-	bool autofree;
+	int autofree;
 } TList;
 
 void ListInit(TList *sl);
 void ListInitAutoFree(TList *sl);
 void ListFree(TList *sl);
-bool ListAdd(TList *sl,void *str);
-bool ListAddFromString(TList *list,char *c);
-bool ListFindString(TList *sl,char *str,uint16 *index);
+int ListAdd(TList *sl,void *str);
+int ListAddFromString(TList *list,char *c);
+int ListFindString(TList *sl,char *str,uint16 *index);
 
 
 /*********************************************************************
@@ -192,9 +190,9 @@ typedef struct
 
 void TableInit(TTable *t);
 void TableFree(TTable *t);
-bool TableAdd(TTable *t,char *name,char *value);
-bool TableAddReplace(TTable *t,char *name,char *value);
-bool TableFindIndex(TTable *t,char *name,uint16 *index);
+int TableAdd(TTable *t,char *name,char *value);
+int TableAddReplace(TTable *t,char *name,char *value);
+int TableFindIndex(TTable *t,char *name,uint16 *index);
 char *TableFind(TTable *t,char *name);
 
 
@@ -216,10 +214,10 @@ typedef pthread_t TThread;
 typedef void* (*PTHREAD_START_ROUTINE)(void *);
 #endif	/* _WIN32 */
 
-bool ThreadCreate(TThread *t,TThreadProc func,void *arg);
-bool ThreadRun(TThread *t);
-bool ThreadStop(TThread *t);
-bool ThreadKill(TThread *t);
+int ThreadCreate(TThread *t,TThreadProc func,void *arg);
+int ThreadRun(TThread *t);
+int ThreadStop(TThread *t);
+int ThreadKill(TThread *t);
 void ThreadWait(uint32 ms);
 
 
@@ -233,10 +231,10 @@ typedef HANDLE TMutex;
 typedef pthread_mutex_t TMutex;
 #endif	/* _WIN32 */
 
-bool MutexCreate(TMutex *m);
-bool MutexLock(TMutex *m);
-bool MutexUnlock(TMutex *m);
-bool MutexTryLock(TMutex *m);
+int MutexCreate(TMutex *m);
+int MutexLock(TMutex *m);
+int MutexUnlock(TMutex *m);
+int MutexTryLock(TMutex *m);
 void MutexFree(TMutex *m);
 
 
@@ -258,7 +256,7 @@ typedef struct
 	TMutex mutex;
 } TPool;
 
-bool PoolCreate(TPool *p,uint32 zonesize);
+int PoolCreate(TPool *p,uint32 zonesize);
 void PoolFree(TPool *p);
 
 void *PoolAlloc(TPool *p,uint32 size);
@@ -294,26 +292,26 @@ typedef uint32 TSocket;
 
 typedef struct in_addr TIPAddr;
 
-bool SocketInit();
+int SocketInit();
 
-bool SocketCreate(TSocket *s);
-bool SocketClose(TSocket *s);
+int SocketCreate(TSocket *s);
+int SocketClose(TSocket *s);
 
 uint32 SocketWrite(TSocket *s, char *buffer, uint32 len);
 uint32 SocketRead(TSocket *s, char *buffer, uint32 len);
 uint32 SocketPeek(TSocket *s, char *buffer, uint32 len);
 
-bool SocketConnect(TSocket *s, TIPAddr *addr, uint16 port);
-bool SocketBind(TSocket *s, TIPAddr *addr, uint16 port);
+int SocketConnect(TSocket *s, TIPAddr *addr, uint16 port);
+int SocketBind(TSocket *s, TIPAddr *addr, uint16 port);
 
-bool SocketListen(TSocket *s, uint32 backlog);
-bool SocketAccept(TSocket *s, TSocket *ns,TIPAddr *ip);
+int SocketListen(TSocket *s, uint32 backlog);
+int SocketAccept(TSocket *s, TSocket *ns,TIPAddr *ip);
 
 uint32 SocketError();
 
-uint32 SocketWait(TSocket *s,bool rd,bool wr,uint32 timems);
+uint32 SocketWait(TSocket *s,int rd,int wr,uint32 timems);
 
-bool SocketBlocking(TSocket *s, bool b);
+int SocketBlocking(TSocket *s, int b);
 uint32 SocketAvailableReadBytes(TSocket *s);
 
 
@@ -381,27 +379,27 @@ typedef struct
 
 typedef int TFile;
 
-bool FileOpen(TFile *f, char *name, uint32 attrib);
-bool FileOpenCreate(TFile *f, char *name, uint32 attrib);
-bool FileClose(TFile *f);
+int FileOpen(TFile *f, char *name, uint32 attrib);
+int FileOpenCreate(TFile *f, char *name, uint32 attrib);
+int FileClose(TFile *f);
 
-bool FileWrite(TFile *f, void *buffer, uint32 len);
+int FileWrite(TFile *f, void *buffer, uint32 len);
 int32 FileRead(TFile *f, void *buffer, uint32 len);
 
-bool FileSeek(TFile *f, uint64 pos, uint32 attrib);
+int FileSeek(TFile *f, uint64 pos, uint32 attrib);
 uint64 FileSize(TFile *f);
 
-bool FileStat(char *filename,TFileStat *filestat);
+int FileStat(char *filename,TFileStat *filestat);
 
-bool FileFindFirst(TFileFind *filefind,char *path,TFileInfo *fileinfo);
-bool FileFindNext(TFileFind *filefind,TFileInfo *fileinfo);
+int FileFindFirst(TFileFind *filefind,char *path,TFileInfo *fileinfo);
+int FileFindNext(TFileFind *filefind,TFileInfo *fileinfo);
 void FileFindClose(TFileFind *filefind);
 
 /*********************************************************************
 ** Server (1/2)
 *********************************************************************/
 
-typedef struct
+typedef struct _TServer
 {
 	TSocket listensock;
 	TFile logfile;
@@ -413,7 +411,8 @@ typedef struct
 	TList handlers;
 	TList defaultfilenames;
 	void *defaulthandler;
-	bool advertise;
+	int advertise;
+	void *userdata;
 #ifdef _UNIX
 	uid_t uid;
 	gid_t gid;
@@ -436,7 +435,7 @@ typedef struct _TConn
 	TSocket socket;
 	TIPAddr peerip;
 	TThread thread;
-	bool connected;
+	int connected;
 	void (*job)(struct _TConn *);
 	char buffer[BUFFER_SIZE];
 } TConn;
@@ -444,16 +443,16 @@ typedef struct _TConn
 TConn *ConnAlloc();
 void ConnFree(TConn *c);
 
-bool ConnCreate(TConn *c, TSocket *s, void (*func)(TConn *));
-bool ConnProcess(TConn *c);
-bool ConnKill(TConn *c);
+int ConnCreate(TConn *c, TSocket *s, void (*func)(TConn *));
+int ConnProcess(TConn *c);
+int ConnKill(TConn *c);
 
-bool ConnWrite(TConn *c,void *buffer,uint32 size);
-bool ConnRead(TConn *c, uint32 timems);
+int ConnWrite(TConn *c,void *buffer,uint32 size);
+int ConnRead(TConn *c, uint32 timems);
 void ConnReadInit(TConn *c);
-bool ConnReadLine(TConn *c,char **z,uint32 timems);
-
-bool ConnWriteFromFile(TConn *c,TFile *file,uint64 start,uint64 end,
+int ConnReadLine(TConn *c,char **z,uint32 timems);
+int ConnReadRaw(TConn *c, char *buffer, uint32 len, uint32 timeout, uint32 *read);
+int ConnWriteFromFile(TConn *c,TFile *file,uint64 start,uint64 end,
 			void *buffer,uint32 buffersize,uint32 rate);
 
 
@@ -461,7 +460,7 @@ bool ConnWriteFromFile(TConn *c,TFile *file,uint64 start,uint64 end,
 ** Range
 *********************************************************************/
 
-bool RangeDecode(char *str,uint64 filesize,uint64 *start,uint64 *end);
+int RangeDecode(char *str,uint64 filesize,uint64 *start,uint64 *end);
 
 /*********************************************************************
 ** Date
@@ -471,17 +470,17 @@ bool RangeDecode(char *str,uint64 filesize,uint64 *start,uint64 *end);
 
 typedef struct tm TDate;
 
-bool DateToString(TDate *tm,char *s);
-bool DateToLogString(TDate *tm,char *s);
+int DateToString(TDate *tm,char *s);
+int DateToLogString(TDate *tm,char *s);
 
-bool DateDecode(char *s,TDate *tm);
+int DateDecode(char *s,TDate *tm);
 
 int32 DateCompare(TDate *d1,TDate *d2);
 
-bool DateFromGMT(TDate *d,time_t t);
-bool DateFromLocal(TDate *d,time_t t);
+int DateFromGMT(TDate *d,time_t t);
+int DateFromLocal(TDate *d,time_t t);
 
-bool DateInit();
+int DateInit();
 
 /*********************************************************************
 ** Base64
@@ -498,7 +497,7 @@ typedef enum
 	m_unknown,m_get,m_put,m_head,m_post,m_delete,m_trace,m_options
 } TMethod;
 
-typedef struct
+typedef struct _TSession
 {
 	TMethod method;
 	uint32 nbfileds;
@@ -517,8 +516,8 @@ typedef struct
 	uint16 status;
 	TString header;
 
-	bool keepalive,cankeepalive;
-	bool done;
+	int keepalive,cankeepalive;
+	int done;
 
 	TServer *server;
 	TConn *conn;
@@ -529,7 +528,7 @@ typedef struct
 
 	TDate date;
 
-	bool chunkedwrite,chunkedwritemode;
+	int chunkedwrite,chunkedwritemode;
 } TSession;
 
 /*********************************************************************
@@ -540,32 +539,32 @@ typedef struct
 #define LF		'\n'
 #define CRLF	"\r\n"
 
-bool RequestValidURI(TSession *r);
-bool RequestValidURIPath(TSession *r);
-bool RequestUnescapeURI(TSession *r);
+int RequestValidURI(TSession *r);
+int RequestValidURIPath(TSession *r);
+int RequestUnescapeURI(TSession *r);
 
 char *RequestHeaderValue(TSession *r,char *name);
 
-bool RequestRead(TSession *r);
+int RequestRead(TSession *r);
 void RequestInit(TSession *r,TConn *c);
 void RequestFree(TSession *r);
 
-bool RequestAuth(TSession *r,char *credential,char *user,char *pass);
+int RequestAuth(TSession *r,char *credential,char *user,char *pass);
 
 /*********************************************************************
 ** Response
 *********************************************************************/
 
-bool ResponseAddField(TSession *r,char *name,char *value);
+int ResponseAddField(TSession *r,char *name,char *value);
 void ResponseWrite(TSession *r);
 
-bool ResponseChunked(TSession *s);
+int ResponseChunked(TSession *s);
 
 void ResponseStatus(TSession *r,uint16 code);
 void ResponseStatusErrno(TSession *r);
 
-bool ResponseContentType(TSession *r,char *type);
-bool ResponseContentLength(TSession *r,uint64 len);
+int ResponseContentType(TSession *r,char *type);
+int ResponseContentLength(TSession *r,uint64 len);
 
 void ResponseError(TSession *r);
 
@@ -578,26 +577,28 @@ char *HTTPReasonByStatus(uint16 status);
 
 int32 HTTPRead(TSession *s,char *buffer,uint32 len);
 
-bool HTTPWrite(TSession *s,char *buffer,uint32 len);
-bool HTTPWriteEnd(TSession *s);
+int HTTPWrite(TSession *s,char *buffer,uint32 len);
+int HTTPWriteEnd(TSession *s);
 
 /*********************************************************************
 ** Server (2/2)
 *********************************************************************/
 
-typedef bool (*URIHandler) (TSession *);
+typedef int (*URIHandler) (TSession *);
 
-bool ServerCreate(TServer *srv,char *name,uint16 port,char *filespath,
+int ServerCreate(TServer *srv,char *name,uint16 port,char *filespath,
 				  char *logfilename);
 void ServerFree(TServer *srv);
 
 void ServerInit(TServer *srv);
 void ServerRun(TServer *srv);
+void ServerSetUserData(TServer *srv, void *userdata);
+void *ServerGetUserData(TServer *srv);
 
-bool ServerAddHandler(TServer *srv,URIHandler handler);
+int ServerAddHandler(TServer *srv,URIHandler handler);
 void ServerDefaultHandler(TServer *srv,URIHandler handler);
 
-bool LogOpen(TServer *srv, char *filename);
+int LogOpen(TServer *srv, char *filename);
 void LogWrite(TServer *srv,char *c);
 void LogClose(TServer *srv);
 
@@ -607,7 +608,7 @@ void LogClose(TServer *srv);
 *********************************************************************/
 
 void MIMETypeInit();
-bool MIMETypeAdd(char *type,char *ext);
+int MIMETypeAdd(char *type,char *ext);
 char *MIMETypeFromExt(char *ext);
 char *MIMETypeFromFileName(char *filename);
 char *MIMETypeGuessFromFile(char *filename);
@@ -617,8 +618,8 @@ char *MIMETypeGuessFromFile(char *filename);
 ** Conf
 *********************************************************************/
 
-bool ConfReadMIMETypes(char *filename);
-bool ConfReadServerFile(char *filename,TServer *srv);
+int ConfReadMIMETypes(char *filename);
+int ConfReadServerFile(char *filename,TServer *srv);
 
 
 /*********************************************************************
@@ -633,6 +634,6 @@ void TraceExit(char *fmt,...);
 ** Session
 *********************************************************************/
 
-bool SessionLog(TSession *s);
+int SessionLog(TSession *s);
 
 #endif	/* _ABYSS_H_ */

@@ -124,7 +124,7 @@ char *GetMultiLine(char **p)
 		};
 }
 
-bool Eol(char *p)
+int Eol(char *p)
 {
 	NextToken(&p);
 
@@ -208,11 +208,11 @@ void RequestFree(TSession *r)
 	StringFree(&(r->header));
 }
 
-bool RequestRead(TSession *r)
+int RequestRead(TSession *r)
 {
 	char *n,*t,*p;
 	uint32 vmin,vmaj;
-	bool ret,singleline=FALSE;
+	int ret,singleline=FALSE;
 
 	/* Ignore CRLFs in the beginning of the request (RFC2068-P30) */
 	do
@@ -286,6 +286,10 @@ bool RequestRead(TSession *r)
 			return FALSE;
 		};
 
+		r->keepalive = FALSE;
+		/* keepalive is default for HTTP/1.1 */
+		if (vmaj > 0 && (vmaj != 1 || vmin != 0))
+			r->keepalive = TRUE;
 		r->versionmajor=vmaj;
 		r->versionminor=vmin;
 	}
@@ -384,7 +388,7 @@ char *RequestHeaderValue(TSession *r,char *name)
 	return (TableFind(&r->request_headers,name));
 }
 
-bool RequestUnescapeURI(TSession *r)
+int RequestUnescapeURI(TSession *r)
 {
 	char *x,*y,c,d;
 
@@ -424,7 +428,7 @@ bool RequestUnescapeURI(TSession *r)
 		};
 };
 
-bool RequestValidURI(TSession *r)
+int RequestValidURI(TSession *r)
 {
 	char *p;
 
@@ -494,7 +498,7 @@ bool RequestValidURI(TSession *r)
 }
 
 
-bool RequestValidURIPath(TSession *r)
+int RequestValidURIPath(TSession *r)
 {
 	uint32 i=0;
 	char *p=r->uri;
@@ -528,7 +532,7 @@ bool RequestValidURIPath(TSession *r)
 	return ((*p==0) && (i>0));
 }
 
-bool RequestAuth(TSession *r,char *credential,char *user,char *pass)
+int RequestAuth(TSession *r,char *credential,char *user,char *pass)
 {
 	char *p,*x;
 	char z[80],t[80];
@@ -563,7 +567,7 @@ bool RequestAuth(TSession *r,char *credential,char *user,char *pass)
 ** Range
 *********************************************************************/
 
-bool RangeDecode(char *str,uint64 filesize,uint64 *start,uint64 *end)
+int RangeDecode(char *str,uint64 filesize,uint64 *start,uint64 *end)
 {
 	char *ss;
 
@@ -656,12 +660,14 @@ char *HTTPReasonByStatus(uint16 code)
 	return "No Reason";
 }
 
-int32 HTTPRead(TSession *s,char *buffer,uint32 len)
+int32 HTTPRead(TSession *s, char *buffer, uint32 len)
 {
-	return 0;
+	uint32 read;
+	ConnReadRaw(s->conn, buffer, len, s->server->timeout, &read);
+	return read;
 }
 
-bool HTTPWrite(TSession *s,char *buffer,uint32 len)
+int HTTPWrite(TSession *s,char *buffer,uint32 len)
 {
 	if (s->chunkedwrite && s->chunkedwritemode)
 	{
@@ -677,7 +683,7 @@ bool HTTPWrite(TSession *s,char *buffer,uint32 len)
 	return ConnWrite(s->conn,buffer,len);
 }
 
-bool HTTPWriteEnd(TSession *s)
+int HTTPWriteEnd(TSession *s)
 {
 	if (!s->chunkedwritemode)
 		return TRUE;
@@ -714,7 +720,7 @@ void ResponseError(TSession *r)
 	ConnWrite(r->conn,z,strlen(z));	
 }
 
-bool ResponseChunked(TSession *r)
+int ResponseChunked(TSession *r)
 {
 	/* This is only a hope, things will be real only after a call of ResponseWrite */
 	r->chunkedwrite=(r->versionmajor>=1) && (r->versionminor>=1);
@@ -747,14 +753,14 @@ void ResponseStatusErrno(TSession *r)
 	ResponseStatus(r,code);
 }
 
-bool ResponseAddField(TSession *r,char *name,char *value)
+int ResponseAddField(TSession *r,char *name,char *value)
 {
 	return TableAdd(&r->response_headers,name,value);
 }
 
 void ResponseWrite(TSession *r)
 {
-	bool connclose=TRUE;
+	int connclose=TRUE;
 	char z[64];
 	TTableItem *ti;
 	uint16 i;
@@ -823,12 +829,12 @@ void ResponseWrite(TSession *r)
 	ConnWrite(r->conn,CRLF,2);	
 }
 
-bool ResponseContentType(TSession *r,char *type)
+int ResponseContentType(TSession *r,char *type)
 {
 	return ResponseAddField(r,"Content-type",type);
 }
 
-bool ResponseContentLength(TSession *r,uint64 len)
+int ResponseContentLength(TSession *r,uint64 len)
 {
 	char z[32];
 
@@ -851,7 +857,7 @@ void MIMETypeInit()
 	PoolCreate(&_MIMEPool,1024);
 }
 
-bool MIMETypeAdd(char *type,char *ext)
+int MIMETypeAdd(char *type,char *ext)
 {
 	uint16 index;
 
@@ -956,7 +962,7 @@ static char *_DateMonth[12]=
 static int32 _DateTimeBias=0;
 static char _DateTimeBiasStr[6]="";
 
-bool DateToString(TDate *tm,char *s)
+int DateToString(TDate *tm,char *s)
 {
 	if (mktime(tm)==(time_t)(-1))
 	{
@@ -970,7 +976,7 @@ bool DateToString(TDate *tm,char *s)
 	return TRUE;
 }
 
-bool DateToLogString(TDate *tm,char *s)
+int DateToLogString(TDate *tm,char *s)
 {
 	time_t t;
 	TDate d;
@@ -988,7 +994,7 @@ bool DateToLogString(TDate *tm,char *s)
 	return FALSE;
 }
 
-bool DateDecode(char *s,TDate *tm)
+int DateDecode(char *s,TDate *tm)
 {
 	uint32 n=0;
 
@@ -1054,7 +1060,7 @@ int32 DateCompare(TDate *d1,TDate *d2)
 	return x;
 }
 
-bool DateFromGMT(TDate *d,time_t t)
+int DateFromGMT(TDate *d,time_t t)
 {
 	TDate *dx;
 
@@ -1067,12 +1073,12 @@ bool DateFromGMT(TDate *d,time_t t)
 	return FALSE;
 }
 
-bool DateFromLocal(TDate *d,time_t t)
+int DateFromLocal(TDate *d,time_t t)
 {
 	return DateFromGMT(d,t+_DateTimeBias*2);
 }
 
-bool DateInit()
+int DateInit()
 {
 	time_t t;
 	TDate gmt,local,*d;

@@ -38,7 +38,7 @@
 ** Thread
 *********************************************************************/
 
-bool ThreadCreate(TThread *t,uint32 (*func)(void *),void *arg)
+int ThreadCreate(TThread *t,uint32 (*func)(void *),void *arg)
 {
 #ifdef _WIN32
 	DWORD z;
@@ -77,7 +77,7 @@ bool ThreadCreate(TThread *t,uint32 (*func)(void *),void *arg)
 #endif	/* _WIN32 */
 }
 
-bool ThreadRun(TThread *t)
+int ThreadRun(TThread *t)
 {
 #ifdef _WIN32
 	return (ResumeThread(*t)!=0xFFFFFFFF);
@@ -85,7 +85,7 @@ bool ThreadRun(TThread *t)
 	return TRUE;	
 #endif	/* _WIN32 */
 }
-bool ThreadStop(TThread *t)
+int ThreadStop(TThread *t)
 {
 #ifdef _WIN32
 	return (SuspendThread(*t)!=0xFFFFFFFF);
@@ -94,7 +94,7 @@ bool ThreadStop(TThread *t)
 #endif	/* _WIN32 */
 }
 
-bool ThreadKill(TThread *t)
+int ThreadKill(TThread *t)
 {
 #ifdef _WIN32
 	return (TerminateThread(*t,0)!=0);
@@ -117,7 +117,7 @@ void ThreadWait(uint32 ms)
 ** Mutex
 *********************************************************************/
 
-bool MutexCreate(TMutex *m)
+int MutexCreate(TMutex *m)
 {
 #ifdef _THREAD
 	return (pthread_mutex_init(m, NULL)==0);
@@ -128,7 +128,7 @@ bool MutexCreate(TMutex *m)
 #endif	
 }
 
-bool MutexLock(TMutex *m)
+int MutexLock(TMutex *m)
 {
 #ifdef _THREAD
 	return (pthread_mutex_lock(m)==0);
@@ -139,7 +139,7 @@ bool MutexLock(TMutex *m)
 #endif
 }
 
-bool MutexUnlock(TMutex *m)
+int MutexUnlock(TMutex *m)
 {
 #ifdef _THREAD
 	return (pthread_mutex_unlock(m)==0);
@@ -150,7 +150,7 @@ bool MutexUnlock(TMutex *m)
 #endif
 }
 
-bool MutexTryLock(TMutex *m)
+int MutexTryLock(TMutex *m)
 {
 #ifdef _THREAD
 	return (pthread_mutex_trylock(m)==0);

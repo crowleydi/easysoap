@@ -38,7 +38,12 @@
 ** Socket
 *********************************************************************/
 
-bool SocketInit()
+#ifdef _WIN32
+#define EINTR WSAEINTR
+#define EMSGSIZE WSAEMSGSIZE
+#endif
+
+int SocketInit()
 {
 #ifdef _WIN32
 	WORD wVersionRequested;
@@ -56,7 +61,7 @@ bool SocketInit()
 
 #define RET(x)	return ((x)!=(-1))
 
-bool SocketCreate(TSocket *s)
+int SocketCreate(TSocket *s)
 {
 	int32 n=1;
 
@@ -66,7 +71,7 @@ bool SocketCreate(TSocket *s)
 	RET(setsockopt(*s,SOL_SOCKET,SO_REUSEADDR,(char*)&n,sizeof(n)));
 }
 
-bool SocketClose(TSocket *s)
+int SocketClose(TSocket *s)
 {
 #ifdef _WIN32
 	RET(closesocket(*s));
@@ -90,17 +95,13 @@ uint32 SocketPeek(TSocket *s, char *buffer, uint32 len)
 	int32 r=recv(*s,buffer,len,MSG_PEEK);
 
 	if (r==(-1))
-#ifdef _WIN32
-		if (SocketError()==WSAEMSGSIZE)
-#else
 		if (SocketError()==EMSGSIZE)
-#endif
 			return len;
 
 	return r;
 }
 
-bool SocketConnect(TSocket *s, TIPAddr *addr, uint16 port)
+int SocketConnect(TSocket *s, TIPAddr *addr, uint16 port)
 {
 	struct sockaddr_in name;
 
@@ -111,7 +112,7 @@ bool SocketConnect(TSocket *s, TIPAddr *addr, uint16 port)
 	RET(connect(*s,(struct sockaddr *)&name,sizeof(name)));
 }
 
-bool SocketBind(TSocket *s, TIPAddr *addr, uint16 port)
+int SocketBind(TSocket *s, TIPAddr *addr, uint16 port)
 {
 	struct sockaddr_in name;
 
@@ -125,7 +126,7 @@ bool SocketBind(TSocket *s, TIPAddr *addr, uint16 port)
 	RET(bind(*s,(struct sockaddr *)&name,sizeof(name)));
 }
 
-bool SocketListen(TSocket *s, uint32 backlog)
+int SocketListen(TSocket *s, uint32 backlog)
 {
 	int32 n=-1;
 
@@ -135,7 +136,7 @@ bool SocketListen(TSocket *s, uint32 backlog)
 	RET(listen(*s,backlog));
 }
 
-bool SocketAccept(TSocket *s, TSocket *ns,TIPAddr *ip)
+int SocketAccept(TSocket *s, TSocket *ns,TIPAddr *ip)
 {
 	struct sockaddr_in sa;
 	uint32 size=sizeof(sa);
@@ -153,7 +154,7 @@ bool SocketAccept(TSocket *s, TSocket *ns,TIPAddr *ip)
 	RET(*ns);
 }
 
-uint32 SocketWait(TSocket *s,bool rd,bool wr,uint32 timems)
+uint32 SocketWait(TSocket *s,int rd,int wr,uint32 timems)
 {
 	fd_set rfds,wfds;
 #ifdef _WIN32
@@ -197,7 +198,7 @@ uint32 SocketWait(TSocket *s,bool rd,bool wr,uint32 timems)
 		};
 }
 
-bool SocketBlocking(TSocket *s, bool b)
+int SocketBlocking(TSocket *s, int b)
 {
 	uint32 x=b;
 
