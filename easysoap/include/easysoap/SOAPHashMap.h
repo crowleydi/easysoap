@@ -16,7 +16,7 @@
  * License along with this library; if not, write to the Free
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- * $Id$
+ * SOAPHashMap.h,v 1.4 2002/07/23 18:57:42 dcrowley Exp
  */
 
 
@@ -421,14 +421,28 @@ public:
 	 * @param item The value associated with the key.
 	 */
 	template <typename X, typename Y>
-	I& Add(const X& key, const Y& item)
+	Iterator Add(const X& key, const Y& item)
 	{
 		// see if we can find it
 		size_t hash = hashcode(key);
 		Iterator found = Find(key, hash);
 		if (found)
-			return *found = item;
+		{
+			*found = item;
+			return found;
+		}
 		return Put(hash, key, item);
+	}
+
+	template <typename X>
+	Iterator Add(const X& key)
+	{
+		// see if we can find it
+		size_t hash = hashcode(key);
+		Iterator found = Find(key, hash);
+		if (found)
+			return found;
+		return Put(hash, key);
 	}
 
 	/**
@@ -448,7 +462,7 @@ public:
 		Iterator found = Find(key, hash);
 		if (found)
 			return *found;
-		return Put(hash, key);
+		return *Put(hash, key);
 	}
 
 
@@ -641,7 +655,7 @@ private:
 
 	// This method actually puts an object into the hashtable.
 	template<typename X, typename Y>
-	I& Put(size_t hash, const X& key, const Y& item)
+	Iterator Put(size_t hash, const X& key, const Y& item)
 	{
 		// check for resize
 		if (m_numElements >= m_resizeThreshold)
@@ -655,12 +669,12 @@ private:
 		he->m_next = m_elements[index];
 		m_elements[index] = he;
 
-		return he->m_item;
+		return Iterator(this, (Elements::Iterator)m_elements.Begin() + index, he);
 	}
 
 	// This method actually puts an object into the hashtable.
 	template <typename X>
-	I& Put(size_t hash, const X& key)
+	Iterator Put(size_t hash, const X& key)
 	{
 		// check for resize
 		if (m_numElements >= m_resizeThreshold)
@@ -673,7 +687,7 @@ private:
 		he->m_next = m_elements[index];
 		m_elements[index] = he;
 
-		return he->m_item;
+		return Iterator(this, (Elements::Iterator)m_elements.Begin() + index, he);
 	}
 
 	friend class ForwardHashMapIterator;
