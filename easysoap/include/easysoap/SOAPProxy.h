@@ -81,6 +81,14 @@ public:
 
 	void SetEndpoint(const SOAPUrl& endpoint, const SOAPUrl& proxy);
 
+	void SetEndpoint(SOAPTransport *transport, bool deltrans = false)
+	{
+		if (m_deltrans)
+			delete m_transport;
+		m_transport = transport;
+		m_deltrans = deltrans;
+	}
+
 	SOAPMethod& SetMethod(const char *name, const char *ns)
 	{
 		SOAPMethod& method = m_message.GetBody().GetMethod();
@@ -103,8 +111,6 @@ private:
 
 	SOAPProxy(const SOAPProxy& proxy);
 	SOAPProxy& operator=(const SOAPProxy& proxy);
-
-	void SetEndpoint(SOAPTransport *trans, bool deltrans);
 
 	SOAPEnvelope		m_message;
 	SOAPResponse		m_response;

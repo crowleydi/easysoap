@@ -101,12 +101,3 @@ SOAPProxy::SetEndpoint(const SOAPUrl& endpoint, const SOAPUrl& proxy)
 	SetEndpoint(transport, true);
 	transport->ConnectTo(endpoint, proxy);
 }
-
-void
-SOAPProxy::SetEndpoint(SOAPTransport *trans, bool deltrans)
-{
-	if (m_deltrans)
-		delete m_transport;
-	m_transport = trans;
-	m_deltrans = deltrans;
-}
