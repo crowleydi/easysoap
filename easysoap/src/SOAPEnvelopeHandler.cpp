@@ -35,6 +35,7 @@ SOAPEnvelopeHandler::SOAPEnvelopeHandler(SOAPEnvelope& envelope)
 : m_envelope(&envelope)
 , m_bodyHandler(envelope.GetBody())
 , m_headerHandler(envelope.GetHeader())
+, m_done(false)
 {
 
 }
@@ -47,12 +48,14 @@ SOAPEnvelopeHandler::~SOAPEnvelopeHandler()
 SOAPParseEventHandler *
 SOAPEnvelopeHandler::start(const XML_Char *name, const XML_Char **attrs)
 {
+	m_done = false;
 	return this;
 }
 
 SOAPParseEventHandler *
 SOAPEnvelopeHandler::startElement(const XML_Char *name, const XML_Char **attrs)
 {
+	m_done = false;
 	if (sp_strcmp(name, SOAPBodyHandler::start_tag) == 0)
 	{
 		return m_bodyHandler.start(name, attrs);
@@ -75,5 +78,7 @@ SOAPEnvelopeHandler::characterData(const XML_Char *str, int len)
 void
 SOAPEnvelopeHandler::endElement(const XML_Char *name)
 {
+	if (sp_strcmp(name, start_tag) == 0)
+		m_done = true;
 }
 

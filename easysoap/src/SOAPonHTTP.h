@@ -95,9 +95,6 @@ public:
 
 	virtual ~SOAPonHTTP() {}
 
-	// returns how big the response payload is
-	virtual int GetPayloadSize();
-
 	// read the payload into the buffer.
 	// can be called multiple times.
 	// returns 0 if entire payload has been read.

@@ -32,9 +32,6 @@ protected:
 public:
 	virtual ~SOAPTransport() {}
 
-	// returns how big the response payload is
-	virtual int GetPayloadSize() = 0;
-
 	// read the payload into the buffer.
 	// can be called multiple times.
 	// returns 0 if entire payload has been read.

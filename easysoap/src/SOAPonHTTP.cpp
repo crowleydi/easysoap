@@ -10,13 +10,6 @@
 #define SOAPUSER_AGENT "EasySoap++/0.1"
 #endif // SOAPUSER_AGENT
 
-// returns how big the response payload is
-int
-SOAPonHTTP::GetPayloadSize()
-{
-	return m_http.GetContentLength();
-}
-
 // read the payload into the buffer.
 // can be called multiple times.
 // returns 0 if entire payload has been read.

@@ -48,9 +48,6 @@ SOAPParser::~SOAPParser()
 SOAPResponse&
 SOAPParser::Parse(SOAPResponse& resp, SOAPTransport& trans)
 {
-	int msglen = trans.GetPayloadSize();
-	int done = 0;
-
 	if (m_parser)
 	{
 		XML_ParserFree(m_parser);
@@ -71,7 +68,7 @@ SOAPParser::Parse(SOAPResponse& resp, SOAPTransport& trans)
 	// put ourselves on the stack
 	m_handlerstack.Push(this);
 
-	while (!done)
+	while (1)
 	{
 		//
 		// create a buffer to read the HTTP payload into
@@ -83,19 +80,19 @@ SOAPParser::Parse(SOAPResponse& resp, SOAPTransport& trans)
 		//
 		// read the HTTP payload
 		//
-		int read = trans.Read((char *)buffer, sp_minimum(BUFF_SIZE, msglen));
+		int read = trans.Read((char *)buffer, BUFF_SIZE);
 
-		//
-		// figure out if we've finished reading the payload
-		//
-		if ((msglen -= read) == 0)
-			done = 1;
-	
-		if (!XML_ParseBuffer(m_parser, read, done))
+		if (!XML_ParseBuffer(m_parser, read, read == 0))
 		{
 			throw SOAPException(
 				"Error while parsing SOAP XML payload: %s",
 				XML_ErrorString(XML_GetErrorCode(m_parser)));
+		}
+
+		if (m_response->Done())
+		{
+			XML_ParseBuffer(m_parser, 0, 1);
+			break;
 		}
 	}
 
@@ -128,7 +125,7 @@ SOAPParser::startElement(const XML_Char *name, const XML_Char **attrs)
 	if (sp_strcmp(name, SOAPResponseHandler::start_tag) == 0)
 		return m_response->start(name, attrs);
 
-	return 0;
+	throw SOAPException("Unknown SOAP response tag: %s", name);
 }
 
 void

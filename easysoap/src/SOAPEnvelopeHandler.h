@@ -40,10 +40,12 @@ public:
 	virtual void endElement(const XML_Char *name);
 	virtual void characterData(const XML_Char *str, int len);
 
+	bool Done()	{return m_done;}
+
 	static const char *start_tag;
 
 private:
-
+	bool				m_done;
 	SOAPEnvelope		*m_envelope;
 	SOAPBodyHandler		m_bodyHandler;
 	SOAPHeaderHandler	m_headerHandler;
