@@ -16,14 +16,12 @@ SOAPQName::Set(const char *name, const char *ns)
 	}
 	else
 	{
-		char *psep = sp_strstr(name, PARSER_NS_SEP);
+		const char *psep = sp_strstr(name, PARSER_NS_SEP);
 		if (psep)
 		{
-			char c = *psep;
-			*psep = 0;
-			m_namespace = name;
 			m_name = (psep + 1);
-			*psep = c;
+			m_namespace = "";
+			m_namespace.Append(name, psep - name);
 		}
 		else
 		{
