@@ -152,24 +152,6 @@ public:
 	}
 };
 
-class EASYSOAP_EXPORT SOAPTypeTraits<SOAPBase64>
-{
-public:
-	// Encode an array as base64
-	static void GetType(SOAPQName& type);
-	static SOAPParameter& Serialize(SOAPParameter& param, const SOAPBase64& val);
-	static const SOAPParameter& Deserialize(const SOAPParameter& param, SOAPBase64& val);
-};
-
-class EASYSOAP_EXPORT SOAPTypeTraits<SOAPHex>
-{
-public:
-	// Encode an array as hex
-	static void GetType(SOAPQName& type);
-	static SOAPParameter& Serialize(SOAPParameter& param, const SOAPHex& val);
-	static const SOAPParameter& Deserialize(const SOAPParameter& param, SOAPHex& val);
-};
-
 class SOAPArrayTypeTraits
 {
 private:
@@ -261,6 +243,106 @@ public:
 		}
 		return param;
 	}
+};
+
+//
+// Base class for Encoding and
+// Decoding hex and base64 strings.
+class SOAPByteArrayEncodingTraits
+{
+public:
+	template<typename T>
+	static SOAPParameter&
+	Serialize(SOAPParameter& param, const T& val)
+	{
+		size_t size = (val.m_arr ? val.m_arr : val.m_carr)->size();
+		const char *bytes = (val.m_arr ? val.m_arr : val.m_carr)->begin();
+		val.Encode(bytes, size, param.GetStringRef());
+		return param;
+	}
+
+	template<typename T>
+	static const SOAPParameter&
+	Deserialize(const SOAPParameter& param, T& val)
+	{
+		size_t size = val.EstimateSize(param.GetStringRef());
+		val.m_arr->resize(size);
+		val.Decode(param.GetStringRef(), val.m_arr->begin(), size);
+		val.m_arr->resize(size);
+		return param;
+	}
+};
+
+//
+// Traits for base64 encoded byte arrays
+class SOAPBase64 : public SOAPBase64Base
+{
+public:
+	const SOAPArray<char>*	m_carr;
+	SOAPArray<char>*		m_arr;
+
+	SOAPBase64(const SOAPArray<char>& carr)
+		: m_carr(&carr), m_arr(0)
+	{
+	}
+
+	SOAPBase64(SOAPArray<char>& arr)
+		: m_arr(&arr), m_carr(0)
+	{
+	}
+private:
+	SOAPBase64();
+	SOAPBase64(const SOAPBase64&);
+	SOAPBase64& operator=(const SOAPBase64&);
+};
+
+
+class SOAPBase64Traits : public SOAPByteArrayEncodingTraits
+{
+public:
+	static void GetType(SOAPQName& type)
+	{
+		type.Set("base64Binary", SOAP_XSD);
+	}
+};
+
+//
+// Traits for hex encoded byte arrays
+class SOAPHex : public SOAPHexBase
+{
+public:
+	const SOAPArray<char>*	m_carr;
+	SOAPArray<char>*		m_arr;
+
+	SOAPHex(const SOAPArray<char>& carr) : m_carr(&carr), m_arr(0)
+	{
+	}
+
+	SOAPHex(SOAPArray<char>& arr) : m_arr(&arr), m_carr(0)
+	{
+	}
+private:
+	SOAPHex();
+	SOAPHex(const SOAPHex&);
+	SOAPHex& operator=(const SOAPHex&);
+};
+
+
+class SOAPHexTraits : public SOAPByteArrayEncodingTraits
+{
+public:
+	static void GetType(SOAPQName& type)
+	{
+		type.Set("hexBinary", SOAP_XSD);
+	}
+};
+
+class SOAPTypeTraits< SOAPBase64 > : public SOAPBase64Traits
+{
+};
+
+class SOAPTypeTraits< SOAPHex > : public SOAPHexTraits
+{
 };
 
 class SOAPTypeTraits< SOAPArray<bool> > : public SOAPArrayTypeTraits

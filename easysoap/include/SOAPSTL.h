@@ -102,6 +102,63 @@ class SOAPTypeTraits< std::vector<std::string> > : public SOAPArrayTypeTraits
 {
 };
 
+
+//
+// Traits for base64 encoded byte arrays
+class SOAPSTLBase64 : public SOAPBase64Base
+{
+public:
+	const std::vector<char>*	m_carr;
+	std::vector<char>*			m_arr;
+
+	SOAPSTLBase64(const std::vector<char>& carr)
+		: m_carr(&carr), m_arr(0)
+	{
+	}
+
+	SOAPSTLBase64(std::vector<char>& arr)
+		: m_arr(&arr), m_carr(0)
+	{
+	}
+private:
+	SOAPSTLBase64();
+	SOAPSTLBase64(const SOAPSTLBase64&);
+	SOAPSTLBase64& operator=(const SOAPSTLBase64&);
+};
+
+
+class SOAPTypeTraits< SOAPSTLBase64 > : public SOAPBase64Traits
+{
+};
+
+
+//
+// Traits for hex encoded byte arrays
+class SOAPSTLHex : public SOAPHexBase
+{
+public:
+	const std::vector<char>*	m_carr;
+	std::vector<char>*			m_arr;
+
+	SOAPSTLHex(const std::vector<char>& carr) : m_carr(&carr), m_arr(0)
+	{
+	}
+
+	SOAPSTLHex(std::vector<char>& arr) : m_arr(&arr), m_carr(0)
+	{
+	}
+private:
+	SOAPSTLHex();
+	SOAPSTLHex(const SOAPSTLHex&);
+	SOAPSTLHex& operator=(const SOAPSTLHex&);
+};
+
+
+class SOAPTypeTraits< SOAPSTLHex > : public SOAPHexTraits
+{
+};
+
+
 class SOAPSTLMapTypeTraits
 {
 public:

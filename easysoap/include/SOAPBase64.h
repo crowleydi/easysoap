@@ -33,62 +33,36 @@
 
 //
 // Encode/Decode as base64
-class EASYSOAP_EXPORT SOAPBase64
+class EASYSOAP_EXPORT SOAPBase64Base
 {
 public:
-	SOAPBase64(const SOAPArray<char>& carr)
-	{
-		m_carr = &carr;
-		m_arr = 0;
-	}
+	static size_t EstimateSize(const SOAPString& str);
+	static void Encode(const char *bytes, size_t byteslen, SOAPString& str);
+	static void Decode(const SOAPString& str, char *bytes, size_t& byteslen);
 
-	SOAPBase64(SOAPArray<char>& arr)
-	{
-		m_arr = &arr;
-		m_carr = 0;
-	}
+protected:
+	SOAPBase64Base() {}
 
-	~SOAPBase64()
-	{
-	}
-
-	const SOAPArray<char>	*m_carr;
-	SOAPArray<char>			*m_arr;
-
-	static void Encode(const SOAPArray<char>& bytes, SOAPString& str);
-	static void Decode(const SOAPString& str, SOAPArray<char>& bytes);
 private:
-	SOAPBase64();
+	SOAPBase64Base(const SOAPBase64Base&);
+	SOAPBase64Base& operator=(const SOAPBase64Base&);
 };
 
 //
 // Encode/Decode as hex
-class EASYSOAP_EXPORT SOAPHex
+class EASYSOAP_EXPORT SOAPHexBase
 {
 public:
-	SOAPHex(const SOAPArray<char>& carr)
-	{
-		m_carr = &carr;
-		m_arr = 0;
-	}
+	static size_t EstimateSize(const SOAPString& str);
+	static void Encode(const char *bytes, size_t byteslen, SOAPString& str);
+	static void Decode(const SOAPString& str, char *bytes, size_t& byteslen);
 
-	SOAPHex(SOAPArray<char>& arr)
-	{
-		m_arr = &arr;
-		m_carr = 0;
-	}
+protected:
+	SOAPHexBase() {}
 
-	~SOAPHex()
-	{
-	}
-
-	const SOAPArray<char>	*m_carr;
-	SOAPArray<char>			*m_arr;
-
-	static void Encode(const SOAPArray<char>& bytes, SOAPString& str);
-	static void Decode(const SOAPString& str, SOAPArray<char>& bytes);
 private:
-	SOAPHex();
+	SOAPHexBase(const SOAPHexBase&);
+	SOAPHexBase& operator=(const SOAPHexBase&);
 };
 
 #endif // !defined(AFX_SOAPBASE64_H__8831A358_2EA1_11D5_B3F3_000000000000__INCLUDED_)

@@ -69,11 +69,6 @@ initializeBase64Tables()
 static int initialized = initializeBase64Tables();
 
 
-SOAPBase64::SOAPBase64()
-{
-
-}
-
 inline int
 nextChar(const char*& str)
 {
@@ -91,10 +86,18 @@ nextChar(const char*& str)
 	return c;
 }
 
-void
-SOAPBase64::Decode(const SOAPString& strx, SOAPArray<char>& array)
+
+size_t
+SOAPBase64Base::EstimateSize(const SOAPString& str)
 {
-	array.Resize(0);
+	return (str.Length() / 4) * 3 + 3;
+}
+
+void
+SOAPBase64Base::Decode(const SOAPString& strx, char *bytes, size_t& byteslen)
+{
+	size_t outlen = 0;
+
 	bool done = false;
 	const char *str = strx;
 
@@ -126,43 +129,47 @@ SOAPBase64::Decode(const SOAPString& strx, SOAPArray<char>& array)
 			in[1] == 0x80 ||
 			in[2] == 0x80 ||
 			in[3] == 0x80)
-		{
 			throw SOAPException("Invalid character in base64 string.");
-		}
 
 		out[0] = (in[0] << 2) | (in[1] >> 4);
 		out[1] = (in[1] << 4) | (in[2] >> 2);
 		out[2] = (in[2] << 6) |  in[3];
 
+		if (outlen + valid > byteslen)
+			throw SOAPException("Input array for base64 decoding not big enough.");
+
+		outlen += valid;
+
 		if (valid == 1)
 		{
-			array.Add(out[0]);
+			*bytes++ = out[0];
 			done = true;
 		}
 		else if (valid == 2)
 		{
-			array.Add(out[0]);
-			array.Add(out[1]);
+			*bytes++ = out[0];
+			*bytes++ = out[1];
 			done = true;
 		}
 		else // valid == 3
 		{
-			array.Add(out[0]);
-			array.Add(out[1]);
-			array.Add(out[2]);
+			*bytes++ = out[0];
+			*bytes++ = out[1];
+			*bytes++ = out[2];
 		}
 	}
+
+	byteslen = outlen;
 }
 
 void
-SOAPBase64::Encode(const SOAPArray<char>& array, SOAPString& str)
+SOAPBase64Base::Encode(const char *bytes, size_t size, SOAPString& str)
 {
-	size_t size = array.Size();
 	size_t num64chars = (size / 3) * 4 + 4;
 	str.Resize(num64chars + 4);
 
 	char *out = str.Str();
-	const unsigned char *in = (const unsigned char *)array.Ptr();
+	const unsigned char *in = (const unsigned char *)bytes;
 	size_t numout = 0;
 
 	while (size >= 3)
@@ -194,23 +201,6 @@ SOAPBase64::Encode(const SOAPArray<char>& array, SOAPString& str)
 	*out = 0;
 }
 
-void
-SOAPHex::Encode(const SOAPArray<char>& bytes, SOAPString& str)
-{
-	static const char *hexchars = "0123456789ABCDEF";
-
-	str.Resize(bytes.Size() * 2 + 1);
-	char *s = str.Str();
-	const char *b = bytes.Begin();
-	while (b != bytes.End())
-	{
-		int c = *b++;
-		*s++ = hexchars[(c >> 4) & 0x0F];
-		*s++ = hexchars[c & 0x0F];
-	}
-	*s = 0;
-}
-
 inline
 int getHexValue(int c)
 {
@@ -237,18 +227,48 @@ int getHexValue(int c)
 	}
 }
 
-void
-SOAPHex::Decode(const SOAPString& str, SOAPArray<char>& bytes)
+size_t
+SOAPHexBase::EstimateSize(const SOAPString& str)
 {
+	return str.Length() / 2;
+}
+
+void
+SOAPHexBase::Decode(const SOAPString& str, char *bytes, size_t& byteslen)
+{
+	size_t outlen = 0;
 	const char *s = str.Str();
 	int ub;
 
-	bytes.Resize(0);
 	while ((ub = nextChar(s)))
 	{
 		int lb = nextChar(s);
 		if (!lb)
 			throw SOAPException("Reached unexpected end of hex string, not an even number of characters.");
-		bytes.Add((getHexValue(ub) << 4) + getHexValue(lb));
+		if (outlen > byteslen)
+			throw SOAPException("");
+
+		*bytes++ = ((getHexValue(ub) << 4) + getHexValue(lb));
 	}
+
+	byteslen = outlen;
 }
+
+void
+SOAPHexBase::Encode(const char *b, size_t size, SOAPString& str)
+{
+	static const char *hexchars = "0123456789ABCDEF";
+
+	str.Resize(size * 2 + 1);
+	char *s = str.Str();
+	const char *const bend = b + size;
+	while (b != bend)
+	{
+		int c = *b++;
+		*s++ = hexchars[(c >> 4) & 0x0F];
+		*s++ = hexchars[c & 0x0F];
+	}
+	*s = 0;
+}
+
+
