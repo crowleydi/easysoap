@@ -21,7 +21,15 @@
 #ifndef __SOAPSTRING_H__
 #define __SOAPSTRING_H__
 
+#ifdef HAVE_WCHAR_H
 #include <wchar.h>
+#define HAVE_WCHART
+#else
+#ifdef STDDEF_HAS_WCHART
+#include <stddef.h>
+#define HAVE_WCHART
+#endif
+#endif
 
 #include <SOAP.h>
 #include <SOAPUtil.h>
@@ -188,6 +196,7 @@ public:
 		return Compare(str) < 0;
 	}
 
+#ifdef HAVE_WCHART
 	void Assign(const wchar_t *str)
 	{
 		Assign("");
@@ -234,6 +243,7 @@ public:
 		Append(str);
 		return *this;
 	}
+#endif // HAVE_WCHART
 };
 
 #ifdef __SOAPHASHMAP_H__
