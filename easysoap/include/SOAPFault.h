@@ -29,6 +29,8 @@ class SOAPFaultHandler;
 class EASYSOAP_EXPORT SOAPFault
 {
 public:
+	friend class SOAPFaultHandler;
+
 	SOAPFault();
 	virtual ~SOAPFault();
 
@@ -70,8 +72,6 @@ private:
 	{
 		AddParameter(param).SetValue(value);
 	}
-
-	friend SOAPFaultHandler;
 
 	static const char *faultcode_attr;
 	static const char *faultstring_attr;

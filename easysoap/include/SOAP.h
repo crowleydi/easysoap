@@ -21,40 +21,19 @@
 #ifndef __SOAP_h__
 #define __SOAP_h__
 
+#include <config/es_comp.h>
 
-#ifdef _WIN32
-
-#pragma warning (disable: 4786)
-#pragma warning (disable: 4251)
-
-#define snprintf _snprintf
-#define vsnprintf _vsnprintf
-
-#ifdef EASYSOAP_STATIC
-#define EASYSOAP_EXPORT
-#else // not EASYSOAP_STATIC
-#ifdef EASYSOAP_DLL
-#define EASYSOAP_EXPORT __declspec( dllexport )
-#else // not EASYSOAP_DLL
-#define EASYSOAP_EXPORT __declspec (dllimport )
-#endif // EASYSOAP_EXPORTS
-#endif // EASYSOAP_STATIC
-
-#else
-#define EASYSOAP_EXPORT
-#endif // _WIN32
-
-#include "SOAPUtil.h"
-#include "SOAPTypes.h"
-#include "SOAPHashMap.h"
-#include "SOAPArray.h"
-#include "SOAPString.h"
-#include "SOAPException.h"
+#include <SOAPUtil.h>
+#include <SOAPTypes.h>
+#include <SOAPHashMap.h>
+#include <SOAPArray.h>
+#include <SOAPString.h>
+#include <SOAPException.h>
 
 class SOAPPacketWriter;
 
-#include "SOAPParseEventHandler.h"
-#include "SOAPProxy.h"
+#include <SOAPParseEventHandler.h>
+#include <SOAPProxy.h>
 
 #endif // __SOAP_h__
 

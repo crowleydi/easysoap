@@ -21,10 +21,12 @@
 #if !defined(AFX_SOAPPARSEEVENTHANDLER_H__144ECE87_83A1_49B0_B48B_5112E1FFDA99__INCLUDED_)
 #define AFX_SOAPPARSEEVENTHANDLER_H__144ECE87_83A1_49B0_B48B_5112E1FFDA99__INCLUDED_
 
-#ifdef _WIN32
+#ifdef _MSC_VER
 #pragma warning(disable: 4275)
-#endif _WIN32
+#endif // _MSC_VER
 
+// avoid include of expat.h
+typedef void *XML_Parser;
 typedef char XML_Char;
 
 class SOAPParseEventHandler

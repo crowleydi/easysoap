@@ -25,9 +25,6 @@
 #include "SOAPParseEventHandler.h"
 #include "SOAPStack.h"
 
-// avoid include of expat.h
-typedef void *XML_Parser;
-
 class SOAPResponse;
 class SOAPResponseHandler;
 
@@ -50,9 +47,9 @@ private:
 	// the C based XML parser calls through to these methods
 	// which pass them on to the C++ interface
 	//
-	static void startElement(void *userData, const XML_Char *name, const XML_Char **attrs);
-	static void endElement(void *userData, const XML_Char *name);
-	static void characterData(void *userData, const XML_Char *str, int len);
+	static void _startElement(void *userData, const XML_Char *name, const XML_Char **attrs);
+	static void _endElement(void *userData, const XML_Char *name);
+	static void _characterData(void *userData, const XML_Char *str, int len);
 
 	XML_Parser							m_parser;
 

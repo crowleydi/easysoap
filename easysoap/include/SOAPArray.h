@@ -34,7 +34,7 @@ private:
 	size_t	m_allocated;
 	size_t	m_size;
 
-	void Realloc (size_t size)
+	void _realloc(size_t size)
 	{
 		if (size > m_allocated)
 		{
@@ -208,7 +208,7 @@ public:
 	{
 
 		if (size > Size())
-			Realloc(size);
+			_realloc(size);
 		m_size = size;
 	}
 
