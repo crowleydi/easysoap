@@ -126,7 +126,7 @@ public:
 	}
 
 	SOAPSTLBase64(std::vector<char>& arr)
-		: m_arr(&arr), m_carr(0)
+		: m_carr(0), m_arr(&arr)
 	{
 	}
 private:
@@ -153,7 +153,7 @@ public:
 	{
 	}
 
-	SOAPSTLHex(std::vector<char>& arr) : m_arr(&arr), m_carr(0)
+	SOAPSTLHex(std::vector<char>& arr) : m_carr(0), m_arr(&arr)
 	{
 	}
 private:
