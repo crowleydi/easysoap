@@ -204,7 +204,7 @@ public:
 			while (*str)
 			{
 				int c = 0;
-#ifdef _MSVC
+#ifdef _WIN32
 				ConvertUTF16toUCS(str, c);
 #else
 				c = *str++;
