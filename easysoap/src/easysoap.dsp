@@ -96,6 +96,10 @@ SOURCE=.\SOAPArrayHandler.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\SOAPBase64.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\SOAPBody.cpp
 # End Source File
 # Begin Source File
@@ -209,6 +213,10 @@ SOURCE=..\include\SOAPArray.h
 # Begin Source File
 
 SOURCE=.\SOAPArrayHandler.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\SOAPBase64.h
 # End Source File
 # Begin Source File
 
