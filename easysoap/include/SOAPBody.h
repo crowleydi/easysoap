@@ -47,8 +47,6 @@ public:
 
 private:
 
-	static const char *parse_tag;
-
 	SOAPMethod	m_method;
 	SOAPFault	m_fault;
 	bool		m_isfault;
