@@ -36,6 +36,7 @@ private:
 	SOAPUrl		m_endpoint;
 	SOAPUrl		m_proxy;
 	SOAPString	m_httpmsg;
+	SOAPString	m_charset;
 	int			m_canread;
 	bool		m_httpproxy;
 	bool		m_doclose;
@@ -80,8 +81,9 @@ public:
 	void	WriteHeader(const char *header, const char *value);
 	void	WriteHeader(const char *header, int value);
 
-	const char *GetHeader(const char *header);
-	int		GetContentLength();
+	const char *GetCharset() const {return m_charset;}
+	const char *GetHeader(const char *header) const;
+	int		GetContentLength() const;
 
 	virtual size_t Read(char *buffer, int len);
 	virtual void Close();
@@ -110,6 +112,10 @@ public:
 	{}
 
 	virtual ~SOAPonHTTP() {}
+
+	//
+	//  Return charset if we know it
+	virtual const char *GetCharset() const;
 
 	// read the payload into the buffer.
 	// can be called multiple times.

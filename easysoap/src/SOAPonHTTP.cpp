@@ -57,20 +57,10 @@ SOAPonHTTP::Write(const SOAPMethod& method, const char *payload, size_t payloads
 
 	int ret = m_http.PostData(payload, payloadsize);
 	bool isxml = true;
+
 	const char *contype = m_http.GetHeader("Content-Type");
 	if (contype)
-	{
-		char *charset = sp_strchr(contype, ';');
-		if (charset)
-			*charset = 0;
-		isxml = (sp_strcmp(contype, "text/xml") == 0);
-		if (charset)
-		{
-			// TODO: Determine character set of the response.
-			// and inform the parser...
-			*charset = ';';
-		}
-	}
+		isxml = (sp_strstr(contype, "text/xml") != 0);
 
 	if (ret != 200 && !isxml)
 		throw SOAPException("Unexpected return code: %s",
@@ -80,6 +70,12 @@ SOAPonHTTP::Write(const SOAPMethod& method, const char *payload, size_t payloads
 		throw SOAPException("Unexpected return Content-Type: %s", contype);
 
 	return ret;
+}
+
+const char *
+SOAPonHTTP::GetCharset() const
+{
+	return m_http.GetCharset();
 }
 
 void
@@ -208,7 +204,7 @@ SOAPHTTPProtocol::GetReply()
 		throw SOAPException("Couldn't read response.");
 	}
 
-	char *vers = sp_strchr(buff, '/');
+	const char *vers = sp_strchr(buff, '/');
 	if (vers)
 	{
 		respver += atoi(++vers) * 10;
@@ -216,7 +212,7 @@ SOAPHTTPProtocol::GetReply()
 			respver += atoi(++vers);
 	}
 
-	char *httpretcode = sp_strchr(buff, ' ');
+	const char *httpretcode = sp_strchr(buff, ' ');
 	if (httpretcode)
 	{
 		m_httpmsg = ++httpretcode;
@@ -249,6 +245,31 @@ SOAPHTTPProtocol::GetReply()
 	}
 
 	//
+	// Save charset info
+	//
+	// Per some RFC, encoding is us-ascii if it's not
+	// specifief in HTTP header.
+	m_charset = "US-ASCII";
+	const char *contype = GetHeader("Content-Type");
+	if (contype)
+	{
+		const char *charset = charset = sp_strstr(contype, "charset=");
+		if (charset)
+		{
+			charset += 8;
+			if (*charset == '\"')
+				++charset;
+			const char *end = charset;
+
+			while (*end && *end != '\"' && *end != ';' && *end != ' ')
+				++end;
+
+			m_charset = 0;
+			m_charset.Append(charset, end - charset);
+		}
+	}
+
+	//
 	// Get some information so we can close the
 	// the connection gracefully if we need to..
 	//
@@ -272,7 +293,7 @@ SOAPHTTPProtocol::GetReply()
 }
 
 const char *
-SOAPHTTPProtocol::GetHeader(const char *header)
+SOAPHTTPProtocol::GetHeader(const char *header) const
 {
 	HeaderMap::Iterator i = m_headers.Find(header);
 	if (i != m_headers.End())
@@ -283,7 +304,7 @@ SOAPHTTPProtocol::GetHeader(const char *header)
 }
 
 int
-SOAPHTTPProtocol::GetContentLength()
+SOAPHTTPProtocol::GetContentLength() const
 {
 	const char *header = GetHeader("Content-Length");
 	int len = -1;

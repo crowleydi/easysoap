@@ -69,6 +69,11 @@ public:
 			m_infile = fopen(infile, "rb");
 	}
 
+	const char *GetCharset() const
+	{
+		return 0;
+	}
+
 	size_t Read(char *buffer, size_t buffsize)
 	{
 		int read = 0;
