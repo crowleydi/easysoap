@@ -54,10 +54,8 @@ private:
 			Resize(req);
 			sp_strcpy(m_str, str);
 		}
-		else if (m_str)
-		{
-			*m_str = 0;
-		}
+		else
+			sp_free(m_str);
 	}
 
 public:
