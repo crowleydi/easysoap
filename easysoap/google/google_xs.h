@@ -9,6 +9,23 @@
 
 BEGIN_EASYSOAP_NAMESPACE
 
+
+#ifndef HAVE_PARTIAL_SPECIALIZATION
+
+//
+// specify how we de/serialize our array types.
+template<>
+class SOAPTypeTraits<GoogleSearch::ResultElementArray> : public SOAPArrayTypeTraits
+{
+};
+
+template<>
+class SOAPTypeTraits<GoogleSearch::DirectoryCategoryArray> : public SOAPArrayTypeTraits
+{
+};
+#endif // not HAVE_PARTIAL_SPECIALIZATION
+
+template<>
 class SOAPTypeTraits<GoogleSearch::Result>
 {
 public:
@@ -31,6 +48,7 @@ public:
 	}
 };
 
+template<>
 class SOAPTypeTraits<GoogleSearch::DirectoryCategory>
 {
 public:
@@ -44,6 +62,7 @@ public:
 	}
 };
 
+template<>
 class SOAPTypeTraits<GoogleSearch::ResultElement>
 {
 public:

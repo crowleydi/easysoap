@@ -29,7 +29,9 @@ GoogleSearch::getCachedPage(
 	method.AddParameter("url") << url;
 
 	const SOAPResponse& response = m_proxy.Execute(method);
-	response.GetReturnValue() >> result;
+
+	SOAPSTLBase64 base64(result);
+	response.GetReturnValue() >> base64;
 }
 
 void

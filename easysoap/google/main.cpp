@@ -1,4 +1,5 @@
 
+#include <iostream>
 #include "google.h"
 
 //
@@ -47,11 +48,11 @@ main(int argc, const char *argv[])
 
 		//
 		// Print out a summary of the results
-		std::cout << "Found an estimated " << result.estimatedTotalResultsCount <<
-			" results in " << result.searchTime << " second(s)." << std::endl;
-
-		std::cout << "Search comments: " << result.searchComments << std::endl;
-		std::cout << "Search tips: " << result.searchTips << std::endl;
+		std::cout << "Found an estimated " << result.estimatedTotalResultsCount
+			<< " results in " << result.searchTime << " second(s)." << std::endl
+			<< "Search comments: " << result.searchComments << std::endl
+			<< "Search tips: " << result.searchTips << std::endl
+			;
 
 		//
 		// Print info on the hits.
