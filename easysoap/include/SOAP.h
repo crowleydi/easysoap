@@ -21,6 +21,11 @@
 #ifndef __SOAP_h__
 #define __SOAP_h__
 
+#define EASYSOAP_STRING			"EasySoap++"
+#define EASYSOAP_HOMEPAGE		"http://easysoap.sourceforge.net/"
+#define EASYSOAP_VERSION_STRING	"0.2"
+#define EASYSOAP_VERSION		20
+
 #include <config/es_comp.h>
 
 #include <SOAPUtil.h>
