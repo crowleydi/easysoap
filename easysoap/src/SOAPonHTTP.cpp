@@ -37,7 +37,21 @@
 int
 SOAPonHTTP::Read(char *buffer, int buffsize)
 {
-	return m_http.Read(buffer, buffsize);
+	int ret = 0;
+	if (m_canread == -1)
+		ret = m_http.Read(buffer, buffsize);
+	else if (m_canread > 0)
+	{
+		ret = m_http.Read(buffer, buffsize);
+		m_canread -= ret;
+		if (m_canread == 0)
+		{
+			const char *conn = m_http.GetHeader("Connection");
+			if (sp_strcasecmp(conn, "Close") == 0)
+				m_http.Close();
+		}
+	}
+	return ret;
 }
 
 // send the payload.  can only be called ONCE per
@@ -46,18 +60,19 @@ SOAPonHTTP::Read(char *buffer, int buffsize)
 int
 SOAPonHTTP::Write(const SOAPMethod& method, const char *payload, int payloadsize)
 {
-	char buff[128];
-	snprintf(buff, sizeof(buff), "\"%s#%s\"",
-		(const char *)method.GetNamespace(),
-		(const char *)method.GetName());
-
 	m_http.BeginPost(m_path);
 	m_http.WriteHeader("User-Agent", SOAPUSER_AGENT);
 	m_http.WriteHeader("Content-Type", "text/xml");
-	m_http.WriteHeader("SOAPAction", buff);
 
+	m_http.Write("SOAPAction: \"");
+	m_http.Write(method.GetSoapAction());
+	m_http.WriteLine("\"");
 
-	return m_http.PostData(payload, payloadsize);
+	int ret = m_http.PostData(payload, payloadsize);
+
+	m_canread = m_http.GetContentLength();
+
+	return ret;
 }
 
 void
@@ -230,7 +245,7 @@ int
 SOAPHTTPProtocol::GetContentLength()
 {
 	const char *header = GetHeader("Content-Length");
-	int len = 0;
+	int len = -1;
 	if (header)
 		len = atoi(header);
 	return len;
