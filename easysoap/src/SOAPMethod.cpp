@@ -30,14 +30,28 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-SOAPMethod::SOAPMethod(const char *name, const char *ns)
+SOAPMethod::SOAPMethod(const char *name, const char *ns, const char *sa, bool appendName)
 {
 	SetName(name, ns);
+	SetSoapAction(sa, appendName);
 }
 
 SOAPMethod::~SOAPMethod()
 {
 
+}
+
+void
+SOAPMethod::SetSoapAction(const char *sa, bool appendName)
+{
+	if (sa)
+	{
+		m_action = sa;
+		if (appendName)
+			m_action.Append(m_name);
+	}
+	else
+		m_action = "";
 }
 
 void

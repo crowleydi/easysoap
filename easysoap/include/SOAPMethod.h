@@ -27,7 +27,7 @@
 class EASYSOAP_EXPORT SOAPMethod
 {
 public:
-	SOAPMethod(const char *name = 0, const char *ns = 0);
+	SOAPMethod(const char *name = 0, const char *ns = 0, const char *soapAction = 0, bool appendName = true);
 	virtual ~SOAPMethod();
 
 	SOAPMethod& SetName(const char *name, const char *ns = 0)
@@ -85,12 +85,19 @@ public:
 		return m_params[i];
 	}
 
+	void SetSoapAction(const char *sa, bool appendName = true);
+	const SOAPString& GetSoapAction() const
+	{
+		return m_action;
+	}
+
 	bool WriteSOAPPacket(SOAPPacketWriter& packet) const;
 private:
 
 	SOAPParameter::Array	m_params;
 	SOAPString				m_name;
 	SOAPString				m_namespace;
+	SOAPString				m_action;
 };
 
 #endif // !defined(AFX_SOAPMETHOD_H__B3726AD6_5844_4059_8ECD_36A553A918AD__INCLUDED_)
