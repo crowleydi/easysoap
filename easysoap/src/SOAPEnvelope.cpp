@@ -30,6 +30,11 @@
 const SOAPQName EnvelopeTag("Envelope", SOAP_ENV);
 const SOAPQName EncodingAttr("encodingStyle", SOAP_ENV);
 
+
+const SOAPQName SOAPEnvelope::MustUnderstand("mustUnderstand", SOAP_ENV);
+const SOAPQName SOAPEnvelope::Actor("mustUnderstand", SOAP_ENV);
+
+
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
