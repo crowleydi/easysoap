@@ -61,11 +61,14 @@ void
 SOAPHeader::Reset()
 {
 	for (Headers::Iterator i = m_headers.Begin(); i != m_headers.End(); ++i)
+	{
+		(*i)->Reset();
 		m_pool.Return(*i);
-
-	m_outtasync = false;
+	}
 	m_headers.Resize(0);
+
 	m_headermap.Clear();
+	m_outtasync = false;
 }
 
 const SOAPParameter&
