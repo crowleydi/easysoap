@@ -22,22 +22,26 @@
 //
 //   A Simple CGI Program for EasySoap++
 //
+//   Just place this file in your cgi-bin directory (or similar)
+//   of your web server and go.
 //
+//   THIS DOESN'T WORK RUNNING UNDER IIS
+//   If you know how to get this to work on IIS, PLEASE let me know.
 //
 
 #include <SOAP.h>
-
-#include <stdio.h>
 #include <SOAPCGIHandler.h>
+#include <SOAPDispatchHandler.h>
 
 class DemoCalculatorHandler : public SOAPDispatchHandler<DemoCalculatorHandler>
 {
 public:
 	DemoCalculatorHandler()
 	{
+		const char * ns = "http://easysoap.sourceforge.net/demos/calculator";
 		DispatchTo(this);
-		DispatchMethod("add", &DemoCalculatorHandler::add);
-		DispatchMethod("mult", &DemoCalculatorHandler::mult);
+		DispatchMethod("add", ns, &DemoCalculatorHandler::add);
+		DispatchMethod("mult", ns, &DemoCalculatorHandler::mult);
 	}
 
 	~DemoCalculatorHandler()
@@ -83,6 +87,6 @@ main(int argc, char* argv[], char *env[])
 	SOAPCGIDispatch cgi;
 	DemoCalculatorHandler calchandle;
 
-	return cgi.Dispatch("http://easysoap.sourceforge.net/demos/calculator", &calchandle).Handle();
+	return cgi.DispatchTo(&calchandle).Handle();
 }
 
