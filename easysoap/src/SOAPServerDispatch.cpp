@@ -122,9 +122,9 @@ SOAPServerDispatch::Handle(SOAPTransport& trans)
 		if (!HandleRequest(m_request, m_response))
 		{
 			faultcode = clientfault;
-			throw SOAPException("Could not find handler for method \"%s\" in namespace \"%s\"",
-				(const char *)requestMethod.GetName().GetName(),
-				(const char *)requestMethod.GetName().GetNamespace());
+			throw SOAPException("Could not find handler for method \"{%s}:%s\"",
+				(const char *)requestMethod.GetName().GetNamespace(),
+				(const char *)requestMethod.GetName().GetName());
 		}
 
 		//
@@ -214,7 +214,7 @@ SOAPServerDispatch::HandleHeaders(SOAPEnvelope& request, SOAPResponse& response)
 				if (mu && *mu == "1")
 					// TODO:  Special MustUnderstand exception so the
 					// actor(?) in the SOAPFault can be set correctly.
-					throw SOAPException("Failed to understand header {%s}:%s",
+					throw SOAPException("Failed to understand header \"{%s}:%s\"",
 						(const char *)header.GetName().GetNamespace(),
 						(const char *)header.GetName().GetName());
 			}
