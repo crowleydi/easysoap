@@ -48,7 +48,8 @@ public:
 	SOAPParameter& operator=(const SOAPParameter& param);
 
 
-	void	Reset();
+	void Reset();		// clears value and name
+	void ClearValue();	// clears just the value
 
 	SOAPQName& GetName()					{return m_name;}
 	const SOAPQName& GetName() const		{return m_name;}
@@ -156,8 +157,7 @@ operator<<(SOAPParameter& param, const T& val)
 	// class then you will have to implement it.
 	// Look in SOAPTypeTraits.h for examples.
 	//
-
-	param.Reset();
+	param.ClearValue();
 	// Add xsi:type attribute
 	SOAPTypeTraits<T>::GetType(param.AddAttribute(XMLSchemaInstance::type));
 	// serialize
@@ -183,7 +183,7 @@ operator>>(const SOAPParameter& param, T& val)
 inline SOAPParameter&
 operator<<(SOAPParameter& param, const char *val)
 {
-	param.Reset();
+	param.ClearValue();
 	SOAPTypeTraits<const char *>::GetType(param.AddAttribute(XMLSchemaInstance::type));
 	return SOAPTypeTraits<const char *>::Serialize(param, val);
 }
@@ -192,7 +192,7 @@ operator<<(SOAPParameter& param, const char *val)
 inline SOAPParameter&
 operator<<(SOAPParameter& param, const wchar_t *val)
 {
-	param.Reset();
+	param.ClearValue();
 	SOAPTypeTraits<const wchar_t *>::GetType(param.AddAttribute(XMLSchemaInstance::type));
 	return SOAPTypeTraits<const wchar_t *>::Serialize(param, val);
 }

@@ -80,7 +80,7 @@ SOAPParameter::operator=(const SOAPParameter& param)
 }
 
 void
-SOAPParameter::Reset()
+SOAPParameter::ClearValue()
 {
 	for (Array::Iterator i = m_array.Begin(); i != m_array.End(); ++i)
 	{
@@ -94,6 +94,15 @@ SOAPParameter::Reset()
 	m_isstruct = false;
 	m_outtasync = false;
 	m_strval = "";
+}
+
+void
+SOAPParameter::Reset()
+{
+	m_parent = 0;
+	m_name.GetName().Empty();
+	m_name.GetNamespace().Empty();
+	ClearValue();
 }
 
 void
@@ -291,8 +300,8 @@ SOAPParameter&
 SOAPParameter::AddParameter(const SOAPParameter& p)
 {
 	SOAPParameter *ret = m_pool.Get(p);
-	m_array.Add(ret);
 	ret->SetParent(this);
+	m_array.Add(ret);
 	m_outtasync = true;
 	SetIsStruct();
 
