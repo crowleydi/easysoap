@@ -56,11 +56,16 @@ public:
 
 	SOAPQName& operator=(const char *name)
 	{
-		Set(name);
+		m_name = name;
+		m_namespace = (const char *)0;
 		return *this;
 	}
 
-	void Set(const char *name, const char *ns = 0);
+	void Set(const char *name, const char *ns)
+	{
+		m_name = name;
+		m_namespace = ns;
+	}
 
 	bool operator==(const SOAPQName& that) const
 	{
@@ -73,7 +78,10 @@ public:
 		return !(*this == that);
 	}
 
-	bool operator==(const char *) const;
+	bool operator==(const char *name) const
+	{
+		return m_namespace.IsEmpty() && m_name == name;
+	}
 
 	SOAPString& GetName()
 	{
@@ -85,12 +93,21 @@ public:
 		return m_name;
 	}
 
+	SOAPString& GetNamespace()
+	{
+		return m_namespace;
+	}
+
 	const SOAPString& GetNamespace() const
 	{
 		return m_namespace;
 	}
 
-	void Clear();
+	void Clear()
+	{
+		m_name.Empty();
+		m_namespace.Empty();
+	}
 
 	bool IsUndefined()
 	{
