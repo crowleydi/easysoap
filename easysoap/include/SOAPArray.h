@@ -180,14 +180,24 @@ public:
 		return (Size() == 0);
 	}
 
-	operator T* ()
+	T* Ptr()
 	{
 		return m_array;
 	}
 
-	operator const T* () const
+	const T* Ptr() const
 	{
 		return m_array;
+	}
+
+	operator T* ()
+	{
+		return Ptr();
+	}
+
+	operator const T* () const
+	{
+		return Ptr();
 	}
 
 	template <typename X>
