@@ -23,6 +23,8 @@
 #include <easysoap/SOAP.h>
 #include <easysoap/SOAPPacketWriter.h>
 
+USING_EASYSOAP_NAMESPACE
+
 bool SOAPPacketWriter::g_makePretty = false;
 
 SOAPPacketWriter::SOAPPacketWriter()

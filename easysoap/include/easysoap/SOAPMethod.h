@@ -26,6 +26,8 @@
 #include <easysoap/SOAP.h>
 #include <easysoap/SOAPParameter.h>
 
+BEGIN_EASYSOAP_NAMESPACE
+
 class EASYSOAP_EXPORT SOAPMethod : public SOAPParameter
 {
 public:
@@ -54,6 +56,8 @@ private:
 
 	SOAPString				m_action;
 };
+
+END_EASYSOAP_NAMESPACE
 
 #endif // !defined(AFX_SOAPMETHOD_H__B3726AD6_5844_4059_8ECD_36A553A918AD__INCLUDED_)
 

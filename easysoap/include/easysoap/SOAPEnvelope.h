@@ -28,6 +28,8 @@
 #include <easysoap/SOAPBody.h>
 #include <easysoap/SOAPHeader.h>
 
+BEGIN_EASYSOAP_NAMESPACE
+
 class EASYSOAP_EXPORT SOAPEnvelope
 {
 public:
@@ -53,6 +55,8 @@ private:
 	SOAPHeader	m_header;
 	SOAPBody	m_body;
 };
+
+END_EASYSOAP_NAMESPACE
 
 #endif // !defined(AFX_SOAPENVELOPE_H__E0A24A39_4139_4A48_9C59_1DF34800189D__INCLUDED_)
 

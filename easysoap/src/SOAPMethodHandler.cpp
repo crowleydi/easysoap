@@ -32,6 +32,8 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
+USING_EASYSOAP_NAMESPACE
+
 SOAPMethodHandler::SOAPMethodHandler()
 : m_method(0)
 {

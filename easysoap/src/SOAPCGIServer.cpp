@@ -22,6 +22,8 @@
 #include <easysoap/SOAPCGIServer.h>
 #include <easysoap/SOAPCGITransport.h>
 
+USING_EASYSOAP_NAMESPACE
+
 int
 SOAPCGIServer::Handle(const char *infile)
 {

@@ -25,6 +25,8 @@
 
 #include <easysoap/SOAPSocket.h>
 
+BEGIN_EASYSOAP_NAMESPACE
+
 class SOAPClientSocketImp : public SOAPSocketInterface
 {
 protected:
@@ -43,6 +45,8 @@ public:
 	virtual size_t Read(char *buffer, size_t len);
 	virtual size_t Write(const char *buffer, size_t len);
 };
+
+END_EASYSOAP_NAMESPACE
 
 #endif // !defined(AFX_SOAPCLIENTSOCKETIMP_H__7D357522_E8B1_45A2_8CE1_A472A7D58C13__INCLUDED_)
 

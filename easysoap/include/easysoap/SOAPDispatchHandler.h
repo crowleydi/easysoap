@@ -26,6 +26,8 @@
 #include <easysoap/SOAP.h>
 
 
+BEGIN_EASYSOAP_NAMESPACE
+
 class EASYSOAP_EXPORT SOAPDispatchHandlerInterface
 {
 public:
@@ -129,5 +131,7 @@ protected:
 	}
 };
 
+END_EASYSOAP_NAMESPACE
 
 #endif // !defined(AFX_SOAPDISPATCHHANDLER_H__6D5D16BD_6AE8_48F6_A8FF_D7A56A9CAB34__INCLUDED_)
+

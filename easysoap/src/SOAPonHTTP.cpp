@@ -42,6 +42,8 @@
 // can be called multiple times.
 // returns 0 if entire payload has been read.
 
+USING_EASYSOAP_NAMESPACE
+
 void
 SOAPonHTTP::SetError()
 {

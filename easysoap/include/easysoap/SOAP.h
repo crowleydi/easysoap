@@ -37,7 +37,11 @@
 #include <easysoap/SOAPQName.h>
 #include <easysoap/SOAPException.h>
 
+BEGIN_EASYSOAP_NAMESPACE
+
 class SOAPPacketWriter;
+
+END_EASYSOAP_NAMESPACE
 
 #include <easysoap/SOAPParseEventHandler.h>
 #include <easysoap/SOAPProxy.h>

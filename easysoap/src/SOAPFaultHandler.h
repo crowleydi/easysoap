@@ -25,6 +25,8 @@
 
 #include "SOAPParameterHandler.h"
 
+BEGIN_EASYSOAP_NAMESPACE
+
 class SOAPFault;
 
 class SOAPFaultHandler : public SOAPParseEventHandler  
@@ -42,6 +44,8 @@ private:
 	SOAPFault				*m_fault;
 	SOAPParameterHandler	m_paramHandler;
 };
+
+END_EASYSOAP_NAMESPACE
 
 #endif // !defined(AFX_SOAPFAULTHANDLER_H__84DF153C_6C26_4F4C_A0EC_FCC63C1704E5__INCLUDED_)
 

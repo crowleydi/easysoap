@@ -36,6 +36,8 @@
 #include <easysoap/SOAP.h>
 #include <easysoap/SOAPUtil.h>
 
+BEGIN_EASYSOAP_NAMESPACE
+
 class EASYSOAP_EXPORT SOAPString
 {
 private:
@@ -315,5 +317,8 @@ struct SOAPEqualsFunctorNoCase<SOAPString>
 };
 
 #endif // __SOAPHASHMAP_H__
+
+END_EASYSOAP_NAMESPACE
+
 #endif // __SOAPSTRING_H__
 

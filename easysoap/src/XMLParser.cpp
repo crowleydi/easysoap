@@ -30,6 +30,8 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
+USING_EASYSOAP_NAMESPACE
+
 XMLParser::XMLParser()
 {
 	m_parser = 0;

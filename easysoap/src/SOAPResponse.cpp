@@ -30,6 +30,8 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
+USING_EASYSOAP_NAMESPACE
+
 SOAPResponse::SOAPResponse()
 {
 

@@ -25,6 +25,8 @@
 
 #include <easysoap/SOAP.h>
 
+BEGIN_EASYSOAP_NAMESPACE
+
 class SOAPMethod;
 
 class EASYSOAP_EXPORT SOAPTransport
@@ -56,7 +58,7 @@ public:
 	}
 };
 
+END_EASYSOAP_NAMESPACE
 
 #endif // !defined(AFX_SOAPTRANSPORT_H__7D357522_E8B1_45A2_8CE1_A472A7D58C13__INCLUDED_)
-
 

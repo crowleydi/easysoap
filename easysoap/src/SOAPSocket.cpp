@@ -29,6 +29,8 @@
 #include "SOAPClientSocketImp.h"
 #include "SOAPSecureSocketImp.h"
 
+USING_EASYSOAP_NAMESPACE
+
 SOAPProtocolBase::SOAPProtocolBase()
 	: m_socket(0)
 	, m_buff(0)

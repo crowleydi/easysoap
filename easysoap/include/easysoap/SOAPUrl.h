@@ -25,6 +25,8 @@
 
 #include <easysoap/SOAP.h>
 
+BEGIN_EASYSOAP_NAMESPACE
+
 class EASYSOAP_EXPORT SOAPUrl  
 {
 public:
@@ -67,6 +69,8 @@ private:
 	unsigned int	m_port;		// Port given in URL, or default
 	SOAPString		m_path;		// The URL Path
 };
+
+END_EASYSOAP_NAMESPACE
 
 #endif // !defined(AFX_SOAPURL_H__592D82D9_B93F_431A_BB8D_F658609814C4__INCLUDED_)
 

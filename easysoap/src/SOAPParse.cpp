@@ -36,6 +36,8 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
+USING_EASYSOAP_NAMESPACE
+
 SOAPParser::SOAPParser()
 {
 	m_envelopeHandler = new SOAPEnvelopeHandler();

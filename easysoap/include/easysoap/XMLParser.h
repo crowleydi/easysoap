@@ -25,6 +25,10 @@
 
 #define PARSER_NS_SEP "#"
 
+#include <easysoap/es_conf.h>
+
+BEGIN_EASYSOAP_NAMESPACE
+
 class XMLParser
 {
 public:
@@ -57,6 +61,8 @@ private:
 	void FreeParser();
 	void *m_parser;
 };
+
+END_EASYSOAP_NAMESPACE
 
 #endif // !defined(AFX_XMLPARSER_H__751545FF_EF84_42BC_9622_A6CE624F1F14__INCLUDED_)
 

@@ -24,6 +24,8 @@
 
 #include <stdlib.h>
 
+BEGIN_EASYSOAP_NAMESPACE
+
 template<typename T>
 inline T*
 sp_alloc(size_t n)
@@ -499,6 +501,8 @@ sp_UTF8_UCS(const char *& utf8, int& c)
 	}
   	return true;
 }
+
+END_EASYSOAP_NAMESPACE
 
 #endif // __SOAPUTIL_H__
 

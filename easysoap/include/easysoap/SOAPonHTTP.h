@@ -30,6 +30,7 @@
 #include <easysoap/SOAPSocket.h>
 #include <easysoap/SOAPTransport.h>
 
+BEGIN_EASYSOAP_NAMESPACE
 
 class EASYSOAP_EXPORT SOAPHTTPProtocol : public SOAPProtocolBase
 {
@@ -149,7 +150,7 @@ public:
 	virtual size_t Write(const SOAPMethod& method, const char *payload, size_t payloadsize);
 };
 
+END_EASYSOAP_NAMESPACE
 
 #endif // !defined(AFX_SOAPONHTTP_H__7D357522_E8B1_45A2_8CE1_A472A7D58C13__INCLUDED_)
-
 

@@ -31,6 +31,8 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
+USING_EASYSOAP_NAMESPACE
+
 const SOAPString SOAPFault::faultactor_attr = "faultactor";
 const SOAPString SOAPFault::faultcode_attr = "faultcode";
 const SOAPString SOAPFault::faultdetail_attr = "detail";

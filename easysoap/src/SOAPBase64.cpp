@@ -26,6 +26,8 @@
 #include <easysoap/SOAP.h>
 #include <easysoap/SOAPBase64.h>
 
+USING_EASYSOAP_NAMESPACE
+
 static char base64encode[64];
 static int  base64decode[256];
 static char base64pad = '=';

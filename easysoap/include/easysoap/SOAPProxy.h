@@ -32,6 +32,8 @@
 #include <easysoap/SOAPParse.h>
 #include <easysoap/SOAPUrl.h>
 
+BEGIN_EASYSOAP_NAMESPACE
+
 class SOAPTransport;
 
 class EASYSOAP_EXPORT SOAPProxy  
@@ -106,6 +108,8 @@ private:
 	SOAPTransport		*m_transport;
 	bool				m_deltrans;
 };
+
+END_EASYSOAP_NAMESPACE
 
 #endif // !defined(AFX_SOAPPROXY_H__D489F911_F39E_4C38_A5C0_95CD3D0A9459__INCLUDED_)
 

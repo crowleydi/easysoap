@@ -31,6 +31,8 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
+USING_EASYSOAP_NAMESPACE
+
 const char *SOAPHeader::actorNext = "http://schemas.xmlsoap.org/soap/actor/next";
 
 SOAPHeader::SOAPHeader()

@@ -22,11 +22,12 @@
 #include <easysoap/SOAPServerDispatch.h>
 #include <easysoap/SOAPDispatchHandler.h>
 
-
-
 //
 // Special exception for mustUnderstand faults
 // so we can return the correct faultstring
+
+BEGIN_EASYSOAP_NAMESPACE
+
 class SOAPMustUnderstandException : public SOAPException
 {
 public:
@@ -42,6 +43,9 @@ public:
 	~SOAPMustUnderstandException() {}
 };
 
+END_EASYSOAP_NAMESPACE
+
+USING_EASYSOAP_NAMESPACE
 
 SOAPServerDispatch::SOAPServerDispatch()
 	: m_transport(0)

@@ -53,6 +53,8 @@
 #include <vector>
 #include <map>
 
+BEGIN_EASYSOAP_NAMESPACE
+
 class SOAPTypeTraits<std::string>
 {
 public:
@@ -209,4 +211,7 @@ class SOAPTypeTraits< std::map<K, V> > : public SOAPSTLMapTypeTraits
 };
 #endif // HAVE_PARTIAL_SPECIALIZATION
 
+END_EASYSOAP_NAMESPACE
+
 #endif // _SOAPSTL_H_
+

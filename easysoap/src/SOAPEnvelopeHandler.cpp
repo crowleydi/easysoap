@@ -34,6 +34,8 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
+USING_EASYSOAP_NAMESPACE
+
 SOAPEnvelopeHandler::SOAPEnvelopeHandler()
 : m_done(false)
 , m_envelope(0)

@@ -26,6 +26,8 @@
 
 #include <easysoap/SOAPDebugger.h>
 
+USING_EASYSOAP_NAMESPACE
+
 FILE *SOAPDebugger::m_file = 0;
 int SOAPDebugger::m_messageLevel = 1;
 

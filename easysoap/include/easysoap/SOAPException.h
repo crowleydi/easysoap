@@ -32,6 +32,8 @@
 
 #include <easysoap/SOAPString.h>
 
+BEGIN_EASYSOAP_NAMESPACE
+
 class EASYSOAP_EXPORT SOAPException  
 {
 protected:
@@ -68,6 +70,8 @@ public:
 	SOAPMemoryException() {}
 	~SOAPMemoryException() {}
 };
+
+END_EASYSOAP_NAMESPACE
 
 #endif // !defined(AFX_SOAPEXCEPTION_H__18828772_7674_41DA_A39A_14D5CCB77E75__INCLUDED_)
 

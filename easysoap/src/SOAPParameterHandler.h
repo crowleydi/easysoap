@@ -26,6 +26,8 @@
 #include <easysoap/SOAP.h>
 #include <easysoap/SOAPParseEventHandler.h>
 
+BEGIN_EASYSOAP_NAMESPACE
+
 class SOAPStructHandler;
 class SOAPParameter;
 
@@ -51,6 +53,8 @@ private:
 	SOAPQName				m_attrName;
 	bool					m_setvalue;
 };
+
+END_EASYSOAP_NAMESPACE
 
 #endif // !defined(AFX_SOAPPARAMETERHANDLER_H__124ED3B5_721D_4AB5_8B65_32D5C4F86420__INCLUDED_)
 

@@ -27,6 +27,8 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
+BEGIN_EASYSOAP_NAMESPACE
+
 //
 // These classes are used to wrap arrays
 // so we know how to encode/decode.
@@ -65,7 +67,7 @@ private:
 	SOAPHexBase& operator=(const SOAPHexBase&);
 };
 
+END_EASYSOAP_NAMESPACE
+
 #endif // !defined(AFX_SOAPBASE64_H__8831A358_2EA1_11D5_B3F3_000000000000__INCLUDED_)
-
-
 

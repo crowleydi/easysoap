@@ -26,6 +26,8 @@
 #include <easysoap/SOAP.h>
 #include <easysoap/SOAPEnvelope.h>
 
+BEGIN_EASYSOAP_NAMESPACE
+
 class EASYSOAP_EXPORT SOAPResponse : public SOAPEnvelope
 {
 public:
@@ -51,6 +53,8 @@ public:
 
 private:
 };
+
+END_EASYSOAP_NAMESPACE
 
 #endif // !defined(AFX_SOAPRESPONSE_H__B8BDA9D2_F6F6_4312_BFAD_B34A813A3B55__INCLUDED_)
 

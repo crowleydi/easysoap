@@ -26,6 +26,8 @@
 #include <easysoap/SOAP.h>
 #include <easysoap/SOAPUrl.h>
 
+BEGIN_EASYSOAP_NAMESPACE
+
 class EASYSOAP_EXPORT SOAPSocketException : public SOAPException
 {
 public:
@@ -40,8 +42,6 @@ public:
 	}
 	~SOAPSocketException() {}
 };
-
-
 
 class SOAPSocketInterface
 {
@@ -60,8 +60,6 @@ public:
 protected:
 	SOAPSocketInterface() {}
 };
-
-
 
 class EASYSOAP_EXPORT SOAPProtocolBase
 {
@@ -112,6 +110,8 @@ public:
 	// write string plus \r\n
 	virtual size_t WriteLine(const char *str = 0);
 };
+
+END_EASYSOAP_NAMESPACE
 
 #endif // !defined(AFX_SIMPLESOCKET_H__10CE9068_BA2E_4BE4_8AE2_D48D2FCA40AF__INCLUDED_)
 

@@ -25,6 +25,8 @@
 
 #include <easysoap/SOAP.h>
 
+BEGIN_EASYSOAP_NAMESPACE
+
 class EASYSOAP_EXPORT SOAPQName  
 {
 public:
@@ -128,7 +130,7 @@ struct SOAPHashCodeFunctor<SOAPQName>
 	}
 };
 
+END_EASYSOAP_NAMESPACE
 
 #endif // !defined(AFX_SOAPQNAME_H__E392FAB3_3022_11D5_B3F3_000000000000__INCLUDED_)
-
 

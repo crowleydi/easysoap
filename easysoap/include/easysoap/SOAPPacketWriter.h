@@ -26,6 +26,8 @@
 #include <easysoap/SOAPHashMap.h>
 #include <easysoap/SOAPString.h>
 
+BEGIN_EASYSOAP_NAMESPACE
+
 class EASYSOAP_EXPORT SOAPPacketWriter  
 {
 public:
@@ -89,6 +91,8 @@ private:
 
 	static bool		g_makePretty;
 };
+
+END_EASYSOAP_NAMESPACE
 
 #endif // !defined(AFX_SOAPPACKETWRITER_H__DB61E902_B4A0_4AA3_A0F7_479D6295BD06__INCLUDED_)
 

@@ -29,6 +29,8 @@
 #include <easysoap/SOAPNamespaces.h>
 #include <easysoap/SOAPPacketWriter.h>
 
+USING_EASYSOAP_NAMESPACE
+
 SOAPParameter::SOAPParameter()
 : m_parent(0)
 , m_dataPtr(&m_x_data)

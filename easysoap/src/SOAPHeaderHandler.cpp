@@ -33,6 +33,8 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
+USING_EASYSOAP_NAMESPACE
+
 SOAPHeaderHandler::SOAPHeaderHandler()
 : m_header(0)
 {

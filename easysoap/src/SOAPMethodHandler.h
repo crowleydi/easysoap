@@ -25,6 +25,8 @@
 
 #include "SOAPParameterHandler.h"
 
+BEGIN_EASYSOAP_NAMESPACE
+
 class SOAPMethod;
 
 class SOAPMethodHandler   : public SOAPParseEventHandler
@@ -42,6 +44,8 @@ private:
 	SOAPMethod				*m_method;
 	SOAPParameterHandler	m_paramHandler;
 };
+
+END_EASYSOAP_NAMESPACE
 
 #endif // !defined(AFX_SOAPMETHODHANDLER_H__986E8F0F_4214_4C89_A3E6_FA2BD4444667__INCLUDED_)
 

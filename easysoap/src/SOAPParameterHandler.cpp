@@ -33,6 +33,8 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
+USING_EASYSOAP_NAMESPACE
+
 SOAPParameterHandler::SOAPParameterHandler()
 : m_param(0)
 , m_structHandler(0)

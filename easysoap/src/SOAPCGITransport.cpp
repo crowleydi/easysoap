@@ -28,8 +28,8 @@
 #include <io.h>
 #endif // _WIN32
 
-	
-		
+USING_EASYSOAP_NAMESPACE
+
 SOAPCGITransport::SOAPCGITransport()
 : m_logfile(0)
 , m_infile(0)

@@ -28,14 +28,42 @@
 #define EASYSOAP_EXPORT
 #endif
 
+//
+// There are a few situations where some compilers
+// want the typename keyword before a type declaration.
+// Some compilers on the other hand don't like it one
+// bit ....
 #ifdef HAVE_TEMPLATE_KEYWORD_QUALIFIER
 #define MEMBER_TYPE(T) typename T
 #else
 #define MEMBER_TYPE(T) T
 #endif
 
-#ifdef DEBUG_DMALLOC
-#  include <dmalloc.h>
+//
+//  Let's set up a macro for compilers that
+//  support namespaces...
+#ifdef HAVE_NAMESPACES 
+#define BEGIN_EASYSOAP_NAMESPACE namespace EasySoap {
+#define END_EASYSOAP_NAMESPACE }
+#define USING_EASYSOAP_NAMESPACE using namespace EasySoap;
+#else // DONT HAVE_NAMESPACES
+#define BEGIN_EASYSOAP_NAMESPACE
+#define END_EASYSOAP_NAMESPACE
+#define USING_EASYSOAP_NAMESPACE
 #endif
+
+//
+// If we're using the dmalloc library...
+// we have to include the malloc family defines
+// before we include the dmalloc header.
+#ifdef DEBUG_DMALLOC
+#ifdef HAVE_STDLIB_H
+#include <stdlib.h>
+#endif // HAVE_STDLIB_H
+#ifdef HAVE_MALLOC_H
+#include <malloc.h>
+#endif // HAVE_MALLOC_H
+#include <dmalloc.h>
+#endif // DEBUG_DMALLOC
 
 #endif // __ES_CONF_H_

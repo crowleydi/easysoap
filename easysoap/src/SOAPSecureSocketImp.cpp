@@ -66,7 +66,7 @@ extern "C" {
 //
 // Initialize OpenSSH
 //
-static class OpenSSLinit
+class OpenSSLinit
 {
 public:
 	OpenSSLinit()
@@ -83,19 +83,20 @@ public:
 	~OpenSSLinit()
 	{
 	}
-} __opensslinit;
-
-
+};
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
 
+USING_EASYSOAP_NAMESPACE
+
 SOAPSecureSocketImp::SOAPSecureSocketImp()
 : m_ssl(0)
 , m_ctx(0)
 {
+	static OpenSSLinit __opensslinit;
 }
 
 SOAPSecureSocketImp::~SOAPSecureSocketImp()

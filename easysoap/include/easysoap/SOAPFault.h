@@ -26,6 +26,8 @@
 #include <easysoap/SOAP.h>
 #include <easysoap/SOAPParameter.h>
 
+BEGIN_EASYSOAP_NAMESPACE
+
 class SOAPFaultHandler;
 
 class EASYSOAP_EXPORT SOAPFault : public SOAPParameter
@@ -90,6 +92,7 @@ public:
 	SOAPFaultException(const SOAPFault&);
 };
 
+END_EASYSOAP_NAMESPACE
 
 #endif // !defined(AFX_SOAPFAULT_H__290FC204_F572_4249_8E5E_D52E987FFAD0__INCLUDED_)
 

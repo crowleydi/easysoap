@@ -27,6 +27,8 @@
 #pragma warning(disable: 4284)
 #endif // _MSC_VER
 
+BEGIN_EASYSOAP_NAMESPACE
+
 /**
  * Functor used by SOAPHashMap class to generate
  * a hashcode for an object of type T.
@@ -69,9 +71,12 @@ struct SOAPHashCodeFunctorNoCase;
 template<typename T>
 struct SOAPEqualsFunctorNoCase;
 
+END_EASYSOAP_NAMESPACE
+
 #include <easysoap/SOAPUtil.h>
 #include <easysoap/SOAPPool.h>
 
+BEGIN_EASYSOAP_NAMESPACE
 
 /**
  * SOAPHashMap is a general purpose templated hash table class.
@@ -707,6 +712,7 @@ public:
 	}
 };
 
+END_EASYSOAP_NAMESPACE
 
 #endif // __SOAPHASHMAP_H__
 

@@ -28,6 +28,8 @@
 struct ssl_st;
 struct ssl_ctx_st;
 
+BEGIN_EASYSOAP_NAMESPACE
+
 class SOAPSecureSocketImp : public SOAPClientSocketImp
 {
 private:
@@ -51,6 +53,7 @@ public:
 	void InitSSL();
 };
 
+END_EASYSOAP_NAMESPACE
 
 #endif // !defined(AFX_SOAPSECURESOCKETIMP_H__7481DF95_30AD_4892_B5E4_44463F2F6D42__INCLUDED_)
 

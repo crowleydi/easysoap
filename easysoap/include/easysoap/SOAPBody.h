@@ -28,6 +28,8 @@
 #include <easysoap/SOAPMethod.h>
 #include <easysoap/SOAPFault.h>
 
+BEGIN_EASYSOAP_NAMESPACE
+
 class EASYSOAP_EXPORT SOAPBody
 {
 public:
@@ -56,6 +58,8 @@ private:
 	SOAPArray<SOAPParameter>	m_params;
 	bool						m_isfault;
 };
+
+END_EASYSOAP_NAMESPACE
 
 #endif // !defined(AFX_SOAPBODY_H__2ED6E429_A5CB_4FEB_B1B1_19E83A2F8046__INCLUDED_)
 

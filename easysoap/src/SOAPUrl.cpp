@@ -31,6 +31,8 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
+USING_EASYSOAP_NAMESPACE
+
 static const unsigned int ftp_default_port = 21;
 static const unsigned int http_default_port = 80;
 static const unsigned int https_default_port = 443;

@@ -27,6 +27,7 @@
 #include <easysoap/SOAPServerDispatch.h>
 #include <easysoap/SOAPDispatchHandler.h>
 
+BEGIN_EASYSOAP_NAMESPACE
 
 template <typename T>
 class SOAPServer
@@ -50,6 +51,8 @@ public:
 		return *(T*)this; // Is there a better way to do this?
 	}
 };
+
+END_EASYSOAP_NAMESPACE
 
 #endif // AFX_SOAPSERVER_H__E392FAB3_3022_11D5_B3F3_000000000000__INCLUDED_
 

@@ -26,6 +26,8 @@
 #include <easysoap/SOAP.h>
 #include <easysoap/SOAPPool.h>
 
+BEGIN_EASYSOAP_NAMESPACE
+
 class EASYSOAP_EXPORT SOAPHeader
 {
 public:
@@ -68,6 +70,8 @@ private:
 	mutable HeaderMap		m_headermap;
 	mutable bool			m_outtasync;
 };
+
+END_EASYSOAP_NAMESPACE
 
 #endif // !defined(AFX_SOAPHEADER_H__9717994A_8D5C_42BE_9F48_E0B7990C59E3__INCLUDED_)
 

@@ -19,26 +19,18 @@
  * $Id$
  */
 
-#if !defined(AFX_SOAPCGIHANDLER_H__E392FAB3_3022_11D5_B3F3_000000000000__INCLUDED_)
-#define AFX_SOAPCGIHANDLER_H__E392FAB3_3022_11D5_B3F3_000000000000__INCLUDED_
+#ifndef ES_NAMESPACES_H
+#define ES_NAMESPACES_H
 
-#include <easysoap/SOAPServer.h>
+//
+// This file is only for internal use by the library
+// and it should not be included for any other purpose.
+//
+#define SOAP_ENV "http://schemas.xmlsoap.org/soap/envelope/"
+#define SOAP_ENC "http://schemas.xmlsoap.org/soap/encoding/"
+#define SOAP_XSI_1999 "http://www.w3.org/1999/XMLSchema-instance"
+#define SOAP_XSD_1999 "http://www.w3.org/1999/XMLSchema"
+#define SOAP_XSI_2001 "http://www.w3.org/2001/XMLSchema-instance"
+#define SOAP_XSD_2001 "http://www.w3.org/2001/XMLSchema"
 
-BEGIN_EASYSOAP_NAMESPACE
-
-class EASYSOAP_EXPORT SOAPCGIServer : public SOAPServer<SOAPCGIServer>
-{
-public:
-	SOAPCGIServer() {}
-	int Handle(const char *infile = 0);
-
-private:
-
-	SOAPCGIServer(const SOAPCGIServer&);
-	SOAPCGIServer& operator=(const SOAPCGIServer&);
-};
-
-END_EASYSOAP_NAMESPACE
-
-#endif // !defined(AFX_SOAPCGIHANDLER_H__E392FAB3_3022_11D5_B3F3_000000000000__INCLUDED_)
-
+#endif // ES_NAMESPACES_H

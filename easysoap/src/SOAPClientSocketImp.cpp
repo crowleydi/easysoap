@@ -129,6 +129,8 @@ public:
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
+USING_EASYSOAP_NAMESPACE
+
 SOAPClientSocketImp::SOAPClientSocketImp()
 : m_socket(INVALID_SOCKET)
 {

@@ -25,6 +25,8 @@
 
 #include <easysoap/SOAPBase64.h>
 
+BEGIN_EASYSOAP_NAMESPACE
+
 template<typename T>
 class SOAPTypeTraits;
 
@@ -591,5 +593,7 @@ class SOAPTypeTraits< SOAP2DArray<SOAPString> > : public SOAP2DArrayTypeTraits
 };
 #endif // HAVE_PARTIAL_SPECIALIZATION
 
+END_EASYSOAP_NAMESPACE
 
 #endif // !defined(AFX_SOAPTYPETRAITS_H__C5FEAF2C_BF9D_4B2A_BA32_516712F68E78__INCLUDED_)
+

@@ -42,6 +42,8 @@
 #include <float.h>
 #endif
 
+USING_EASYSOAP_NAMESPACE
+
 static int
 sp_strtol(const char *str)
 {

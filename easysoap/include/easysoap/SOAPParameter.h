@@ -31,6 +31,8 @@
 #include <easysoap/SOAPNamespaces.h>
 #include <easysoap/SOAPPool.h>
 
+BEGIN_EASYSOAP_NAMESPACE
+
 class SOAPParameterHandler;
 
 class EASYSOAP_EXPORT SOAPParameter
@@ -170,7 +172,11 @@ private:
 	Data			*m_dataPtr;
 };
 
+END_EASYSOAP_NAMESPACE
+
 #include <easysoap/SOAPTypeTraits.h>
+
+BEGIN_EASYSOAP_NAMESPACE
 
 template<typename T>
 inline SOAPParameter&
@@ -221,6 +227,8 @@ operator<<(SOAPParameter& param, const wchar_t *val)
 	return SOAPTypeTraits<const wchar_t *>::Serialize(param, val);
 }
 #endif
+
+END_EASYSOAP_NAMESPACE
 
 #endif // !defined(AFX_SOAPPARAMETER_H__30811BAD_D6A1_4535_B256_9EEB56A84026__INCLUDED_)
 

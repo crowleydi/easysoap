@@ -30,6 +30,7 @@
 #include <easysoap/SOAPBody.h>
 #include <easysoap/SOAPNamespaces.h>
 
+USING_EASYSOAP_NAMESPACE
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

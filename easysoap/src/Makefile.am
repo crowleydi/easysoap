@@ -45,7 +45,8 @@ noinst_HEADERS = \
 	SOAPMethodHandler.h \
 	SOAPParameterHandler.h \
 	SOAPSecureSocketImp.h \
-	SOAPStructHandler.h 
+	SOAPStructHandler.h \
+	es_namespaces.h
 
 INCLUDES=-I@top_srcdir@/include -I@top_srcdir@/src/abyss/src
 

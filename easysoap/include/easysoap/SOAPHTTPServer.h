@@ -28,6 +28,8 @@
 struct _TServer;
 struct _TSession;
 
+BEGIN_EASYSOAP_NAMESPACE
+
 class EASYSOAP_EXPORT SOAPHTTPServer : public SOAPServer<SOAPHTTPServer>
 {
 public:
@@ -48,4 +50,7 @@ private:
 	struct _TServer		*m_server;
 };
 
+END_EASYSOAP_NAMESPACE
+
 #endif // !defined(AFX_SOAPHTTPSERVERTRANSPORT_H__0A80D352_B75C_411D_9096_7F1CACB82BD1__INCLUDED_)
+

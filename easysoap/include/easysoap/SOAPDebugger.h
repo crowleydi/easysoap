@@ -26,6 +26,8 @@
 #include <stdio.h>
 #include <easysoap/SOAP.h>
 
+BEGIN_EASYSOAP_NAMESPACE
+
 class EASYSOAP_EXPORT SOAPDebugger
 {
 public:
@@ -46,6 +48,8 @@ private:
 	static FILE	*m_file;
 	static int	m_messageLevel;
 };
+
+END_EASYSOAP_NAMESPACE
 
 #endif // !defined(AFX_SOAPDEBUGGER_H__2ED6E429_A5CB_4FEB_B1B1_19E83A2F8046__INCLUDED_)
 

@@ -22,10 +22,11 @@
 
 #include <easysoap/SOAPHTTPServer.h>
 
-
 extern "C" {
 #include <abyss.h>
 }
+
+USING_EASYSOAP_NAMESPACE
 
 //
 // Little static class to init the Abyss web server.

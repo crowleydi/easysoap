@@ -25,6 +25,8 @@
 
 #include <easysoap/SOAPStack.h>
 
+BEGIN_EASYSOAP_NAMESPACE
+
 template<typename T>
 class SOAPPool
 {
@@ -92,7 +94,7 @@ public:
 	}
 };
 
+END_EASYSOAP_NAMESPACE
 
 #endif // __SOAPPOOL_H__
-
 

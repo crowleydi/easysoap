@@ -32,6 +32,8 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
+USING_EASYSOAP_NAMESPACE
+
 SOAPMethod::SOAPMethod(const char *name, const char *ns, const char *sa, bool appendName)
 {
 	SetName(name, ns);

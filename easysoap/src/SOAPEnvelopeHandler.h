@@ -27,6 +27,8 @@
 #include "SOAPBodyHandler.h"
 #include "SOAPHeaderHandler.h"
 
+BEGIN_EASYSOAP_NAMESPACE
+
 class SOAPEnvelope;
 
 class SOAPEnvelopeHandler : public SOAPParseEventHandler  
@@ -52,6 +54,8 @@ private:
 	SOAPHeaderHandler	m_headerHandler;
 
 };
+
+END_EASYSOAP_NAMESPACE
 
 #endif // !defined(AFX_SOAPENVELOPEHANDLER_H__DD7D4800_3A07_4FF2_943F_E7364E9278E7__INCLUDED_)
 

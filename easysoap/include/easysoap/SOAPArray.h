@@ -28,6 +28,8 @@
 #include <easysoap/SOAPUtil.h>
 #include <easysoap/SOAPException.h>
 
+BEGIN_EASYSOAP_NAMESPACE
+
 template <typename T>
 class SOAPArray
 {
@@ -373,6 +375,7 @@ public:
 	void resize(size_t rows, size_t cols)	{Resize(rows, cols);}
 };
 
-#endif // __SOAPARRAY_H__
+END_EASYSOAP_NAMESPACE
 
+#endif // __SOAPARRAY_H__
 

@@ -23,6 +23,8 @@
 #ifndef __SOAPNamesSpaces_h__
 #define __SOAPNamesSpaces_h__
 
+BEGIN_EASYSOAP_NAMESPACE
+
 class EASYSOAP_EXPORT SOAPEnc
 {
 public:
@@ -80,4 +82,7 @@ public:
 	static const SOAPQName null;
 };
 
+END_EASYSOAP_NAMESPACE
+
 #endif // __SOAPNamesSpaces_h__
+

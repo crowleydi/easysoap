@@ -25,6 +25,8 @@
 
 #include "es_namespaces.h"
 
+USING_EASYSOAP_NAMESPACE
+
 const char *SOAPEnc::base = SOAP_ENC;
 
 const SOAPQName SOAPEnc::root("root", SOAPEnc::base);

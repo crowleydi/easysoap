@@ -27,8 +27,12 @@
 #pragma warning(disable: 4275)
 #endif // _MSC_VER
 
+#include "es_conf.h"
+
 // avoid include of expat.h
 typedef char XML_Char;
+
+BEGIN_EASYSOAP_NAMESPACE
 
 class SOAPParser;
 class SOAPParseEventHandler
@@ -43,6 +47,8 @@ public:
 	virtual void endElement(const XML_Char * /*name*/) {};
 	virtual void characterData(const XML_Char * /*str*/, int /*len*/) {};
 };
+
+END_EASYSOAP_NAMESPACE
 
 #endif // !defined(AFX_SOAPPARSEEVENTHANDLER_H__144ECE87_83A1_49B0_B48B_5112E1FFDA99__INCLUDED_)
 

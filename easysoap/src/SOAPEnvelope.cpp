@@ -33,6 +33,8 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
+USING_EASYSOAP_NAMESPACE
+
 SOAPEnvelope::SOAPEnvelope()
 {
 

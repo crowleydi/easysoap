@@ -25,6 +25,8 @@
 
 #include <easysoap/SOAPArray.h>
 
+BEGIN_EASYSOAP_NAMESPACE
+
 template<typename T>
 class SOAPStack
 {
@@ -73,7 +75,7 @@ public:
 	void Clear() {m_array.Resize(0);}
 };
 
+END_EASYSOAP_NAMESPACE
 
 #endif // __SOAPSTACK_H__
-
 

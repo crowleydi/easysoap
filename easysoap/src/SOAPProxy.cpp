@@ -26,6 +26,8 @@
 #include <easysoap/SOAPProxy.h>
 #include <easysoap/SOAPonHTTP.h>
 
+USING_EASYSOAP_NAMESPACE
+
 const SOAPResponse&
 SOAPProxy::Execute(const SOAPMethod& method)
 {
