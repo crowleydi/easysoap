@@ -26,6 +26,7 @@
 #define PARSER_NS_SEP "#"
 
 #include <easysoap/es_conf.h>
+struct XML_ParserStruct;
 
 BEGIN_EASYSOAP_NAMESPACE
 
@@ -62,7 +63,7 @@ private:
 	static void _endNamespace(void *userData, const XML_Char *prefix);
 
 	void FreeParser();
-	void *m_parser;
+	struct XML_ParserStruct *m_parser;
 };
 
 END_EASYSOAP_NAMESPACE
