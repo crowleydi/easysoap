@@ -88,10 +88,12 @@ SOAPParameter::Reset()
 		m_pool.Return(*i);
 	}
 
+	m_attrs.Clear();
 	m_array.Resize(0);
 	m_struct.Clear();
 	m_isstruct = false;
 	m_outtasync = false;
+	m_strval = "";
 }
 
 void
