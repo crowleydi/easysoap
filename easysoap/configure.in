@@ -10,8 +10,9 @@ AM_CONFIG_HEADER(include/es_config.h)
 
 dnl
 dnl Include other macros we need...
-sinclude(conftools/ac_cxx_partial_specialization.m4)
+sinclude(conftools/ac_cxx_namespaces.m4)
 sinclude(conftools/ac_cxx_template_keyword_qualifier.m4)
+sinclude(conftools/ac_cxx_partial_specialization.m4)
 
 AC_CANONICAL_HOST
 AC_CYGWIN
@@ -28,8 +29,9 @@ AM_PROG_LIBTOOL
 AC_PATH_PROG(MAKEDEPEND, makedepend, $TRUE)
 
 dnl Check C++ compiler characteristics
-AC_CXX_PARTIAL_SPECIALIZATION
+AC_CXX_NAMESPACES
 AC_CXX_TEMPLATE_KEYWORD_QUALIFIER
+AC_CXX_PARTIAL_SPECIALIZATION
 
 dnl Checks for libraries.
 AC_CHECK_LIB(stdc++, __builtin_new)
