@@ -164,7 +164,7 @@ SOAPParser::endNamespace(const XML_Char *prefix)
 }
 
 SOAPParameter *
-SOAPParser::GetHRefParam(const SOAPString& name)
+SOAPParser::GetHRefParam(const char *name)
 {
 	HRefMap::Iterator i = m_hrefmap.Find(name);
 	if (i)
@@ -173,7 +173,7 @@ SOAPParser::GetHRefParam(const SOAPString& name)
 }
 
 void
-SOAPParser::SetHRefParam(const SOAPString& name, SOAPParameter *param)
+SOAPParser::SetHRefParam(const char *name, SOAPParameter *param)
 {
 	m_hrefmap[name] = param;
 }

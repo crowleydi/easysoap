@@ -50,10 +50,10 @@ public:
 
 	// Given an HRef, return the Parameter for it
 	// if any (will return null if not found)
-	SOAPParameter *GetHRefParam(const SOAPString& name);
+	SOAPParameter *GetHRefParam(const char *name);
 
 	// Assign a SOAPParameter to an HRef
-	void SetHRefParam(const SOAPString&, SOAPParameter *);
+	void SetHRefParam(const char *name, SOAPParameter *);
 
 protected:
 
