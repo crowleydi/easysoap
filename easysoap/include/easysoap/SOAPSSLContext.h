@@ -140,16 +140,12 @@ private:
 	} CertType;
 
 	static rsa_st*		m_tmpRSAKey;
-	SOAPString 			m_cafile;
-	SOAPString 			m_certfile;
-	SOAPString 			m_keyfile;
-	SOAPString 			m_password;
 	ssl_ctx_st*			m_ctx;
 	CertType 			type;
 
 	bool				m_verifyserver;
 	SOAPArray<int> 		m_certerrors;
-        VerifyPeerCallback      m_verifycb;
+	VerifyPeerCallback	m_verifycb;
 
 
 	SOAPSSLContext(const SOAPSSLContext& ctx);
