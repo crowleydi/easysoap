@@ -30,26 +30,24 @@
 #include <float.h>
 #include <math.h>
 
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
+#define NULL_FLAG   1
+#define ARRAY_FLAG  2
+#define STRUCT_FLAG 4
 
 unsigned int SOAPParameter::m_gensym = 0;
-static const char *SOAP_xsi_type = TAG_SOAP_XSI ":type";
 
 SOAPParameter::SOAPParameter()
 : m_parent(0)
-, m_isnull(true)
+, m_flags(NULL_FLAG)
 , m_outtasync(false)
-, m_basetype(SOAPTypes::xsd_none)
 {
 	Reset();
 }
 
 SOAPParameter::SOAPParameter(const SOAPParameter& param)
 : m_parent(0)
-, m_isnull(true)
-, m_basetype(SOAPTypes::xsd_none)
+, m_flags(NULL_FLAG)
+, m_outtasync(false)
 {
 	Assign(param);
 }
@@ -63,10 +61,11 @@ void
 SOAPParameter::Assign(const SOAPParameter& param)
 {
 	Reset();
-	m_basetype = param.m_basetype;
 	SetName(param.m_name);
-	m_attrs = param.m_attrs;
+	m_type = param.m_type;
+	m_typens = param.m_typens;
 	m_strval = param.m_strval;
+	m_flags= param.m_flags;
 
 	const Array& params = param.GetArray();
 	m_array.Resize(params.Size());
@@ -91,9 +90,9 @@ SOAPParameter::Reset()
 {
 	m_array.Resize(0);
 	m_struct.Clear();
-	m_attrs.Clear();
-	SetType(SOAPTypes::xsd_none);
-	SetNull();
+	m_typens = "";
+	m_type = "";
+	m_flags = NULL_FLAG;
 }
 
 void
@@ -106,92 +105,120 @@ SOAPParameter::SetName(const char *name)
 }
 
 void
-SOAPParameter::SetType(const char *type)
-{
-	m_attrs[SOAP_xsi_type] = type;
-}
-
-void
 SOAPParameter::SetType(const char *type, const char *ns)
 {
-	char nsbuff[64];
-	char typebuff[256];
+	if (!ns)
+		ns = FULL_SOAP_XSD;
 
-	unsigned int symnum = ++m_gensym;
-	snprintf(nsbuff, sizeof(nsbuff), "xmlns:ns%d",symnum);
-	snprintf(typebuff, sizeof(typebuff), "ns%d:%s",symnum, type);
-
-	SOAPParameter *param = this;
-	while (param->m_parent)
-		param = param->m_parent;
-	param->m_attrs[nsbuff] = ns;
-	m_attrs[SOAP_xsi_type] = typebuff;
+	m_type = type;
+	m_typens = ns;
 }
 
-void
-SOAPParameter::SetType(SOAPTypes::xsd_type type)
+const SOAPString&
+SOAPParameter::GetTypeNamespace() const
 {
-	SetType(SOAPTypes::GetXsdString(type));
+	return m_typens;
 }
 
-SOAPTypes::xsd_type
+const SOAPString&
 SOAPParameter::GetType() const
 {
-	if (m_basetype != SOAPTypes::xsd_none)
-		return m_basetype;
-
-	Attrs::Iterator i = m_attrs.Find(SOAP_xsi_type);
-	if (i)
-		return SOAPTypes::GetXsdType(*i);
-	return SOAPTypes::xsd_none;
+	return m_type;
 }
 
-const char *
-SOAPParameter::GetTypeString() const
+bool
+SOAPParameter::IsNull() const
 {
-	Attrs::Iterator i = m_attrs.Find(SOAP_xsi_type);
-	if (i)
-		return *i;
-	return 0;
+	return (m_flags & NULL_FLAG) != 0;
 }
 
-void
-SOAPParameter::SetNull()
+bool
+SOAPParameter::IsArray() const
 {
-	m_isnull = true;
-	m_strval = "";
+	return (m_flags & ARRAY_FLAG) != 0;
+}
+
+bool
+SOAPParameter::IsStruct() const
+{
+	return (m_flags & STRUCT_FLAG) != 0;
 }
 
 void
-SOAPParameter::SetInteger(const char *val)
+SOAPParameter::SetNull(bool isnull)
 {
-	SetType(SOAPTypes::xsd_int);
-	m_strval = val;
-	m_isnull = false;
+	if (isnull)
+		Reset();
+	else
+	{
+		m_flags = 0;
+		m_strval = "";
+	}
+}
+
+void
+SOAPParameter::SetIsArray()
+{
+	m_flags = ARRAY_FLAG;
+	SetType("Array", FULL_SOAP_ENC);
+}
+
+void
+SOAPParameter::SetIsStruct()
+{
+	m_flags = STRUCT_FLAG;
+}
+
+void
+SOAPParameter::SetInt(const char *val)
+{
+	SetType("int");
+	if (val)
+	{
+		m_strval = val;
+		m_flags = 0;
+	}
+	else
+		SetNull();
 }
 
 void
 SOAPParameter::SetValue(const char *val)
 {
-	SetType(SOAPTypes::xsd_string);
-	m_strval = val;
-	m_isnull = false;
+	SetType("string");
+	if (val)
+	{
+		m_strval = val;
+		m_flags = 0;
+	}
+	else
+		SetNull();
 }
 
 void
 SOAPParameter::SetFloat(const char *val)
 {
-	SetType(SOAPTypes::xsd_float);
-	m_strval = val;
-	m_isnull = false;
+	SetType("float");
+	if (val)
+	{
+		m_strval = val;
+		m_flags = 0;
+	}
+	else
+		SetNull();
 }
 
 void
 SOAPParameter::SetDouble(const char *val)
 {
-	SetType(SOAPTypes::xsd_double);
-	m_strval = val;
-	m_isnull = false;
+	SetType("double");
+	if (val)
+	{
+		m_strval = val;
+		m_flags = 0;
+	}
+	else
+		SetNull();
 }
 
 void
@@ -199,7 +226,7 @@ SOAPParameter::SetValue(int val)
 {
 	char buffer[64];
 	snprintf(buffer, sizeof(buffer), "%d", val);
-	SetInteger(buffer);
+	SetInt(buffer);
 }
 
 void
@@ -209,7 +236,7 @@ SOAPParameter::SetValue(float fval)
 	if (finite(val))
 	{
 		char buffer[64];
-		snprintf(buffer, sizeof(buffer), "%g", val);
+		snprintf(buffer, sizeof(buffer), "%G", val);
 		SetFloat(buffer);
 	}
 	else
@@ -229,7 +256,7 @@ SOAPParameter::SetValue(double val)
 	if (finite(val))
 	{
 		char buffer[64];
-		snprintf(buffer, sizeof(buffer), "%g", val);
+		snprintf(buffer, sizeof(buffer), "%G", val);
 		SetDouble(buffer);
 	}
 	else
@@ -243,10 +270,46 @@ SOAPParameter::SetValue(double val)
 	}
 }
 
+void
+SOAPParameter::SetBoolean(const char *val)
+{
+	SetType("boolean");
+	if (val)
+	{
+		m_strval = val;
+		m_flags = 0;
+	}
+	else
+		SetNull();
+}
+
+void
+SOAPParameter::SetValue(bool val)
+{
+	if (val)
+		SetBoolean("true");
+	else
+		SetBoolean("false");
+}
+
+
 int
 SOAPParameter::GetInt() const
 {
 	return atoi(m_strval);
+}
+
+bool
+SOAPParameter::GetBoolean() const
+{
+	if (sp_strcasecmp(m_strval, "true") ||
+		sp_strcmp(m_strval, "1"))
+		return true;
+	if (sp_strcasecmp(m_strval, "false") ||
+		sp_strcmp(m_strval, "0"))
+		return false;
+	throw SOAPException("Invalid value for boolean type: %s",
+		(const char *)m_strval);
 }
 
 float
@@ -268,8 +331,7 @@ SOAPParameter::GetDouble() const
 const SOAPParameter *
 SOAPParameter::GetParameter(const char *name) const
 {
-	SOAPParameter *ncthis = const_cast<SOAPParameter *>(this);
-	ncthis->CheckStructSync();
+	CheckStructSync();
 	Struct::Iterator i = m_struct.Find(name);
 	if (i)
 		return *i;
@@ -298,20 +360,19 @@ SOAPParameter::GetStruct()
 const SOAPParameter::Struct&
 SOAPParameter::GetStruct() const
 {
-	SOAPParameter *ncthis = const_cast<SOAPParameter *>(this);
-	ncthis->CheckStructSync();
+	CheckStructSync();
 	return m_struct;
 }
 
 void
-SOAPParameter::CheckStructSync()
+SOAPParameter::CheckStructSync() const
 {
 	if (m_outtasync)
 	{
 		m_struct.Clear();
-		for (Array::Iterator i = m_array.Begin(); i != m_array.End(); ++i)
+		for (Array::ConstIterator i = m_array.Begin(); i != m_array.End(); ++i)
 		{
-			m_struct[i->GetName()] = i;
+			m_struct[i->GetName()] = (SOAPParameter *)i;
 		}
 		m_outtasync = false;
 	}
@@ -323,69 +384,48 @@ SOAPParameter::WriteSOAPPacket(SOAPPacketWriter& packet) const
 	const char *sym = 0;
 	char symbuff[64];
 
-	//if (m_type == SOAPTypes::xsd_none)
-		//throw SOAPException("Cannot serialize undefined parameter value");
-
 	if (m_name.Length() > 0)
-	{
 		sym = m_name;
-	}
-	/*
-	else if (m_type == SOAPTypes::soap_array)
-	{
-		sym = TAG_SOAP_ENC ":Array";
-	}
-	else if (m_type == SOAPTypes::soap_struct)
-	{
-		sym = TAG_SOAP_ENC ":Struct";
-	}*/
 	else
-	{
-		// TODO: Move random tag generation to packet writer
-		snprintf(symbuff, sizeof(symbuff), "gensym%d", ++m_gensym);
-		sym = symbuff;
-	}
+		sym = packet.GetSymbol(symbuff, "gs");
 
 	packet.StartTag(sym);
 
-	for (Attrs::Iterator ai = m_attrs.Begin(); ai != m_attrs.End(); ++ai)
-		packet.AddAttr(ai.Key(), ai.Item());
-
-	switch (GetType())
+	packet.AddNSAttr(FULL_SOAP_XSI, "type", m_typens, m_type);
+	if (IsNull())
 	{
-	case SOAPTypes::soap_array:
+		packet.AddNSAttr(FULL_SOAP_XSI, "null", "1");
+	}
+	else if (IsArray())
+	{
+		char typebuff[128];
+		if (GetArray().Size() > 0)
 		{
 			// TODO:  This is bogus.  We need to go through all params
-			// and check their type.  If they're not all the same, use 'anyType'
-			char typebuff[128];
-			if (GetArray().Size() > 0)
-			{
-				snprintf(typebuff, sizeof(typebuff), "%s[%d]", GetArray()[0].GetTypeString(), GetArray().Size());
-				packet.AddAttr(TAG_SOAP_ENC ":arrayType", typebuff);
-			}
-			else
-			{
-				packet.AddAttr(TAG_SOAP_ENC ":arrayType", TAG_SOAP_XSD ":int[0]");
-			}
-
-			for (size_t i = 0; i < GetArray().Size(); ++i)
-				GetArray()[i].WriteSOAPPacket(packet);
-
+			// and check their type.  If they're not all the same, use 'ur-type'
+			snprintf(typebuff, sizeof(typebuff), "%s[%d]", (const char *)GetArray()[0].GetType(), GetArray().Size());
+			packet.AddNSAttr(FULL_SOAP_ENC, "arrayType", (const char *)GetArray()[0].GetTypeNamespace(), typebuff);
 		}
-		break;
-
-	case SOAPTypes::soap_struct:
+		else
 		{
-			for (Struct::Iterator i = GetStruct().Begin(); i != GetStruct().End(); ++i)
-				(*i)->WriteSOAPPacket(packet);
+			// TODO: With no elements, we obviously can't discern the
+			// type so... we probably should have a way for the user to
+			// set the type to use...
+			packet.AddNSAttr(FULL_SOAP_ENC, "arrayType", FULL_SOAP_XSD, "ur-type[0]");
 		}
-		break;
 
-	default:
-		packet.WriteValue(m_strval);
-		break;
+		for (size_t i = 0; i < GetArray().Size(); ++i)
+			GetArray()[i].WriteSOAPPacket(packet);
 	}
-
+	else if (IsStruct())
+	{
+		for (Struct::Iterator i = GetStruct().Begin(); i != GetStruct().End(); ++i)
+			(*i)->WriteSOAPPacket(packet);
+	}
+	else
+	{
+		packet.WriteValue(m_strval);
+	}
 	packet.EndTag(sym);
 
 	return true;

@@ -53,21 +53,21 @@ public:
 		return m_name;
 	}
 
-	SOAPTypes::xsd_type GetType() const;
-	const char *GetTypeString() const;
-	void SetType(SOAPTypes::xsd_type type);
-	void SetType(const char *type);
-	void SetType(const char *type, const char *ns);
+	const SOAPString& GetType() const;
+	const SOAPString& GetTypeNamespace() const;
+	void SetType(const char *type, const char *ns = 0);
 
+	void SetValue(bool val);
+	void SetBoolean(const char *val);
 	void SetValue(int val);
-	void SetInteger(const char *val);
+	void SetInt(const char *val);
 	void SetValue(float val);
 	void SetFloat(const char *val);
 	void SetValue(double val);
 	void SetDouble(const char *val);
 
 	void SetValue(const char *val);
-	void SetNull();
+	bool GetBoolean() const;
 
 	int GetInt() const;
 	operator int() const					{return GetInt();}
@@ -78,7 +78,6 @@ public:
 	double GetDouble() const;
 	operator double() const					{return GetDouble();}
 
-	//SOAPString& GetString()					{return m_strval;}
 	const SOAPString& GetString() const		{return m_strval;}
 	operator const SOAPString&() const		{return GetString();}
 
@@ -98,41 +97,43 @@ public:
 	SOAPParameter& AddParameter(const char *name = "item");
 	const SOAPParameter *GetParameter(const char *name) const;
 
-	void SetBaseType(SOAPTypes::xsd_type type)
-	{
-		m_basetype = type;
-	}
-
-	void SetAttribute(const char *tag, const char *val)
-	{
-		m_attrs[tag] = val;
-	}
-
-	Attrs& GetAttributes() {return m_attrs;}
-	const Attrs& GetAttributes() const {return m_attrs;}
-
 	bool WriteSOAPPacket(SOAPPacketWriter& packet) const;
+
+	void SetIsArray();
+	void SetIsStruct();
+	void SetNull(bool isnull = true);
+	bool IsNull() const;
+	bool IsStruct() const;
+	bool IsArray() const;
 
 private:
 	void SetParent(SOAPParameter *parent) {m_parent = parent;}
 	void Assign(const SOAPParameter&);
-	void CheckStructSync();
+	void CheckStructSync() const;
 
 	friend class SOAPParameterHandler;
 
 	SOAPParameter	*m_parent;
-	Attrs			m_attrs;
 	SOAPString		m_name;
+	SOAPString		m_type;
+	SOAPString		m_typens;
+
+	int				m_flags;
 
 	SOAPString		m_strval;
 	Array			m_array;
-	Struct			m_struct;
-	bool			m_isnull;
-	bool			m_outtasync;
-	SOAPTypes::xsd_type m_basetype;
+	mutable Struct	m_struct;
+	mutable bool	m_outtasync;
 
 	static unsigned int		m_gensym;
 };
+
+inline SOAPParameter&
+operator<<(SOAPParameter& param, bool val)
+{
+	param.SetValue(val);
+	return param;
+}
 
 inline SOAPParameter&
 operator<<(SOAPParameter& param, int val)
@@ -159,6 +160,13 @@ inline SOAPParameter&
 operator<<(SOAPParameter& param, const char * val)
 {
 	param.SetValue(val);
+	return param;
+}
+
+inline const SOAPParameter&
+operator>>(const SOAPParameter& param, bool& val)
+{
+	val = param.GetBoolean();
 	return param;
 }
 
@@ -194,7 +202,7 @@ template<typename T>
 inline const SOAPParameter&
 operator<<(SOAPParameter& param, const SOAPArray<T>& val)
 {
-	param.SetType(SOAPTypes::soap_array);
+	param.SetIsArray();
 	for (SOAPArray<T>::ConstIterator i = val.Begin(); i != val.End(); ++i)
 		param.AddParameter() << *i;
 	return param;
