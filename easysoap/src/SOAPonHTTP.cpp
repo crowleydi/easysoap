@@ -79,7 +79,7 @@ SOAPonHTTP::Write(const SOAPMethod& method, const char *payload, size_t payloads
 		{
 			const char *location = m_http.GetHeader("Location");
 			if (!location)
-				throw SOAPException("HTTP 302 code did not return a Location.");
+				throw SOAPException("HTTP code %d did not return a Location header.", ret);
 
 			SOAPUrl newurl = location;
 
@@ -94,17 +94,17 @@ SOAPonHTTP::Write(const SOAPMethod& method, const char *payload, size_t payloads
 		else
 			break;
 	}
-	bool isxml = true;
-
-	const char *contype = m_http.GetHeader("Content-Type");
-	if (contype)
-		isxml = (sp_strstr(contype, "text/xml") != 0);
 
 	// Only valid return codes  we know of.  200 is success,
 	// 500 could be a soap fault.
 	if (ret != 200 && ret != 500)
 		throw SOAPException("Unexpected return code: %s",
 			(const char *)m_http.GetRequestMessage());
+
+	bool isxml = true;
+	const char *contype = m_http.GetHeader("Content-Type");
+	if (contype)
+		isxml = (sp_strstr(contype, "text/xml") != 0);
 
 	if (!isxml)
 		throw SOAPException("Unexpected return Content-Type: %s", contype);
