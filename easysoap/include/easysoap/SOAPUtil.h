@@ -277,36 +277,33 @@ sp_itoa(L a, T *const buffer)
 {
     T *ptr = buffer;
 
-	// check if we're negative
-	bool neg = (a < 0);
-
-	// handle first char before we make the
-	// number positive
-    int rem = a % 10;
-    a /= 10;
-
-	// since we just did the divide, we know we're
-	// not max int.  so it's now safe to do a=-a.
-    if (neg)
-    {
-        rem = -rem;
-        a = -a;
-		*ptr++ = '-';
-    }
-
 	//
 	// store begining of string
 	// we have to reverse
   	T *b = ptr;
-	*ptr++ = rem + '0';
 
-	// while we have a non-zero value
-	// get the base 10 remainder
-    while (a != 0)
-    {
-        *ptr++ = (a % 10) + '0';
-        a /= 10;
-    }
+	// check if we're negative
+	if (a < 0)
+	{
+		// while we have a non-zero value
+		// get the base 10 remainder
+		while (a != 0)
+		{
+			*ptr++ = '0' - (a % 10);
+			a /= 10;
+		}
+		*ptr++ = '-';
+	}
+	else
+	{
+		// while we have a non-zero value
+		// get the base 10 remainder
+		while (a != 0)
+		{
+			*ptr++ = (a % 10) + '0';
+			a /= 10;
+		}
+	}
 
 	// null terminate
 	*ptr = 0;
