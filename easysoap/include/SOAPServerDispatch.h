@@ -36,7 +36,7 @@ public:
 	virtual ~SOAPServerDispatch();
 
 	SOAPServerDispatch& DispatchTo(SOAPDispatchHandlerInterface *disp);
-	SOAPServerDispatch& DispatchHeadersTo(SOAPHeaderHandlerInterface *disp);
+	SOAPServerDispatch& DispatchTo(SOAPHeaderHandlerInterface *disp);
 
 	int Handle(SOAPTransport& transport);
 
