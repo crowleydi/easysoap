@@ -32,11 +32,9 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-SOAPEnvelopeHandler::SOAPEnvelopeHandler(SOAPEnvelope& envelope)
+SOAPEnvelopeHandler::SOAPEnvelopeHandler()
 : m_done(false)
-, m_envelope(&envelope)
-, m_bodyHandler(envelope.GetBody())
-, m_headerHandler(envelope.GetHeader())
+, m_envelope(0)
 {
 
 }
@@ -45,6 +43,17 @@ SOAPEnvelopeHandler::~SOAPEnvelopeHandler()
 {
 
 }
+
+
+void
+SOAPEnvelopeHandler::SetEnvelope(SOAPEnvelope& env)
+{
+	m_envelope = &env;
+	m_done = false;
+	m_bodyHandler.SetBody(m_envelope->GetBody());
+	m_headerHandler.SetHeader(m_envelope->GetHeader());
+}
+
 
 SOAPParseEventHandler *
 SOAPEnvelopeHandler::start(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs)

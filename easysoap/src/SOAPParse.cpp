@@ -37,18 +37,20 @@
 
 SOAPParser::SOAPParser()
 {
+	m_envelopeHandler = new SOAPEnvelopeHandler();
 }
 
 SOAPParser::~SOAPParser()
 {
+	delete m_envelopeHandler;
 }
 
 
 SOAPEnvelope&
 SOAPParser::Parse(SOAPEnvelope& env, SOAPTransport& trans)
 {
-	SOAPEnvelopeHandler envhandler(env);
-	m_handler = &envhandler;
+	m_envelopeHandler->SetEnvelope(env);
+	m_handler = m_envelopeHandler;
 
 	// make sure our stack is empty
 	m_handlerstack.Clear();

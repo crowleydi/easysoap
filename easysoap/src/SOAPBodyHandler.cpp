@@ -33,11 +33,9 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-SOAPBodyHandler::SOAPBodyHandler(SOAPBody& body)
-: m_body(&body)
+SOAPBodyHandler::SOAPBodyHandler()
+: m_body(0)
 , m_gotMethod(false)
-, m_methodHandler(body.GetMethod())
-, m_faultHandler(body.GetFault())
 {
 	m_paramHandler.SetIgnoreId();
 	m_paramHandler.SetIgnoreName();
@@ -46,6 +44,14 @@ SOAPBodyHandler::SOAPBodyHandler(SOAPBody& body)
 SOAPBodyHandler::~SOAPBodyHandler()
 {
 
+}
+
+void
+SOAPBodyHandler::SetBody(SOAPBody& body)
+{
+	m_body = &body;
+	m_methodHandler.SetMethod(body.GetMethod());
+	m_faultHandler.SetFault(body.GetFault());
 }
 
 SOAPParseEventHandler *

@@ -30,8 +30,10 @@ class SOAPMethod;
 class SOAPMethodHandler   : public SOAPParseEventHandler
 {
 public:
-	SOAPMethodHandler(SOAPMethod&);
+	SOAPMethodHandler();
 	virtual ~SOAPMethodHandler();
+
+	void SetMethod(SOAPMethod&);
 
 	virtual SOAPParseEventHandler* start(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs);
 	virtual SOAPParseEventHandler* startElement(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs);

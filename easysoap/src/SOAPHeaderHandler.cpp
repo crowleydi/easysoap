@@ -33,8 +33,8 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-SOAPHeaderHandler::SOAPHeaderHandler(SOAPHeader& header)
-: m_header(&header)
+SOAPHeaderHandler::SOAPHeaderHandler()
+: m_header(0)
 {
 
 }
@@ -42,6 +42,12 @@ SOAPHeaderHandler::SOAPHeaderHandler(SOAPHeader& header)
 SOAPHeaderHandler::~SOAPHeaderHandler()
 {
 
+}
+
+void
+SOAPHeaderHandler::SetHeader(SOAPHeader& header)
+{
+	m_header = &header;
 }
 
 SOAPParseEventHandler *

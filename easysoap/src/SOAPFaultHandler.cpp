@@ -33,14 +33,19 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-SOAPFaultHandler::SOAPFaultHandler(SOAPFault& fault)
+SOAPFaultHandler::SOAPFaultHandler()
+: m_fault(0)
 {
-	m_fault = &fault;
 }
 
 SOAPFaultHandler::~SOAPFaultHandler()
 {
+}
 
+void
+SOAPFaultHandler::SetFault(SOAPFault& fault)
+{
+	m_fault = &fault;
 }
 
 SOAPParseEventHandler *

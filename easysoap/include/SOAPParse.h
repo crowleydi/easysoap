@@ -69,6 +69,7 @@ private:
 	typedef SOAPHashMap<SOAPString, SOAPString> NamespaceMap;
 	typedef SOAPHashMap<SOAPString, SOAPParameter*> HRefMap;
 
+	SOAPEnvelopeHandler		*m_envelopeHandler;
 	HandlerStack			m_handlerstack;
 	mutable SOAPString		m_work;
 	SOAPEnvelopeHandler		*m_handler;

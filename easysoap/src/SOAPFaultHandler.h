@@ -30,8 +30,10 @@ class SOAPFault;
 class SOAPFaultHandler : public SOAPParseEventHandler  
 {
 public:
-	SOAPFaultHandler(SOAPFault& fault);
+	SOAPFaultHandler();
 	virtual ~SOAPFaultHandler();
+
+	void SetFault(SOAPFault&);
 
 	virtual SOAPParseEventHandler* start(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs);
 	virtual SOAPParseEventHandler* startElement(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs);

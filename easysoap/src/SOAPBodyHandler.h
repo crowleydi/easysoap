@@ -32,8 +32,10 @@ class SOAPBody;
 class SOAPBodyHandler : public SOAPParseEventHandler  
 {
 public:
-	SOAPBodyHandler(SOAPBody&);
+	SOAPBodyHandler();
 	virtual ~SOAPBodyHandler();
+
+	void SetBody(SOAPBody&);
 
 	virtual SOAPParseEventHandler* start(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs);
 	virtual SOAPParseEventHandler* startElement(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs);

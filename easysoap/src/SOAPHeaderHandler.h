@@ -31,8 +31,10 @@ class SOAPHeaderHandler : public SOAPParseEventHandler
 {
 public:
 
-	SOAPHeaderHandler(SOAPHeader&);
+	SOAPHeaderHandler();
 	virtual ~SOAPHeaderHandler();
+
+	void SetHeader(SOAPHeader&);
 
 	virtual SOAPParseEventHandler* start(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs);
 	virtual SOAPParseEventHandler* startElement(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs);

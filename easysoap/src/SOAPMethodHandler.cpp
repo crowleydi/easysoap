@@ -32,8 +32,8 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-SOAPMethodHandler::SOAPMethodHandler(SOAPMethod& method)
-: m_method(&method)
+SOAPMethodHandler::SOAPMethodHandler()
+: m_method(0)
 {
 
 }
@@ -41,6 +41,12 @@ SOAPMethodHandler::SOAPMethodHandler(SOAPMethod& method)
 SOAPMethodHandler::~SOAPMethodHandler()
 {
 
+}
+
+void
+SOAPMethodHandler::SetMethod(SOAPMethod& method)
+{
+	m_method = &method;
 }
 
 SOAPParseEventHandler *

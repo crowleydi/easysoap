@@ -34,14 +34,16 @@ class SOAPEnvelopeHandler : public SOAPParseEventHandler
 
 public:
 
-	SOAPEnvelopeHandler(SOAPEnvelope&);
+	SOAPEnvelopeHandler();
 	virtual ~SOAPEnvelopeHandler();
+
+	void SetEnvelope(SOAPEnvelope& env);
+	bool Done()	{return m_done;}
 
 	virtual SOAPParseEventHandler* start(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs);
 	virtual SOAPParseEventHandler* startElement(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs);
 	virtual void endElement(const XML_Char *name);
 
-	bool Done()	{return m_done;}
 
 private:
 	bool				m_done;
