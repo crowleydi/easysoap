@@ -66,7 +66,7 @@
 #endif // EASYSOAP_STATIC
 
 #define HAVE_64BIT_INT
-#define 64BIT_INT __int64
-#define 64BIT_UINT unsigned __int64
+#define INT64BIT __int64
+#define UINT64BIT unsigned __int64
 
 #endif // __ES_MSVC_H_
