@@ -24,14 +24,6 @@
 #pragma warning (disable: 4786)
 #endif // _MSC_VER
 
-#ifdef _WIN32
-#if !defined (__MWERKS__)
-#include <winsock2.h>
-#endif
-#else // not _WIN32
-#include <sys/time.h>
-#endif // _WIN32
-
 #include <easysoap/SOAP.h>
 #include <easysoap/SOAPDebugger.h>
 #include <easysoap/SOAPSSLContext.h>
@@ -62,18 +54,22 @@ size_t SOAPSecureSocketImp::Read(char *, size_t) {return 0;}
 size_t SOAPSecureSocketImp::Write(const char *, size_t) {return 0;}
 bool SOAPSecureSocketImp::WaitRead(int, int) {return false;}
 void SOAPSecureSocketImp::InitSSL() {}
-#else
+
+#else // HAVE_LIBSSL
+
+#ifdef HAVE_ERRNO_H
+#include <errno.h>
+#endif
+
+#ifdef HAVE_STRING_H
+#include <string.h>
+#endif
 
 extern "C" {
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 #include <openssl/rand.h>
 };
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 
 SOAPSecureSocketImp::SOAPSecureSocketImp()
 : m_ssl(0)
@@ -125,6 +121,30 @@ SOAPSecureSocketImp::HandleError(const char *context, int retcode)
 		break;
 
 	case SSL_ERROR_SYSCALL:
+		{
+			if (ERR_get_error() == 0)
+			{
+				if (retcode == 0)
+				{
+					// premature EOF, but not necessarily an error
+					SOAPDebugger::Print(2, "%s: premature close on socket", context);
+					break;
+				}
+
+				if (retcode == -1)
+				{
+					char msg[256];
+#ifdef HAVE_STRERROR
+					sp_strncpy(msg, strerror(errno), sizeof(msg));
+#else // dont HAVE_STRERROR
+					snprintf(msg, sizeof(msg), "socket error, errno=%d", errno);
+#endif // HAVE_STRERROR
+					msg[sizeof(msg) - 1] = 0;
+					throw SOAPSocketException(context, msg);
+				}
+			}
+		}
+		// okay to fall through.
 	case SSL_ERROR_SSL:
 	default:
 		{
@@ -289,5 +309,5 @@ SOAPSecureSocketImp::Close()
 
 }
 
-#endif // EASYSOAP_SSL
+#endif // HAVE_LIBSSL
 
