@@ -28,9 +28,8 @@
 #include "SOAPTransport.h"
 #include "SOAPStack.h"
 
-class SOAPResponse;
-class SOAPResponseHandler;
 class SOAPParserEventHandler;
+class SOAPEnvelopeHandler;
 
 class EASYSOAP_EXPORT SOAPParser : protected XMLParser
 {
@@ -39,7 +38,7 @@ public:
 	SOAPParser();
 	virtual ~SOAPParser();
 
-	SOAPResponse& Parse(SOAPResponse& resp, SOAPTransport& trans);
+	SOAPEnvelope& Parse(SOAPEnvelope& env, SOAPTransport& trans);
 
 	// Used by subscribers/handlers
 
@@ -70,7 +69,7 @@ private:
 
 	HandlerStack			m_handlerstack;
 	SOAPString				m_work;
-	SOAPResponseHandler		*m_response;
+	SOAPEnvelopeHandler		*m_handler;
 	NamespaceMap			m_nsmap;
 	HRefMap					m_hrefmap;
 };

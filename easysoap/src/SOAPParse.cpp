@@ -23,7 +23,7 @@
 
 #include "SOAP.h"
 #include "SOAPParse.h"
-#include "SOAPResponseHandler.h"
+#include "SOAPEnvelopeHandler.h"
 
 #include "SOAPNamespaces.h"
 
@@ -42,11 +42,11 @@ SOAPParser::~SOAPParser()
 }
 
 
-SOAPResponse&
-SOAPParser::Parse(SOAPResponse& resp, SOAPTransport& trans)
+SOAPEnvelope&
+SOAPParser::Parse(SOAPEnvelope& env, SOAPTransport& trans)
 {
-	SOAPResponseHandler response(resp);
-	m_response = &response;
+	SOAPEnvelopeHandler envhandler(env);
+	m_handler = &envhandler;
 
 	// make sure our stack is empty
 	m_handlerstack.Clear();
@@ -73,14 +73,14 @@ SOAPParser::Parse(SOAPResponse& resp, SOAPTransport& trans)
 				GetErrorMessage());
 		}
 
-		if (read != 0 && m_response->Done())
+		if (read != 0 && m_handler->Done())
 		{
 			ParseBuffer(0);
 			break;
 		}
 	}
 
-	return resp;
+	return env;
 }
 
 void
@@ -89,9 +89,9 @@ SOAPParser::startElement(const XML_Char *name, const XML_Char **attrs)
 	SOAPParseEventHandler* handler = 0;
 	if (m_handlerstack.IsEmpty())
 	{
-		if (sp_strcmp(name, SOAPResponseHandler::start_tag) == 0)
+		if (sp_strcmp(name, SOAPEnvelopeHandler::start_tag) == 0)
 		{
-			handler = m_response;
+			handler = m_handler;
 		}
 		else
 		{
