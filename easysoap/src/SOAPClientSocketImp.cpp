@@ -57,7 +57,8 @@ public:
 
 	~WinSockInit()
 	{
-		WSACleanup();
+		if (didinit)
+			WSACleanup();
 	}
 } __winsockinit;
 
