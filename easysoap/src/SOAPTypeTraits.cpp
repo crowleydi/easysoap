@@ -197,7 +197,7 @@ SOAPParameter&
 SOAPTypeTraits<short>::Serialize(SOAPParameter& param, short val)
 {
 	char buffer[64];
-	snprintf(buffer, sizeof(buffer), "%d", val);
+	sp_itoa(val, buffer);
 	param.GetStringRef() = buffer;
 	return param;
 }
@@ -228,7 +228,7 @@ SOAPParameter&
 SOAPTypeTraits<int>::Serialize(SOAPParameter& param, int val)
 {
 	char buffer[64];
-	snprintf(buffer, sizeof(buffer), "%d", val);
+	sp_itoa(val, buffer);
 	Serialize(param, buffer);
 	return param;
 }
@@ -266,7 +266,7 @@ SOAPParameter&
 SOAPTypeTraits<long>::Serialize(SOAPParameter& param, long val)
 {
 	char buffer[64];
-	snprintf(buffer, sizeof(buffer), "%d", val);
+	sp_itoa(val, buffer);
 	param.GetStringRef() = buffer;
 	return param;
 }
