@@ -16,7 +16,7 @@
  * License along with this library; if not, write to the Free
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- * $Id$
+ * XMLComposer.cpp,v 1.1 2001/12/20 22:38:19 dcrowley Exp
  */
 
 
@@ -483,14 +483,15 @@ XMLComposer::Write(const char *str, unsigned int len)
 void
 XMLComposer::PopLevel()
 {
-	for (NamespaceArray::Iterator i = m_nsarray.End(); i != m_nsarray.Begin();)
+	size_t numRemoved = 0;
+	for (NamespaceArray::Iterator i = m_nsarray.End(); i-- != m_nsarray.Begin();)
 	{
-		--i;
-		if (i->level == m_level)
-			m_nsmap.Remove(i->value);
-		else
+		if (i->level != m_level)
 			break;
+		m_nsmap.Remove(i->value);
+		++numRemoved;
 	}
+	m_nsarray.Resize(m_nsarray.Size() - numRemoved);
 	--m_level;
 }
 
