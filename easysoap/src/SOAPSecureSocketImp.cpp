@@ -46,6 +46,11 @@ SOAPSecureSocketImp::SOAPSecureSocketImp()
 	throw SOAPSocketException("Secure sockets not supported.");
 }
 
+SOAPSecureSocketImp::SOAPSecureSocketImp(SOAPSSLContext& ctx) 
+{
+	throw SOAPSocketException("Secure sockets not supported.");
+}
+
 SOAPSecureSocketImp::~SOAPSecureSocketImp()
 {
 }

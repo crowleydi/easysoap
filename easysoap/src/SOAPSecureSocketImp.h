@@ -22,12 +22,15 @@
 
 #if !defined(AFX_SOAPSECURESOCKETIMP_H__7481DF95_30AD_4892_B5E4_44463F2F6D42__INCLUDED_)
 #define AFX_SOAPSECURESOCKETIMP_H__7481DF95_30AD_4892_B5E4_44463F2F6D42__INCLUDED_
-#include <openssl/ssl.h>
-#include "SOAPClientSocketImp.h"
-#include <SOAPSSLContext.h>
 
+
+#include "SOAPClientSocketImp.h"
+
+struct SSL;
 
 BEGIN_EASYSOAP_NAMESPACE
+
+class SOAPSSLContext;
 
 class SOAPSecureSocketImp : public SOAPClientSocketImp
 {
