@@ -11,10 +11,10 @@ void
 usage(const char * prog)
 {
 	std::cout
-		<< "Usage: " << prog << " <key> <query>" << std::endl
+		<< "Usage: " << prog << " <query>" << std::endl
 		<< "Where:" << std::endl
-		<< "\t<key> is your Google account key." << std::endl
 		<< "\t<query> is your search string." << std::endl << std::endl
+		<< "Set GOOGLE_KEY environment to your Google account key." << std::endl
 		<< "Register for your Google account key at "
 		<< "http://www.google.com/apis/" << std::endl << std::endl
 		;
@@ -23,11 +23,14 @@ usage(const char * prog)
 int
 main(int argc, const char *argv[])
 {
-	if (argc < 3)
+	if (argc < 2)
 	{
 		usage(argv[0]);
 		return 1;
 	}
+
+	const char *googleKey = getenv("GOOGLE_KEY");
+	const char *query = argv[1];
 
 	try
 	{
@@ -37,12 +40,18 @@ main(int argc, const char *argv[])
 		// set the key up one time so
 		// we don't have to pass it in
 		// with each query.
-		google.setKey(argv[1]);
+		if (!googleKey)
+		{
+			std::cout << "GOOGLE_KEY environment variable not set." << std::endl;
+			usage(argv[0]);
+			return 1;
+		}
+		google.setKey(googleKey);
 
 		//
 		// Do our search.
 		GoogleSearch::Result result;
-		google.search(argv[2], 0, 10,
+		google.search(query, 0, 10,
 				false, "", false, "",
 				"latin1", "latin1", result);
 
