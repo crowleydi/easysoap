@@ -62,11 +62,11 @@ public:
 
 protected:
 
-	void startElement(const XML_Char *name, const XML_Char **attrs);
-	void endElement(const XML_Char *name);
-	void characterData(const XML_Char *str, int len);
-	void startNamespace(const XML_Char *prefix, const XML_Char *uri);
-	void endNamespace(const XML_Char *prefix);
+	void startElement(const char *name, const char **attrs);
+	void endElement(const char *name);
+	void characterData(const char *str, int len);
+	void startNamespace(const char *prefix, const char *uri);
+	void endNamespace(const char *prefix);
 
 private:
 

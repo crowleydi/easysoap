@@ -29,8 +29,6 @@
 
 #include "es_conf.h"
 
-// avoid include of expat.h
-typedef char XML_Char;
 
 BEGIN_EASYSOAP_NAMESPACE
 
@@ -42,14 +40,47 @@ class SOAPParser;
 class SOAPParseEventHandler
 {
 public:
+	SOAPParseEventHandler()
+	{
+	}
 
-	SOAPParseEventHandler() {}
 	virtual ~SOAPParseEventHandler() {}
 
-	virtual SOAPParseEventHandler* start(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs) = 0;
-	virtual SOAPParseEventHandler* startElement(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs) = 0;
-	virtual void endElement(const XML_Char * /*name*/) {};
-	virtual void characterData(const XML_Char * /*str*/, int /*len*/) {};
+	virtual SOAPParseEventHandler* start(
+			SOAPParser& parser,
+			const char *name,
+			const char **attrs) = 0;
+
+	virtual SOAPParseEventHandler* startElement(
+			SOAPParser& parser,
+			const char *name,
+			const char **attrs) = 0;
+
+	virtual void endElement(
+			SOAPParser& parser,
+			const char *name)
+	{
+		endElement(name);
+	};
+
+	virtual void endElement(
+			const char * /*name*/)
+	{
+	};
+
+	virtual void characterData(
+			SOAPParser& parser,
+			const char * str,
+			int len)
+	{
+		characterData(str, len);
+	};
+
+	virtual void characterData(
+			const char * /*str*/,
+			int /*len*/)
+	{
+	};
 };
 
 END_EASYSOAP_NAMESPACE

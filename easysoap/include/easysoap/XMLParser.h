@@ -45,13 +45,15 @@ public:
 	const char *GetErrorMessage();
 
 protected:
-	virtual void startElement(const XML_Char *name, const XML_Char **attrs);
-	virtual void endElement(const XML_Char *name);
-	virtual void characterData(const XML_Char *str, int len);
-	virtual void startNamespace(const XML_Char *prefix, const XML_Char *uri);
-	virtual void endNamespace(const XML_Char *prefix);
+	virtual void startElement(const char *name, const char **attrs);
+	virtual void endElement(const char *name);
+	virtual void characterData(const char *str, int len);
+	virtual void startNamespace(const char *prefix, const char *uri);
+	virtual void endNamespace(const char *prefix);
 
 private:
+	typedef char XML_Char;
+
 	//
 	// the C based XML parser calls through to these methods
 	// which pass them on to the C++ interface
