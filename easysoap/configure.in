@@ -1,5 +1,10 @@
+dnl
 dnl Process this file with autoconf to produce a configure script.
-AC_INIT(include/SOAP.h)
+dnl
+dnl
+
+AC_INIT(Makefile.am)
+
 AM_INIT_AUTOMAKE(EasySoap++, 0.4)
 AM_CONFIG_HEADER(include/es_config.h)
 AC_CANONICAL_HOST
@@ -19,8 +24,8 @@ AC_PATH_PROG(MAKEDEPEND, makedepend, $TRUE)
 
 dnl Checks for libraries.
 AC_CHECK_LIB(expat, XML_Parse)
+AC_CHECK_LIB(crypto, ERR_put_error)
 AC_CHECK_LIB(ssl, SSL_connect)
-AC_CHECK_LIB(crypto, des_crypt)
 AC_CHECK_LIB(wsock32, WSAStartup)
 
 dnl Checks for header files.
