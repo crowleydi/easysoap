@@ -48,7 +48,7 @@ public:
 private:
 	SOAPParameter			*m_param;
 
-	SOAPString				m_str;
+	SOAPArray<XML_Char>		m_str;
 	SOAPStructHandler		*m_structHandler;
 	SOAPQName				m_attrName;
 	bool					m_setvalue;

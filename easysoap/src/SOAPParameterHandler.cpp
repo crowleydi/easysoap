@@ -65,7 +65,7 @@ SOAPParameterHandler::start(SOAPParser& parser, const XML_Char *name, const XML_
 	}
 
 	m_setvalue = true;
-	m_str = "";
+	m_str.Resize(0);
 
 	const XML_Char **cattrs = attrs;
 	while (*cattrs)
@@ -131,7 +131,7 @@ void
 SOAPParameterHandler::characterData(const XML_Char *str, int len)
 {
 	if (m_setvalue)
-		m_str.Append(str, len);
+		m_str.Add(str, len);
 }
 
 void
@@ -140,6 +140,7 @@ SOAPParameterHandler::endElement(const XML_Char *)
 	if (m_setvalue)
 	{
 		m_param->SetNull(false);
-		m_param->GetStringRef() = m_str;
+		m_str.Add(0); // null terminate
+		m_param->GetStringRef() = (const char *)m_str;
 	}
 }
