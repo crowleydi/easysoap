@@ -7,7 +7,8 @@
 <body>
 
 <h3>Basic Tests</h3>
-Just some basic types.  Integer, float, String, struct, etc.
+Just some basic types.  Integer, float, String, struct, etc.<p/>
+Table updated: <xsl:value-of select="InteropTests/Date"/>
 <table>
 <tr>
 	<th></th>
