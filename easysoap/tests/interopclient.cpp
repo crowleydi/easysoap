@@ -920,7 +920,15 @@ main(int argc, char* argv[])
 			// Just test against localhost
 			Endpoint& e = endpoints.Add();
 			e.name = "localhost";
+
+//  FIX ME:
+//  Make this configurable from the makefile
+#ifdef _WIN32
 			e.endpoint = "http://localhost:80/cgi-bin/interopserver.exe";
+#else
+			e.endpoint = "http://localhost:80/cgi-bin/interopserver";
+#endif // _WIN32
+
 			e.nspace = default_interop_namespace;
 			e.soapaction = default_interop_soapaction;
 			e.needsappend = false;
