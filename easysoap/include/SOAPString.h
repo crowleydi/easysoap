@@ -141,11 +141,6 @@ public:
 		return Str();
 	}
 
-	operator char *()
-	{
-		return Str();
-	}
-
 	size_t Length() const
 	{
 		return m_str ? sp_strlen(m_str) : 0;
