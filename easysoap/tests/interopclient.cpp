@@ -733,6 +733,12 @@ TestEchoString(SOAPProxy& proxy, const Endpoint& e)
 }
 
 void
+TestEchoString_null(SOAPProxy& proxy, const Endpoint& e)
+{
+	TestEchoString(proxy, e, 0);
+}
+
+void
 TestEchoString_newlines(SOAPProxy& proxy, const Endpoint& e)
 {
 	TestEchoString(proxy, e, "This\ris\na\r\ntest\tstring\n\rfrom EasySoap++");
@@ -1507,6 +1513,7 @@ TestInterop(const Endpoint& e, TestType test)
 	TestForFault(proxy, e, "echoFloat_Junk1",			TestEchoFloat_Junk1);
 	TestForPass(proxy, e, "echoFloat_Junk2",			TestEchoFloat_Junk2);
 	TestForPass(proxy, e, "echoString",					TestEchoString);
+	TestForPass(proxy, e, "echoString_null",			TestEchoString_null);
 	TestForPass(proxy, e, "echoString_newlines",		TestEchoString_newlines);
 	TestForPass(proxy, e, "echoStruct",					TestEchoStruct);
 	TestForPass(proxy, e, "echoIntegerArray",			TestEchoIntegerArray);
