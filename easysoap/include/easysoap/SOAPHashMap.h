@@ -116,9 +116,9 @@ private:
 	class ForwardHashMapIterator
 	{
 	private:
-		const SOAPHashMap		*m_map;
-		Elements::Iterator		m_index;
-		HashElement				*m_he;
+		const SOAPHashMap				*m_map;
+		typename Elements::Iterator		m_index;
+		HashElement						*m_he;
 		
 		friend class SOAPHashMap<K,I,H,E>;
 
