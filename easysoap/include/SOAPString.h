@@ -151,6 +151,11 @@ public:
 		return m_str ? sp_strlen(m_str) : 0;
 	}
 
+	bool IsEmpty() const
+	{
+		return m_str == 0 || *m_str == 0;
+	}
+
 	int Compare(const char *str) const
 	{
 		return sp_strcmp(m_str, str);
