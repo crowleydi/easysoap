@@ -58,6 +58,60 @@ SetTraceFile(const char *server, const char *test)
 }
 
 //
+// Little helper function used by the structure
+// accessors
+//
+const SOAPParameter&
+SafeGetParameter(const SOAPParameter& param, const char *pname)
+{
+	const SOAPParameter *p = 0;
+	if (!(p = param.GetParameter(pname)))
+		throw SOAPException("Invalid struct, member '%s' is missing", pname);
+	return *p;
+}
+
+//
+// The struct used to hold endpoint information
+//
+
+struct Endpoint
+{
+	SOAPString name;
+	SOAPString wsdl;
+	SOAPString endpoint;
+	SOAPString soapaction;
+	bool	   needsappend;
+	SOAPString nspace;
+};
+
+const SOAPParameter&
+operator>>(const SOAPParameter& param, Endpoint& e)
+{
+	SafeGetParameter(param, "name") >> e.name;
+	SafeGetParameter(param, "wsdl") >> e.wsdl;
+	SafeGetParameter(param, "endpoint") >> e.endpoint;
+	SafeGetParameter(param, "soapaction") >> e.soapaction;
+	e.needsappend = SafeGetParameter(param, "soapactionNeedsMethod").GetInt() != 0;
+	SafeGetParameter(param, "namespace") >> e.nspace;
+
+	return param;
+}
+
+void
+GetAllEndpoints(SOAPArray<Endpoint>& e)
+{
+	SOAPProxy proxy("http://www.xmethods.net/perl/soaplite.cgi");
+	SOAPMethod getAllEndpoints("getAllEndpoints",
+		"http://soapinterop.org/ilab",
+		"http://soapinterop.org/ilab#", true);
+
+	const SOAPResponse& response = proxy.Execute(getAllEndpoints);
+	const SOAPParameter& p = response.GetReturnValue();
+
+	p >> e;
+}
+
+//
 //  The struct used for interop tests
 //
 struct SOAPInteropStruct
@@ -114,17 +168,6 @@ operator<<(SOAPParameter& param, const SOAPInteropStruct& val)
 }
 
 //
-// Little helper function
-const SOAPParameter&
-SafeGetParameter(const SOAPParameter& param, const char *pname)
-{
-	const SOAPParameter *p = 0;
-	if (!(p = param.GetParameter(pname)))
-		throw SOAPException("Invalid struct, member '%s' is missing", pname);
-	return *p;
-}
-
-//
 // Define how we de-serialize the struct
 const SOAPParameter&
 operator>>(const SOAPParameter& param, SOAPInteropStruct& val)
@@ -141,7 +184,7 @@ operator>>(const SOAPParameter& param, SOAPInteropStruct& val)
 bool
 almostequal(float a, float b)
 {
-	return (fabs(a - b) <= fabs(a) * 0.0000001);
+	return (fabs(a - b) <= fabs(a) * 0.0000005);
 }
 
 bool
@@ -154,15 +197,10 @@ almostequal(const SOAPArray<float>& a, const SOAPArray<float>& b)
 	{
 		if (a[i] != b[i])
 		{
-			std::cout << "Checking almost equal "
-				<< a[i] << " " << b[i];
 			if (!almostequal(a[i], b[i]))
 			{
 				retval = false;
-				std::cout << " NOPE, diff=" << (a[i] - b[i]) << std::endl;
 			}
-			else
-				std::cout << " OKAY" << std::endl;
 		}
 	}
 	return retval;
@@ -268,6 +306,39 @@ TestEchoInteger(SOAPProxy& proxy,
 }
 
 bool
+TestEchoInteger(SOAPProxy& proxy,
+			const char *uri,
+			const char *soapAction,
+			bool appendMethod, const char *value)
+{
+	try
+	{
+		SOAPMethod method("echoInteger", uri, soapAction, appendMethod);
+		SOAPParameter& inputParam = method.AddParameter("inputInteger");
+		inputParam.SetFloat(value);
+
+		std::cout << "Testing " << method.GetName() << ": ";
+
+		const SOAPResponse& response = proxy.Execute(method);
+		const SOAPParameter& outputParam = response.GetReturnValue();
+
+		std::cout << "PASS: input=" << inputParam.GetString()
+			<<" output=" << outputParam.GetString() << std::endl;
+
+		return false;
+	}
+	catch (SOAPException& sex)
+	{
+		std::cout << "FAILED: " << sex.What() << std::endl;
+	}
+	catch (...)
+	{
+		std::cout << "FAILED (badly)" << std::endl;
+	}
+	return true;
+}
+
+bool
 TestEchoIntegerInvalid(SOAPProxy& proxy,
 			const char *uri,
 			const char *soapAction,
@@ -320,16 +391,18 @@ TestEchoFloat(SOAPProxy& proxy,
 		float outputValue = 0;
 		outputParam >> outputValue;
 
+		const char *exact = 0;
 		if (inputValue == outputValue)
-			std::cout << "PASS exact" << std::endl;
+			exact = "exact";
 		else if (almostequal(inputValue, outputValue))
-			std::cout << "PASS inexact" << std::endl;
+			exact = "inexact";
 		else
 			throw SOAPException("Values are not equal: %s != %s",
 				(const char *)inputParam.GetString(),
 				(const char *)outputParam.GetString());
 
-		std::cout << "PASS: (in=" << inputParam.GetString() << ", out=" << outputParam.GetString() << ")" << std::endl;
+		std::cout << "PASS " << exact << ": (in=" << inputParam.GetString()
+			<< ", out=" << outputParam.GetString() << ")" << std::endl;
 		return false;
 	}
 	catch (SOAPException& sex)
@@ -351,17 +424,17 @@ TestEchoFloat(SOAPProxy& proxy,
 {
 	try
 	{
-		SOAPString outputValue;
-
 		SOAPMethod method("echoFloat", uri, soapAction, appendMethod);
-		method.AddParameter("inputFloat").SetFloat(value);
+		SOAPParameter& inputParam = method.AddParameter("inputFloat");
+		inputParam.SetFloat(value);
 
 		std::cout << "Testing " << method.GetName() << ": ";
 
 		const SOAPResponse& response = proxy.Execute(method);
-		response.GetReturnValue() >> outputValue;
+		const SOAPParameter& outputParam = response.GetReturnValue();
 
-		std::cout << "PASS: " << outputValue << std::endl;
+		std::cout << "PASS: input=" << inputParam.GetString()
+			<< " output=" << outputParam.GetString() << std::endl;
 		return false;
 	}
 	catch (SOAPException& sex)
@@ -630,12 +703,14 @@ TestEchoStructArray(SOAPProxy& proxy,
 }
 
 
-void TestInterop(const char *name,
-				 const char *endpoint,
-				 const char *soapAction,
-				 bool appendMethod,
-				 const char *uri)
+void TestInterop(const Endpoint& e)
 {
+	const char *name = e.name;
+	const char *endpoint = e.endpoint;
+	const char *soapAction = e.soapaction;
+	bool appendMethod = e.needsappend;
+	const char *uri = e.nspace;
+
 	std::cout << "Testing " << name << " interopability." << std::endl;
 
 	SOAPProxy proxy(endpoint);//, "http://localhost:8080");
@@ -664,19 +739,28 @@ void TestInterop(const char *name,
 
 #else
 	// Lets test some boundry cases...
+	SetTraceFile(name, "echoString_Null");
+	TestEchoString(proxy, uri, soapAction, appendMethod, 0);
+	SetTraceFile(name, "echoInteger_Null");
+	TestEchoInteger(proxy, uri, soapAction, appendMethod, (const char *)0);
+	SetTraceFile(name, "echoFloat_Null");
+	TestEchoFloat(proxy, uri, soapAction, appendMethod, (const char *)0);
+
 	SetTraceFile(name, "echoInteger_Overflow");
 	TestEchoIntegerInvalid(proxy, uri, soapAction, appendMethod, "2147483648");
 	SetTraceFile(name, "echoInteger_Underflow");
 	TestEchoIntegerInvalid(proxy, uri, soapAction, appendMethod, "-2147483649");
-	SetTraceFile(name, "echoInteger_NaN");
+
+	SetTraceFile(name, "echoFloat_NaN");
 	TestEchoFloat(proxy, uri, soapAction, appendMethod, "NaN");
-	SetTraceFile(name, "echoInteger_INF");
+	SetTraceFile(name, "echoFloat_INF");
 	TestEchoFloat(proxy, uri, soapAction, appendMethod, HUGE_VAL);
-	SetTraceFile(name, "echoInteger_nINF");
+	SetTraceFile(name, "echoFloat_nINF");
 	TestEchoFloat(proxy, uri, soapAction, appendMethod, -HUGE_VAL);
-	SetTraceFile(name, "echoInteger_pINF");
-	TestEchoFloatInvalid(proxy, uri, soapAction, appendMethod, "+INF");
-	SetTraceFile(name, "echoInteger_n0");
+	SetTraceFile(name, "echoFloat_pINF");
+	TestEchoFloat(proxy, uri, soapAction, appendMethod, "+INF");
+
+	SetTraceFile(name, "echoFloat_n0");
 	TestEchoFloat(proxy, uri, soapAction, appendMethod, "-0.0");
 #endif
 	SOAPDebugger::Close();
@@ -691,76 +775,11 @@ main(int argc, char* argv[])
 
 	try
 	{
-		//
-		// See: http://www.xmethods.net/ilab/ilab.html
-		// This information changes frequently.
-		//
-		TestInterop("4s4c",
-			"http://soap.4s4c.com/ilab/soap.asp",
-			"urn:soapinterop", false,
-			"http://soapinterop.org/");/**/
+		SOAPArray<Endpoint> endpoints;
+		GetAllEndpoints(endpoints);
 
-		TestInterop("Apache",
-			"http://services.xmethods.net:8080/soap/servlet/rpcrouter",
-			"urn:soapinterop", false,
-			"http://soapinterop.org/");/**/
-
-		TestInterop("Frontier",
-			"http://www.soapware.org:80/xmethodsInterop",
-			"/xmethodsInterop", false,
-			"urn:xmethodsInterop");/**/
-
-		TestInterop("Kafka",
-			"http://www.vbxml.com/soapworkshop/services/kafka10/services/endpoint.asp?service=ilab",
-			"urn:soapinterop", false,
-			"http://soapinterop.org/");/**/
-
-		/*TestInterop("MS SOAP Toolkit 2.0 (untyped)",
-			"http://131.107.72.13/stk/InteropService.asp",
-			"urn:soapinterop", false,
-			"http://soapinterop.org/");/**/
-
-		TestInterop("MSSOAPtk",
-			"http://131.107.72.13/stk/InteropTypedService.asp",
-			"urn:soapinterop", false,
-			"http://soapinterop.org/");/**/
-
-		TestInterop("Phalanx",
-			"http://www.phalanxsys.com/interop/listener.asp",
-			"urn:soapinterop", false,
-			"http://soapinterop.org/");/**/
-
-		TestInterop("SOAPRMI",
-			"http://rainier.extreme.indiana.edu:1568",
-			"urn:soapinterop", false,
-			"http://soapinterop.org/");/**/
-
-		TestInterop("SOAPLite",
-			"http://services.soaplite.com/interop.cgi",
-			"urn:soapinterop", false,
-			"http://soapinterop.org/");/**/
-
-		TestInterop("SQLData",
-			"http://www.soapclient.com/interop/sqldatainterop.wsdl",
-			"/soapinterop", false,
-			"http://tempuri.org/message/");/**/
-
-		/****** These have problems... ******/
-
-		TestInterop("WhiteMesa",
-			"http://services3.xmethods.net:8080/interop",
-			"urn:soapinterop#", true,
-			"http://soapinterop.org/");/**/
-
-		/*TestInterop("MS .NET Beta 2 (untyped)",
-			"http://131.107.72.13/test/simple.asmx",
-			"http://soapinterop.org/", true,
-			"http://soapinterop.org/");/**/
-
-		TestInterop("MSdotNET",
-			"http://131.107.72.13/test/typed.asmx",
-			"http://soapinterop.org/", true,
-			"http://soapinterop.org/");/**/
+		for (size_t i = 0; i < endpoints.Size(); ++i)
+			TestInterop(endpoints[i]);
 	}
 	catch (const SOAPMemoryException&)
 	{
