@@ -29,12 +29,12 @@ class WhichToolkitHandler :
 public:
 	WhichToolkitHandler()
 	{
-		DispatchTo(this);
 		DispatchMethod("whichToolkit", "http://www.soapware.org/", &WhichToolkitHandler::whichToolkit);
 	}
 
-	virtual ~WhichToolkitHandler()
+	WhichToolkitHandler* GetTarget(const SOAPEnvelope& request)
 	{
+		return this;
 	}
 
 	void whichToolkit(const SOAPMethod& request, SOAPMethod& response);

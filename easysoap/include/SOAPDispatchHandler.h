@@ -28,7 +28,7 @@ class EASYSOAP_EXPORT SOAPDispatchHandlerInterface
 {
 public:
 	virtual ~SOAPDispatchHandlerInterface() {}
-	virtual bool ExecuteMethod(const SOAPMethod& request, SOAPMethod& response) = 0;
+	virtual bool ExecuteMethod(const SOAPEnvelope& request, SOAPMethod& response) = 0;
 };
 
 
@@ -43,30 +43,27 @@ private:
 	SOAPDispatchHandler(const SOAPDispatchHandler&);
 	SOAPDispatchHandler& operator=(const SOAPDispatchHandler&);
 
-	bool ExecuteMethod(const SOAPMethod& request, SOAPMethod& response)
+	bool ExecuteMethod(const SOAPEnvelope& request, SOAPMethod& response)
 	{
-		DispatchMap::Iterator i = m_dispatchMap.Find(request.GetName());
+		const SOAPMethod& method = request.GetBody().GetMethod();
+		DispatchMap::Iterator i = m_dispatchMap.Find(method.GetName());
 		if (i)
 		{
-			(m_target->*(*i))(request, response);
+			T *target= GetTarget(request);
+			(target->*(*i))(method, response);
 			return true;
 		}
 		return false;
 	}
 
 	DispatchMap	m_dispatchMap;
-	T			*m_target;
 
 protected:
-	SOAPDispatchHandler(T* target = 0)
-		: m_target(target)
+	SOAPDispatchHandler()
 	{
 	}
 
-	void DispatchTo(T *target)
-	{
-		m_target = target;
-	}
+	virtual T* GetTarget(const SOAPEnvelope& request) = 0;
 
 	void DispatchMethod(const char *name, const char *ns, HandlerFunction func)
 	{

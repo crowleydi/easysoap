@@ -14,6 +14,11 @@ public:
 	SOAPBuildersInteropHandler();
 	virtual ~SOAPBuildersInteropHandler();
 
+	SOAPBuildersInteropHandler* GetTarget(const SOAPEnvelope& request)
+	{
+		return this;
+	}
+
 	void echoVoid(const SOAPMethod& req, SOAPMethod& response);
 	void echoInteger(const SOAPMethod& req, SOAPMethod& response);
 	void echoFloat(const SOAPMethod& req, SOAPMethod& response);

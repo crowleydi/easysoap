@@ -27,21 +27,18 @@
 //
 
 #include <SOAP.h>
-#include <SOAPCGIHandler.h>
-#include <SOAPDispatchHandler.h>
+#include <SOAPCGIServer.h>
 
 #include "SOAPBuildersInteropHandler.h"
 
 int
 main(int argc, char* argv[], char *env[])
 {
-	SOAPCGIDispatch cgi;
+	SOAPCGIServer server;
 	SOAPBuildersInteropHandler interopHandler;;
 
 	SOAPPacketWriter::SetAddWhiteSpace();
 
-	return cgi.
-		DispatchTo(&interopHandler).
-		Handle();
+	return server.DispatchTo(&interopHandler).Handle();
 }
 

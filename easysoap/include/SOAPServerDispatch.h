@@ -30,12 +30,10 @@ class EASYSOAP_EXPORT SOAPServerDispatch
 {
 public:
 	SOAPServerDispatch();
-	SOAPServerDispatch(SOAPTransport& transport, bool deltrans = false);
 	virtual ~SOAPServerDispatch();
 
-	SOAPServerDispatch& SetTransport(SOAPTransport& transport, bool deltrans = false);
 	SOAPServerDispatch& DispatchTo(SOAPDispatchHandlerInterface *disp);
-	int Handle();
+	int Handle(SOAPTransport& transport);
 
 protected:
 	virtual bool	HandleRequest(SOAPEnvelope& request, SOAPResponse& response);
@@ -50,7 +48,6 @@ private:
 
 	Handlers			m_handlers;
 	SOAPTransport		*m_transport;
-	bool				m_deltrans;
 	SOAPResponse		m_response;
 	SOAPEnvelope		m_request;
 	SOAPPacketWriter	m_writer;

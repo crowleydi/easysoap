@@ -27,8 +27,7 @@
 //
 
 #include <SOAP.h>
-#include <SOAPCGIHandler.h>
-#include <SOAPDispatchHandler.h>
+#include <SOAPHTTPServer.h>
 
 class DemoCalculatorHandler : public SOAPDispatchHandler<DemoCalculatorHandler>
 {
@@ -36,13 +35,13 @@ public:
 	DemoCalculatorHandler()
 	{
 		const char * ns = "http://easysoap.sourceforge.net/demos/calculator";
-		DispatchTo(this);
 		DispatchMethod("add", ns, &DemoCalculatorHandler::add);
 		DispatchMethod("mult", ns, &DemoCalculatorHandler::mult);
 	}
 
-	~DemoCalculatorHandler()
+	DemoCalculatorHandler* GetTarget(const SOAPEnvelope& request)
 	{
+		return this;
 	}
 
 	void add(const SOAPMethod& request, SOAPMethod& response)
@@ -79,9 +78,10 @@ public:
 int
 main(int argc, char* argv[], char *env[])
 {
-	SOAPCGIDispatch cgi;
+	SOAPHTTPServer server;
+
 	DemoCalculatorHandler calchandle;
 
-	return cgi.DispatchTo(&calchandle).Handle();
+	return server.DispatchTo(&calchandle).Handle();
 }
 

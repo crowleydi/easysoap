@@ -21,52 +21,28 @@
 #if !defined(AFX_SOAPCGIHANDLER_H__E392FAB3_3022_11D5_B3F3_000000000000__INCLUDED_)
 #define AFX_SOAPCGIHANDLER_H__E392FAB3_3022_11D5_B3F3_000000000000__INCLUDED_
 
-#include <stdio.h>
-#include "SOAP.h"
-#include "SOAPServerDispatch.h"
-//
-//
-//  A simple Transport class for CGI
-//
-class EASYSOAP_EXPORT SOAPCGITransport : public SOAPTransport
+#include <SOAP.h>
+#include <SOAPServerDispatch.h>
+#include <SOAPDispatchHandler.h>
+
+class EASYSOAP_EXPORT SOAPCGIServer
 {
 public:
-	SOAPCGITransport();
-	~SOAPCGITransport();
+	SOAPCGIServer() {}
+	SOAPCGIServer& DispatchTo(SOAPDispatchHandlerInterface* disp)
+	{
+		m_dispatch.DispatchTo(disp);
+		return *this;
+	}
 
-	void SetError();
-	const char *GetCharset() const;
-	size_t Read(char *buffer, size_t buffsize);
-	size_t Write(const SOAPMethod& method, const char *payload, size_t payloadsize);
-
-	// Log requests to this file.  Used for debugging
-	// (copies stdin to this file)
-	void SetLogFile(const char *logfile);
-	// Read input from this file.  Used for debugging.
-	// (reads this file instead of stdin)
-	void SetInFile(const char *infile);
+	int Handle();
 
 private:
 
-	SOAPCGITransport(const SOAPCGITransport&);
-	SOAPCGITransport& operator=(const SOAPCGITransport&);
+	SOAPCGIServer(const SOAPCGIServer&);
+	SOAPCGIServer& operator=(const SOAPCGIServer&);
 
-	FILE	*m_logfile;
-	FILE	*m_infile;
-	int		m_canread;
-};
-
-class SOAPCGIDispatch : public SOAPServerDispatch
-{
-public:
-	SOAPCGIDispatch() : SOAPServerDispatch(m_cgi) {}
-
-private:
-
-	SOAPCGIDispatch(const SOAPCGIDispatch&);
-	SOAPCGIDispatch& operator=(const SOAPCGIDispatch&);
-
-	SOAPCGITransport	m_cgi;
+	SOAPServerDispatch	m_dispatch;
 };
 
 

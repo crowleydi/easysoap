@@ -29,7 +29,6 @@ class UserlandValidatorHandler :
 public:
 	UserlandValidatorHandler()
 	{
-		DispatchTo(this);
 		DispatchMethod("countTheEntities",	&UserlandValidatorHandler::countTheEntities);
 		DispatchMethod("easyStructTest",	&UserlandValidatorHandler::easyStructTest);
 		DispatchMethod("echoStructTest",	&UserlandValidatorHandler::echoStructTest);
@@ -39,8 +38,9 @@ public:
 		DispatchMethod("simpleStructReturnTest",&UserlandValidatorHandler::simpleStructReturnTest);
 	}
 
-	~UserlandValidatorHandler()
+	UserlandValidatorHandler* GetTarget(const SOAPEnvelope& request)
 	{
+		return this;
 	}
 
 	void countTheEntities(const SOAPMethod& req, SOAPMethod& resp);

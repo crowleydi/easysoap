@@ -13,8 +13,6 @@ SOAPBuildersInteropHandler::SOAPBuildersInteropHandler()
 {
 	const char *interop_namespace = "http://soapinterop.org/";
 
-	DispatchTo(this);
-
 	DispatchMethod("echoVoid",	interop_namespace,
 		&SOAPBuildersInteropHandler::echoVoid);
 

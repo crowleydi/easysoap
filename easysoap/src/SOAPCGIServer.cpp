@@ -18,12 +18,46 @@
  */
 
 
+#include <stdio.h>
+
 #ifdef _WIN32
 #include <fcntl.h>
 #include <io.h>
 #endif // _WIN32
 
-#include "SOAPCGIHandler.h"
+#include "SOAPCGIServer.h"
+
+//
+//
+//  A simple Transport class for CGI
+//
+class SOAPCGITransport : public SOAPTransport
+{
+public:
+	SOAPCGITransport();
+	~SOAPCGITransport();
+
+	void SetError();
+	const char *GetCharset() const;
+	size_t Read(char *buffer, size_t buffsize);
+	size_t Write(const SOAPMethod& method, const char *payload, size_t payloadsize);
+
+	// Log requests to this file.  Used for debugging
+	// (copies stdin to this file)
+	void SetLogFile(const char *logfile);
+	// Read input from this file.  Used for debugging.
+	// (reads this file instead of stdin)
+	void SetInFile(const char *infile);
+
+private:
+
+	SOAPCGITransport(const SOAPCGITransport&);
+	SOAPCGITransport& operator=(const SOAPCGITransport&);
+
+	FILE	*m_logfile;
+	FILE	*m_infile;
+	int		m_canread;
+};
 
 SOAPCGITransport::SOAPCGITransport()
 : m_logfile(0)
@@ -125,3 +159,12 @@ SOAPCGITransport::Write(const SOAPMethod& method, const char *payload, size_t pa
 
 	return payloadsize;
 }
+
+int
+SOAPCGIServer::Handle()
+{
+	SOAPCGITransport	cgi;
+	return m_dispatch.Handle(cgi);
+}
+
+

@@ -25,7 +25,7 @@
 //
 
 #include <SOAP.h>
-#include <SOAPCGIHandler.h>
+#include <SOAPCGIServer.h>
 
 #include "UserlandValidatorHandler.h"
 #include "WhichToolkitHandler.h"
@@ -37,13 +37,13 @@
 int
 main(int argc, char* argv[], char *env[])
 {
-	SOAPCGIDispatch cgi;
+	SOAPCGIServer server;
 	WhichToolkitHandler whichToolkitHandler;
 	UserlandValidatorHandler validatorHandler;
 
 	//SOAPPacketWriter::SetAddWhiteSpace();
 
-	return cgi.
+	return server.
 		DispatchTo(&validatorHandler).
 		DispatchTo(&whichToolkitHandler).
 		Handle();
