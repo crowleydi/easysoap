@@ -106,6 +106,9 @@ SOAPProtocolBase::Readbuff()
 size_t
 SOAPProtocolBase::Read(char *buffer, size_t len)
 {
+	if (!m_socket)
+		throw SOAPSocketException("Protocol doesn't have a socket.");
+
 	Flush(); // in case we haven't sent everything
 	if (m_buff != m_buffend)
 	{
@@ -123,6 +126,9 @@ SOAPProtocolBase::Read(char *buffer, size_t len)
 size_t
 SOAPProtocolBase::ReadLine(char *buff, size_t bufflen)
 {
+	if (!m_socket)
+		throw SOAPSocketException("Protocol doesn't have a socket.");
+
 	char *end = buff + bufflen;
 	size_t numread = 0;
 	char c;
@@ -157,7 +163,7 @@ SOAPProtocolBase::ReadLine(char *buff, size_t bufflen)
 void
 SOAPProtocolBase::Flush()
 {
-	if (m_wpos != m_wbuff)
+	if (m_socket && m_wpos != m_wbuff)
 	{
 		int bufflen = m_wpos - m_wbuff;
 		m_socket->Write(m_wbuff, bufflen);
@@ -168,6 +174,9 @@ SOAPProtocolBase::Flush()
 size_t
 SOAPProtocolBase::Write(const char *buff, size_t bufflen)
 {
+	if (!m_socket)
+		throw SOAPSocketException("Protocol doesn't have a socket.");
+
 	const char *bend = buff + bufflen;
 	while (buff != bend)
 	{
