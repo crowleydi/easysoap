@@ -706,7 +706,7 @@ main(int argc, char* argv[])
 	{
 		for (int i = 1; i < argc; ++i)
 		{
-			if (sp_strcmp(argv[i], "-a"))
+			if (sp_strcmp(argv[i], "-a") == 0)
 			{
 				SOAPArray<Endpoint> endpoints;
 				GetAllEndpoints(endpoints);
