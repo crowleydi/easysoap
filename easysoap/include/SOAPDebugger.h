@@ -29,7 +29,11 @@
 class EASYSOAP_EXPORT SOAPDebugger
 {
 public:
-	static void SetFile(const char *fname);
+	//
+	// Returns true if we were able to open
+	// the file for writing.
+	static bool SetFile(const char *fname);
+
 	static void SetMessageLevel(int level);
 	static void Close();
 	static void Write(int level, const char *bytes, size_t len);

@@ -69,9 +69,10 @@ SOAPDebugger::Close()
 	}
 }
 
-void
+bool
 SOAPDebugger::SetFile(const char *name)
 {
 	Close();
 	m_file = fopen(name, "wb");
+	return (m_file != 0);
 }
