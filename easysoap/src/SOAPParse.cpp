@@ -219,13 +219,19 @@ SOAPParser::endElement(const XML_Char *name)
 void
 SOAPParser::startNamespace(const XML_Char *prefix, const XML_Char *uri)
 {
-	m_nsmap[prefix] = uri;
+	if (prefix)
+		m_nsmap[prefix] = uri;
+	else
+		m_nsmap[""] = uri;
 }
 
 void
 SOAPParser::endNamespace(const XML_Char *prefix)
 {
-	m_nsmap.Remove(prefix);
+	if (prefix)
+		m_nsmap.Remove(prefix);
+	else
+		m_nsmap.Remove("");
 }
 
 //
