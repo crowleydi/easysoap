@@ -39,7 +39,7 @@ public:
 	SOAPServerDispatch& DispatchTo(SOAPDispatchHandlerInterface *disp);
 	SOAPServerDispatch& DispatchTo(SOAPHeaderHandlerInterface *disp);
 
-	int Handle(SOAPTransport& transport);
+	int Handle(SOAPServerTransport& transport);
 
 protected:
 	virtual bool	HandleRequest(SOAPEnvelope& request, SOAPResponse& response);
@@ -57,7 +57,7 @@ private:
 
 	Handlers			m_handlers;
 	HeaderHandlers		m_headerHandlers;
-	SOAPTransport		*m_transport;
+	SOAPServerTransport	*m_transport;
 	SOAPResponse		m_response;
 	SOAPEnvelope		m_request;
 	SOAPPacketWriter	m_writer;

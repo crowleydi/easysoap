@@ -100,7 +100,7 @@ SOAPServerDispatch::WriteFault(const SOAPFault& fault)
 
 
 int
-SOAPServerDispatch::Handle(SOAPTransport& trans)
+SOAPServerDispatch::Handle(SOAPServerTransport& trans)
 {
 	int retval = 0;
 	const char *serverfault = "SOAP-ENV:Server";
@@ -266,29 +266,6 @@ SOAPServerDispatch::HandleHeaders(SOAPEnvelope& request, SOAPResponse& response)
 				(const char *)header.GetName().GetNamespace(),
 				(const char *)header.GetName().GetName(),
 				(const char *)mu->GetName());
-		}
-	}
-}
-
-void
-SOAPTransport::ParseContentType(SOAPString& str, const char *contenttype)
-{
-	str = "US-ASCII";
-	if (contenttype)
-	{
-		const char *charset = sp_strstr(contenttype, "charset=");
-		if (charset)
-		{
-			charset += 8;
-			if (*charset == '\"')
-				++charset;
-			const char *end = charset;
-
-			while (*end && *end != '\"' && *end != ';' && *end != ' ')
-				++end;
-
-			str = "";
-			str.Append(charset, end - charset);
 		}
 	}
 }
