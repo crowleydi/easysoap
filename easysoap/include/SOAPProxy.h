@@ -76,23 +76,24 @@ public:
 
 	SOAPMethod& SetMethod(const char *name, const char *ns)
 	{
-		m_method.SetName(name, ns);
-		return m_method;
+		SOAPMethod& method = m_message.GetBody().GetMethod();
+		method.SetName(name, ns);
+		return method;
 	}
 
 	const SOAPResponse& Execute()
 	{
-		return Execute(m_method);
+		return Execute(m_message);
 	}
 
-	const SOAPResponse& Execute(SOAPMethod& method);
+	const SOAPResponse& Execute(const SOAPMethod& method);
+	const SOAPResponse& Execute(const SOAPEnvelope& envelope);
 
 private:
 
 	SOAPProxy(const SOAPProxy& proxy);
 	SOAPProxy& operator=(const SOAPProxy& proxy);
 
-	SOAPMethod			m_method;
 	SOAPEnvelope		m_message;
 	SOAPResponse		m_response;
 	SOAPPacketWriter	m_packet;

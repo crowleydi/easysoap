@@ -25,15 +25,24 @@
 #include <SOAPonHTTP.h>
 
 const SOAPResponse&
-SOAPProxy::Execute(SOAPMethod& method)
+SOAPProxy::Execute(const SOAPMethod& method)
 {
 	if (!m_transport)
 		throw SOAPException("No transport!");
 
 	m_message.GetBody().SetMethod(method);
-	m_message.WriteSOAPPacket(m_packet);
-	m_transport->Write(method, m_packet.GetBytes(), m_packet.GetLength());
-	m_response.SetMethod(method);
+	return Execute(m_message);
+}
+
+const SOAPResponse&
+SOAPProxy::Execute(const SOAPEnvelope& envelope)
+{
+	if (!m_transport)
+		throw SOAPException("No transport!");
+
+	envelope.WriteSOAPPacket(m_packet);
+	m_transport->Write(envelope.GetBody().GetMethod(), m_packet.GetBytes(), m_packet.GetLength());
+	m_response.SetMethod(envelope.GetBody().GetMethod());
 	m_parser.Parse(m_response, *m_transport);
 
 	if (m_response.IsFault())
