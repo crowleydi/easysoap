@@ -201,7 +201,7 @@ SOAPBuildersInteropHandler::echoDate(const SOAPMethod& req, SOAPMethod& resp)
 
 	req.GetParameter("inputDate") >> val;
 	// we don't support the type natively so we have to set it.
-	(resp.AddParameter("return") << val).SetType("dateTime");
+	(resp.AddParameter("return") << val).SetType("dateTime", SOAP_XSD);
 }
 
 
@@ -222,7 +222,7 @@ SOAPBuildersInteropHandler::echoDecimal(const SOAPMethod& req, SOAPMethod& resp)
 
 	req.GetParameter("inputDecimal") >> val;
 	// we don't support the type natively so we have to set it.
-	(resp.AddParameter("return") << val).SetType("decimal");
+	(resp.AddParameter("return") << val).SetType("decimal", SOAP_XSD);
 }
 
 
