@@ -55,9 +55,11 @@ INCLUDES=-I@top_srcdir@/include
 libeasysoap_la_LDFLAGS = -no-undefined 
 
 
-AM_CFLAGS=-Wall -pedantic
-AM_CXXFLAGS=-Wall -pedantic
+AM_CFLAGS=-Wall -pedantic -I/usr/kerberos/include
+AM_CXXFLAGS=-Wall -pedantic -I/usr/kerberos/include
 
+libeasysoap_a_CXXFLAGS = $(AM_CXXFLAGS)
+libeasysoap_a_CFLAGS = $(AM_CFLAGS)
 
 EXTRA_DIST = \
 	digtest.c \
