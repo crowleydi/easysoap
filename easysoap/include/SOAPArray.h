@@ -101,6 +101,19 @@ public:
 		Empty();
 	}
 
+	void AttachTo(SOAPArray<T>& other)
+	{
+		Empty();
+
+		m_allocated = other.m_allocated;
+		m_array = other.m_array;
+		m_size = other.m_size;
+
+		other.m_allocated = 0;
+		other.m_array = 0;
+		other.m_size = 0;
+	}
+
 	T& Add()
 	{
 		size_t len = Size();
