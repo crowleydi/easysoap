@@ -15,7 +15,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "validator"=.\validator\validator.dsp - Package Owner=<4>
+Project: "interopclient"=.\tests\interopclient.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -24,13 +24,28 @@ Package=<5>
 Package=<4>
 {{{
     Begin Project Dependency
-    Project_Dep_Name tests
+    Project_Dep_Name interopserver
     End Project Dependency
 }}}
 
 ###############################################################################
 
-Project: "tests"=.\tests\tests.dsp - Package Owner=<4>
+Project: "interopserver"=.\tests\interopserver.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name easysoap
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "validator"=.\validator\validator.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
