@@ -77,9 +77,14 @@ SOAPonHTTP::Write(const SOAPMethod& method, const char *payload, size_t payloads
 
 		m_http.WriteHeader("Content-Type", "text/xml; charset=\"UTF-8\"");
 
-		m_http.Write("SOAPAction: \"");
-		m_http.Write(method.GetSoapAction());
-		m_http.WriteLine("\"");
+		m_http.Write("SOAPAction:");
+		if (method.GetSoapAction())
+		{
+			m_http.Write(" \"");
+			m_http.Write(method.GetSoapAction());
+			m_http.Write("\"");
+		}
+		m_http.WriteLine();
 
 		ret = m_http.PostData(payload, payloadsize);
 
