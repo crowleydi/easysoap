@@ -182,6 +182,10 @@ SOURCE=.\SOAPHTTPServer.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\SOAPISAPIServer.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\SOAPMethod.cpp
 # End Source File
 # Begin Source File
@@ -331,6 +335,10 @@ SOURCE=.\SOAPHeaderHandler.h
 # Begin Source File
 
 SOURCE=..\include\SOAPHTTPServer.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\SOAPISAPIServer.h
 # End Source File
 # Begin Source File
 
