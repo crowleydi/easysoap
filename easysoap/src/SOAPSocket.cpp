@@ -92,7 +92,7 @@ SOAPProtocolBase::Connect(const char *host, unsigned int port, bool secure)
 bool
 SOAPProtocolBase::Readbuff()
 {
-	SendPacket(); // in case we haven't sent everything
+	Flush(); // in case we haven't sent everything
 	m_buff = 0;
 	m_buffend = 0;
 	int bytes = m_socket->Read(m_buffer, sizeof(m_buffer));
@@ -108,7 +108,7 @@ SOAPProtocolBase::Readbuff()
 int
 SOAPProtocolBase::Read(char *buffer, int len)
 {
-	SendPacket(); // in case we haven't sent everything
+	Flush(); // in case we haven't sent everything
 	if (m_buff != m_buffend)
 	{
 		int numread = 0;
@@ -157,7 +157,7 @@ SOAPProtocolBase::ReadLine(char *buff, int bufflen)
 }
 
 void
-SOAPProtocolBase::SendPacket()
+SOAPProtocolBase::Flush()
 {
 	if (m_wpos != m_wbuff)
 	{
@@ -174,7 +174,7 @@ SOAPProtocolBase::Write(const char *buff, int bufflen)
 	while (buff != bend)
 	{
 		if (m_wpos == m_wend)
-			SendPacket();
+			Flush();
 		*m_wpos++ = *buff++;
 	}
 	return bufflen;

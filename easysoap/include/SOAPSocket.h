@@ -75,7 +75,9 @@ private:
 	const char  *m_wend;
 
 	bool	Readbuff();
-	void	SendPacket();
+
+protected:
+	void	Flush();
 
 public:
 	SOAPProtocolBase();
