@@ -26,29 +26,6 @@ class SOAPTypeTraits<GoogleSearch::DirectoryCategoryArray> : public SOAPArrayTyp
 #endif // not HAVE_PARTIAL_SPECIALIZATION
 
 template<>
-class SOAPTypeTraits<GoogleSearch::Result>
-{
-public:
-	static const SOAPParameter&
-	Deserialize(const SOAPParameter& p, GoogleSearch::Result& v)
-	{
-		p.GetParameter("documentFiltering")				>> v.documentFiltering;
-		p.GetParameter("searchComments")				>> v.searchComments;
-		p.GetParameter("estimatedTotalResultsCount")	>> v.estimatedTotalResultsCount;
-		p.GetParameter("estimateIsExact")				>> v.estimateIsExact;
-		p.GetParameter("resultElements")				>> v.resultElements;
-		p.GetParameter("searchQuery")					>> v.searchQuery;
-		p.GetParameter("startIndex")					>> v.startIndex;
-		p.GetParameter("endIndex")						>> v.endIndex;
-		p.GetParameter("searchTips")					>> v.searchTips;
-		p.GetParameter("directoryCategories")			>> v.directoryCategories;
-		p.GetParameter("searchTime")					>> v.searchTime;
-
-		return p;
-	}
-};
-
-template<>
 class SOAPTypeTraits<GoogleSearch::DirectoryCategory>
 {
 public:
@@ -78,6 +55,29 @@ public:
 		p.GetParameter("hostName")						>> v.hostName;
 		p.GetParameter("directoryCategory")				>> v.directoryCategory;
 		p.GetParameter("directoryTitle")				>> v.directoryTitle;
+
+		return p;
+	}
+};
+
+template<>
+class SOAPTypeTraits<GoogleSearch::Result>
+{
+public:
+	static const SOAPParameter&
+	Deserialize(const SOAPParameter& p, GoogleSearch::Result& v)
+	{
+		p.GetParameter("documentFiltering")				>> v.documentFiltering;
+		p.GetParameter("searchComments")				>> v.searchComments;
+		p.GetParameter("estimatedTotalResultsCount")	>> v.estimatedTotalResultsCount;
+		p.GetParameter("estimateIsExact")				>> v.estimateIsExact;
+		p.GetParameter("resultElements")				>> v.resultElements;
+		p.GetParameter("searchQuery")					>> v.searchQuery;
+		p.GetParameter("startIndex")					>> v.startIndex;
+		p.GetParameter("endIndex")						>> v.endIndex;
+		p.GetParameter("searchTips")					>> v.searchTips;
+		p.GetParameter("directoryCategories")			>> v.directoryCategories;
+		p.GetParameter("searchTime")					>> v.searchTime;
 
 		return p;
 	}
