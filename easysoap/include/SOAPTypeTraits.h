@@ -233,7 +233,7 @@ public:
 			{
 				size_t newpos;
 				parsepos(SOAPEnc::position, *attr, newpos);
-				if (newrow < row || newcol < col)
+				if (newpos < pos)
 					throw SOAPException("Error decoding array, position attribute cannot point to a previous element."
 						" Current position: [%d], next position: [%d]",
 						pos, newpos);
