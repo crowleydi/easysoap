@@ -1,13 +1,12 @@
 noinst_PROGRAMS = simpleserver simpleclient
 
 simpleserver_SOURCES = \
-	simpleserver.cpp
-
-simpleserver_HEADERS = \
+	simpleserver.cpp \
 	calchandler.h
 
 simpleclient_SOURCES = \
-	simpleclient.cpp
+	simpleclient.cpp \
+	calchandler.h
 
 LDADD = ../src/libeasysoap.la
 LDFLAGS = -no-install
