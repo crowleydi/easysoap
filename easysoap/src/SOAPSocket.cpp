@@ -109,14 +109,17 @@ int
 SOAPProtocolBase::Read(char *buffer, int len)
 {
 	SendPacket(); // in case we haven't sent everything
-	int numread = 0;
-	while (m_buff != m_buffend && numread < len)
+	if (m_buff != m_buffend)
 	{
-		*buffer++ = *m_buff++;
-		++numread;
+		int numread = 0;
+		while (m_buff != m_buffend && numread < len)
+		{
+			*buffer++ = *m_buff++;
+			++numread;
+		}
+		return numread;
 	}
-
-	return m_socket->Read(buffer, len - numread) + numread;
+	return m_socket->Read(buffer, len);
 }
 
 int
