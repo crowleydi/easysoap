@@ -276,7 +276,6 @@ inline T*
 sp_itoa(L a, T *const buffer)
 {
     T *ptr = buffer;
-	T *begin = buffer;
 
 	// check if we're negative
 	bool neg = (a < 0);
@@ -292,9 +291,14 @@ sp_itoa(L a, T *const buffer)
     {
         rem = -rem;
         a = -a;
-		*begin++ = '-';
+		*ptr++ = '-';
     }
-    *ptr++ = rem + '0';
+
+	//
+	// store begining of string
+	// we have to reverse
+  	T *b = ptr;
+	*ptr++ = rem + '0';
 
 	// while we have a non-zero value
 	// get the base 10 remainder
@@ -308,7 +312,6 @@ sp_itoa(L a, T *const buffer)
 	*ptr = 0;
 
 	// now reverse the string
-    T *b = begin;
 	while (b < --ptr)
 	{
 		T keep = *b;
