@@ -58,9 +58,10 @@ private:
 	SOAPString 			m_keyfile;
 	SOAPString 			m_password;
 	CertType 			type;
+
+	void sslinit();
 	// handles error, returns true if they are recoverable, false if not.
 	void HandleError(const char* context, int retcode);
-	
 };
 
 END_EASYSOAP_NAMESPACE

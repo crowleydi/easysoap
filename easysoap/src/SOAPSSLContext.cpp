@@ -80,10 +80,10 @@ public:
 SOAPSSLContext::SOAPSSLContext() 
 	:	m_ctx(0)
 {
-		static OpenSSLinit __opensslinit;
-		m_ctx = SSL_CTX_new(SSLv23_client_method());
-		if (!m_ctx)
-				throw SOAPMemoryException();
+	sslinit();
+	m_ctx = SSL_CTX_new(SSLv23_client_method());
+	if (!m_ctx)
+	throw SOAPMemoryException();
 }
 
 SOAPSSLContext::SOAPSSLContext(const char* certfile, const char* keyfile, const char* password)
@@ -92,12 +92,19 @@ SOAPSSLContext::SOAPSSLContext(const char* certfile, const char* keyfile, const 
 		, m_password(password)
 		, m_ctx(0)
 {
-		static OpenSSLinit __opensslinit;
-		m_ctx = SSL_CTX_new(SSLv23_client_method());
-		if (!m_ctx)
-				throw SOAPMemoryException();
-		SetCertInfo(certfile, keyfile, password);
+	sslinit();
+	m_ctx = SSL_CTX_new(SSLv23_client_method());
+	if (!m_ctx)
+		throw SOAPMemoryException();
+	SetCertInfo(certfile, keyfile, password);
 }
+
+void
+SOAPSSLContext::sslinit()
+{
+		static OpenSSLinit __opensslinit;
+}
+
 /*
 SOAPSSLContext::SOAPSSLContext(const SOAPSSLContext& ctx)
 {
