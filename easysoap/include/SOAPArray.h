@@ -275,7 +275,7 @@ public:
 	}
 
 	template<typename X>
-	bool operator==(const SOAPArray<X>& x)
+	bool operator==(const SOAPArray<X>& x) const
 	{
 		if (m_size != x.m_size)
 			return false;
@@ -286,7 +286,7 @@ public:
 	}
 
 	template<typename X>
-	bool operator!=(const SOAPArray<X>& x)
+	bool operator!=(const SOAPArray<X>& x) const
 	{
 		return !(*this == x);
 	}
