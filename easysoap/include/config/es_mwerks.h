@@ -23,13 +23,16 @@
 #pragma warning (disable: 4786)
 #pragma warning (disable: 4251)
 
+#define strcasecmp strcmp
+
+
 #ifdef EASYSOAP_STATIC
 #define EASYSOAP_EXPORT
 #else // not EASYSOAP_STATIC
 #ifdef EASYSOAP_DLL
-#define EASYSOAP_EXPORT __declspec( dllexport )
+#define EASYSOAP_EXPORT __declspec ( dllexport )
 #else // not EASYSOAP_DLL
-#define EASYSOAP_EXPORT __declspec (dllimport )
+#define EASYSOAP_EXPORT __declspec ( dllimport )
 #endif // EASYSOAP_EXPORTS
 #endif // EASYSOAP_STATIC
 
