@@ -20,7 +20,6 @@
  */
 
 
-#include <httpext.h>
 #include <easysoap/SOAPISAPIServer.h>
 #include <easysoap/SOAPonHTTP.h>
 
@@ -37,20 +36,6 @@ public:
 		{
 			if (sp_strcmp(m_ecb->lpszMethod, "POST"))
 				throw SOAPException("Invalid HTTP method '%s', only POST is supported.", m_ecb->lpszMethod);
-
-			//
-			//  Set thread to impersonate
-			HANDLE impersonateToken = 0;
-			if (m_ecb->ServerSupportFunction(m_ecb->ConnID,
-				HSE_REQ_GET_IMPERSONATION_TOKEN,
-				&impersonateToken, 0, 0))
-			{
-				if (!SetThreadToken(NULL, impersonateToken))
-				{
-					throw SOAPException("Failed to impersonate user.");
-				}
-			}
-
 
 			SOAPHTTPProtocol::ParseContentType(m_contentType, m_charset, m_ecb->lpszContentType);
 			m_leftRead = m_ecb->cbTotalBytes;
@@ -80,11 +65,6 @@ public:
 			m_ecb->ServerSupportFunction(m_ecb->ConnID, HSE_REQ_DONE_WITH_SESSION, &dwState, NULL, 0);
 			m_ecb = 0;
 		}
-
-		//
-		// Clear the thread of any impersonatings it
-		// may be doing...
-		SetThreadToken(NULL, NULL);
 	}
 
 	void SetError()
@@ -218,9 +198,11 @@ SOAPISAPIServer::Handle()
 			break;
 		try
 		{
+			EXTENSION_CONTROL_BLOCK *pECB = (EXTENSION_CONTROL_BLOCK*)pN1;
+			SOAPISAPIImpersonateUser impersonate(pECB);
 			if (pN2 == 0)
 			{
-				SOAPISAPITransport isapi((EXTENSION_CONTROL_BLOCK*)pN1);
+				SOAPISAPITransport isapi(pECB);
 				m_dispatch.Handle(isapi);
 			}
 			else
@@ -239,3 +221,33 @@ SOAPISAPIServer::Handle()
 	return 0;
 }
 
+SOAPISAPIImpersonateUser::SOAPISAPIImpersonateUser(EXTENSION_CONTROL_BLOCK *pECB)
+: m_ecb(pECB)
+{
+	if (m_ecb)
+	{
+		//
+		//  Set thread to impersonate
+		HANDLE impersonateToken = 0;
+		if (m_ecb->ServerSupportFunction(m_ecb->ConnID,
+			HSE_REQ_GET_IMPERSONATION_TOKEN,
+			&impersonateToken, 0, 0))
+		{
+			if (!SetThreadToken(NULL, impersonateToken))
+			{
+				throw SOAPException("Failed to impersonate user.");
+			}
+		}
+	}
+}
+
+SOAPISAPIImpersonateUser::~SOAPISAPIImpersonateUser()
+{
+	if (m_ecb)
+	{
+		//
+		// Clear the thread of any impersonatings it
+		// may be doing...
+		SetThreadToken(NULL, NULL);
+	}
+}

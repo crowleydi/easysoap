@@ -23,6 +23,7 @@
 #if !defined(AFX_SOAPISAPIHANDLER_H__E392FAB3_3022_11D5_B3F3_000000000000__INCLUDED_)
 #define AFX_SOAPISAPIHANDLER_H__E392FAB3_3022_11D5_B3F3_000000000000__INCLUDED_
 
+#include <httpext.h>
 #include <easysoap/SOAPServer.h>
 
 BEGIN_EASYSOAP_NAMESPACE
@@ -40,6 +41,19 @@ private:
 	SOAPISAPIServer& operator=(const SOAPISAPIServer&);
 
 	HANDLE				m_ioport;
+};
+
+class EASYSOAP_EXPORT SOAPISAPIImpersonateUser
+{
+public:
+	SOAPISAPIImpersonateUser(EXTENSION_CONTROL_BLOCK *);
+	~SOAPISAPIImpersonateUser();
+
+private:
+	SOAPISAPIImpersonateUser(const SOAPISAPIImpersonateUser&);
+	SOAPISAPIImpersonateUser& operator=(const SOAPISAPIImpersonateUser&);
+
+	EXTENSION_CONTROL_BLOCK	*m_ecb;
 };
 
 END_EASYSOAP_NAMESPACE
