@@ -285,8 +285,8 @@ public:
 
 
 	// find & set or add
-	template <typename X>
-	I& Add(const X& key, const I& item)
+	template <typename X, typename Y>
+	I& Add(const X& key, const Y& item)
 	{
 		// see if we can find it
 		size_t hash = hashcode(key);
@@ -450,56 +450,48 @@ private:
 		--m_numElements;
 	}
 
-	HashElement *GetNextHashElement(
-			size_t hash,
-			const K& key,
-			const I& item)
+	HashElement *GetNextHashElement(size_t hash)
 	{
 		HashElement *he = m_pool.Get();
 		he->m_hash = hash;
-		he->m_key = key;
-		he->m_item = item;
 		++m_numElements;
 		return he;
 	}
-
-	HashElement *GetNextHashElement(
-			size_t hash,
-			const K& key)
-	{
-		HashElement *he = m_pool.Get();
-		he->m_hash = hash;
-		he->m_key = key;
-		++m_numElements;
-		return he;
-	}
-
 
 	// This method actually puts an object into the hashtable.
-	I& Put(size_t hash, const K& key, const I& item)
+	template<typename X, typename Y>
+	I& Put(size_t hash, const X& key, const Y& item)
 	{
 		// check for resize
 		if (m_numElements >= m_resizeThreshold)
 			Resize(m_elements.Size() * 2 + 1);
 
 		size_t index = hash % m_elements.Size();
-		HashElement *he = GetNextHashElement(hash, key, item);
+		HashElement *he = GetNextHashElement(hash);
+
+		he->m_key = key;
+		he->m_item = item;
 		he->m_next = m_elements[index];
 		m_elements[index] = he;
+
 		return he->m_item;
 	}
 
 	// This method actually puts an object into the hashtable.
-	I& Put(size_t hash, const K& key)
+	template <typename X>
+	I& Put(size_t hash, const X& key)
 	{
 		// check for resize
 		if (m_numElements >= m_resizeThreshold)
 			Resize(m_elements.Size() * 2 + 1);
 
 		size_t index = hash % m_elements.Size();
-		HashElement *he = GetNextHashElement(hash, key);
+		HashElement *he = GetNextHashElement(hash);
+
+		he->m_key = key;
 		he->m_next = m_elements[index];
 		m_elements[index] = he;
+
 		return he->m_item;
 	}
 
