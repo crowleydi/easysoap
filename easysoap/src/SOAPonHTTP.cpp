@@ -70,10 +70,8 @@ SOAPonHTTP::Write(const SOAPMethod& method, const char *payload, size_t payloads
 	while (retry--)
 	{
 		m_http.BeginPost(m_endpoint.Path());
-		if (m_userAgent.IsEmpty())
-			m_http.WriteHeader("User-Agent", DEFAULT_USERAGENT);
-		else
-			m_http.WriteHeader("User-Agent", m_userAgent);
+		m_http.WriteHeader("User-Agent", m_userAgent.IsEmpty() ?
+				DEFAULT_USERAGENT : (const char *)m_userAgent);
 
 		m_http.WriteHeader("Content-Type", "text/xml; charset=\"UTF-8\"");
 
@@ -185,7 +183,7 @@ void
 SOAPHTTPProtocol::WriteHostHeader(const SOAPUrl& url)
 {
 	if (url.PortIsDefault())
-		WriteHeader("Host", url.Hostname());
+		WriteHeader("Host", (const char *)url.Hostname());
 	else
 	{
 		char buffer[256];
