@@ -298,11 +298,11 @@ sp_itoa(L a, T *const buffer)
 	{
 		// while we have a non-zero value
 		// get the base 10 remainder
-		while (a != 0)
+		do
 		{
 			*ptr++ = (a % 10) + '0';
 			a /= 10;
-		}
+		} while (a != 0);
 	}
 
 	// null terminate
