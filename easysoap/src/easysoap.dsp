@@ -230,6 +230,10 @@ SOURCE=..\include\SOAP.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\include\SOAPArray.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\SOAPArrayHandler.h
 # End Source File
 # Begin Source File
@@ -263,6 +267,10 @@ SOURCE=..\include\SOAPFault.h
 # Begin Source File
 
 SOURCE=.\SOAPFaultHandler.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\SOAPHashMap.h
 # End Source File
 # Begin Source File
 
@@ -330,6 +338,10 @@ SOURCE=..\include\SOAPSocket.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\include\SOAPString.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\SOAPStructHandler.h
 # End Source File
 # Begin Source File
@@ -343,6 +355,10 @@ SOURCE=..\include\SOAPTypes.h
 # Begin Source File
 
 SOURCE=..\include\SOAPUrl.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\SOAPUtil.h
 # End Source File
 # End Group
 # End Target
