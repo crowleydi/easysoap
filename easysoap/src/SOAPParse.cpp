@@ -63,14 +63,13 @@ SOAPParser::Parse(SOAPResponse& resp, SOAPTransport& trans)
 	XML_SetCharacterDataHandler(m_parser, SOAPParser::characterData);
 
 	// make sure our stack is empth
-	while (!m_handlerstack.empty())
-		m_handlerstack.pop();
+	m_handlerstack.Clear();
 
 	SOAPResponseHandler response(resp);
 	m_response = &response;
 
 	// put ourselves on the stack
-	m_handlerstack.push(this);
+	m_handlerstack.Push(this);
 
 	while (!done)
 	{
@@ -150,28 +149,28 @@ void
 SOAPParser::startElement(void *userData, const XML_Char *name, const XML_Char **attrs)
 {
 	SOAPParser *parser = static_cast<SOAPParser *>(userData);
-	SOAPParseEventHandler* handler = parser->m_handlerstack.top();
+	SOAPParseEventHandler* handler = parser->m_handlerstack.Top();
 	if (handler)
-		parser->m_handlerstack.push(handler->startElement(name, attrs));
+		parser->m_handlerstack.Push(handler->startElement(name, attrs));
 	else
-		parser->m_handlerstack.push(0);
+		parser->m_handlerstack.Push(0);
 }
 
 void
 SOAPParser::endElement(void *userData, const XML_Char *name)
 {
 	SOAPParser *parser = static_cast<SOAPParser *>(userData);
-	SOAPParseEventHandler* handler = parser->m_handlerstack.top();
+	SOAPParseEventHandler* handler = parser->m_handlerstack.Top();
 	if (handler)
 		handler->endElement(name);
-	parser->m_handlerstack.pop();
+	parser->m_handlerstack.Pop();
 }
 
 void
 SOAPParser::characterData(void *userData, const XML_Char *str, int len)
 {
 	SOAPParser *parser = static_cast<SOAPParser *>(userData);
-	SOAPParseEventHandler* handler = parser->m_handlerstack.top();
+	SOAPParseEventHandler* handler = parser->m_handlerstack.Top();
 	if (handler)
 		handler->characterData(str, len);
 }

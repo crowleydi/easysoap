@@ -21,10 +21,9 @@
 #if !defined(AFX_SOAPPARSE_H__751545FF_EF84_42BC_9622_A6CE624F1F14__INCLUDED_)
 #define AFX_SOAPPARSE_H__751545FF_EF84_42BC_9622_A6CE624F1F14__INCLUDED_
 
-#include <stack>
-
 #include "SOAPTransport.h"
 #include "SOAPParseEventHandler.h"
+#include "SOAPStack.h"
 
 // avoid include of expat.h
 typedef void *XML_Parser;
@@ -65,7 +64,7 @@ private:
 	//
 	// our parsing stack
 	//
-	std::stack<SOAPParseEventHandler *>	m_handlerstack;
+	SOAPStack<SOAPParseEventHandler *>	m_handlerstack;
 
 };
 
