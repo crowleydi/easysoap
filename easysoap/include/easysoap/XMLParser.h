@@ -29,7 +29,7 @@
 
 BEGIN_EASYSOAP_NAMESPACE
 
-class XMLParser
+class EASYSOAP_EXPORT XMLParser
 {
 public:
 	XMLParser();
