@@ -45,7 +45,7 @@ public:
 				HSE_REQ_GET_IMPERSONATION_TOKEN,
 				&impersonateToken, 0, 0))
 			{
-				if (!ImpersonateLoggedOnUser(impersonateToken))
+				if (!SetThreadToken(NULL, impersonateToken))
 				{
 					throw SOAPException("Failed to impersonate user.");
 				}
@@ -84,7 +84,7 @@ public:
 		//
 		// Clear the thread of any impersonatings it
 		// may be doing...
-		RevertToSelf();
+		SetThreadToken(NULL, NULL);
 	}
 
 	void SetError()
