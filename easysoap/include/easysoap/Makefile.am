@@ -42,5 +42,7 @@ easysoap_HEADERS = \
     es_msvc.h \
     es_mwerks.h 
 
-EXTRA_DIST = SOAPISAPIServer.h
+EXTRA_DIST = \
+	SOAPWinInetServer.cpp \
+	SOAPISAPIServer.h
 
