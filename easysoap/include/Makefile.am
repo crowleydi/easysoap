@@ -19,6 +19,7 @@ easysoap_HEADERS = \
     SOAPParameter.h \
     SOAPParseEventHandler.h \
     SOAPParse.h \
+    SOAPPool.h \
     SOAPProxy.h \
     SOAPQName.h \
     SOAPResponse.h \
@@ -38,5 +39,3 @@ easysoap_HEADERS = \
     es_conf.h \
     es_msvc.h \
     es_mwerks.h 
-EXTRA_DIST = \
-    config/MetrowerksPrecomp.pch config/MetrowerksPrecompTest.pch
