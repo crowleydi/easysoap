@@ -34,4 +34,44 @@
 
 #define PARSER_NS_SEP "#"
 
+class EASYSOAP_EXPORT SOAPEnc
+{
+public:
+	//
+	// for locating the document root
+	static const SOAPQName root;
+	//
+	// For array encodings.
+	static const SOAPQName Array;
+	static const SOAPQName arrayType;
+	static const SOAPQName offset;
+	static const SOAPQName position;
+	//
+	// This was for before there was a base64
+	// type in the XML Schema
+	static const SOAPQName base64;
+};
+
+class EASYSOAP_EXPORT SOAPEnv
+{
+public:
+	static const SOAPQName Body;
+	static const SOAPQName Header;
+	static const SOAPQName Envelope;
+	static const SOAPQName Fault;
+
+	static const SOAPQName encodingStyle;
+	//
+	// For headers
+	static const SOAPQName mustUnderstand;
+	static const SOAPQName actor;
+};
+
+class EASYSOAP_EXPORT XMLSchemaInstance
+{
+public:
+	static const SOAPQName type;
+	static const SOAPQName nil;
+};
+
 #endif // __SOAPNamesSpaces_h__
