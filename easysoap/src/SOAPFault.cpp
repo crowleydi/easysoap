@@ -84,7 +84,7 @@ SOAPFault::GetDetail() const
 
 SOAPFaultException::SOAPFaultException(const SOAPFault& fault)
 {
-		const SOAPParameter *p = 0;
+		const SOAPParameter *p;
 		m_what = "SOAP Fault";
 		if ((p = fault.GetFaultString()))
 		{

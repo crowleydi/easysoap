@@ -33,7 +33,7 @@ static char base64pad = '=';
 static int
 initializeBase64Tables()
 {
-	int i = 0;
+	int i;
 
 	// initialize the encoding table
 	for (i = 0; i < 26; ++i)
@@ -170,7 +170,6 @@ SOAPBase64Base::Encode(const char *bytes, size_t size, SOAPString& str)
 
 	char *out = str.Str();
 	const unsigned char *in = (const unsigned char *)bytes;
-	size_t numout = 0;
 
 	while (size >= 3)
 	{
@@ -180,7 +179,6 @@ SOAPBase64Base::Encode(const char *bytes, size_t size, SOAPString& str)
 		*out++ = base64encode[in[2] & 0x3F];
 		size -= 3;
 		in += 3;
-		numout += 4;
 	}
 
 	if (size == 2)

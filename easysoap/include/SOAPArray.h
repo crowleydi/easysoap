@@ -53,7 +53,7 @@ private:
 				throw SOAPMemoryException(); 
 
 			// Copy/construct new array from old array
-			size_t i = 0;
+			size_t i;
 			for (i = 0; i < m_size; ++i)
 				new (newarray + i) T(m_array[i]);
 
