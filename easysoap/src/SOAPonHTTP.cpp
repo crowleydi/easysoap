@@ -65,18 +65,6 @@ static void testDigest()
 
 USING_EASYSOAP_NAMESPACE
 
-SOAPonHTTP::SOAPonHTTP(const SOAPUrl& endpoint)
-: m_ctx(0)
-{
-	ConnectTo(endpoint);
-}
-
-SOAPonHTTP::SOAPonHTTP(const SOAPUrl& endpoint, const SOAPUrl& proxy)
-: m_ctx(0)
-{
-	ConnectTo(endpoint, proxy);
-}
-
 
 // read the payload into the buffer.
 // can be called multiple times.
@@ -601,7 +589,6 @@ SOAPHTTPProtocol::Connect()
 				
 				m_sslsocket->Connect(host, port);
 
-				
 				if (m_httpproxy)
 				{
 					char buffer[1024];

@@ -113,8 +113,12 @@ public:
 			delete m_sslsocket;
 	}
 
-	void	SetKeepAlive(bool keepAlive = true)	{m_keepAlive = keepAlive;}
-	void 	SetContext(SOAPSSLContext& context) { m_ctx = &context; }
+	void	SetKeepAlive(bool keepAlive = true)	{
+		m_keepAlive = keepAlive;
+	}
+	void 	SetContext(SOAPSSLContext& context) { 
+		m_ctx = &context; 
+	}
 	void	ConnectTo(const SOAPUrl& endpoint);
 	void	ConnectTo(const SOAPUrl& endpoint, const SOAPUrl& proxy);
 	int		Get(const char *path);
@@ -152,9 +156,19 @@ private:
 	SOAPSSLContext 		*m_ctx;
 
 public:
-	SOAPonHTTP() : m_ctx(0){}
-	SOAPonHTTP(const SOAPUrl& endpoint);
-	SOAPonHTTP(const SOAPUrl& endpoint, const SOAPUrl& proxy);
+	SOAPonHTTP(SOAPSSLContext * ctx = 0) : m_ctx(ctx){}
+	SOAPonHTTP(const SOAPUrl& endpoint, SOAPSSLContext * ctx = 0)
+		: m_ctx(ctx)
+	{
+		ConnectTo(endpoint);
+	}
+
+	SOAPonHTTP(const SOAPUrl& endpoint, SOAPUrl& proxy, SOAPSSLContext * ctx = 0)
+		: m_ctx(ctx)
+	{
+		ConnectTo(endpoint);
+	}
+
 
 	virtual ~SOAPonHTTP() {}
 
@@ -166,8 +180,12 @@ public:
 	void SetKeepAlive(bool keepAlive = true)	{m_http.SetKeepAlive(keepAlive);}
 	void SetContext(SOAPSSLContext& context) 
 	{
+		if (!m_ctx) {
 			m_ctx = &context;
 			m_http.SetContext(context);
+		} else {
+			throw SOAPException("attempting to replace context on active connection!");
+		}	
 	}
 	//
 	//  Return charset if we know it

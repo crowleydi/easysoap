@@ -6,7 +6,7 @@ dnl
 AC_INIT(Makefile.am)
 AC_CONFIG_AUX_DIR(conftools)
 
-AM_INIT_AUTOMAKE(EasySoap++, 0.6.1)
+AM_INIT_AUTOMAKE(EasySoap++, 0.6.2)
 AM_CONFIG_HEADER(include/easysoap/es_config.h)
 
 dnl
@@ -15,6 +15,8 @@ sinclude(conftools/ac_cxx_namespaces.m4)
 sinclude(conftools/ac_cxx_template_keyword_qualifier.m4)
 sinclude(conftools/ac_cxx_partial_specialization.m4)
 sinclude(conftools/peti_with_dmalloc.m4)
+
+
 
 AC_CANONICAL_HOST
 AC_CYGWIN
