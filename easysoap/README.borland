@@ -1,122 +1,55 @@
-Building EasySoap (and Expat which is needed by EasySoap) with Borland project
-files or makefiles.
-
+Building EasySoap with Borland project files or makefiles.
 
 1. Preliminaries
 
+Borland project and makefiles are included to build EasySoap version 0.6 
+using Borland C++ Builder version 5.0 Update Pack 1 or the C++ compiler 5.5.
+You can probably use BCB6 too.
 
-Borland project and makefiles are included to build Expat version 1.95.2 and 
-EasySoap version 0.5 using Borland C++ Builder version 5.0 Update Pack 1 or 
-the C++ compiler 5.
+I havent tested the makefiles with the free stand-alone comiler you can download
+from Borland. It should work, perhaps with some tweaks. It does work with
+the command line make that is part of BCB5.
 
-The makefiles contain some DOS commands that only work with win9x, though its 
-only the 2 master files called borland.mak. Adapting them to NT shouldn't be 
-hard but you'll have to do that yourself at this stage. The easy way to do 
-it is to delete the DOS commands in those .mak files (the commands check if the 
-output directories exist and create them if necessary) and create the output 
-directories manually.
+win9x DOS commands are used in the main makefile makefile.mak and in 
+setup.bat (which is used also by the projects). Adapting them to NT 
+shouldn't be hard but you'll have to do that yourself at this stage. The 
+easy way to do it is to delete the DOS commands in those files and do what
+they do manually, its not hard.
 
-I've offered to give these files to the EasySoap project, but until they get 
-incorporated you can install and use them yourself as follows.
+You require Expat version 1.95.2 to be installed in a directory adjacent 
+to EasySoap. The project and makefiles depend on the export lib 
+expatrel.lib being in Expat-1.95.2/Libs, and setup.bat (invoked by both 
+the projects and make files) tries to copy expatrel.dll from the Expat 
+tree over to win32/release.
 
+Since Expat doent presently come with Borland project files, 
+you can get the Easysoap patch from version 0.5 which contains the Expat
+projects. Its located on the EasySoap page on Sourceforge. A Borland 
+patch will also (soon) be on the Expat page on Sourceforge.
 
-2. Install
+The default build is a debug configuration even though the output directory
+is called release.
 
-
-Get Expat from http://sourceforge.net/projects/expat/ . You want the file 
-expat_win32bin_1_95_2.exe. Although this contains the VC binaries, it also has 
-the source code. Run this file and let it install to its default location, 
-something like C:\Expat-1.95.2 .
-
-Get EasSoap from http://sourceforge.net/projects/easysoap/ . You want the file
-EasySoap++-0.5.tar.gz . Unpack this beside Expat, so for example, if you 
-installed Expat to C:\Expat-1.95.2, then unpack EasySoap to C:\.
-
-Unpack my two zip files to C:\. 
-EPBorland.zip adds project and makefiles to Expat.
-ESBorland.zip adds project, makefiles to EasySoap, and overwrites some source 
-files with files modified to work with Borland. When your zip utility asks you 
-if you want to overwrite, say yes to all. The source changes shouldn't affect 
-the ability to build with other compilers.
-
-
-2. Build Expat.
-
+2. Building
 
 2.1 Using Makefiles
 
-If you dont have codeguard libraries (maybe they dont come with the free 
-compiler), edit C:\Expat-1.95.2\Source\Lib\borland.mak and remove the clause 
-that builds the debugcg.dll.
+At a dos prompt, cd to easysoap\proj\win32\BCB5 and type make. 
+If  everything  works, you have a bunch of .dll's, export libs, and 
+exe's in  C:\EasySoap++-0.6\win32\release.
 
-At a dos prompt, cd to C:\Expat-1.95.2\Source\Lib and type make -f 
-borland.mak . Pray. If everything worked, you have 3 .dll's and export libs in 
-C:\Expat-1.95.2\Libs. The 3 versions are release, debug, and debug with code 
-guard.
-
-You will also see an expat.dll and .lib. These are the original VC files,
-you dont need them.
+You can do a make clean to remove all the obj files, or a make cleanall 
+to remove the win32 directories and everything in them.
 
 2.2 Using Project Files
+Just open easysoap.bpg in the BCB5 project directory and do 
+a Build All.
 
-Create the output directories. Go to Expat-1.95.2\Source\lib and open the main 
-project group called expat.bpg
+3. Running EasySoap.
 
-Activate each project in turn, open the options window for each, then  click 
-OK. You should get a prompt asking if you want to create a folder, answer yes. 
-If you get an error message, create these folders yourself using the file explorer.
+You should now be able to use EasySoap. You can immediately 
+run 2 of the test programs: interopclient.exe and simpletest.exe. Both of these 
+communicate with a soap server at sourceforge so you need your internet hookup 
+open.4. FeedbackPost feedback to the EasySoap discussion Forum on sourceforge or 
+email me at pmcconnell@users.sourceforge.net
 
-Notice there are projects for release, debug, and debug with code guard.
-
-Go Project|Build All Projects
-
-
-3. Build EasySoap
-
-
-3.1 Using Makefiles
-
-If you dont have codeguard libraries (maybe they dont come with the free 
-compiler), edit C:\EasySoap++-0.5\Proj\Borl\borland.mak and remove the clause that builds the debugcg.dll.
-
-At a dos prompt, cd to C:\EasySoap++-0.5\Proj\Borl\ and type make -f borland.mak . If everything worked, you have a bunch of .dll's, export libs, 
-and exe's in C:\EasySoap++-0.5\win32\<release|debug|debugcg>. The 3 versions 
-are release, debug, and debug with code guard. 
-
-3.2 Using Project Files
-
-Create the output folders. On my system, BCB always gives an error when it 
-tries to automatically create these folders using the method of 2.2 above, so 
-you should probably do it yourself. Under the folder EasySoap++-0.5 create:
-
-Win32\Debug
-Wind32\Debug\obj
-Win32\DebugCG
-Wind32\DebugCG\obj
-Win32\Release
-Wind32\Release\obj
-
-There are 3 program group files (.bpg) in C:\EasySoap++-0.5\Proj\Borl\ . Open 
-each one in turn and do Project|Build All Porjects.
-
-
-4. Running EasySoap.
-
-
-EasySoap needs access to the Expat .dll files. The 3 EasySoap builds (release, 
-debug, debug with code guard) need the corresponding Expat dll's: 
-expatrel.dll, expatd.dll, expatdcg.dll. I do this by copying as follows:
-
-expatrel.dll from C:\Expat-1.95.2\Libs to C:\EasySoap++-0.5\Win32\release
-expatd.dll from C:\Expat-1.95.2\Libs to C:\EasySoap++-0.5\Win32\debug
-expatdcg.dll from C:\Expat-1.95.2\Libs to C:\EasySoap++-0.5\Win32\debugcg
-
-You should now be able to use EasySoap. You can immediately run 2 of the test 
-programs: interopclient.exe and simpletest.exe. Both of these communicate with 
-a soap server at sourceforge so you need your internet hookup open.
-
-
-5. Feedback
-
-
-Post feedback to borland.public.cppbuilder.internet or email me at p.mcconnell@mail.com
