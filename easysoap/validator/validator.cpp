@@ -457,8 +457,6 @@ main(int argc, char* argv[], char *env[])
 	const char *faultcode = "SOAP-ENV::Sever";
 	try
 	{
-		printf("SOAPServer: %s/%s\n", EASYSOAP_STRING, EASYSOAP_VERSION_STRING);
-
 		SOAPParser p;
 		SOAPResponse resp;
 		SOAPEnvelope env;
