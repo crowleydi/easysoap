@@ -37,6 +37,7 @@ AC_CXX_PARTIAL_SPECIALIZATION
 
 dnl Checks for libraries.
 AC_CHECK_LIB(gcc, main)
+AC_CHECK_LIB(m, isnan)
 AC_CHECK_LIB(stdc++, main)
 AC_CHECK_LIB(nsl, gethostbyname)
 AC_CHECK_LIB(socket, send)
@@ -68,6 +69,7 @@ AC_CHECK_HEADERS( \
 	resolv.h \
 	stdlib.h \
 	string.h \
+	strings.h \
 	unistd.h \
 	arpa/inet.h \
 	arpa/nameser.h \
