@@ -30,7 +30,7 @@
 
 BEGIN_EASYSOAP_NAMESPACE
 
-class SOAPWinInetTransport : public SOAPTransport
+class EASYSOAP_EXPORT SOAPWinInetTransport : public SOAPTransport
 {
 private:
 	SOAPWinInetTransport(const SOAPWinInetTransport&);
