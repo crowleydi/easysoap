@@ -76,6 +76,12 @@ SOAPCGITransport::SetInFile(const char *infile)
 		m_infile = fopen(infile, "rb");
 }
 
+void
+SOAPCGITransport::SetError()
+{
+	fprintf(stdout, "Status: 500 Internal Server Error\r\n");
+}
+
 const char *
 SOAPCGITransport::GetCharset() const
 {
@@ -89,7 +95,7 @@ SOAPCGITransport::Read(char *buffer, size_t buffsize)
 
 	if (m_canread == -1 || m_canread > 0)
 	{
-		if (m_canread != -1 && buffsize > m_canread)
+		if (m_canread != -1 && buffsize > (size_t)m_canread)
 			buffsize = m_canread;
 
 		if (m_infile)

@@ -34,6 +34,7 @@ public:
 	SOAPCGITransport();
 	~SOAPCGITransport();
 
+	void SetError();
 	const char *GetCharset() const;
 	size_t Read(char *buffer, size_t buffsize);
 	size_t Write(const SOAPMethod& method, const char *payload, size_t payloadsize);

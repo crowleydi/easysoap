@@ -35,6 +35,11 @@
 // can be called multiple times.
 // returns 0 if entire payload has been read.
 
+void
+SOAPonHTTP::SetError()
+{
+}
+
 size_t
 SOAPonHTTP::Read(char *buffer, size_t buffsize)
 {

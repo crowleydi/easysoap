@@ -32,6 +32,7 @@ protected:
 public:
 	virtual ~SOAPTransport() {}
 
+	virtual void SetError() = 0;
 	//
 	//  Return charset if known otherwise null
 	virtual const char *GetCharset() const = 0;

@@ -113,6 +113,7 @@ public:
 
 	virtual ~SOAPonHTTP() {}
 
+	virtual void SetError();
 	//
 	//  Return charset if we know it
 	virtual const char *GetCharset() const;

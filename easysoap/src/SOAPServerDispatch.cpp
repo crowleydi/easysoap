@@ -69,6 +69,7 @@ SOAPServerDispatch::WriteFault(const char *code, const char *str)
 	m_writer.EndTag("SOAP-ENV:Body");
 	m_writer.EndTag("SOAP-ENV:Envelope");
 
+	m_transport->SetError();
 	m_transport->Write(m_response.GetBody().GetMethod(), m_writer.GetBytes(), m_writer.GetLength());
 }
 
