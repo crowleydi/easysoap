@@ -231,10 +231,18 @@ public:
 			attr = (*i)->GetAttributes().Find(SOAPEnc::position);
 			if (attr)
 			{
-				parsepos(SOAPEnc::position, *attr, pos);
-				if (pos >= numvals)
-					throw SOAPException("Error decoding array, position out of range: position is [%d], size is [%d]",
-					pos, numvals);
+				size_t newpos;
+				parsepos(SOAPEnc::position, *attr, newpos);
+				if (newrow < row || newcol < col)
+					throw SOAPException("Error decoding array, position attribute cannot point to a previous element."
+						" Current position: [%d], next position: [%d]",
+						pos, newpos);
+				if (newpos >=  numvals)
+					throw SOAPException("Error decoding array, position out of range."
+						" Current size: [%d], requested position: [%d]",
+						numvals, newpos);
+
+				pos = newpos;
 			}
 			SOAPTypeTraits<MEMBER_TYPE(V::value_type)>::Deserialize(**i, val[pos++]);
 		}
@@ -458,10 +466,19 @@ public:
 			attr = (*i)->GetAttributes().Find(SOAPEnc::position);
 			if (attr)
 			{
-				parse2Dpos(SOAPEnc::position, *attr, row, col);
-				if (col >= numcols || row >= numrows)
-					throw SOAPException("Error decoding array, position out of range: position is [%d,%d], size is [%d,%d]",
-					row, col, numrows, numcols);
+				size_t newrow, newcol;
+				parse2Dpos(SOAPEnc::position, *attr, newrow, newcol);
+				if (newrow < row || newcol < col)
+					throw SOAPException("Error decoding array, position attribute cannot point to a previous element."
+						" Current position: [%d,%d], next position: [%d,%d]",
+						row, col, newrow, newcol);
+				if (newcol >= numcols || newrow >= numrows)
+					throw SOAPException("Error decoding array, position out of range."
+						" Current size: [%d,%d], requested position: [%d,%d]",
+						numrows, numcols, newrow, newcol);
+
+				row = newrow;
+				col = newcol;
 			}
 			SOAPTypeTraits<MEMBER_TYPE(V::value_type)>::Deserialize(**i, val[row][col]);
 			if (++col == numcols)
