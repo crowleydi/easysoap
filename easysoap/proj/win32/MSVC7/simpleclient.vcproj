@@ -2,9 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.00"
-	Name="simpleclient"
-	SccProjectName="simpleclient"
-	SccLocalPath=".">
+	Name="simpleclient">
 	<Platforms>
 		<Platform
 			Name="Win32"/>
