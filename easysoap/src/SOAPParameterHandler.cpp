@@ -141,6 +141,6 @@ SOAPParameterHandler::endElement(const XML_Char *)
 	{
 		m_param->SetNull(false);
 		m_str.Add(0); // null terminate
-		m_param->GetStringRef() = (const char *)m_str;
+		m_param->GetStringRef() = m_str.Ptr();
 	}
 }
