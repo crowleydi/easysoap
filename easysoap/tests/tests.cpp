@@ -53,7 +53,7 @@ void
 SetTraceFile(const char *server, const char *test)
 {
 	char buffer[256];
-	snprintf(buffer, sizeof(buffer), "%s\\%s.log", server, test);
+	snprintf(buffer, sizeof(buffer), "%s\\%s.txt", server, test);
 	SOAPDebugger::SetFile(buffer);
 }
 
@@ -293,7 +293,9 @@ TestEchoFloat(SOAPProxy& proxy,
 		outputParam >> outputValue;
 
 		if (inputValue != outputValue)
-			throw SOAPException("Values are not equal: %g != %g", inputValue, outputValue);
+			throw SOAPException("Values are not equal: %s != %s",
+				(const char *)inputParam.GetString(),
+				(const char *)outputParam.GetString());
 
 		std::cout << "PASS: (in=" << inputParam.GetString() << ", out=" << outputParam.GetString() << ")" << std::endl;
 		return false;
@@ -462,15 +464,16 @@ TestEchoFloatArray(SOAPProxy& proxy,
 	{
 		SOAPArray<float> inputValue;
 
-		inputValue.Add(1.3);
-		inputValue.Add(6.6535);
-		inputValue.Add(73.235);
-		inputValue.Add(92735.3e2);
-		inputValue.Add(-16e30);
-		inputValue.Add(-16e-30);
-		inputValue.Add(-16e30);
-		inputValue.Add(-163.0);
+		inputValue.Add(1.34523452345346754753453);
+		inputValue.Add(6.65334598983465754583455);
+		inputValue.Add(73.233453452324523453455);
+		inputValue.Add(927324985793245335.235423e2);
+		inputValue.Add(1.63245234532453452345e10);
+		inputValue.Add(1.62345234523452345e-10);
+		inputValue.Add(-1.5324523423453246e10);
+		inputValue.Add(-1.6234523452345345e-10);
 		inputValue.Add(-0.1);
+		inputValue.Add(0.1);
 
 		SOAPMethod method("echoFloatArray", uri, soapAction, appendMethod);
 		method.AddParameter("inputFloatArray") << inputValue;
@@ -603,13 +606,14 @@ void TestInterop(const char *name,
 
 	SOAPProxy proxy(endpoint);//, "http://localhost:8080");
 
+#if 1
 	SetTraceFile(name, "echoVoid");
 	TestEchoVoid(proxy, uri, soapAction, appendMethod);
 
 	SetTraceFile(name, "echoInteger");
 	TestEchoInteger(proxy, uri, soapAction, appendMethod, 464);
 	SetTraceFile(name, "echoFloat");
-	TestEchoFloat(proxy, uri, soapAction, appendMethod, (float)-3.6e-6);
+	TestEchoFloat(proxy, uri, soapAction, appendMethod, (float)-3.628134987338e-6);
 	SetTraceFile(name, "echoString");
 	TestEchoString(proxy, uri, soapAction, appendMethod, "This is a test string from EasySOAP++");
 	SetTraceFile(name, "echoStruct");
@@ -624,22 +628,23 @@ void TestInterop(const char *name,
 	SetTraceFile(name, "echoStructArray");
 	TestEchoStructArray(proxy, uri, soapAction, appendMethod);
 
+#else
 	// Lets test some boundry cases...
-	//SetTraceFile(name, "echoInteger_Overflow");
-	//TestEchoIntegerInvalid(proxy, uri, soapAction, appendMethod, "2147483648");
-	//SetTraceFile(name, "echoInteger_Underflow");
-	//TestEchoIntegerInvalid(proxy, uri, soapAction, appendMethod, "-2147483649");
-	//SetTraceFile(name, "echoInteger_NaN");
-	//TestEchoFloat(proxy, uri, soapAction, appendMethod, "NaN");
-	//SetTraceFile(name, "echoInteger_INF");
-	//TestEchoFloat(proxy, uri, soapAction, appendMethod, HUGE_VAL);
-	//SetTraceFile(name, "echoInteger_nINF");
-	//TestEchoFloat(proxy, uri, soapAction, appendMethod, -HUGE_VAL);
-
-	//SetTraceFile(name, "echoInteger_pINF");
-	//TestEchoFloatInvalid(proxy, uri, soapAction, appendMethod, "+INF");
-	//SetTraceFile(name, "echoInteger_n0");
-	//TestEchoFloat(proxy, uri, soapAction, appendMethod, "-0.0");
+	SetTraceFile(name, "echoInteger_Overflow");
+	TestEchoIntegerInvalid(proxy, uri, soapAction, appendMethod, "2147483648");
+	SetTraceFile(name, "echoInteger_Underflow");
+	TestEchoIntegerInvalid(proxy, uri, soapAction, appendMethod, "-2147483649");
+	SetTraceFile(name, "echoInteger_NaN");
+	TestEchoFloat(proxy, uri, soapAction, appendMethod, "NaN");
+	SetTraceFile(name, "echoInteger_INF");
+	TestEchoFloat(proxy, uri, soapAction, appendMethod, HUGE_VAL);
+	SetTraceFile(name, "echoInteger_nINF");
+	TestEchoFloat(proxy, uri, soapAction, appendMethod, -HUGE_VAL);
+	SetTraceFile(name, "echoInteger_pINF");
+	TestEchoFloatInvalid(proxy, uri, soapAction, appendMethod, "+INF");
+	SetTraceFile(name, "echoInteger_n0");
+	TestEchoFloat(proxy, uri, soapAction, appendMethod, "-0.0");
+#endif
 	SOAPDebugger::Close();
 
 	std::cout << "Done." << std::endl << std::endl;
