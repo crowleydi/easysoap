@@ -41,7 +41,6 @@ public:
 
 private:
 	SOAPHeader	*m_header;
-
 };
 
 #endif // !defined(AFX_SOAPHEADERHANDLER_H__A673A39C_3468_40A3_A837_690B8A74AAE2__INCLUDED_)

@@ -64,6 +64,10 @@ SOAPEnvelopeHandler::startElement(const XML_Char *name, const XML_Char **attrs)
 	{
 		return m_headerHandler.start(name, attrs);
 	}
+	else if (sp_strcmp(name, SOAPEnvelopeHandler::start_tag) == 0)
+	{
+		return this;
+	}
 	//
 	// FIX ME: Get actual tag used, not one with the namespace
 	// //
