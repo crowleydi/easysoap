@@ -23,28 +23,18 @@
 #if !defined(AFX_SOAPCGIHANDLER_H__E392FAB3_3022_11D5_B3F3_000000000000__INCLUDED_)
 #define AFX_SOAPCGIHANDLER_H__E392FAB3_3022_11D5_B3F3_000000000000__INCLUDED_
 
-#include <SOAP.h>
-#include <SOAPServerDispatch.h>
-#include <SOAPDispatchHandler.h>
+#include <SOAPServer.h>
 
-class EASYSOAP_EXPORT SOAPCGIServer
+class EASYSOAP_EXPORT SOAPCGIServer : public SOAPServer<SOAPCGIServer>
 {
 public:
 	SOAPCGIServer() {}
-	SOAPCGIServer& DispatchTo(SOAPDispatchHandlerInterface* disp)
-	{
-		m_dispatch.DispatchTo(disp);
-		return *this;
-	}
-
 	int Handle(const char *infile = 0);
 
 private:
 
 	SOAPCGIServer(const SOAPCGIServer&);
 	SOAPCGIServer& operator=(const SOAPCGIServer&);
-
-	SOAPServerDispatch	m_dispatch;
 };
 
 

@@ -23,20 +23,12 @@
 #if !defined(AFX_SOAPISAPIHANDLER_H__E392FAB3_3022_11D5_B3F3_000000000000__INCLUDED_)
 #define AFX_SOAPISAPIHANDLER_H__E392FAB3_3022_11D5_B3F3_000000000000__INCLUDED_
 
-#include <SOAP.h>
-#include <SOAPServerDispatch.h>
-#include <SOAPDispatchHandler.h>
+#include <SOAPServer.h>
 
-class EASYSOAP_EXPORT SOAPISAPIServer
+class EASYSOAP_EXPORT SOAPISAPIServer : public SOAPServer<SOAPISAPIServer>
 {
 public:
 	SOAPISAPIServer(HANDLE ioport) : m_ioport(ioport) {}
-	SOAPISAPIServer& DispatchTo(SOAPDispatchHandlerInterface* disp)
-	{
-		m_dispatch.DispatchTo(disp);
-		return *this;
-	}
-
 	int Handle();
 
 private:
@@ -45,7 +37,6 @@ private:
 	SOAPISAPIServer(const SOAPISAPIServer&);
 	SOAPISAPIServer& operator=(const SOAPISAPIServer&);
 
-	SOAPServerDispatch	m_dispatch;
 	HANDLE				m_ioport;
 };
 

@@ -20,28 +20,36 @@
  */
 
 
-#if !defined(AFX_SOAPHTTPSERVERTRANSPORT_H__0A80D352_B75C_411D_9096_7F1CACB82BD1__INCLUDED_)
-#define AFX_SOAPHTTPSERVERTRANSPORT_H__0A80D352_B75C_411D_9096_7F1CACB82BD1__INCLUDED_
+#if !defined(AFX_SOAPSERVER_H__E392FAB3_3022_11D5_B3F3_000000000000__INCLUDED_)
+#define AFX_SOAPSERVER_H__E392FAB3_3022_11D5_B3F3_000000000000__INCLUDED_
 
-#include <SOAPServer.h>
+#include <SOAP.h>
+#include <SOAPServerDispatch.h>
+#include <SOAPDispatchHandler.h>
 
-struct _TServer;
-struct _TSession;
 
-class EASYSOAP_EXPORT SOAPHTTPServer : public SOAPServer<SOAPHTTPServer>
+template <typename T>
+class SOAPServer
 {
-public:
-	SOAPHTTPServer(int port=80);
-	~SOAPHTTPServer();
+protected:
+	SOAPServer() {}
+	~SOAPServer() {}
 
-	int Handle();
-private:
-
-	static int _RequestHandler(struct _TSession *);
-	void RequestHandler(struct _TSession *);
-
-	struct _TServer		*m_server;
 	SOAPServerDispatch	m_dispatch;
+
+public:
+	T& DispatchTo(SOAPDispatchHandlerInterface* disp)
+	{
+		m_dispatch.DispatchTo(disp);
+		return *(T*)this; // Is there a better way to do this?
+	}
+
+	T& DispatchTo(SOAPHeaderHandlerInterface* disp)
+	{
+		m_dispatch.DispatchTo(disp);
+		return *(T*)this; // Is there a better way to do this?
+	}
 };
 
-#endif // !defined(AFX_SOAPHTTPSERVERTRANSPORT_H__0A80D352_B75C_411D_9096_7F1CACB82BD1__INCLUDED_)
+#endif // AFX_SOAPSERVER_H__E392FAB3_3022_11D5_B3F3_000000000000__INCLUDED_
+
