@@ -49,19 +49,33 @@ public:
 	void EndTag(const SOAPQName& tag);
 
 	void WriteValue(const char *val);
-	const char *GetSymbol(char *buff, const char *prefix);
-
-	void SetNamespace(const char *ns, const char *tag);
 
 	static void SetAddWhiteSpace(bool ws = true);
+
 private:
+	SOAPPacketWriter(const SOAPPacketWriter&);
+	SOAPPacketWriter& operator=(const SOAPPacketWriter&);
+
+	const char *GetSymbol(char *buff, const char *prefix);
 	void EndStart();
 	void Resize();
 	void Write(const char *str);
 	void WriteEscaped(const char *str);
-	void Write(const char *str, int len);
+	void Write(const char *str, unsigned int len);
 
-	typedef SOAPHashMap<SOAPString, SOAPString> NamespaceMap;
+	void PushLevel();
+	void PopLevel();
+
+	class NamespaceInfo {
+	public:
+		NamespaceInfo() : level(0) {}
+		SOAPString		prefix;
+		SOAPString		value;
+		unsigned int	level;
+	};
+
+	typedef SOAPHashMap<SOAPString, NamespaceInfo> NamespaceMap;
+	typedef SOAPArray<NamespaceInfo> NamespaceArray;
 
 	bool			m_instart;
 	char			*m_buffer;
@@ -69,7 +83,9 @@ private:
 	const char		*m_buffend;
 	unsigned int	m_buffsize;
 	unsigned int	m_gensym;
+	unsigned int	m_level;
 	NamespaceMap	m_nsmap;
+	NamespaceArray	m_nsarray;
 
 	static bool		g_makePretty;
 };

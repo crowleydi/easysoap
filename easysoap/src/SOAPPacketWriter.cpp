@@ -26,13 +26,14 @@
 bool SOAPPacketWriter::g_makePretty = false;
 
 SOAPPacketWriter::SOAPPacketWriter()
+: m_instart(false)
+, m_buffer(0)
+, m_buffptr(0)
+, m_buffend(0)
+, m_buffsize(0)
+, m_gensym(0)
+, m_level(0)
 {
-	m_instart = false;
-	m_buffer = 0;
-	m_buffptr = 0;
-	m_buffend = 0;
-	m_buffsize = 0;
-	m_gensym = 0;
 }
 
 SOAPPacketWriter::~SOAPPacketWriter()
@@ -57,9 +58,12 @@ SOAPPacketWriter::GetSymbol(char *buff, const char *prefix)
 void
 SOAPPacketWriter::Reset()
 {
+	m_gensym = 0;
+	m_level = 0;
 	m_instart = false;
 	m_buffptr = m_buffer;
 	m_nsmap.Clear();
+	m_nsarray.Resize(0);
 }
 
 const char *
@@ -78,6 +82,8 @@ SOAPPacketWriter::GetLength()
 void
 SOAPPacketWriter::StartTag(const char *tag)
 {
+	PushLevel();
+
 	EndStart();
 	Write("<");
 	Write(tag);
@@ -87,7 +93,7 @@ SOAPPacketWriter::StartTag(const char *tag)
 void
 SOAPPacketWriter::StartTag(const SOAPQName& tag, const char *prefix)
 {
-	const char *nstag = 0;
+	const char *nsprefix = 0;
 	bool addxmlns = false;
 	char buffer[64];
 
@@ -96,6 +102,8 @@ SOAPPacketWriter::StartTag(const SOAPQName& tag, const char *prefix)
 		StartTag(tag.GetName());
 		return;
 	}
+
+	PushLevel();
 
 	EndStart();
 	Write("<");
@@ -107,16 +115,16 @@ SOAPPacketWriter::StartTag(const SOAPQName& tag, const char *prefix)
 		{
 			addxmlns = true;
 			if (prefix)
-				nstag = prefix;
+				nsprefix = prefix;
 			else
-				nstag = GetSymbol(buffer, "ns");
+				nsprefix = GetSymbol(buffer, "ns");
 		}
 		else
 		{
-			nstag = i->Str();
+			nsprefix = i->prefix;
 		}
 
-		Write(nstag);
+		Write(nsprefix);
 		Write(":");
 	}
 
@@ -124,13 +132,13 @@ SOAPPacketWriter::StartTag(const SOAPQName& tag, const char *prefix)
 	m_instart = true;
 
 	if (addxmlns)
-		AddXMLNS(nstag, tag.GetNamespace());
+		AddXMLNS(nsprefix, tag.GetNamespace());
 }
 
 void
 SOAPPacketWriter::AddAttr(const SOAPQName& tag, const char *value)
 {
-	const char *nstag = 0;
+	const char *nsprefix = 0;
 	bool addxmlns = false;
 	char buffer[64];
 
@@ -148,14 +156,14 @@ SOAPPacketWriter::AddAttr(const SOAPQName& tag, const char *value)
 		if (!i)
 		{
 			addxmlns = true;
-			nstag = GetSymbol(buffer, "ns");
+			nsprefix = GetSymbol(buffer, "ns");
 		}
 		else
 		{
-			nstag = i->Str();
+			nsprefix = i->prefix;
 		}
 
-		Write(nstag);
+		Write(nsprefix);
 		Write(":");
 	}
 
@@ -165,14 +173,14 @@ SOAPPacketWriter::AddAttr(const SOAPQName& tag, const char *value)
 	Write("\"");
 
 	if (addxmlns)
-		AddXMLNS(nstag, tag.GetNamespace());
+		AddXMLNS(nsprefix, tag.GetNamespace());
 }
 
 void
 SOAPPacketWriter::AddAttr(const SOAPQName& tag, const SOAPQName& value)
 {
-	const char *tnstag;
-	const char *vnstag = 0;
+	const char *tnsprefix;
+	const char *vnsprefix = 0;
 	bool addtns = false;
 	bool addvns = false;
 	char tbuff[64];
@@ -185,11 +193,11 @@ SOAPPacketWriter::AddAttr(const SOAPQName& tag, const SOAPQName& value)
 	if (!i)
 	{
 		addtns = true;
-		tnstag = GetSymbol(tbuff, "ns");
+		tnsprefix = GetSymbol(tbuff, "ns");
 	}
 	else
 	{
-		tnstag = i->Str();
+		tnsprefix = i->prefix;
 	}
 
 	if (g_makePretty)
@@ -197,7 +205,7 @@ SOAPPacketWriter::AddAttr(const SOAPQName& tag, const SOAPQName& value)
 	else
 		Write(" ");
 
-	Write(tnstag);
+	Write(tnsprefix);
 	Write(":");
 	Write(tag.GetName());
 	Write("=\"");
@@ -212,14 +220,14 @@ SOAPPacketWriter::AddAttr(const SOAPQName& tag, const SOAPQName& value)
 		if (!i)
 		{
 			addvns = true;
-			vnstag = GetSymbol(vbuff, "ns");
+			vnsprefix = GetSymbol(vbuff, "ns");
 		}
 		else
 		{
-			vnstag = i->Str();
+			vnsprefix = i->prefix;
 		}
 
-		Write(vnstag);
+		Write(vnsprefix);
 		Write(":");
 		WriteEscaped(value.GetName());
 
@@ -228,9 +236,9 @@ SOAPPacketWriter::AddAttr(const SOAPQName& tag, const SOAPQName& value)
 	Write("\"");
 
 	if (addtns)
-		AddXMLNS(tnstag, tag.GetNamespace());
+		AddXMLNS(tnsprefix, tag.GetNamespace());
 	if (addvns)
-		AddXMLNS(vnstag, value.GetNamespace());
+		AddXMLNS(vnsprefix, value.GetNamespace());
 }
 
 void
@@ -256,7 +264,12 @@ SOAPPacketWriter::AddXMLNS(const char *prefix, const char *ns)
 	NamespaceMap::Iterator i = m_nsmap.Find(ns);
 	if (!i)
 	{
-		m_nsmap[ns] = prefix;
+		NamespaceInfo& ni = m_nsmap[ns];
+		ni.prefix = prefix;
+		ni.level = m_level;
+		ni.value = ns;
+
+		m_nsarray.Add(ni);
 
 		if (g_makePretty)
 			Write("\r\n\t");
@@ -293,6 +306,8 @@ SOAPPacketWriter::EndTag(const char *tag)
 		if (g_makePretty)
 			Write("\r\n");
 	}
+
+	PopLevel();
 }
 
 void
@@ -322,7 +337,7 @@ SOAPPacketWriter::EndTag(const SOAPQName& tag)
 				throw SOAPException("EndTag: Could not find tag for namespace: %s",
 					(const char *)tag.GetNamespace());
 
-			Write(i->Str());
+			Write(i->prefix);
 			Write(":");
 		}
 
@@ -331,6 +346,8 @@ SOAPPacketWriter::EndTag(const SOAPQName& tag)
 		if (g_makePretty)
 			Write("\r\n");
 	}
+
+	PopLevel();
 }
 
 void
@@ -420,24 +437,34 @@ SOAPPacketWriter::WriteEscaped(const char *str)
 }
 
 void
-SOAPPacketWriter::Write(const char *str, int len)
+SOAPPacketWriter::Write(const char *str, unsigned int len)
 {
 	const char *strend = str + len;
 	while (str != strend)
 	{
 		if (m_buffptr == m_buffend)
 			Resize();
-		else
-			*m_buffptr++ = *str++;
+		*m_buffptr++ = *str++;
 	}
 }
 
 void
-SOAPPacketWriter::SetNamespace(const char *ns, const char *tag)
+SOAPPacketWriter::PopLevel()
 {
-	if (!ns || !*ns)
-		throw SOAPException("Cannot add empty namespace");
+	for (NamespaceArray::Iterator i = m_nsarray.End(); i != m_nsarray.Begin();)
+	{
+		--i;
+		if (i->level == m_level)
+			m_nsmap.Remove(i->value);
+		else
+			break;
+	}
+	--m_level;
+}
 
-	m_nsmap[ns] = tag;
+void
+SOAPPacketWriter::PushLevel()
+{
+	++m_level;
 }
 
