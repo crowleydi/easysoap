@@ -97,24 +97,29 @@ SOAPPacketWriter::StartTag(const SOAPQName& tag, const char *prefix)
 		return;
 	}
 
-	NamespaceMap::Iterator i = m_nsmap.Find(tag.GetNamespace());
-	if (!i)
-	{
-		addxmlns = true;
-		if (prefix)
-			nstag = prefix;
-		else
-			nstag = GetSymbol(buffer, "ns");
-	}
-	else
-	{
-		nstag = i->Str();
-	}
-
 	EndStart();
 	Write("<");
-	Write(nstag);
-	Write(":");
+
+	if (!tag.GetNamespace().IsEmpty())
+	{
+		NamespaceMap::Iterator i = m_nsmap.Find(tag.GetNamespace());
+		if (!i)
+		{
+			addxmlns = true;
+			if (prefix)
+				nstag = prefix;
+			else
+				nstag = GetSymbol(buffer, "ns");
+		}
+		else
+		{
+			nstag = i->Str();
+		}
+
+		Write(nstag);
+		Write(":");
+	}
+
 	Write(tag.GetName());
 	m_instart = true;
 
@@ -132,23 +137,28 @@ SOAPPacketWriter::AddAttr(const SOAPQName& tag, const char *value)
 	if (!m_instart)
 		throw SOAPException("XML serialization error.  Adding attribute when not in start tag.");
 
-	NamespaceMap::Iterator i = m_nsmap.Find(tag.GetNamespace());
-	if (!i)
-	{
-		addxmlns = true;
-		nstag = GetSymbol(buffer, "ns");
-	}
-	else
-	{
-		nstag = i->Str();
-	}
-
 	if (g_makePretty)
-		Write("\n\t");
+		Write("\r\n\t");
 	else
 		Write(" ");
-	Write(nstag);
-	Write(":");
+
+	if (!tag.GetNamespace().IsEmpty())
+	{
+		NamespaceMap::Iterator i = m_nsmap.Find(tag.GetNamespace());
+		if (!i)
+		{
+			addxmlns = true;
+			nstag = GetSymbol(buffer, "ns");
+		}
+		else
+		{
+			nstag = i->Str();
+		}
+
+		Write(nstag);
+		Write(":");
+	}
+
 	Write(tag.GetName());
 	Write("=\"");
 	WriteEscaped(value);
@@ -182,19 +192,8 @@ SOAPPacketWriter::AddAttr(const SOAPQName& tag, const SOAPQName& value)
 		tnstag = i->Str();
 	}
 
-	i = m_nsmap.Find(value.GetNamespace());
-	if (!i)
-	{
-		addvns = true;
-		vnstag = GetSymbol(vbuff, "ns");
-	}
-	else
-	{
-		vnstag = i->Str();
-	}
-
 	if (g_makePretty)
-		Write("\n\t");
+		Write("\r\n\t");
 	else
 		Write(" ");
 
@@ -202,9 +201,30 @@ SOAPPacketWriter::AddAttr(const SOAPQName& tag, const SOAPQName& value)
 	Write(":");
 	Write(tag.GetName());
 	Write("=\"");
-	Write(vnstag);
-	Write(":");
-	WriteEscaped(value.GetName());
+
+	if (value.GetNamespace().IsEmpty())
+	{
+		Write(value.GetName());
+	}
+	else
+	{
+		i = m_nsmap.Find(value.GetNamespace());
+		if (!i)
+		{
+			addvns = true;
+			vnstag = GetSymbol(vbuff, "ns");
+		}
+		else
+		{
+			vnstag = i->Str();
+		}
+
+		Write(vnstag);
+		Write(":");
+		WriteEscaped(value.GetName());
+
+	}
+
 	Write("\"");
 
 	if (addtns)
@@ -220,7 +240,7 @@ SOAPPacketWriter::AddAttr(const char *attr, const char *value)
 		throw SOAPException("XML serialization error.  Adding attribute when not in start tag.");
 
 	if (g_makePretty)
-		Write("\n\t");
+		Write("\r\n\t");
 	else
 		Write(" ");
 
@@ -240,7 +260,7 @@ SOAPPacketWriter::AddXMLNS(const char *prefix, const char *ns)
 		m_nsmap[m_nsstr] = prefix;
 
 		if (g_makePretty)
-			Write("\n\t");
+			Write("\r\n\t");
 		else
 			Write(" ");
 
@@ -263,7 +283,7 @@ SOAPPacketWriter::EndTag(const char *tag)
 	{
 		Write("/>");
 		if (g_makePretty)
-			Write("\n");
+			Write("\r\n");
 		m_instart = false;
 	}
 	else
@@ -272,7 +292,7 @@ SOAPPacketWriter::EndTag(const char *tag)
 		Write(tag);
 		Write(">");
 		if (g_makePretty)
-			Write("\n");
+			Write("\r\n");
 	}
 }
 
@@ -289,24 +309,28 @@ SOAPPacketWriter::EndTag(const SOAPQName& tag)
 	{
 		Write("/>");
 		if (g_makePretty)
-			Write("\n");
+			Write("\r\n");
 		m_instart = false;
 	}
 	else
 	{
-		NamespaceMap::Iterator i = m_nsmap.Find(tag.GetNamespace());
-		if (!i)
-			throw SOAPException("EndTag: Could not find tag for namespace: %s",
-				(const char *)tag.GetNamespace());
-
-		const char *nstag = i->Str();
 		Write("</");
-		Write(nstag);
-		Write(":");
+
+		if (!tag.GetNamespace().IsEmpty())
+		{
+			NamespaceMap::Iterator i = m_nsmap.Find(tag.GetNamespace());
+			if (!i)
+				throw SOAPException("EndTag: Could not find tag for namespace: %s",
+					(const char *)tag.GetNamespace());
+
+			Write(i->Str());
+			Write(":");
+		}
+
 		Write(tag.GetName());
 		Write(">");
 		if (g_makePretty)
-			Write("\n");
+			Write("\r\n");
 	}
 }
 
@@ -328,7 +352,7 @@ SOAPPacketWriter::EndStart()
 	{
 		Write(">");
 		if (g_makePretty)
-			Write("\n");
+			Write("\r\n");
 		m_instart = false;
 	}
 }
@@ -412,6 +436,9 @@ SOAPPacketWriter::Write(const char *str, int len)
 void
 SOAPPacketWriter::SetNamespace(const char *ns, const char *tag)
 {
+	if (!ns || !*ns)
+		throw SOAPException("Cannot add empty namespace");
+
 	m_nsmap[ns] = tag;
 }
 
