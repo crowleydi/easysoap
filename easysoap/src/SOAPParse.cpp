@@ -92,7 +92,7 @@ SOAPParser::startElement(const XML_Char *name, const XML_Char **attrs)
 	SOAPParseEventHandler* handler = 0;
 	if (m_handlerstack.IsEmpty())
 	{
-		if (sp_strcmp(name, SOAPEnvelopeHandler::start_tag) == 0)
+		if (sp_strcmp(name, SOAP_ENV PARSER_NS_SEP "Envelope") == 0)
 		{
 			handler = m_handler;
 		}
@@ -177,9 +177,10 @@ SOAPParser::SetHRefParam(const SOAPString& name, SOAPParameter *param)
 }
 
 const char *
-SOAPParser::ExpandNamespace(const char *ns) const
+SOAPParser::ExpandNamespace(const char *ns, const char *nsend) const
 {
-	m_work = ns;
+	m_work = "";
+	m_work.Append(ns, nsend - ns);
 	NamespaceMap::Iterator i = m_nsmap.Find(m_work);
 	if (i)
 		return i->Str();

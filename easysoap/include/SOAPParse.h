@@ -46,7 +46,7 @@ public:
 
 	// Resolves a namespace like "xsi" into a fully qualified name
 	// "http://www.w3.org/1999/XMLSchema-instance"
-	const char *ExpandNamespace(const char *name) const;
+	const char *ExpandNamespace(const char *name, const char *nsend) const;
 
 	// Given an HRef, return the Parameter for it
 	// if any (will return null if not found)
