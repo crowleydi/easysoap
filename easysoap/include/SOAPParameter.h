@@ -105,6 +105,7 @@ public:
 		return m_array[i];
 	}
 
+	const SOAPQName& GetArrayType() const {return m_arrayType;}
 	void SetIsArray();
 	void SetArrayType(const char *name, const char *ns = 0);
 	void SetIsStruct();
