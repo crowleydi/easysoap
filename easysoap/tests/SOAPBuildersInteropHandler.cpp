@@ -41,6 +41,12 @@ SOAPBuildersInteropHandler::SOAPBuildersInteropHandler()
 
 	DispatchMethod("echoStructArray",	interop_namespace,
 		&SOAPBuildersInteropHandler::echoStructArray);
+
+	DispatchMethod("echoDate",	interop_namespace,
+		&SOAPBuildersInteropHandler::echoDate);
+
+	DispatchMethod("echoBase64",	interop_namespace,
+		&SOAPBuildersInteropHandler::echoBase64);
 }
 
 SOAPBuildersInteropHandler::~SOAPBuildersInteropHandler()
@@ -135,6 +141,28 @@ SOAPBuildersInteropHandler::echoStructArray(const SOAPMethod& req, SOAPMethod& r
 	req.GetParameter("inputStructArray") >> val;
 
 	resp.AddParameter("return") << val;
+}
+
+
+void
+SOAPBuildersInteropHandler::echoBase64(const SOAPMethod& req, SOAPMethod& resp)
+{
+	SOAPArray<char> val;
+
+	req.GetParameter("inputBase64") >> val;
+
+	resp.AddParameter("return") << val;
+}
+
+void
+SOAPBuildersInteropHandler::echoDate(const SOAPMethod& req, SOAPMethod& resp)
+{
+	SOAPString val;
+
+	const SOAPParameter& inputDate = req.GetParameter("inputDate");
+	inputDate >> val;
+
+	(resp.AddParameter("return") << val).SetType(inputDate.GetType());
 }
 
 

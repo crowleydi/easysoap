@@ -23,6 +23,8 @@ public:
 	void echoFloatArray(const SOAPMethod& req, SOAPMethod& response);
 	void echoStringArray(const SOAPMethod& req, SOAPMethod& response);
 	void echoStructArray(const SOAPMethod& req, SOAPMethod& response);
+	void echoBase64(const SOAPMethod& req, SOAPMethod& response);
+	void echoDate(const SOAPMethod& req, SOAPMethod& response);
 };
 
 #endif // !defined(AFX_SOAPBUILDERSINTEROPHANDLER_H__C0C1D23F_D31D_4118_BB27_C85AB1FA7645__INCLUDED_)

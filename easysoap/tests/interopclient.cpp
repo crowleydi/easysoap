@@ -104,7 +104,7 @@ struct Endpoint
 {
 	SOAPString name;
 	SOAPString wsdl;
-	SOAPString endpoint;
+	SOAPUrl    endpoint;
 	SOAPString soapaction;
 	bool	   needsappend;
 	SOAPString nspace;
@@ -113,9 +113,10 @@ struct Endpoint
 const SOAPParameter&
 operator>>(const SOAPParameter& param, Endpoint& e)
 {
+	SOAPString endpoint;
 	param.GetParameter("name") >> e.name;
 	param.GetParameter("wsdl") >> e.wsdl;
-	param.GetParameter("endpoint") >> e.endpoint;
+	param.GetParameter("endpoint") >> endpoint; e.endpoint = endpoint;
 	param.GetParameter("soapaction") >> e.soapaction;
 	e.needsappend = (param.GetParameter("soapactionNeedsMethod").GetInt() != 0);
 	param.GetParameter("methodNamespace") >> e.nspace;
@@ -158,6 +159,7 @@ TestBogusNamespace(SOAPProxy& proxy, const Endpoint& e)
 {
 	SOAPMethod method("echoVoid", "http://bogusns.com/", e.soapaction, e.needsappend);
 	proxy.Execute(method);
+	throw SOAPPassException("Method executed with bogus namespace.");
 }
 
 void
@@ -376,6 +378,24 @@ TestEchoStructArray(SOAPProxy& proxy, const Endpoint& e, int numvals)
 	SOAPArray<SOAPInteropStruct> outputValue;
 	response.GetReturnValue() >> outputValue;
 	if (inputValue != outputValue)
+		throw SOAPException("Values are not equal");
+}
+
+void
+TestEchoBase64(SOAPProxy& proxy, const Endpoint& e)
+{
+	SOAPArray<char> inputBinary, outputBinary;
+
+	int size = rand() % 501 + 500;
+	inputBinary.Resize(size);
+	for (int i = 0; i < size; ++i)
+		inputBinary[i] = rand();
+
+	SOAPMethod method("echoBase64", e.nspace, e.soapaction, e.needsappend);
+	method.AddParameter("inputBase64") << inputBinary;
+	const SOAPResponse& response = proxy.Execute(method);
+	response.GetReturnValue() >> outputBinary;
+	if (inputBinary != outputBinary)
 		throw SOAPException("Values are not equal");
 }
 
@@ -606,13 +626,13 @@ TestForFail(SOAPProxy& proxy, const Endpoint& e, const char *testname, TestFunct
 void
 TestInterop(const Endpoint& e)
 {
-	SOAPProxy proxy((const char *)e.endpoint, httpproxy);
+	SOAPProxy proxy(e.endpoint, httpproxy);
 
 	testresults.StartTag("Server");
 	testresults.AddAttr("name", e.name);
 
 	testresults.StartTag("Endpoint");
-	testresults.WriteValue(e.endpoint);
+	testresults.WriteValue(e.endpoint.GetString());
 	testresults.EndTag("Endpoint");
 
 	testresults.StartTag("SoapAction");
@@ -647,6 +667,7 @@ TestInterop(const Endpoint& e)
 	TestForPass(proxy, e, "echoFloatArray_ZeroLen",		TestEchoFloatArrayZeroLen);
 	TestForPass(proxy, e, "echoStringArray_ZeroLen",	TestEchoStringArrayZeroLen);
 	TestForPass(proxy, e, "echoStructArray_ZeroLen",	TestEchoStructArrayZeroLen);
+	TestForPass(proxy, e, "echoBase64",					TestEchoBase64);
 
 	testresults.EndTag("Server");
 }
@@ -663,6 +684,7 @@ main(int argc, char* argv[])
 		bool testlocal = true;
 		bool doall = false;
 		bool execute = true;
+		bool doappend = false;
 
 		SOAPArray<Endpoint> endpoints;
 		SOAPPacketWriter::SetAddWhiteSpace(true);
@@ -684,6 +706,14 @@ main(int argc, char* argv[])
 			else if (sp_strcmp(argv[i], "-l") == 0)
 			{
 				execute = false;
+			}
+			else if (sp_strcmp(argv[i], "-a+") == 0)
+			{
+				doappend = true;
+			}
+			else if (sp_strcmp(argv[i], "-a-") == 0)
+			{
+				doappend = false;
 			}
 			else if (sp_strcmp(argv[i], "-p") == 0)
 			{
@@ -709,11 +739,11 @@ main(int argc, char* argv[])
 			{
 				testlocal = false;
 				Endpoint& e = endpoints.Add();
-				e.name = servicename ? servicename : argv[i];
 				e.endpoint = argv[i];
+				e.name = servicename ? servicename : e.endpoint.Hostname();
 				e.nspace = nspace;
 				e.soapaction = soapaction;
-				e.needsappend = false;
+				e.needsappend = doappend;
 				servicename = 0;
 			}
 		}
@@ -741,7 +771,7 @@ main(int argc, char* argv[])
 			Endpoint& e = endpoints[j];
 
 			std::cout	<< "      Name: " << e.name << std::endl
-						<< "  Endpoint: " << e.endpoint << std::endl
+						<< "  Endpoint: " << e.endpoint.GetString() << std::endl
 						<< " Namespace: " << e.nspace << std::endl
 						<< "SOAPAction: " << e.soapaction
 						<< (e.needsappend ? "(method)" : "") <<	std::endl
