@@ -68,7 +68,7 @@ private:
 		const SOAPHashMap	*m_map;
 		size_t				m_index;
 		
-		friend SOAPHashMap;
+		friend class SOAPHashMap;
 
 		// private constuctor that can only be called by SOAPHashMap
 		ForwardHashMapIterator(const SOAPHashMap *map, HashElement *he, size_t index)
@@ -492,7 +492,7 @@ private:
 		return he->m_item;
 	}
 
-	friend Iterator;
+	friend class Iterator;
 
 	HashElement **m_table;
 	size_t	m_buckets;

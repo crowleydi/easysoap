@@ -23,7 +23,9 @@
 #endif // _MSC_VER
 
 #ifdef _WIN32
+#if !defined (__MWERKS__)
 #include <winsock2.h>
+#endif
 #else // not _WIN32
 #include <sys/time.h>
 #endif // _WIN32

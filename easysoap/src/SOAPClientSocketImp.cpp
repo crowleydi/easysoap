@@ -27,7 +27,10 @@
 
 
 #if defined (_WIN32)
+#if !defined (__MWERKS__)
 #include <winsock2.h>
+#endif
+
 //
 // Initialize Windows socket library
 //

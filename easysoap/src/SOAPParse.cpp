@@ -55,7 +55,7 @@ SOAPParser::Parse(SOAPResponse& resp, SOAPTransport& trans)
 		m_parser = 0;
 	}
 
-	m_parser = XML_ParserCreateNS(NULL, PARSER_NS_SEP[0]);
+	m_parser = XML_ParserCreateNS((const char *)NULL, (char)PARSER_NS_SEP[0]);
 	XML_SetUserData(m_parser, this);
 
 	XML_SetElementHandler(m_parser,
