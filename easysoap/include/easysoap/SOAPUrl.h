@@ -30,11 +30,14 @@ BEGIN_EASYSOAP_NAMESPACE
 class EASYSOAP_EXPORT SOAPUrl  
 {
 public:
-	SOAPUrl(const char *url = 0) : m_proto(no_proto), m_port(0) {Set(url);}
+	SOAPUrl() : m_proto(no_proto), m_port(0) {}
+	SOAPUrl(const char *url) : m_proto(no_proto), m_port(0) {Set(url);}
+	SOAPUrl(const SOAPString& url) : m_proto(no_proto), m_port(0) {Set(url);}
 	~SOAPUrl() {}
 
 	void Set(const char *url);
 	SOAPUrl& operator=(const char *url) {Set(url); return *this;}
+	SOAPUrl& operator=(const SOAPString& url) {Set(url); return *this;}
 
 	typedef enum {
 		no_proto,		// not set

@@ -62,7 +62,7 @@ SOAPUrl::Set(const char *url)
 	const char * const keepurl = url;
 
 	Reset();
-	if (url)
+	if (url && *url)
 	{
 		char buffer[1024];
 		char *work;
