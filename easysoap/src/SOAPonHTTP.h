@@ -33,19 +33,36 @@ private:
 	typedef std::map<std::string, std::string>	HeaderMap;
 
 	HeaderMap	m_headers;
+	SOAPUrl		m_endpoint;
+	SOAPUrl		m_proxy;
 
 	int		GetReply();
-	bool	Connect(const SOAPUrl& url);
+	bool	Connect();
 	void	WriteHostHeader(const SOAPUrl&);
 	void	FlushInput();
+	void	StartVerb(const char *verb, const char *path);
 
 public:
-	SOAPHTTPProtocol();
-	~SOAPHTTPProtocol();
+	SOAPHTTPProtocol()
+	{}
 
-	void	Close();
-	int		Get(const SOAPUrl& url);
-	void	Post(const SOAPUrl& url);
+	SOAPHTTPProtocol(const SOAPUrl& endpoint)
+	{
+		ConnectTo(endpoint);
+	}
+
+	SOAPHTTPProtocol(const SOAPUrl& endpoint, const SOAPUrl& proxy)
+	{
+		ConnectTo(endpoint, proxy);
+	}
+
+	~SOAPHTTPProtocol()
+	{}
+
+	void	ConnectTo(const SOAPUrl& endpoint);
+	void	ConnectTo(const SOAPUrl& endpoint, const SOAPUrl& proxy);
+	int		Get(const char *path);
+	void	BeginPost(const char *path);
 	int		PostData(const char *bytes, int len);
 	void	WriteHeader(const char *header, const char *value);
 	void	WriteHeader(const char *header, int value);
@@ -59,13 +76,21 @@ class EASYSOAP_EXPORT SOAPonHTTP : public SOAPTransport
 {
 private:
 	SOAPHTTPProtocol	m_http;
-	SOAPUrl				m_url;
+	std::string			m_path;
 
 public:
 	SOAPonHTTP() {}
-	SOAPonHTTP(const SOAPUrl& url) : m_url(url) {}
 
-	void SetUrl(const SOAPUrl& url) {m_url = url;}
+	SOAPonHTTP(const SOAPUrl& endpoint)
+		: m_http(endpoint)
+		, m_path(endpoint.Path())
+	{}
+
+	SOAPonHTTP(const SOAPUrl& endpoint, const SOAPUrl& proxy)
+		: m_http(endpoint, proxy)
+		, m_path(endpoint.Path())
+	{}
+
 	virtual ~SOAPonHTTP() {}
 
 	// returns how big the response payload is

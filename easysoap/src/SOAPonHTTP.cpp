@@ -5,6 +5,10 @@
 #include "SOAPEnvelope.h"
 
 
+#ifndef SOAPUSER_AGENT
+#define SOAPUSER_AGENT "EasySoap++/0.1"
+#endif // SOAPUSER_AGENT
+
 // returns how big the response payload is
 int
 SOAPonHTTP::GetPayloadSize()
@@ -33,8 +37,8 @@ SOAPonHTTP::Write(const SOAPMethod& method, const char *payload, int payloadsize
 		method.GetNamespace(),
 		method.GetName());
 
-	m_http.Post(m_url);
-	m_http.WriteHeader("User-Agent", "EasySoap++/0.1");
+	m_http.BeginPost(m_path.c_str());
+	m_http.WriteHeader("User-Agent", SOAPUSER_AGENT);
 	m_http.WriteHeader("Content-Type", "text/xml");
 	m_http.WriteHeader("SOAPAction", buff);
 
@@ -42,24 +46,20 @@ SOAPonHTTP::Write(const SOAPMethod& method, const char *payload, int payloadsize
 	return m_http.PostData(payload, payloadsize);
 }
 
-//
-// Our HTTP protocol implementation
-//
-SOAPHTTPProtocol::SOAPHTTPProtocol()
+void
+SOAPHTTPProtocol::ConnectTo(const SOAPUrl& endpoint, const SOAPUrl& proxy)
 {
-	// We try to keep track to see if
-	// the connection is open.
-}
-
-
-SOAPHTTPProtocol::~SOAPHTTPProtocol()
-{
+	Close();
+	m_endpoint = endpoint;
+	m_proxy = proxy;
 }
 
 void
-SOAPHTTPProtocol::Close()
+SOAPHTTPProtocol::ConnectTo(const SOAPUrl& endpoint)
 {
-	super::Close();
+	Close();
+	m_endpoint = endpoint;
+	m_proxy = SOAPUrl();
 }
 
 void
@@ -76,34 +76,9 @@ SOAPHTTPProtocol::WriteHostHeader(const SOAPUrl& url)
 }
 
 int
-SOAPHTTPProtocol::Get(const SOAPUrl& url)
+SOAPHTTPProtocol::Get(const char *path)
 {
-	FlushInput();
-	if (!IsOpen())
-	{
-		// try to reconnect
-		Connect(url);
-		if (!IsOpen())
-			throw SOAPSocketException("Unable to make socket connection");
-	}
-
-	const char *path = url.Path();
-
-	if (path && *path)
-	{
-		Write("GET ");
-		Write(path);
-		WriteLine(" HTTP/1.0");
-	}
-	else
-	{
-		WriteLine("GET / HTTP/1.0");
-	}
-
-	WriteHostHeader(url);
-	WriteHeader("Connection", "Keep-Alive");
-	WriteLine();
-
+	StartVerb("GET", path);
 	return GetReply();
 }
 
@@ -116,32 +91,53 @@ SOAPHTTPProtocol::FlushInput()
 }
 
 void
-SOAPHTTPProtocol::Post(const SOAPUrl& url)
+SOAPHTTPProtocol::StartVerb(const char *verb, const char *path)
 {
-	FlushInput();
-	if (!IsOpen())
-	{
-		// try to reconnect
-		Connect(url);
-		if (!IsOpen())
-			throw SOAPSocketException("Unable to make socket connection");
-	}
+	Write(verb);
+	Write(" ");
 
-	const char *path = url.Path();
+	if (m_proxy.Protocol() != SOAPUrl::no_proto)
+	{
+		// TODO: Get a string back from SOAPUrl
+		if (m_endpoint.Protocol() == SOAPUrl::http_proto)
+		{
+			Write("http://");
+			Write(m_endpoint.Hostname());
+		}
+		else if (m_endpoint.Protocol() == SOAPUrl::https_proto)
+		{
+			//
+			Write("https://");
+			Write(m_endpoint.Hostname());
+		}
+		else
+		{
+			// not true, some proxies can do FTP GETs
+			throw SOAPException("Proxy only handle HTTP destinations");
+		}
+	}
 
 	if (path && *path)
 	{
-		Write("POST ");
 		Write(path);
-		WriteLine(" HTTP/1.0");
 	}
 	else
 	{
-		WriteLine("POST / HTTP/1.0");
+		Write("/");
 	}
 
-	WriteHostHeader(url);
+	WriteLine(" HTTP/1.0");
+	WriteHostHeader(m_endpoint);
 	WriteHeader("Connection", "Keep-Alive");
+}
+
+void
+SOAPHTTPProtocol::BeginPost(const char *path)
+{
+	FlushInput();
+	if (!Connect())
+		throw SOAPSocketException("Unable to make socket connection");
+	StartVerb("POST", path);
 }
 
 int
@@ -261,20 +257,30 @@ SOAPHTTPProtocol::GetContentLength()
 }
 
 bool
-SOAPHTTPProtocol::Connect(const SOAPUrl& url)
+SOAPHTTPProtocol::Connect()
 {
-	Close();
-	switch (url.Protocol())
+	if (!IsOpen())
 	{
-	case SOAPUrl::http_proto:
-		SOAPProtocolBase::Connect(url.Hostname(), url.Port(), false);
-		break;
-	case SOAPUrl::https_proto:
-		SOAPProtocolBase::Connect(url.Hostname(), url.Port(), true);
-		break;
-	default:
-		throw SOAPSocketException("Can only handle HTTP protocols");
-		break;
+		bool proxy = m_proxy.Protocol() != SOAPUrl::no_proto;
+
+		int port					= proxy ? m_proxy.Port()		: m_endpoint.Port();
+		const char *host			= proxy ? m_proxy.Hostname()	: m_endpoint.Hostname();
+		SOAPUrl::UrlProtocol proto	= proxy ? m_proxy.Protocol()	: m_endpoint.Protocol();
+
+		switch (proto)
+		{
+		case SOAPUrl::http_proto:
+			SOAPProtocolBase::Connect(host, port, false);
+			break;
+		case SOAPUrl::https_proto:
+			SOAPProtocolBase::Connect(host, port, true);
+			break;
+		default:
+			throw SOAPSocketException("Can only handle HTTP protocols");
+			break;
+		}
+		return IsOpen();
 	}
-	return IsOpen();
+
+	return true;
 }

@@ -41,11 +41,18 @@ public:
 	{
 	}
 
-	SOAPProxy(const SOAPUrl& url) :
+	SOAPProxy(const SOAPUrl& endpoint) :
 		m_transport(0),
 		m_deltrans(false)
 	{
-		SetEndpoint(url);
+		SetEndpoint(endpoint);
+	}
+
+	SOAPProxy(const SOAPUrl& endpoint, const SOAPUrl& proxy) :
+		m_transport(0),
+		m_deltrans(false)
+	{
+		SetEndpoint(endpoint, proxy);
 	}
 
 	SOAPProxy(SOAPTransport *transport, bool deltrans = false) :
@@ -61,7 +68,9 @@ public:
 			delete m_transport;
 	}
 
-	void SetEndpoint(const SOAPUrl& url);
+	void SetEndpoint(const SOAPUrl& endpoint);
+
+	void SetEndpoint(const SOAPUrl& endpoint, const SOAPUrl& proxy);
 
 	void SetEndpoint(SOAPTransport *trans, bool deltrans = false);
 

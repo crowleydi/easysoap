@@ -40,17 +40,19 @@ SOAPProxy::Execute(SOAPMethod& method)
 }
 
 void
-SOAPProxy::SetEndpoint(const SOAPUrl& url)
+SOAPProxy::SetEndpoint(const SOAPUrl& endpoint)
 {
-	switch (url.Protocol())
-	{
-	case SOAPUrl::http_proto:
-	case SOAPUrl::https_proto:
-		SetEndpoint(new SOAPonHTTP(url), true);
-		break;
-	default:
-		throw SOAPException("Unknown transport protocol.");
-	}
+	// Assume it's an HTTP protocol.
+	// What we need here is a factory.
+	SetEndpoint(new SOAPonHTTP(endpoint), true);
+}
+
+void
+SOAPProxy::SetEndpoint(const SOAPUrl& endpoint, const SOAPUrl& proxy)
+{
+	// Assume it's an HTTP protocol.
+	// What we need here is a factory.
+	SetEndpoint(new SOAPonHTTP(endpoint, proxy), true);
 }
 
 void
