@@ -33,7 +33,16 @@
 SOAPMethod::SOAPMethod(const char *name, const char *ns, const char *sa, bool appendName)
 {
 	SetName(name, ns);
-	SetSoapAction(sa, appendName);
+	if (sa)
+	{
+		SetSoapAction(sa, appendName);
+	}
+	else
+	{
+		m_action = ns;
+		m_action.Append("#");
+		m_action.Append(name);
+	}
 }
 
 SOAPMethod::~SOAPMethod()
