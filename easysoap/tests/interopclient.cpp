@@ -195,6 +195,8 @@ almostequal(const SOAPArray<SOAPStruct>& a, const SOAPArray<SOAPStruct>& b)
 
 struct Endpoint
 {
+	Endpoint() {skip = false;}
+
 	SOAPString name;
 	SOAPString wsdl;
 	SOAPUrl    endpoint;
@@ -202,6 +204,7 @@ struct Endpoint
 	bool	   needsappend;
 	SOAPString nspace;
 	SOAPString dir;
+	bool       skip;
 
 	bool operator<(const Endpoint& p) const
 	{
@@ -245,6 +248,7 @@ GetRound1Endpoints(SOAPArray<Endpoint>& ea)
 	{
 		Endpoint& e = ea.Add();
 		*(*i) >> e;
+		e.skip = false;
 	}
 }
 
@@ -273,6 +277,12 @@ GetRound2Endpoints(SOAPArray<Endpoint>& ea, const char *groupName)
 		(*i)->GetParameter("wsdlURL") >> e.wsdl;
 		e.nspace = default_interop_namespace;
 		e.soapaction = round2_soapaction;
+		e.skip = false;
+
+		if (e.name == "OpenLink")
+			e.skip = true;
+		if (e.name == "SilverStream")
+			e.skip = true;
 	}
 }
 
@@ -1771,13 +1781,24 @@ main(int argc, char* argv[])
 				GetRound2Endpoints(endpoints, "base");
 				break;
 			case round2b:
-				GetRound2Endpoints(endpoints, "Group B");
+				GetRound2Endpoints(endpoints, "GroupB");
 				break;
 			case round2c:
-				GetRound2Endpoints(endpoints, "Group C");
+				GetRound2Endpoints(endpoints, "GroupC");
 				break;
 			}
 		}
+		else if (endpoints.Size() == 0)
+		{
+			// Just test against sourceforge
+			Endpoint& e = endpoints.Add();
+			e.name = default_server_name;
+			e.endpoint = default_server;
+			e.nspace = default_interop_namespace;
+			e.soapaction = default_interop_soapaction;
+			e.needsappend = false;
+		}
+
 
 		char buffer[256];
 		time_t ltime = time(0);
@@ -1790,22 +1811,15 @@ main(int argc, char* argv[])
 		testresults.EndTag("Date");
 
 
-		if (endpoints.Size() == 0)
-		{
-			// Just test against sourceforge
-			Endpoint& e = endpoints.Add();
-			e.name = default_server_name;
-			e.endpoint = default_server;
-			e.nspace = default_interop_namespace;
-			e.soapaction = default_interop_soapaction;
-			e.needsappend = false;
-		}
-
 		std::sort(endpoints.Begin(), endpoints.End());
 
 		for (size_t j = 0; j < endpoints.Size(); ++j)
 		{
 			Endpoint& e = endpoints[j];
+
+			if (e.skip)
+				continue;
+
 			if (e.dir.IsEmpty())
 				e.dir = e.name;
 

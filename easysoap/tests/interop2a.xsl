@@ -3,7 +3,7 @@
 <xsl:template match="/">
 <html>
 <head>
-<title>EasySoap++ Interop Matrix</title>
+<title>EasySoap++ Round 2 base Interop Matrix</title>
 <body>
 
 <h3>Basic Tests</h3>
@@ -15,6 +15,7 @@ Table updated: <xsl:value-of select="InteropTests/Date"/>
 	<th bgcolor="teal">echoInteger</th>
 	<th bgcolor="teal">echoFloat</th>
 	<th bgcolor="teal">echoString</th>
+	<th bgcolor="teal">echoString<br/>(check CR escape)</th>
 	<th bgcolor="teal">echoStruct</th>
 	<th bgcolor="teal">echoBase64</th>
 </tr>
@@ -24,6 +25,7 @@ Table updated: <xsl:value-of select="InteropTests/Date"/>
 <xsl:apply-templates select="Test[@name='echoInteger']" />
 <xsl:apply-templates select="Test[@name='echoFloat']" />
 <xsl:apply-templates select="Test[@name='echoString']" />
+<xsl:apply-templates select="Test[@name='echoString_newlines']" />
 <xsl:apply-templates select="Test[@name='echoStruct']" />
 <xsl:apply-templates select="Test[@name='echoBase64']" />
 </tr>
@@ -50,7 +52,6 @@ Table updated: <xsl:value-of select="InteropTests/Date"/>
 </table>
 <P/>
 <h3>Zero Length Array Tests</h3>
-A surprising amount of servers don't deal with zero length arrays very well..
 <table>
 <tr>
 	<th></th>
@@ -69,16 +70,14 @@ A surprising amount of servers don't deal with zero length arrays very well..
 </tr>
 </xsl:for-each>
 </table>
-<h3>echoVoid and misc floating point</h3>
-Here I try calling a bogus method, echoVoid in the correct namespace,
-and echoVoid in a bogus namespace.  We also try the three non number
-values a float value can have (INF, -INF, NaN).
+<h3>echoVoid and echoBoolean</h3>
 <table>
 <tr>
 	<th></th>
 	<th bgcolor="teal">echoVoid</th>
-	<th bgcolor="teal">BogusMethod</th>
-	<th bgcolor="teal">BogusNamespace</th>
+	<th bgcolor="teal">echoBoolean<br/>(true)</th>
+	<th bgcolor="teal">echoBoolean<br/>(false)</th>
+	<th bgcolor="teal">echoBoolean<br/>(junk)</th>
 	<th bgcolor="teal">echoFloat<br/>(NaN)</th>
 	<th bgcolor="teal">echoFloat<br/>(INF)</th>
 	<th bgcolor="teal">echoFloat<br/>(-INF)</th>
@@ -87,8 +86,9 @@ values a float value can have (INF, -INF, NaN).
 <tr>
 <xsl:apply-templates select="." />
 <xsl:apply-templates select="Test[@name='echoVoid']" />
-<xsl:apply-templates select="Test[@name='BogusMethod']" />
-<xsl:apply-templates select="Test[@name='BogusNamespace']" />
+<xsl:apply-templates select="Test[@name='echoBoolean_true']" />
+<xsl:apply-templates select="Test[@name='echoBoolean_false']" />
+<xsl:apply-templates select="Test[@name='echoBoolean_junk']" />
 <xsl:apply-templates select="Test[@name='echoFloat_NaN']" />
 <xsl:apply-templates select="Test[@name='echoFloat_INF']" />
 <xsl:apply-templates select="Test[@name='echoFloat_negINF']" />
@@ -109,6 +109,8 @@ overflow/underflow.  Click <a href="http://babbage.cs.qc.edu/courses/cs341/IEEE-
 	<th bgcolor="teal">echoFloat<br/>(single underflow, 6.9e-46)</th>
 	<th bgcolor="teal">echoFloat<br/>(double overflow, 1.8e308)</th>
 	<th bgcolor="teal">echoFloat<br/>(double underflow, 2.4e-324)</th>
+	<th bgcolor="teal">echoFloat<br/>(1234junk)</th>
+	<th bgcolor="teal">echoFloat<br/>(1234 with whitespace)</th>
 </tr>
 <xsl:for-each select="InteropTests/Server">
 <tr>
@@ -117,6 +119,8 @@ overflow/underflow.  Click <a href="http://babbage.cs.qc.edu/courses/cs341/IEEE-
 <xsl:apply-templates select="Test[@name='echoFloat_SingleUnderflow']" />
 <xsl:apply-templates select="Test[@name='echoFloat_DoubleOverflow']" />
 <xsl:apply-templates select="Test[@name='echoFloat_DoubleUnderflow']" />
+<xsl:apply-templates select="Test[@name='echoFloat_Junk1']" />
+<xsl:apply-templates select="Test[@name='echoFloat_Junk2']" />
 </tr>
 </xsl:for-each>
 </table>
@@ -131,6 +135,8 @@ cause overflow and underflow.
 	<th bgcolor="teal">echoInteger<br/>(-2147483648)</th>
 	<th bgcolor="teal">echoInteger<br/>(2147483648, overflow)</th>
 	<th bgcolor="teal">echoInteger<br/>(-2147483649, underflow)</th>
+	<th bgcolor="teal">echoInteger<br/>(1234junk)</th>
+	<th bgcolor="teal">echoInteger<br/>(1234 with whitespace)</th>
 </tr>
 <xsl:for-each select="InteropTests/Server">
 <tr>
@@ -139,6 +145,8 @@ cause overflow and underflow.
 <xsl:apply-templates select="Test[@name='echoInteger_MostNegative']" />
 <xsl:apply-templates select="Test[@name='echoInteger_Overflow']" />
 <xsl:apply-templates select="Test[@name='echoInteger_Underflow']" />
+<xsl:apply-templates select="Test[@name='echoInteger_Junk1']" />
+<xsl:apply-templates select="Test[@name='echoInteger_Junk2']" />
 </tr>
 </xsl:for-each>
 </table>
