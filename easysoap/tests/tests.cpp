@@ -1,10 +1,31 @@
-//
-// tests.cpp
-//
+
+/* 
+ * EasySoap++ - A C++ library for SOAP (Simple Object Access Protocol)
+ * Copyright (C) 2001 David Crowley; SciTegic, Inc.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
 
 
+
 //
-// some quck and dirty tests and examples for easysoap.
+// This is a test harness for running interop tests
+// with Easysoap++.  For more information on interop
+// testing, see:
+//
+//    http://www.xmethods.net/ilab/ilab.html
 //
 
 #ifdef _WIN32
@@ -14,10 +35,13 @@
 #include <iostream>
 #include <math.h>
 #include "SOAP.h"
+#include "SOAPDebugger.h"
 
 
-
-
+//
+// The main library doesn't include iostream,
+// so we define an overload to write out
+// a SOAPString here....
 inline std::ostream&
 operator<<(std::ostream& os, const SOAPString& str)
 {
@@ -25,17 +49,12 @@ operator<<(std::ostream& os, const SOAPString& str)
 	return os << (s ? s : "(null)");
 }
 
-
-
-//
-// Little helper function
-const SOAPParameter&
-SafeGetParameter(const SOAPParameter& param, const char *pname)
+void
+SetTraceFile(const char *server, const char *test)
 {
-	const SOAPParameter *p = 0;
-	if (!(p = param.GetParameter(pname)))
-		throw SOAPException("Invalid struct, member '%s' is missing", pname);
-	return *p;
+	char buffer[256];
+	snprintf(buffer, sizeof(buffer), "%s\\%s.log", server, test);
+	SOAPDebugger::SetFile(buffer);
 }
 
 //
@@ -78,13 +97,14 @@ struct SOAPInteropStruct
 };
 const char *SOAPInteropStruct::soap_namespace = "http://soapinterop.org/xsd";
 
+
 //
-//  Define how we load up the struct
+//  Define how we serialize the struct
 SOAPParameter&
 operator<<(SOAPParameter& param, const SOAPInteropStruct& val)
 {
 	param.SetType("SOAPStruct", SOAPInteropStruct::soap_namespace);
-	param.SetBaseType(SOAPTypes::soap_struct);
+	param.SetIsStruct();
 
 	param.AddParameter("varString") << val.varString;
 	param.AddParameter("varInt") << val.varInt;
@@ -94,19 +114,29 @@ operator<<(SOAPParameter& param, const SOAPInteropStruct& val)
 }
 
 //
-// Define how we read the struct
+// Little helper function
+const SOAPParameter&
+SafeGetParameter(const SOAPParameter& param, const char *pname)
+{
+	const SOAPParameter *p = 0;
+	if (!(p = param.GetParameter(pname)))
+		throw SOAPException("Invalid struct, member '%s' is missing", pname);
+	return *p;
+}
+
+//
+// Define how we de-serialize the struct
 const SOAPParameter&
 operator>>(const SOAPParameter& param, SOAPInteropStruct& val)
 {
+	// We should probably confirm the type is
+	// correct...
 	SafeGetParameter(param, "varString") >> val.varString;
 	SafeGetParameter(param, "varInt") >> val.varInt;
 	SafeGetParameter(param, "varFloat") >> val.varFloat;
 
 	return param;
 }
-
-
-
 
 
 
@@ -220,7 +250,7 @@ TestEchoIntegerInvalid(SOAPProxy& proxy,
 		SOAPString outputValue;
 
 		SOAPMethod method("echoInteger", uri, soapAction, appendMethod);
-		method.AddParameter("inputInteger").SetInteger(value);
+		method.AddParameter("inputInteger").SetInt(value);
 
 		std::cout << "Testing " << method.GetName() << ": ";
 
@@ -563,48 +593,54 @@ TestEchoStructArray(SOAPProxy& proxy,
 }
 
 
-void
-TestInterop(SOAPProxy& proxy,
-			const char *uri,
-			const char *soapAction,
-			bool appendMethod)
-{
-	TestEchoVoid(proxy, uri, soapAction, appendMethod);
-
-	TestEchoInteger(proxy, uri, soapAction, appendMethod, 464);
-	TestEchoFloat(proxy, uri, soapAction, appendMethod, -3.6e-6);
-	TestEchoString(proxy, uri, soapAction, appendMethod, "This is a test string from EasySOAP++");
-	TestEchoStruct(proxy, uri, soapAction, appendMethod);
-
-	TestEchoIntegerArray(proxy, uri, soapAction, appendMethod);
-	TestEchoFloatArray(proxy, uri, soapAction, appendMethod);
-	TestEchoStringArray(proxy, uri, soapAction, appendMethod);
-	TestEchoStructArray(proxy, uri, soapAction, appendMethod);
-
-	// Lets test some boundry cases...
-	//TestEchoFloat(proxy, uri, soapAction, appendMethod, -35.6e-22);
-	//TestEchoFloat(proxy, uri, soapAction, appendMethod, -35.6e22);
-	//TestEchoIntegerInvalid(proxy, uri, soapAction, appendMethod, "2147483648");
-	//TestEchoIntegerInvalid(proxy, uri, soapAction, appendMethod, "-2147483649");
-	//TestEchoFloat(proxy, uri, soapAction, appendMethod, "NaN");
-	//TestEchoFloat(proxy, uri, soapAction, appendMethod, "INF");
-	//TestEchoFloat(proxy, uri, soapAction, appendMethod, "-INF");
-	//TestEchoFloatInvalid(proxy, uri, soapAction, appendMethod, "+INF");
-	//TestEchoFloat(proxy, uri, soapAction, appendMethod, "-0.0");
-	//TestEchoFloat(proxy, uri, soapAction, appendMethod, -HUGE_VAL);
-	//TestEchoFloat(proxy, uri, soapAction, appendMethod, HUGE_VAL);
-}
-
 void TestInterop(const char *name,
 				 const char *endpoint,
-				 const char *soapaction,
+				 const char *soapAction,
 				 bool appendMethod,
-				 const char *nspace)
+				 const char *uri)
 {
 	std::cout << "Testing " << name << " interopability." << std::endl;
 
 	SOAPProxy proxy(endpoint);//, "http://localhost:8080");
-	TestInterop(proxy, nspace, soapaction, appendMethod);
+
+	SetTraceFile(name, "echoVoid");
+	TestEchoVoid(proxy, uri, soapAction, appendMethod);
+
+	SetTraceFile(name, "echoInteger");
+	TestEchoInteger(proxy, uri, soapAction, appendMethod, 464);
+	SetTraceFile(name, "echoFloat");
+	TestEchoFloat(proxy, uri, soapAction, appendMethod, (float)-3.6e-6);
+	SetTraceFile(name, "echoString");
+	TestEchoString(proxy, uri, soapAction, appendMethod, "This is a test string from EasySOAP++");
+	SetTraceFile(name, "echoStruct");
+	TestEchoStruct(proxy, uri, soapAction, appendMethod);
+
+	SetTraceFile(name, "echoIntegerArray");
+	TestEchoIntegerArray(proxy, uri, soapAction, appendMethod);
+	SetTraceFile(name, "echoFloatArray");
+	TestEchoFloatArray(proxy, uri, soapAction, appendMethod);
+	SetTraceFile(name, "echoStringArray");
+	TestEchoStringArray(proxy, uri, soapAction, appendMethod);
+	SetTraceFile(name, "echoStructArray");
+	TestEchoStructArray(proxy, uri, soapAction, appendMethod);
+
+	// Lets test some boundry cases...
+	//SetTraceFile(name, "echoInteger_Overflow");
+	//TestEchoIntegerInvalid(proxy, uri, soapAction, appendMethod, "2147483648");
+	//SetTraceFile(name, "echoInteger_Underflow");
+	//TestEchoIntegerInvalid(proxy, uri, soapAction, appendMethod, "-2147483649");
+	//SetTraceFile(name, "echoInteger_NaN");
+	//TestEchoFloat(proxy, uri, soapAction, appendMethod, "NaN");
+	//SetTraceFile(name, "echoInteger_INF");
+	//TestEchoFloat(proxy, uri, soapAction, appendMethod, HUGE_VAL);
+	//SetTraceFile(name, "echoInteger_nINF");
+	//TestEchoFloat(proxy, uri, soapAction, appendMethod, -HUGE_VAL);
+
+	//SetTraceFile(name, "echoInteger_pINF");
+	//TestEchoFloatInvalid(proxy, uri, soapAction, appendMethod, "+INF");
+	//SetTraceFile(name, "echoInteger_n0");
+	//TestEchoFloat(proxy, uri, soapAction, appendMethod, "-0.0");
+	SOAPDebugger::Close();
 
 	std::cout << "Done." << std::endl << std::endl;
 }
@@ -612,28 +648,30 @@ void TestInterop(const char *name,
 int
 main(int argc, char* argv[])
 {
+	int ret = 0;
+
 	try
 	{
 		//
 		// See: http://www.xmethods.net/ilab/ilab.html
 		// This information changes frequently.
 		//
-		TestInterop("4s4c 1.3",
+		TestInterop("4s4c",
 			"http://soap.4s4c.com/ilab/soap.asp",
 			"urn:soapinterop", false,
 			"http://soapinterop.org/");/**/
 
-		TestInterop("Apache 2.1",
+		TestInterop("Apache",
 			"http://services.xmethods.net:8080/soap/servlet/rpcrouter",
 			"urn:soapinterop", false,
 			"http://soapinterop.org/");/**/
 
-		TestInterop("Frontier 7.0b26 (Userland)",
+		TestInterop("Frontier",
 			"http://www.soapware.org:80/xmethodsInterop",
 			"/xmethodsInterop", false,
 			"urn:xmethodsInterop");/**/
 
-		TestInterop("Kafka XSLT",
+		TestInterop("Kafka",
 			"http://www.vbxml.com/soapworkshop/services/kafka10/services/endpoint.asp?service=ilab",
 			"urn:soapinterop", false,
 			"http://soapinterop.org/");/**/
@@ -643,7 +681,7 @@ main(int argc, char* argv[])
 			"urn:soapinterop", false,
 			"http://soapinterop.org/");/**/
 
-		TestInterop("MS SOAP Toolkit 2.0 (typed)",
+		TestInterop("MSSOAPtk",
 			"http://131.107.72.13/stk/InteropTypedService.asp",
 			"urn:soapinterop", false,
 			"http://soapinterop.org/");/**/
@@ -653,24 +691,24 @@ main(int argc, char* argv[])
 			"urn:soapinterop", false,
 			"http://soapinterop.org/");/**/
 
-		TestInterop("SOAP RMI",
+		TestInterop("SOAPRMI",
 			"http://rainier.extreme.indiana.edu:1568",
 			"urn:soapinterop", false,
 			"http://soapinterop.org/");/**/
 
-		TestInterop("SOAP::Lite 0.47",
+		TestInterop("SOAPLite",
 			"http://services.soaplite.com/interop.cgi",
 			"urn:soapinterop", false,
 			"http://soapinterop.org/");/**/
 
-		TestInterop("SQLData SOAP Server",
+		TestInterop("SQLData",
 			"http://www.soapclient.com/interop/sqldatainterop.wsdl",
 			"/soapinterop", false,
 			"http://tempuri.org/message/");/**/
 
 		/****** These have problems... ******/
 
-		TestInterop("White Mesa SOAP RPC 2.0",
+		TestInterop("WhiteMesa",
 			"http://services3.xmethods.net:8080/interop",
 			"urn:soapinterop#", true,
 			"http://soapinterop.org/");/**/
@@ -680,7 +718,7 @@ main(int argc, char* argv[])
 			"http://soapinterop.org/", true,
 			"http://soapinterop.org/");/**/
 
-		TestInterop("MS .NET Beta 2 (typed)",
+		TestInterop("MSdotNET",
 			"http://131.107.72.13/test/typed.asmx",
 			"http://soapinterop.org/", true,
 			"http://soapinterop.org/");/**/
@@ -688,14 +726,15 @@ main(int argc, char* argv[])
 	catch (const SOAPMemoryException&)
 	{
 		std::cout << "SOAP out of memory." << std::endl;
-		return 1;
+		ret = -1;
 	}
 	catch (const SOAPException& ex)
 	{
 		std::cout << "Caught SOAP exception: " << ex.What() << std::endl;
-		return 1;
+		ret = 1;
 	}
 
-	return 0;
+	SOAPDebugger::Close();
+	return ret;
 }
 
