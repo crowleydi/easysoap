@@ -13,7 +13,7 @@ sp_alloc(size_t n)
 }
 
 template<typename T>
-void
+inline void
 sp_free(T*& ptr)
 {
 	if (ptr)
@@ -102,6 +102,51 @@ sp_strcasecmp(const char *a, const char *b)
 	else if (b)
 		ret = -1;
 	return ret;
+}
+
+inline char*
+sp_strstr(const char *haystack, const char *needle)
+{
+	if (*needle == 0)
+		return (char *)haystack;
+
+	// step along the main string
+	while (*haystack)
+	{
+		const char *nn = needle;
+		const char *hh = haystack;
+		// see if substring characters match
+		while (*nn++ == *hh++)
+		{
+			if (*nn == 0)
+				// we got all the way to the end of the substring
+				// so we must've won
+				return (char *)haystack;
+		}
+		++haystack;
+	}
+	return 0;
+}
+
+inline char*
+sp_strchr(const char *s, char c)
+{
+	do
+	{
+		if (*s == c)
+			return (char*)s;
+	}
+	while (*s++);
+	return 0;
+}
+
+inline void *
+sp_memset(void *s, int c, size_t n)
+{
+	unsigned char *ptr = (unsigned char *)s;
+	while (n--)
+		*ptr++ = c;
+	return s;
 }
 
 inline unsigned int
