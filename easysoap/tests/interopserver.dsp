@@ -123,7 +123,19 @@ SOURCE=.\interopserver.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\SOAPBuildersHeaderHandler.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\SOAPBuildersInteropHandler.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\SOAPBuildersInteropHandlerA.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\SOAPBuildersInteropHandlerB.cpp
 # End Source File
 # End Group
 # Begin Group "Header Files"
@@ -132,6 +144,10 @@ SOURCE=.\SOAPBuildersInteropHandler.cpp
 # Begin Source File
 
 SOURCE=.\interopstruct.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\SOAPBuildersHeaderHandler.h
 # End Source File
 # Begin Source File
 
