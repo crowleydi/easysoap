@@ -43,6 +43,7 @@
 #endif
 
 #include <SOAP.h>
+#include <SOAPonHTTP.h>
 #include <SOAPDebugger.h>
 #include <SOAPSocket.h>
 
@@ -73,14 +74,6 @@ inline std::ostream&
 operator<<(std::ostream& os, const SOAPQName& name)
 {
 	return os << name.GetName();
-}
-
-void
-SetTraceFile(const char *dir, const char *test)
-{
-	char buffer[256];
-	snprintf(buffer, sizeof(buffer), "%s/%s.txt", dir, test);
-	SOAPDebugger::SetFile(buffer);
 }
 
 double
@@ -215,6 +208,15 @@ GetAllEndpoints(SOAPArray<Endpoint>& ea)
 		*(*i) >> e;
 	}
 }
+
+typedef enum
+{
+	round1,
+	round2a,
+	round2b,
+	round2c,
+	misc
+} TestType;
 
 void
 TestBogusMethod(SOAPProxy& proxy, const Endpoint& e)
@@ -599,14 +601,18 @@ TestEcho2DStringArray(SOAPProxy& proxy, const Endpoint& e)
 
 	SOAP2DArray<SOAPString> twod, result;
 
-	twod.Resize(3,2);
+	size_t rows = rand() % 5 + 3;
+	size_t cols = rand() % 5 + 3;
 
-	twod[0][0] = "0,0";
-	twod[0][1] = "0,1";
-	twod[1][0] = "1,0";
-	twod[1][1] = "1,1";
-	twod[2][0] = "2,0";
-	twod[2][1] = "2,1";
+	char buff[64];
+	twod.Resize(rows, cols);
+
+	for (size_t i = 0; i < rows; ++i)
+		for (size_t j = 0; j < cols; ++j)
+		{
+			snprintf(buff, sizeof(buff), "%d,%d", i, j);
+			twod[i][j] = buff;
+		}
 
 	method.AddParameter("input2DStringArray") << twod;
 
@@ -625,8 +631,8 @@ TestEchoStructAsSimpleTypes(SOAPProxy& proxy, const Endpoint& e)
 
 	SOAPStruct s;
 	s.varString = "This is a test";
-	s.varInt = 1;
-	s.varFloat = (float)2.2;
+	s.varInt = rand() % 10000;
+	s.varFloat = (float)randdouble();
 
 	method.AddParameter("inputStruct") << s;
 
@@ -650,8 +656,8 @@ TestEchoSimpleTypesAsStruct(SOAPProxy& proxy, const Endpoint& e)
 
 	SOAPStruct s;
 	s.varString = "This is a test";
-	s.varInt = 1;
-	s.varFloat = (float)2.2;
+	s.varInt = rand() % 10000;
+	s.varFloat = (float)randdouble();
 
 	method.AddParameter("inputString") << s.varString;
 	method.AddParameter("inputInteger") << s.varInt;
@@ -889,15 +895,35 @@ TestEchoMap(SOAPProxy& proxy, const Endpoint& e)
 typedef void (*TestFunction)(SOAPProxy&, const Endpoint&);
 
 void
-BeginEndpointTesting(const Endpoint& e)
+BeginEndpointTesting(const Endpoint& e, TestType test)
 {
 	if (cgimode)
 	{
 		std::cout << "<html><head><title>"
 			<< "EasySoap++ Interop tests"
 			<< "</title></head><body>"
-			<< "<h2>EasySoap++ Interop tests<h2>"
-			<< e.name
+			<< "<h2>EasySoap++ Interop tests</h2>"
+			<< "<h3>" << e.name;
+
+		switch (test)
+		{
+			case round1:
+				std::cout << ": Round 1";
+				break;
+			case round2a:
+				std::cout << ": Round 2 Base";
+				break;
+			case round2b:
+				std::cout << ": Round 2 Group B";
+				break;
+			case round2c:
+				std::cout << ": Round 2 Group C";
+			case misc:
+				std::cout << ": Miscellaneous";
+				break;
+		}
+
+		std::cout << "</h3>"
 			<< "<table border='1'>"
 			<< "<tr><th>Test</th><th>Result</th><th>Message</th></tr>";
 	}
@@ -932,11 +958,20 @@ EndEndpointTesting(const Endpoint& e)
 void
 BeginTest(const Endpoint& e, const char *testname)
 {
+	char buffer[256];
+	snprintf(buffer, sizeof(buffer), "%s/%s.txt",
+			(const char *)e.dir, testname);
+	bool created = SOAPDebugger::SetFile(buffer);
+
 	if (cgimode)
 	{
-		std::cout << "<tr><td>"
-			<< "<a href='/interoptests/" << e.dir << "/" << testname <<".txt'>"
-			<< testname << "</a></td>";
+		std::cout << "<tr><td>";
+		if (created)
+			std::cout << "<a href='/interoptests/" << e.dir
+				<< "/" << testname <<".txt'>" << testname << "</a>";
+		else
+			std::cout << testname;
+		std::cout << "</td>";
 	}
 	else
 	{
@@ -985,7 +1020,6 @@ TestForPass(SOAPProxy& proxy, const Endpoint& e, const SOAPString& testname, Tes
 
 	try
 	{
-		SetTraceFile(e.dir, testname);
 		BeginTest(e, testname);
 		func(proxy, e);
 		type = "PASS";
@@ -1040,7 +1074,6 @@ TestForFault(SOAPProxy& proxy, const Endpoint& e, const SOAPString& testname, Te
 	SOAPString msg;
 	try
 	{
-		SetTraceFile(e.dir, testname);
 		BeginTest(e, testname);
 		func(proxy, e);
 		type = "FAIL";
@@ -1088,19 +1121,12 @@ TestForFault(SOAPProxy& proxy, const Endpoint& e, const SOAPString& testname, Te
 	testresults.EndTag("Test");
 }
 
-typedef enum
-{
-	round1,
-	round2a,
-	round2b,
-	round2c,
-	misc
-} TestType;
-
 void
 TestInterop(const Endpoint& e, TestType test)
 {
-	SOAPProxy proxy(e.endpoint, httpproxy);
+	SOAPonHTTP transport(e.endpoint, httpproxy);
+	transport.SetTimeout(30);
+	SOAPProxy proxy(&transport);
 
 	testresults.StartTag("Server");
 	testresults.AddAttr("name", e.name);
@@ -1315,7 +1341,7 @@ main(int argc, char* argv[])
 				{
 					e.nspace = default_interop_namespace;
 					e.soapaction = round2_soapaction;
-					e.needsappend = true;
+					e.needsappend = false;
 				}
 
 			}
@@ -1454,7 +1480,7 @@ main(int argc, char* argv[])
 
 			if (execute && !skips.Find(e.name))
 			{
-				BeginEndpointTesting(e);
+				BeginEndpointTesting(e, test);
 				TestInterop(e, test);
 				EndEndpointTesting(e);
 			}
