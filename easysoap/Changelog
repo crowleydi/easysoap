@@ -1,4 +1,15 @@
 
+0.3, 21-Jun-2001
+	Mostly a bug fix release.
+	Default schema is now 2001.
+	HTTP bug fixes + robustness improvements.
+	Array parsing cleanup and fixes.
+	More error checking on double and float conversion.
+	Enchanced logging for debugging purposes.
+	Added initial support for handling wide characters (Assumes
+	wide char strings are UTF-16 or UTF-32, at least I think thats
+	what it's doing...)
+
 0.2, aka Infomercial 17-Apr-2001
 	Major changes.
 	Extensible type system.
