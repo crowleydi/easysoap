@@ -39,7 +39,7 @@ protected:
 	ssl_st				*m_ssl;
 	ssl_ctx_st			*m_ctx;
 	SOAPString 			m_keyfile;
-	static SOAPString 	m_password;
+	SOAPString 	m_password;
 	bool HandleError(const char *context, int retcode);
 public:
 	SOAPSecureSocketImp();

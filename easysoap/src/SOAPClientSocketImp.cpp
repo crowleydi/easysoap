@@ -182,9 +182,9 @@ SOAPClientSocketImp::WaitRead(int sec, int usec)
 	int ret = select(m_socket+1, &rset, 0, &eset, sec == -1 ? 0 : &tv);
 	int rsetresult = FD_ISSET(m_socket, &rset);
 	int esetresult = FD_ISSET(m_socket, &eset);
-	SOAPDebugger::Print(3, "read select() return: %d\r\n", ret);
-	SOAPDebugger::Print(4, "write select() wset: %d\r\n", rsetresult);
-	SOAPDebugger::Print(4, "write select() eset: %d\r\n", esetresult);
+	SOAPDebugger::Print(3, "read select() return: %d\n", ret);
+	SOAPDebugger::Print(4, "write select() wset: %d\n", rsetresult);
+	SOAPDebugger::Print(4, "write select() eset: %d\n", esetresult);
 	if (ret == (int)SOCKET_ERROR)
 		throw SOAPException("WaitRead select error");
 
@@ -208,9 +208,9 @@ SOAPClientSocketImp::WaitWrite(int sec, int usec)
 	int ret = select(m_socket+1, 0, &wset, &eset, sec == -1 ? 0 : &tv);
 	int wsetresult = FD_ISSET(m_socket, &wset);
 	int esetresult = FD_ISSET(m_socket, &eset);
-	SOAPDebugger::Print(3, "write select() return: %d\r\n", ret);
-	SOAPDebugger::Print(4, "write select() wset: %d\r\n", wsetresult);
-	SOAPDebugger::Print(4, "write select() eset: %d\r\n", esetresult);
+	SOAPDebugger::Print(3, "write select() return: %d\n", ret);
+	SOAPDebugger::Print(4, "write select() wset: %d\n", wsetresult);
+	SOAPDebugger::Print(4, "write select() eset: %d\n", esetresult);
 	if (ret == (int)SOCKET_ERROR)
 		throw SOAPException("WaitWrite select error");
 
@@ -317,7 +317,7 @@ SOAPClientSocketImp::Read(char *buff, size_t bufflen)
 	{
 		*buff = 0;
 		bytes = recv(m_socket, buff, bufflen, 0);
-		SOAPDebugger::Print(2, "RECV: %d bytes\r\n", bytes);
+		SOAPDebugger::Print(2, "RECV: %d bytes\n", bytes);
 		if (bytes == 0)
 		{
 			Close(); // other side dropped the connection
@@ -339,7 +339,7 @@ SOAPClientSocketImp::Write(const char *buff, size_t bufflen)
 	if (bufflen > 0)
 	{
 		bytes = send(m_socket, buff, bufflen, 0);
-		SOAPDebugger::Print(2, "SEND: %d bytes\r\n", bytes);
+		SOAPDebugger::Print(2, "SEND: %d bytes\n", bytes);
 		if (bytes == (int)SOCKET_ERROR)
 		{
 			Close();

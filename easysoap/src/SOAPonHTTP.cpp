@@ -138,8 +138,8 @@ void
 SOAPonHTTP::ConnectTo(const SOAPUrl& endpoint)
 {
 	m_endpoint = endpoint;
-	if ((!m_keyfile.IsEmpty()) &&(!m_password.IsEmpty()))
-			m_http.SetCertificateInfo(m_keyfile, m_password);
+	if (!m_keyfile.IsEmpty())
+			m_http.SetCertificateInfo(m_keyfile.Str(), m_password.Str());
 	m_http.ConnectTo(endpoint);
 }
 
@@ -147,8 +147,8 @@ void
 SOAPonHTTP::ConnectTo(const SOAPUrl& endpoint, const SOAPUrl& proxy)
 {
 	m_endpoint = endpoint;
-	if ((m_keyfile) &&(m_password))
-			m_http.SetCertificateInfo(m_keyfile, m_password);
+	if (!m_keyfile.IsEmpty()) 
+			m_http.SetCertificateInfo(m_keyfile.Str(), m_password.Str());
 	m_http.ConnectTo(endpoint, proxy);
 }
 
@@ -218,7 +218,7 @@ SOAPHTTPProtocol::StartVerb(const char *verb, const char *path)
 		throw SOAPException("Invalid NULL path");
 
 	FlushInput();
-	SOAPDebugger::Print(1, "\r\n\r\nREQUEST:\r\n");
+	SOAPDebugger::Print(1, "\n\nREQUEST:\n");
 
 	if (!Connect())
 		throw SOAPSocketException("Unable to make socket connection");
@@ -284,7 +284,7 @@ int
 SOAPHTTPProtocol::GetReply()
 {
 	Flush();
-	SOAPDebugger::Print(1, "\r\n\r\nRESPONSE:\r\n");
+	SOAPDebugger::Print(1, "\n\nRESPONSE:\n");
 	char buff[2048];
 	m_headers.Clear();
 
@@ -392,7 +392,7 @@ SOAPHTTPProtocol::GetReply()
 	{
 		m_chunked = true;
 		m_canread = 0;
-		SOAPDebugger::Print(2, "\r\nTransfer is Chunked!\r\n");
+		SOAPDebugger::Print(2, "\nTransfer is Chunked!\n");
 	}
 
 	return httpreturn;
@@ -447,7 +447,7 @@ SOAPHTTPProtocol::GetChunkLength()
 		intValue = intValue * 16 + m;
 	}
 
-	SOAPDebugger::Print(1, "\r\nGetChunkLength: %s = %d\r\n", hexStg, intValue);
+	SOAPDebugger::Print(1, "\nGetChunkLength: %s = %d\n", hexStg, intValue);
 	return intValue;
 }
 
@@ -457,7 +457,7 @@ SOAPHTTPProtocol::Close()
 	m_canread = -1;
 	m_doclose = false;
 	super::Close();
-	SOAPDebugger::Print(2, "CLOSED\r\n");
+	SOAPDebugger::Print(2, "CLOSED\n");
 }
 
 bool
@@ -538,9 +538,9 @@ SOAPHTTPProtocol::Connect()
 			{
 				SOAPSecureSocketImp *socket = new SOAPSecureSocketImp();
 				// if we have information about the certificate to be used. 
-				if (!(m_password.IsEmpty()) && !(m_keyfile.IsEmpty()))
+				if (!m_keyfile.IsEmpty()) {	
 						socket->SetCertificateInfo(m_keyfile.Str(), m_password.Str());
-				
+				}
 				socket->SOAPClientSocketImp::Connect(host, port);
 				SOAPProtocolBase::SetSocket(socket);
 				if (m_httpproxy)

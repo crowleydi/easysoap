@@ -90,12 +90,11 @@ public:
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-SOAPString SOAPSecureSocketImp::m_password = 0L;
+
 
 SOAPSecureSocketImp::SOAPSecureSocketImp()
 : m_ssl(0)
 , m_ctx(0)
-, m_keyfile(0)
 {
 	static OpenSSLinit __opensslinit;
 }
@@ -146,7 +145,7 @@ SOAPSecureSocketImp::HandleError(const char *context, int retcode)
 	case SSL_ERROR_SSL:
 	default:
 		{
-		char msg[512];
+		char msg[2048];
 
 #if OPENSSL_VERSION_NUMBER >= 0x00906000L
 		ERR_error_string_n(err, msg, sizeof(msg) - 1);
@@ -166,12 +165,13 @@ SOAPSecureSocketImp::HandleError(const char *context, int retcode)
 // it will have to be stored somehow.. Gulp
 int SOAPSecureSocketImp::password_cb(char* buf, int size, int rwflag, void *userdata) 
 {
-		if (size < sp_strlen(m_password.Str())+1)
+		SOAPString password = ((SOAPSecureSocketImp*)userdata)->m_password;
+		if (size < sp_strlen(password.Str())+1)
 				throw SOAPMemoryException();
 		
-		sp_strcpy(buf, m_password.Str());
+		sp_strcpy(buf, password.Str());
 		
-		return(sp_strlen(m_password.Str()));
+		return(sp_strlen(password.Str()));
 }
 
 void
@@ -190,20 +190,29 @@ SOAPSecureSocketImp::InitSSL()
 	
 	int retcode;
 	// set up our keys and password, if required
-	if ((!m_keyfile.IsEmpty()) && (!m_password.IsEmpty())) {
-			if ((retcode = SSL_CTX_use_certificate_file(m_ctx, m_keyfile.Str(), SSL_FILETYPE_PEM))!= 1)
-					HandleError("Error trying to use the certificate file", retcode);
+	if (!m_keyfile.IsEmpty() ) {
+			if ((retcode = SSL_CTX_use_certificate_chain_file(m_ctx, m_keyfile.Str()))!= 1)
+					HandleError("Error trying to use the certificate file: %s\n", retcode);
+
 			// now set our password callback function...
 			SSL_CTX_set_default_passwd_cb(m_ctx, &password_cb);
-			if ((retcode = SSL_CTX_use_PrivateKey_file(m_ctx, m_keyfile.Str(), SSL_FILETYPE_PEM)) != 1)
-					HandleError("Error trying to use the private key from the certificate file", retcode);
+			// setup the callback userdata.
+			SSL_CTX_set_default_passwd_cb_userdata(m_ctx, this);
+			
+			retcode = SSL_CTX_use_PrivateKey_file(m_ctx, m_keyfile.Str(), SSL_FILETYPE_PEM);
+			if (retcode != 1) 
+					HandleError("Error trying to use the private key from the certificate file : %s\n", retcode);
+
+			if ((retcode = SSL_CTX_check_private_key(m_ctx) != 1))
+					HandleError("Error while checking the private key : %s\n", retcode);
+
 	}
 
 	if ((retcode = SSL_set_fd(m_ssl, m_socket)) != 1)
-		HandleError("Error attaching security layer to socket", retcode);
+		HandleError("Error attaching security layer to socket : %s\n", retcode);
 
 	if ((retcode = SSL_connect(m_ssl)) != 1)
-		HandleError("Error negotiating secure connection", retcode);
+		HandleError("Error negotiating secure connection : %s\n", retcode);
 
 }
 
