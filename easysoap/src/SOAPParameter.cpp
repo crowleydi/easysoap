@@ -28,6 +28,7 @@
 #include "SOAPPacketWriter.h"
 
 #include <float.h>
+#include <stdlib.h>
 #include <math.h>
 #include <errno.h>
 
@@ -332,14 +333,27 @@ SOAPParameter::GetInt() const
 	if (IsNull() || m_strval.Str() == 0)
 		throw SOAPException("Cannot convert null value to integer.");
 
-	int result = strtol(m_strval, 0, 10);
-	if (errno == ERANGE)
+	char *endptr = 0;
+	const char *startptr = m_strval;
+	int ret = strtol(startptr, &endptr, 10);
+
+	if (endptr)
 	{
-		if (result < 0)
-			throw SOAPException("Integer underflow: %s", (const char *)m_strval);
-		throw SOAPException("Integer overflow: %s", (const char *)m_strval);
+		while (sp_isspace(*endptr))
+			++endptr;
+
+		if (startptr == endptr || *endptr != 0)
+			throw SOAPException("Could not convert string to integer: '%s'",
+					startptr);
 	}
-	return result;
+
+
+	if (errno == ERANGE)
+		throw SOAPException("Integer %s: %s",
+				(ret < 0) ? "underflow" : "overflow",
+				(const char *)m_strval);
+
+	return ret;
 }
 
 bool
@@ -376,8 +390,9 @@ SOAPParameter::GetFloat() const
 	if (IsNull() || m_strval.Str() == 0)
 		throw SOAPException("Cannot convert null value to float.");
 
+	float ret;
 	double dret = GetDouble();
-	float ret = dret;
+	ret = dret;
 
 	if (ret == HUGE_VAL && dret != HUGE_VAL ||
 		ret == -HUGE_VAL && dret != -HUGE_VAL)
@@ -425,13 +440,25 @@ SOAPParameter::GetDouble() const
 		return t.d;
 	}
 
-	double ret = strtod(m_strval, 0);
-	if (errno == ERANGE)
+	char *endptr = 0;
+	const char *startptr = m_strval;
+	double ret = strtod(startptr, &endptr);
+
+	if (endptr)
 	{
-		if (ret == 0.0)
-			throw SOAPException("Double floating-point underflow: %s", (const char *)m_strval);
-		throw SOAPException("Double floating-point overflow: %s", (const char *)m_strval);
+		while (sp_isspace(*endptr))
+			++endptr;
+
+		if (startptr == endptr || *endptr != 0)
+			throw SOAPException("Could not convert string to floating point: '%s'",
+					startptr);
 	}
+
+	if (errno == ERANGE)
+		throw SOAPException("Double floating-point %s: %s",
+				(ret == 0.0) ? "underflow" : "overflow",
+				(const char *)m_strval);
+
 	return ret;
 }
 
