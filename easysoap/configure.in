@@ -117,5 +117,6 @@ AC_OUTPUT( \
 	proj/win32/Makefile \
 	proj/win32/BCB5/Makefile \
 	proj/win32/MSVC6/Makefile \
+	proj/win32/MSVC7/Makefile \
 )
 
