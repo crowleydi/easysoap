@@ -30,6 +30,10 @@
 #include "SOAPEnvelopeHandler.h"
 #include "es_namespaces.h"
 
+#ifdef HAVE_LIBZ
+#include <zlib.h>
+#endif // HAVE_LIBZ
+
 #define BUFF_SIZE 1024
 
 //////////////////////////////////////////////////////////////////////
@@ -69,30 +73,119 @@ SOAPParser::Parse(SOAPEnvelope& env, SOAPTransport& trans)
 	if (contentType && sp_strcmp(contentType, "text/xml"))
 		throw SOAPException("Unexpected content type, only support text/xml: %s", contentType);
 
+#ifdef HAVE_LIBZ
+	bool inflateflag = false;
+	// windowSize for zlib
+	int windowBits = 15; // zlib header
+	const char *contentEncoding = trans.GetContentEncoding();
+	if (contentEncoding)
+	{
+		if (sp_strcmp(contentEncoding, "gzip") == 0)
+		{
+			windowBits += 16; // needed to enable gzip.  details in zlib.h
+			inflateflag = true;
+		}
+		else if (sp_strcmp(contentEncoding, "deflate") == 0)
+		{
+			inflateflag = true;
+		}
+	}
+
+	z_stream stream;
+	stream.zalloc = (alloc_func)0;
+	stream.zfree = (free_func)0;
+	stream.opaque = (voidpf)0;
+
+	if (inflateflag)
+	{
+		int res = inflateInit2(&stream, windowBits);
+		if (res != Z_OK)
+		{
+			inflateEnd(&stream);
+			if (res == Z_VERSION_ERROR)
+				throw SOAPException("Version error in zlib initialization.");
+			else
+				throw SOAPMemoryException();
+		}
+	}
+#endif // HAVE_LIBZ
+
 	InitParser(trans.GetCharset());
 	for (;;)
 	{
-		//
-		// create a buffer to read the HTTP payload into
-		//
-		void *buffer = GetParseBuffer(BUFF_SIZE);
-		if (!buffer)
-			throw SOAPMemoryException();
-
-		//
-		// read the HTTP payload
-		//
-		int read = trans.Read((char *)buffer, BUFF_SIZE);
-		if (!ParseBuffer(read))
+#ifdef HAVE_LIBZ
+		if (inflateflag)
 		{
-			throw SOAPException(
-				"Error while parsing SOAP XML payload: %s",
-				GetErrorMessage());
-		}
+			Bytef cbuffer[BUFF_SIZE];
+			int read = trans.Read((char *)cbuffer, BUFF_SIZE);
+			stream.next_in = cbuffer;
+			stream.avail_in = read;
 
-		if (read == 0)
-			break;
+			while (stream.avail_in > 0)
+			{
+				void *buffer = GetParseBuffer(BUFF_SIZE);
+				if (!buffer)
+				{
+					inflateEnd(&stream);
+					throw SOAPMemoryException();
+				}
+
+				stream.next_out = (Bytef *)buffer;
+				stream.avail_out = BUFF_SIZE;
+
+				// do inflate
+				int res = inflate(&stream, Z_SYNC_FLUSH);
+
+				if (res == Z_OK || res == Z_STREAM_END)
+				{
+					if (!ParseBuffer(BUFF_SIZE-stream.avail_out))
+					{
+						inflateEnd(&stream);
+						throw SOAPException(
+							"Error while parsing SOAP XML payload: %s",
+							GetErrorMessage());
+					}
+				}
+				else
+				{
+					inflateEnd(&stream);
+					throw SOAPException("Error while inflating SOAP XML payload");
+				}
+			}
+
+			if (read == 0)
+				break;
+		}
+		else
+#endif // HAVE_LIBZ
+		{
+			//
+			// create a buffer to read the HTTP payload into
+			//
+			void *buffer = GetParseBuffer(BUFF_SIZE);
+			if (!buffer)
+				throw SOAPMemoryException();
+
+			//
+			// read the HTTP payload
+			//
+			int read = trans.Read((char *)buffer, BUFF_SIZE);
+			if (!ParseBuffer(read))
+			{
+				throw SOAPException(
+					"Error while parsing SOAP XML payload: %s",
+					GetErrorMessage());
+			}
+
+			if (read == 0)
+				break;
+		}
 	}
+
+#ifdef HAVE_LIBZ
+	if (inflateflag)
+		inflateEnd(&stream);
+#endif // HAVE_LIBZ
 
 	HandleHRefs();
 

@@ -145,6 +145,12 @@ SOAPWinInetTransport::GetCharset() const
 	return m_charset;
 }
 
+const char *
+SOAPWinInetTransport::GetContentEncoding() const
+{
+	return m_contentEncoding;
+}
+
 size_t
 SOAPWinInetTransport::Read(char *buffer, size_t bufflen)
 {
@@ -219,12 +225,20 @@ SOAPWinInetTransport::Write(const SOAPMethod& method, const char *packet, size_t
 	char headers[256];
 	if (method.GetSoapAction())
 	{
-		snprintf(headers, sizeof(headers), "Content-Type: text/xml; charset=UTF-8\r\n"
+		snprintf(headers, sizeof(headers),
+			"Content-Type: text/xml; charset=UTF-8\r\n"
+#ifdef HAVE_LIBZ
+			"Accept-Encoding: gzip, deflate\r\n"
+#endif // HAVE_LIBZ
 			"SOAPAction: \"%s\"\r\n", (const char *)method.GetSoapAction());
 	}
 	else
 	{
-		snprintf(headers, sizeof(headers), "Content-Type: text/xml; charset=UTF-8\r\n"
+		snprintf(headers, sizeof(headers),
+			"Content-Type: text/xml; charset=UTF-8\r\n"
+#ifdef HAVE_LIBZ
+			"Accept-Encoding: gzip, deflate\r\n"
+#endif // HAVE_LIBZ
 			"SOAPAction: \"\"\r\n");
 	}
 
@@ -306,16 +320,20 @@ SOAPWinInetTransport::Write(const SOAPMethod& method, const char *packet, size_t
 
 	DWORD qsize = sizeof(m_canRead);
 
-	if (!HttpQueryInfo (m_hRequest,
+	if (!HttpQueryInfo(m_hRequest,
 			HTTP_QUERY_CONTENT_LENGTH |
 			HTTP_QUERY_FLAG_NUMBER, &m_canRead, &qsize, NULL))
 		m_canRead = size_t(-1);
 
-	char contenttype[256];
-	qsize = sizeof(contenttype);
-	if (!HttpQueryInfoA(m_hRequest, HTTP_QUERY_CONTENT_TYPE, contenttype, &qsize, NULL))
-		contenttype[0] = 0;
-	SOAPHTTPProtocol::ParseContentType(m_contentType, m_charset, contenttype);
+	char qbuf[256];
+	qsize = sizeof(qbuf);
+	if (!HttpQueryInfo(m_hRequest, HTTP_QUERY_CONTENT_TYPE, qbuf, &qsize, NULL))
+		qbuf[0] = 0;
+	SOAPHTTPProtocol::ParseContentType(m_contentType, m_charset, qbuf);
+	qsize = sizeof(qbuf);
+	if (!HttpQueryInfo(m_hRequest, HTTP_QUERY_CONTENT_ENCODING, qbuf, &qsize, NULL))
+		qbuf[0] = 0;
+	m_contentEncoding = qbuf;
 
 	return packetlen;
 }

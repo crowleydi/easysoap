@@ -117,6 +117,12 @@ SOAPCGITransport::GetContentType() const
 }
 
 const char *
+SOAPCGITransport::GetContentEncoding() const
+{
+	return m_contentEncoding;
+}
+
+const char *
 SOAPCGITransport::GetSoapAction() const
 {
 	return m_soapaction;

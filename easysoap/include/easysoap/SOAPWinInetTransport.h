@@ -41,6 +41,7 @@ private:
 
 	SOAPString		m_charset;
 	SOAPString		m_contentType;
+	SOAPString		m_contentEncoding;
 	SOAPString		m_errorString;
 	SOAPString		m_userAgent;
 	size_t			m_canRead;
@@ -68,6 +69,7 @@ public:
 
 	const char *GetCharset() const;
 	const char *GetContentType() const;
+	const char *GetContentEncoding() const;
 	size_t Read(char *buffer, size_t bufflen);
 	size_t Write(const SOAPMethod& method, const char *packet, size_t len);
 };
