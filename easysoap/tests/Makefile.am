@@ -23,7 +23,7 @@ SSLServer_SOURCES = \
 LDADD = ../src/libeasysoap.la
 INCLUDES = -I@top_srcdir@/include
 
-AM_CFLAGS=-Wall -pedantic
-AM_CXXFLAGS=-Wall -pedantic
+AM_CFLAGS=-Wall #-pedantic
+AM_CXXFLAGS=-Wall #-pedantic
 
 EXTRA_DIST = README.TXT README.SSL
