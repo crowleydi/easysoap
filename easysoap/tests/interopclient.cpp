@@ -703,15 +703,6 @@ void TestInterop(const Endpoint& e)
 	SetTraceFile(name, "echoStructArray_ZeroLen");
 	TestEchoStructArray(proxy, uri, soapAction, appendMethod, 0);
 
-#if 0
-	// Lets try echoing null values
-	SetTraceFile(name, "echoString_Null");
-	TestEchoString(proxy, uri, soapAction, appendMethod, 0);
-	SetTraceFile(name, "echoInteger_Null");
-	TestEchoInteger(proxy, uri, soapAction, appendMethod, (const char *)0);
-	SetTraceFile(name, "echoFloat_Null");
-	TestEchoFloat(proxy, uri, soapAction, appendMethod, (const char *)0);
-
 	// Lets try echoing integers that are too big
 	SetTraceFile(name, "echoInteger_Overflow");
 	TestEchoIntegerInvalid(proxy, uri, soapAction, appendMethod, "2147483648");
@@ -735,6 +726,15 @@ void TestInterop(const Endpoint& e)
 	TestEchoFloatInvalid(proxy, uri, soapAction, appendMethod, "1.65e555");
 	SetTraceFile(name, "echoFloat_Underflow");
 	TestEchoFloatInvalid(proxy, uri, soapAction, appendMethod, "1.65e-555");
+
+#if 0
+	// Lets try echoing null values
+	SetTraceFile(name, "echoString_Null");
+	TestEchoString(proxy, uri, soapAction, appendMethod, 0);
+	SetTraceFile(name, "echoInteger_Null");
+	TestEchoInteger(proxy, uri, soapAction, appendMethod, (const char *)0);
+	SetTraceFile(name, "echoFloat_Null");
+	TestEchoFloat(proxy, uri, soapAction, appendMethod, (const char *)0);
 #endif
 
 	SOAPDebugger::Close();
