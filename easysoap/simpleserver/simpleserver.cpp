@@ -25,7 +25,7 @@
 #include <iostream>
 
 #include <SOAP.h>
-#include <SOAPHTTPServer.h>
+#include <SOAPCGIServer.h>
 
 #include "calchandler.h"
 
@@ -35,22 +35,12 @@
 // main for the server
 //
 int
-main(int argc, const char* argv[])
+main()
 {
-	int port = 0;
-
-	if (argc > 1)
-		port = atoi(argv[1]);
-	if (port == 0)
-		port = 6060;
-
 	try
 	{
-		SOAPHTTPServer server(port);
+		SOAPCGIServer server;
 		DemoCalculatorHandler calchandle;
-
-		std::cout << "Starting SOAP server on port " << port << "." << std::endl
-			<< "Hit CTRL-C to stop." << std::endl;
 
 		return server.DispatchTo(&calchandle).Handle();
 	}
