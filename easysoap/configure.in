@@ -110,8 +110,8 @@ AC_OUTPUT( \
 	include/Makefile \
 	include/easysoap/Makefile \
 	src/Makefile \
-	src/abyss/Makefile \
-	src/abyss/src/Makefile \
+dnl src/abyss/Makefile \
+dnl src/abyss/src/Makefile \
 	simpleserver/Makefile \
 	validator/Makefile \
 	tests/Makefile \

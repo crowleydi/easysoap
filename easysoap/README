@@ -1,15 +1,52 @@
 
-Release. 0.5
+Release 0.6
 =====================================
 
 The Expat XML parsing library 1.95.2 is required.  You can download it
 from expat.sourceforge.net. See below.
 
-To run the tests program you will need to install  SOAP::Lite.
-The soap.daemon must be running on localhost. You may have to edit
-soap.daemon so you can access the example SOAP classes in /My/Examples.
-On linux, I had to install the ActiveState 5.6 perl distribution from
-www.activestate.com.
+Major changes in this release:
+
+1)  Header files are now in a sub-directory called "easysoap" so
+	you will need to change any includes from, for example:
+
+	#include <SOAP.h>
+
+	to:
+
+	#include <easysoap/SOAP.h>
+
+2)  All classes are now in the namespace "EasySoap" for compilers
+	which support namespaces.  There are some macros available to
+	help make this transparent.
+
+	USING_EASYSOAP_NAMESPACE
+	BEGIN_EASYSOAP_NAMESPACE
+	END_EASYSOAP_NAMESPACE
+
+	Your SOAPTypeTraits classes will have to be defined within the
+	EasySoap namespace.
+
+3)  I have temporarily disabled the SOAPHTTPServer class because
+	I was getting way too many bug reports on the underlying Abyss
+	library which it uses.  Sorry.  I added that class mostly as
+	a demonstration of how to write a transport with existing HTTP
+	servers, not as a production server, and also to have a simple
+	HTTP server out of the box.  But its existence is causing me too
+	many headaches (I take things too personally, I like code that
+	works and hate hearing about it when it doesn't, and really hate
+	fixing code I didn't write) and we need a better solution. 
+	An Apache module transport is the way to go, and it is in the
+	works.  Any help on it would be GREATLY appreciated.  If youd
+	insist on using the Abyss HTTP server, feel free.  You will have
+	to figure out on your own how to compile it and any bug reports
+	on it will be merrily :) ignored. 
+
+4)	Blaise added client SSL client certificate support for platforms
+	which use OpenSSL.  I changed the default client transport on
+	Win32 platforms to use the WinInet functions so on those platforms
+	all kinds of cool stuff comes for free (client certificates, SSL,
+	etc.)
 
 Please submit bug reports and comments to:
 dcrowley@users.sourceforge.net.

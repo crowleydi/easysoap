@@ -12,7 +12,6 @@ THESOURCES = \
 	SOAPEnvelope.cpp \
 	SOAPEnvelopeHandler.cpp \
 	SOAPFault.cpp \
-	SOAPHTTPServer.cpp \
 	SOAPHeader.cpp \
 	SOAPHeaderHandler.cpp \
 	SOAPMethod.cpp \
@@ -58,6 +57,7 @@ EXTRA_DIST = \
 	easysoap.dsp \
 	SOAPWinInetTransport.cpp \
 	SOAPISAPIServer.cpp \
+	SOAPHTTPServer.cpp \
 	isapi.cpp \
 	isapi.def
 

@@ -11,7 +11,6 @@ easysoap_HEADERS = \
     SOAPEnvelope.h \
     SOAPException.h \
     SOAPFault.h \
-    SOAPHTTPServer.h \
     SOAPHashMap.h \
     SOAPHeader.h \
     SOAPMethod.h \
@@ -46,5 +45,6 @@ easysoap_HEADERS = \
 
 EXTRA_DIST = \
 	SOAPWinInetTransport.h \
+	SOAPHTTPServer.h \
 	SOAPISAPIServer.h
 
