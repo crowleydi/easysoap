@@ -379,6 +379,10 @@ SOURCE=..\include\SOAPParseEventHandler.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\include\SOAPPool.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\include\SOAPProxy.h
 # End Source File
 # Begin Source File
@@ -404,6 +408,10 @@ SOURCE=..\include\SOAPServerDispatch.h
 # Begin Source File
 
 SOURCE=..\include\SOAPSocket.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\SOAPStack.h
 # End Source File
 # Begin Source File
 
