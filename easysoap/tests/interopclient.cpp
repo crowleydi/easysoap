@@ -219,20 +219,32 @@ TestBogusMethod(SOAPProxy& proxy, const Endpoint& e)
 }
 
 void
-TestMustUnderstand(SOAPProxy& proxy, const Endpoint& e)
+TestMustUnderstand(SOAPProxy& proxy, const Endpoint& e, const char *mu)
 {
 	SOAPEnvelope mustUnderstand;
 	SOAPParameter& header = mustUnderstand.GetHeader().AddHeader();
 
 	header.SetName("Transaction", "uri:my-transaction");
 	header.SetValue("5");
-	header.AddAttribute(SOAPEnvelope::MustUnderstand, "1");
+	header.AddAttribute(SOAPEnvelope::MustUnderstand, mu);
 
 	SOAPMethod& method = mustUnderstand.GetBody().GetMethod();
 	method.SetName("echoVoid", e.nspace);
 	method.SetSoapAction(e.soapaction, e.needsappend);
 
 	proxy.Execute(mustUnderstand);
+}
+
+void
+TestMustUnderstand_1(SOAPProxy& proxy, const Endpoint& e)
+{
+	TestMustUnderstand(proxy, e, "1");
+}
+
+void
+TestMustUnderstand_0(SOAPProxy& proxy, const Endpoint& e)
+{
+	TestMustUnderstand(proxy, e, "0");
 }
 
 void
@@ -807,7 +819,8 @@ TestInterop(const Endpoint& e)
 
 	TestForFault(proxy, e, "BogusMethod",				TestBogusMethod);
 	TestForFault(proxy, e, "BogusNamespace",			TestBogusNamespace);
-	TestForFault(proxy, e, "MustUnderstand",			TestMustUnderstand);
+	TestForFault(proxy, e, "MustUnderstand=1",			TestMustUnderstand_1);
+	TestForPass(proxy, e, "MustUnderstand=0",			TestMustUnderstand_0);
 	TestForPass(proxy, e, "echoVoid",					TestEchoVoid);
 	TestForPass(proxy, e, "echoInteger",				TestEchoInteger);
 	TestForPass(proxy, e, "echoInteger_MostPositive",	TestEchoInteger_MostPositive);
