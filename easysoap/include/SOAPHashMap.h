@@ -210,7 +210,7 @@ public:
 		Clear();
 	}
 	
-	SOAPHashMap(size_t size = 31, float fillfactor = 0.75) :
+	SOAPHashMap(size_t size = 31, float fillfactor = 0.6) :
 		m_numElements(0), m_fillfactor(fillfactor), m_resizeThreshold(0)
 	{
 		Resize(size); // this sets m_resizeThreshold
@@ -339,6 +339,9 @@ private:
 			size_t sindex = index;
 			while (index < m_elements.Size())
 			{
+				if (!m_elements[index].m_used)
+					break;
+
 				if (m_elements[index].m_hash == hash &&
 					m_elements[index].m_key == key)
 					return Iterator(this, (Elements::Iterator)m_elements.Begin() + index);
@@ -346,7 +349,7 @@ private:
 				// now it sux.  linear lookup...
 				if (++index == m_elements.Size())
 					index = 0;
-				else if (index == sindex)
+				if (index == sindex)
 					break;
 			}
 		}
@@ -388,7 +391,7 @@ private:
 
 		size_t index = hash % m_elements.Size();
 		while (m_elements[index].m_used)
-			if (++index = m_elements.Size())
+			if (++index == m_elements.Size())
 				index = 0;
 
 		++m_numElements;
@@ -407,7 +410,7 @@ private:
 
 		size_t index = hash % m_elements.Size();
 		while (m_elements[index].m_used)
-			if (++index = m_elements.Size())
+			if (++index == m_elements.Size())
 				index = 0;
 
 		++m_numElements;
