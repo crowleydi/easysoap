@@ -41,11 +41,17 @@ public:
 
 	SOAPResponse& Parse(SOAPResponse& resp, SOAPTransport& trans);
 
-	// Used by subscribers/handlers to resolve something like
-	// "xsi:integer" into a fully qualified name
-	// "http://www.w3.org/1999/XMLSchema-instance#integer"
-	void ResolveName(const char *name, SOAPString& result);
+	// Used by subscribers/handlers
+
+	// Resolves a namespace like "xsi" into a fully qualified name
+	// "http://www.w3.org/1999/XMLSchema-instance"
+	const char *ExpandNamespace(const char *name) const;
+
+	// Given an HRef, return the Parameter for it
+	// if any (will return null if not found)
 	SOAPParameter *GetHRefParam(const SOAPString& name);
+
+	// Assign a SOAPParameter to an HRef
 	void SetHRefParam(const SOAPString&, SOAPParameter *);
 
 protected:

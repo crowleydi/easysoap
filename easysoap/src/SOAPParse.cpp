@@ -169,26 +169,12 @@ SOAPParser::SetHRefParam(const SOAPString& name, SOAPParameter *param)
 	m_hrefmap[name] = param;
 }
 
-void
-SOAPParser::ResolveName(const char *name, SOAPString& result)
+const char *
+SOAPParser::ExpandNamespace(const char *ns) const
 {
-	char *colon = sp_strchr(name, ':');
-	if (colon)
-	{
-		*colon = 0;
-		NamespaceMap::Iterator i = m_nsmap.Find(name);
-		if (i)
-		{
-			result = *i;
-			result.Append(PARSER_NS_SEP);
-			result.Append(++colon);
-			*--colon = ':';
-		}
-		else
-		{
-			// TODO:
-			// this is probably an error...
-		}
-	}
+	NamespaceMap::Iterator i = m_nsmap.Find(ns);
+	if (i)
+		return i->Str();
+	return 0;
 }
 
