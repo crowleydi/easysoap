@@ -56,8 +56,7 @@ private:
 	bool		m_chunked;
 	SOAPSSLContext	*m_ctx;
 	SOAPSocketInterface * m_sslsocket;
-	bool		m_delsslsocket;
-        void            *m_cbdata;
+	void		*m_cbdata;
 
 	int		GetReply();
 	size_t	GetChunkLength();
@@ -77,7 +76,6 @@ public:
 		, m_chunked(false)
 		, m_ctx(0)
 		, m_sslsocket(0)
-		, m_delsslsocket(false)
 		, m_cbdata(0)
 	{}
 
@@ -89,7 +87,6 @@ public:
 		, m_chunked(false)
 		, m_ctx(0)
 		, m_sslsocket(0)
-		, m_delsslsocket(false)
 		, m_cbdata(0)
 
 	{
@@ -104,28 +101,29 @@ public:
 		, m_chunked(false)
 		, m_ctx(0)
 		, m_sslsocket(0)
-		, m_delsslsocket(false)
 		, m_cbdata(0)
 
 	{
 		ConnectTo(endpoint, proxy);
 	}
 
-	~SOAPHTTPProtocol()
-	{
-		if (m_delsslsocket && m_sslsocket)
-			delete m_sslsocket;
-	}
+	~SOAPHTTPProtocol();
 
-	void	SetKeepAlive(bool keepAlive = true)	{
+	void	SetKeepAlive(bool keepAlive = true)
+	{
 		m_keepAlive = keepAlive;
 	}
-	void 	SetContext(SOAPSSLContext& context) { 
+
+	void 	SetContext(SOAPSSLContext& context)
+	{ 
 		m_ctx = &context; 
 	}
-        void SetVerifyCBData(void* cbdata) {
-                m_cbdata = cbdata;
-        }
+
+	void SetVerifyCBData(void* cbdata)
+	{
+		m_cbdata = cbdata;
+	}
+
 	void	ConnectTo(const SOAPUrl& endpoint);
 	void	ConnectTo(const SOAPUrl& endpoint, const SOAPUrl& proxy);
 	int		Get(const char *path);
@@ -136,6 +134,7 @@ public:
 
 	const char *GetCharset() const {return m_charset;}
 	const char *GetContentType() const {return m_contentType;}
+	const char *GetContentEncoding() const;
 	const char *GetHeader(const char *header) const;
 	int		GetContentLength() const;
 	bool	IsChunked() const {return m_chunked;}
@@ -205,6 +204,7 @@ public:
 	//  Return charset if we know it
 	virtual const char *GetCharset() const;
 	virtual const char *GetContentType() const;
+	virtual const char *GetContentEncoding() const;
 
 	// read the payload into the buffer.
 	// can be called multiple times.

@@ -90,7 +90,10 @@ SOAPonHTTP::Write(const SOAPMethod& method, const char *payload, size_t payloads
 		m_http.WriteHeader("User-Agent", m_userAgent.IsEmpty() ?
 				DEFAULT_USERAGENT : (const char *)m_userAgent);
 
-		m_http.WriteHeader("Content-Type", "text/xml; charset=\"UTF-8\"");
+		m_http.WriteHeader("Content-Type", "text/xml; charset=UTF-8");
+#ifdef HAVE_LIBZ
+		m_http.WriteHeader("Accept-Encoding", "gzip, deflate");
+#endif // HAVE_LIBZ
 		if (!m_endpoint.User().IsEmpty() || !m_endpoint.Password().IsEmpty())
 		{
 			SOAPString up = m_endpoint.User();
@@ -107,7 +110,7 @@ SOAPonHTTP::Write(const SOAPMethod& method, const char *payload, size_t payloads
 		m_http.Write("SOAPAction:");
 		if (method.GetSoapAction())
 		{
-			m_http.Write(" \"");
+			m_http.Write("\"");
 			m_http.Write(method.GetSoapAction());
 			m_http.Write("\"");
 		}
@@ -166,6 +169,12 @@ SOAPonHTTP::GetContentType() const
 	return m_http.GetContentType();
 }
 
+const char *
+SOAPonHTTP::GetContentEncoding() const
+{
+	return m_http.GetContentEncoding();
+}
+
 void
 SOAPonHTTP::ConnectTo(const SOAPUrl& endpoint)
 {
@@ -194,6 +203,12 @@ SOAPonHTTP::ConnectTo(const SOAPUrl& endpoint, const SOAPUrl& proxy)
 	if (m_cbdata)
 			m_http.SetVerifyCBData(m_cbdata);
 	m_http.ConnectTo(endpoint, proxy);
+}
+
+SOAPHTTPProtocol::~SOAPHTTPProtocol()
+{
+	delete m_sslsocket;
+	m_sslsocket = 0;
 }
 
 void
@@ -453,6 +468,12 @@ SOAPHTTPProtocol::GetHeader(const char *header) const
 	return 0;
 }
 
+const char *
+SOAPHTTPProtocol::GetContentEncoding() const
+{
+	return GetHeader("Content-Encoding");
+}
+
 int
 SOAPHTTPProtocol::GetContentLength() const
 {
@@ -581,6 +602,9 @@ SOAPHTTPProtocol::Connect()
 			break;
 		case SOAPUrl::https_proto:
 			{
+				delete m_sslsocket;
+				m_sslsocket = 0;
+
 				if (m_ctx)
 					m_sslsocket = new SOAPSecureSocketImp(*m_ctx, m_cbdata);
 				else
@@ -588,7 +612,6 @@ SOAPHTTPProtocol::Connect()
 
 				if (!m_sslsocket)
 					throw SOAPMemoryException();
-				m_delsslsocket = true;
 				SOAPProtocolBase::SetSocket(m_sslsocket);
 
 				m_sslsocket->Connect(host, port);
