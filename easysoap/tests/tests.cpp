@@ -647,7 +647,7 @@ void TestInterop(const char *name,
 	SetTraceFile(name, "echoInteger");
 	TestEchoInteger(proxy, uri, soapAction, appendMethod, 464);
 	SetTraceFile(name, "echoFloat");
-	TestEchoFloat(proxy, uri, soapAction, appendMethod, (float)-3.628134987338e-6);
+	TestEchoFloat(proxy, uri, soapAction, appendMethod, (float)1.34523452345346754753453);
 	SetTraceFile(name, "echoString");
 	TestEchoString(proxy, uri, soapAction, appendMethod, "This is a test string from EasySOAP++");
 	SetTraceFile(name, "echoStruct");
@@ -725,7 +725,7 @@ main(int argc, char* argv[])
 			"urn:soapinterop", false,
 			"http://soapinterop.org/");/**/
 
-		/*TestInterop("Phalanx",
+		TestInterop("Phalanx",
 			"http://www.phalanxsys.com/interop/listener.asp",
 			"urn:soapinterop", false,
 			"http://soapinterop.org/");/**/
