@@ -180,6 +180,24 @@ sp_strchr(const char *s, char c)
 	return 0;
 }
 
+inline char*
+sp_strrchr(const char *s, char c)
+{
+	if (s)
+	{
+		const char * w = s;
+		while (*w++)
+			;
+
+		while (w != s)
+		{
+			if (*--w == c)
+				return (char*)w;
+		}
+	}
+	return 0;
+}
+
 inline void *
 sp_memset(void *s, int c, size_t n)
 {
