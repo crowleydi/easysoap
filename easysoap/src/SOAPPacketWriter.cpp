@@ -21,6 +21,8 @@
 #include "SOAP.h"
 #include "SOAPPacketWriter.h"
 
+#define ADD_WHITESPACE 0
+
 SOAPPacketWriter::SOAPPacketWriter()
 {
 	m_instart = false;
@@ -129,7 +131,11 @@ SOAPPacketWriter::AddNSAttr(const char *ns, const char *tag,
 		nstag = i->Str();
 	}
 
+#if ADD_WHITESPACE
+	Write("\r\n\t");
+#else
 	Write(" ");
+#endif
 	Write(nstag);
 	Write(":");
 	Write(tag);
@@ -177,7 +183,11 @@ SOAPPacketWriter::AddNSAttr(const char *tns, const char *tag,
 		vnstag = i->Str();
 	}
 
+#if ADD_WHITESPACE
+	Write("\r\n\t");
+#else
 	Write(" ");
+#endif
 	Write(tnstag);
 	Write(":");
 	Write(tag);
@@ -198,7 +208,12 @@ SOAPPacketWriter::AddAttr(const char *attr, const char *value)
 {
 	if (!m_instart)
 		throw SOAPException("XML serialization error.  Adding attribute when not in start tag.");
+
+#if ADD_WHITESPACE
+	Write("\r\n\t");
+#else
 	Write(" ");
+#endif
 	Write(attr);
 	Write("=\"");
 	WriteEscaped(value);
@@ -213,7 +228,12 @@ SOAPPacketWriter::AddXMLNS(const char *prefix, const char *ns)
 	{
 		m_nsmap[ns] = prefix;
 
-		Write(" xmlns");
+#if ADD_WHITESPACE
+		Write("\r\n\t");
+#else
+		Write(" ");
+#endif
+		Write("xmlns");
 		if (prefix)
 		{
 			Write(":");
@@ -231,6 +251,9 @@ SOAPPacketWriter::EndTag(const char *tag)
 	if (m_instart)
 	{
 		Write("/>");
+#if ADD_WHITESPACE
+		Write("\r\n");
+#endif
 		m_instart = false;
 	}
 	else
@@ -238,6 +261,9 @@ SOAPPacketWriter::EndTag(const char *tag)
 		Write("</");
 		Write(tag);
 		Write(">");
+#if ADD_WHITESPACE
+		Write("\r\n");
+#endif
 	}
 }
 
@@ -247,6 +273,9 @@ SOAPPacketWriter::EndNSTag(const char *ns, const char *tag)
 	if (m_instart)
 	{
 		Write("/>");
+#if ADD_WHITESPACE
+		Write("\r\n");
+#endif
 		m_instart = false;
 	}
 	else
@@ -261,13 +290,20 @@ SOAPPacketWriter::EndNSTag(const char *ns, const char *tag)
 		Write(":");
 		Write(tag);
 		Write(">");
+#if ADD_WHITESPACE
+		Write("\r\n");
+#endif
 	}
 }
 
 void
 SOAPPacketWriter::WriteValue(const char *val)
 {
-	EndStart();
+	if (m_instart)
+	{
+		Write(">");
+		m_instart = false;
+	}
 	WriteEscaped(val);
 }
 
@@ -277,6 +313,9 @@ SOAPPacketWriter::EndStart()
 	if (m_instart)
 	{
 		Write(">");
+#if ADD_WHITESPACE
+		Write("\r\n");
+#endif
 		m_instart = false;
 	}
 }
