@@ -216,13 +216,9 @@ public:
 
 		//
 		// parse offset attribute if present
-		bool haveoffset = false;
 		attr = param.GetAttributes().Find(SOAPEnc::offset);
 		if (attr)
-		{
 			parsepos(SOAPEnc::offset, *attr, pos);
-			haveoffset = true;
-		}
 
 		if (arr.Size() > numvals)
 				throw SOAPException("Error de-serializing array.  Too many values.");
@@ -235,9 +231,10 @@ public:
 			attr = (*i)->GetAttributes().Find(SOAPEnc::position);
 			if (attr)
 			{
-				if (haveoffset)
-					throw SOAPException("Cannot de-serialize array with position attribute and offset attribute.");
 				parsepos(SOAPEnc::position, *attr, pos);
+				if (pos >= numvals)
+					throw SOAPException("Error decoding array, position out of range: position is [%d], size is [%d]",
+					pos, numvals);
 			}
 			SOAPTypeTraits<MEMBER_TYPE(V::value_type)>::Deserialize(**i, val[pos++]);
 		}
@@ -446,13 +443,9 @@ public:
 
 		//
 		// parse offset attribute if present
-		bool haveoffset = false;
 		attr = param.GetAttributes().Find(SOAPEnc::offset);
 		if (attr)
-		{
 			parse2Dpos(SOAPEnc::offset, *attr, row, col);
-			haveoffset = true;
-		}
 
 		if (arr.Size() > numrows * numcols)
 				throw SOAPException("Error de-serializing 2D array.  Too many values.");
@@ -465,9 +458,10 @@ public:
 			attr = (*i)->GetAttributes().Find(SOAPEnc::position);
 			if (attr)
 			{
-				if (haveoffset)
-					throw SOAPException("Cannot de-serialize array with position attribute and offset attribute.");
 				parse2Dpos(SOAPEnc::position, *attr, row, col);
+				if (col >= numcols || row >= numrows)
+					throw SOAPException("Error decoding array, position out of range: position is [%d,%d], size is [%d,%d]",
+					row, col, numrows, numcols);
 			}
 			SOAPTypeTraits<MEMBER_TYPE(V::value_type)>::Deserialize(**i, val[row][col]);
 			if (++col == numcols)
