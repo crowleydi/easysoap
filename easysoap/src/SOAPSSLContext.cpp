@@ -97,7 +97,6 @@ SOAPSSLContext::SOAPSSLContext(const char* certfile, const char* keyfile, const 
 		if (!m_ctx)
 				throw SOAPMemoryException();
 		SetCertInfo(certfile, keyfile, password);
-		m_tmpRSAKey = 0;
 }
 /*
 SOAPSSLContext::SOAPSSLContext(const SOAPSSLContext& ctx)
@@ -113,15 +112,12 @@ SOAPSSLContext& SOAPSSLContext::operator=(const SOAPSSLContext& ctx)
 void SOAPSSLContext::SetCertInfo(const char* certfile, const char* keyfile, const char* password)
 {
 	int retcode;
-		
-	// TODO: verify that the files exist
-	
-	
 
-	// TODO: Implmement the rest of the RSA requirements.
+	// TODO: figure out what kind of certificate we are dealing with.
+	type = RSA_cert;
 	
+	// RSA requires a callback function that can generate the correct sized key on the fly...
 	SSL_CTX_set_tmp_rsa_callback(m_ctx, &tmpRSAkey_cb);
-	
 		
 	// set the certificate file.
 	if ((retcode = SSL_CTX_use_certificate_chain_file(m_ctx, m_certfile.Str()))!= 1)
@@ -144,8 +140,6 @@ void SOAPSSLContext::SetCertInfo(const char* certfile, const char* keyfile, cons
 	if ((retcode = SSL_CTX_check_private_key(m_ctx) != 1))
 			HandleError("Error while checking the private key : %s\n", retcode);
 	
-	// TODO: Validate certificate if the root CA cert is given.
-
 }
 
 int SOAPSSLContext::password_cb(char* buf, int size, int rwflag, void *userdata) 
@@ -185,8 +179,6 @@ void SOAPSSLContext::HandleError(const char* context, int retcode)
 	throw SOAPSocketException(context, msg);
 		
 }
-
-
 
 SSL_CTX* SOAPSSLContext::GetContext()
 {

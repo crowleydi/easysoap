@@ -52,7 +52,7 @@ public:
 	} CertType;
 
 private:
-	static rsa_st*				m_tmpRSAKey;
+	static rsa_st*		m_tmpRSAKey;
 	ssl_ctx_st*			m_ctx;
 	SOAPString 			m_certfile;
 	SOAPString 			m_keyfile;
