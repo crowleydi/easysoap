@@ -114,19 +114,19 @@ class EASYSOAP_EXPORT SOAPonHTTP : public SOAPTransport
 {
 private:
 	SOAPHTTPProtocol	m_http;
-	SOAPString			m_path;
+	SOAPUrl				m_url;
 
 public:
 	SOAPonHTTP() {}
 
 	SOAPonHTTP(const SOAPUrl& endpoint)
 		: m_http(endpoint)
-		, m_path(endpoint.Path())
+		, m_url(endpoint)
 	{}
 
 	SOAPonHTTP(const SOAPUrl& endpoint, const SOAPUrl& proxy)
 		: m_http(endpoint, proxy)
-		, m_path(endpoint.Path())
+		, m_url(endpoint)
 	{}
 
 	virtual ~SOAPonHTTP() {}

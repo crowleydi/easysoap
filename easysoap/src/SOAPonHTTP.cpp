@@ -59,22 +59,50 @@ SOAPonHTTP::Read(char *buffer, size_t buffsize)
 size_t
 SOAPonHTTP::Write(const SOAPMethod& method, const char *payload, size_t payloadsize)
 {
-	m_http.BeginPost(m_path);
-	m_http.WriteHeader("User-Agent", SOAPUSER_AGENT);
-	m_http.WriteHeader("Content-Type", "text/xml; charset=\"UTF-8\"");
+	int retry = 5;
+	int ret = 0;
+	while (retry--)
+	{
+		m_http.BeginPost(m_url.Path());
+		m_http.WriteHeader("User-Agent", SOAPUSER_AGENT);
+		m_http.WriteHeader("Content-Type", "text/xml; charset=\"UTF-8\"");
 
-	m_http.Write("SOAPAction: \"");
-	m_http.Write(method.GetSoapAction());
-	m_http.WriteLine("\"");
+		m_http.Write("SOAPAction: \"");
+		m_http.Write(method.GetSoapAction());
+		m_http.WriteLine("\"");
 
-	int ret = m_http.PostData(payload, payloadsize);
+		ret = m_http.PostData(payload, payloadsize);
+
+		//
+		// If resource moved (temporarily or permanently)
+		if (ret == 301 || ret == 302)
+		{
+			const char *location = m_http.GetHeader("Location");
+			if (!location)
+				throw SOAPException("HTTP 302 code did not return a Location.");
+
+			SOAPUrl newurl = location;
+
+			// If only the path changed, we don't
+			// need to re-connect.
+			if (newurl.Hostname() != m_url.Hostname() ||
+				newurl.Port() != m_url.Port())
+				m_http.ConnectTo(m_url);
+
+			m_url = newurl;
+		}
+		else
+			break;
+	}
 	bool isxml = true;
 
 	const char *contype = m_http.GetHeader("Content-Type");
 	if (contype)
 		isxml = (sp_strstr(contype, "text/xml") != 0);
 
-	if (ret != 200 && !isxml)
+	// Only valid return codes  we know of.  200 is success,
+	// 500 could be a soap fault.
+	if (ret != 200 && ret != 500)
 		throw SOAPException("Unexpected return code: %s",
 			(const char *)m_http.GetRequestMessage());
 
@@ -193,9 +221,12 @@ SOAPHTTPProtocol::PostData(const char *bytes, int len)
 	WriteHeader("Content-Length", len);
 	WriteLine("");
 	Write(bytes, len);
+
 	int ret = GetReply();
+
 	if (ret == 100)
 		ret = GetReply();
+
 	return ret;
 }
 
@@ -328,7 +359,7 @@ SOAPHTTPProtocol::GetReply()
 		m_chunked = true;
 		m_canread = 0;
 	}
-	SOAPDebugger::Print(1, "\r\nTransfer is %sChunked!\r\n", (m_chunked?"":"not "));
+	SOAPDebugger::Print(2, "\r\nTransfer is %sChunked!\r\n", (m_chunked?"":"not "));
 
 	return httpreturn;
 }
