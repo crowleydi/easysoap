@@ -1,4 +1,8 @@
 
+	Added SOAPHTTPServer.   Bertrand nudged me at the right time.
+	Moved build system to autoconf/automake.  Thanks to Mike Anothony.
+	Switched keep-alive back to being default.
+
 0.3, 21-Jun-2001
 	Mostly a bug fix release.
 	Default schema is now 2001.
