@@ -29,12 +29,16 @@ class SOAPDispatchHandlerInterface;
 class EASYSOAP_EXPORT SOAPServerDispatch
 {
 public:
+	SOAPServerDispatch();
 	SOAPServerDispatch(SOAPTransport& transport, bool deltrans = false);
-	~SOAPServerDispatch();
+	virtual ~SOAPServerDispatch();
 
 	SOAPServerDispatch& SetTransport(SOAPTransport& transport, bool deltrans = false);
 	SOAPServerDispatch& DispatchTo(SOAPDispatchHandlerInterface *disp);
 	int Handle();
+
+protected:
+	virtual bool	HandleRequest(SOAPEnvelope& request, SOAPResponse& response);
 
 private:
 

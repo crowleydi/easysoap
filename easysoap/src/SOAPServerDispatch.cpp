@@ -9,6 +9,12 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
+SOAPServerDispatch::SOAPServerDispatch()
+	: m_transport(0)
+	, m_deltrans(false)
+{
+}
+
 SOAPServerDispatch::SOAPServerDispatch(SOAPTransport& transport, bool deltrans)
 	: m_transport(0)
 	, m_deltrans(false)
@@ -101,21 +107,7 @@ SOAPServerDispatch::Handle()
 		respname.Append("Response");
 		responseMethod.SetName(respname, requestMethod.GetName().GetNamespace());
 
-		//
-		// TODO:  This is an O(n) lookup...
-		bool handled = false;
-		for (Handlers::Iterator i = m_handlers.Begin(); i != m_handlers.End(); ++i)
-		{
-			//
-			// We found a handler.  Now dispatch the method
-			if ((*i)->ExecuteMethod(requestMethod, responseMethod))
-			{
-				handled = true;
-				break;
-			}
-		}
-
-		if (!handled)
+		if (!HandleRequest(m_request, m_response))
 		{
 			faultcode = clientfault;
 			throw SOAPException("Could not find handler for method \"%s\" in namespace \"%s\"",
@@ -152,5 +144,26 @@ SOAPServerDispatch::Handle()
 	}
 
 	return retval;
+}
+
+bool
+SOAPServerDispatch::HandleRequest(SOAPEnvelope& request, SOAPResponse& response)
+{
+	//
+	// TODO:  This is an O(n) lookup...
+	bool handled = false;
+	for (Handlers::Iterator i = m_handlers.Begin(); i != m_handlers.End(); ++i)
+	{
+		//
+		// We found a handler.  Now dispatch the method
+		if ((*i)->ExecuteMethod(request.GetBody().GetMethod(),
+			response.GetBody().GetMethod()))
+		{
+			handled = true;
+			break;
+		}
+	}
+
+	return handled;
 }
 
