@@ -126,9 +126,9 @@ SOAPServerDispatch::Handle(SOAPTransport& trans)
 		// Set up the "suggested" method return name.  Actual
 		// method can change it.  In future we set it up with
 		// WSDL.
-		SOAPString respname = requestMethod.GetName().GetName();
-		respname.Append("Response");
-		responseMethod.SetName(respname, requestMethod.GetName().GetNamespace());
+		m_respname = requestMethod.GetName().GetName();
+		m_respname.Append("Response");
+		responseMethod.SetName(m_respname, requestMethod.GetName().GetNamespace());
 
 		//
 		// Handle any headers we have...

@@ -60,6 +60,7 @@ private:
 	SOAPEnvelope		m_request;
 	SOAPPacketWriter	m_writer;
 	SOAPParser			m_parser;
+	SOAPString			m_respname;
 };
 
 
