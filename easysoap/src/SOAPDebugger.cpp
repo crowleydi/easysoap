@@ -52,6 +52,7 @@ SOAPDebugger::Close()
 {
 	if (m_file)
 	{
+		fwrite("\r\n", 1, 2, m_file);
 		fclose(m_file);
 		m_file = 0;
 	}
@@ -61,5 +62,5 @@ void
 SOAPDebugger::SetFile(const char *name)
 {
 	Close();
-	m_file = fopen(name, "w");
+	m_file = fopen(name, "wb");
 }
