@@ -168,6 +168,7 @@ SOAPParameter::SetInt(const char *val)
 	SetType("int");
 	if (val)
 	{
+		SetNull(false);
 		m_strval = val;
 		m_flags = 0;
 	}
@@ -181,6 +182,7 @@ SOAPParameter::SetValue(const char *val)
 	SetType("string");
 	if (val)
 	{
+		SetNull(false);
 		m_strval = val;
 		m_flags = 0;
 	}
@@ -194,6 +196,7 @@ SOAPParameter::SetFloat(const char *val)
 	SetType("float");
 	if (val)
 	{
+		SetNull(false);
 		m_strval = val;
 		m_flags = 0;
 	}
@@ -207,6 +210,7 @@ SOAPParameter::SetDouble(const char *val)
 	SetType("double");
 	if (val)
 	{
+		SetNull(false);
 		m_strval = val;
 		m_flags = 0;
 	}
@@ -289,12 +293,18 @@ SOAPParameter::SetValue(bool val)
 int
 SOAPParameter::GetInt() const
 {
+	if (IsNull())
+		throw SOAPException("Cannot convert null value to integer.");
+
 	return atoi(m_strval);
 }
 
 bool
 SOAPParameter::GetBoolean() const
 {
+	if (IsNull())
+		throw SOAPException("Cannot convert null value to boolean.");
+
 	if (sp_strcasecmp(m_strval, "true") == 0 ||
 		sp_strcmp(m_strval, "1") == 0)
 		return true;
@@ -308,12 +318,18 @@ SOAPParameter::GetBoolean() const
 float
 SOAPParameter::GetFloat() const
 {
+	if (IsNull())
+		throw SOAPException("Cannot convert null value to float.");
+
 	return GetDouble();
 }
 
 double
 SOAPParameter::GetDouble() const
 {
+	if (IsNull())
+		throw SOAPException("Cannot convert null value to double.");
+
 	if (m_strval == "INF")
 		return HUGE_VAL;
 	else if (m_strval == "-INF")

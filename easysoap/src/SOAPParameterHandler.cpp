@@ -165,6 +165,7 @@ SOAPParameterHandler::endElement(const XML_Char *name)
 {
 	if (m_setvalue)
 	{
+		m_param->SetNull(false);
 		m_param->m_strval = m_str;
 	}
 }
