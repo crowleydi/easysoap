@@ -299,16 +299,24 @@ SOAPParameter::GetDouble() const
 	return ret;
 }
 
-const SOAPParameter&
-SOAPParameter::GetParameter(const char *name) const
+const SOAPParameter*
+SOAPParameter::FindParameter(const char *name) const
 {
 	CheckStructSync();
 	Struct::Iterator i = m_dataPtr->m_struct.Find(name);
 	if (!i)
-		throw SOAPException("Could not find element by name: %s", name);
-	return **i;
+		return 0;
+	return *i;
 }
 
+const SOAPParameter&
+SOAPParameter::GetParameter(const char *name) const
+{
+	const SOAPParameter *p = FindParameter(name);
+	if (!p)
+		throw SOAPException("Could not find element by name: %s", name);
+	return *p;
+}
 
 SOAPParameter&
 SOAPParameter::AddParameter(const char *name, const char *ns)

@@ -111,6 +111,7 @@ public:
 	SOAPParameter& AddParameter(const SOAPQName& name);
 	SOAPParameter& AddParameter(const SOAPParameter& p);
 
+	const SOAPParameter* FindParameter(const char *) const;
 	const SOAPParameter& GetParameter(const char *) const;
 	const SOAPParameter& GetParameter(size_t i) const
 	{
