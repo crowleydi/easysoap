@@ -30,6 +30,7 @@
 #include <easysoap/SOAP.h>
 #include <easysoap/SOAPonHTTP.h>
 #include <easysoap/SOAPDebugger.h>
+#include <easysoap/SOAPSSLContext.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -125,12 +126,14 @@ int main(int argc, char* argv[])
 		SOAPDebugger::SetFile("./soapdebug.log");
 		SOAPDebugger::SetMessageLevel(5);
 		SOAPDebugger::Print(3, "Keyfile: %s\n", keyfile.Str());
-
-		SOAPonHTTP http;
-		SOAPProxy proxy(&http);
-
+		
+		SOAPSSLContext *ctx=0;
 		if (argc > 2) 
-			http.SetCertificateInfo(keyfile.Str(), password.Str());
+			ctx = new SOAPSSLContext(argv[3], argv[3], argv[4]);
+		SOAPonHTTP http;
+		if (ctx)
+			http.SetContext(*ctx);
+		SOAPProxy proxy(&http);
 
 		http.ConnectTo(SOAPUrl(endpoint));
 
@@ -146,6 +149,7 @@ int main(int argc, char* argv[])
 			fprintf(stderr, "%s : %s\n", SSLEnvVars[i], tmp.Str());
 			++i;
 		}
+		delete ctx;
 	} catch(SOAPException &e) {
 		fprintf(stderr, "SOAPFault: %s", e.What().Str());
 	}
