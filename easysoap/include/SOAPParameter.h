@@ -28,8 +28,8 @@
 #endif // _MSC_VER
 
 #include <SOAP.h>
-#include <SOAPBase64.h>
 #include <SOAPNamespaces.h>
+#include <SOAPPool.h>
 
 class SOAPParameterHandler;
 
@@ -128,10 +128,6 @@ public:
 	bool WriteSOAPPacket(SOAPPacketWriter& packet) const;
 
 private:
-	SOAPParameter *GetNewParam();
-	SOAPParameter *GetNewParam(const SOAPParameter& param);
-	void PutBackParam(SOAPParameter*& param);
-
 	void SetParent(SOAPParameter *parent) {m_parent = parent;}
 	void Assign(const SOAPParameter&);
 	void CheckStructSync() const;
@@ -142,7 +138,7 @@ private:
 	bool			m_isstruct;	// true for array, struct types
 	SOAPString		m_strval;	// value legal only if m_isstruct == false
 
-	Array			m_pool;
+	SOAPPool<SOAPParameter>	m_pool;
 	Array			m_array;
 	Attrs			m_attrs;
 	mutable Struct	m_struct;
