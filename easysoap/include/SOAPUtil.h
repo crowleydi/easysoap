@@ -145,6 +145,20 @@ sp_strstr(const char *haystack, const char *needle)
 	return 0;
 }
 
+inline bool
+sp_isspace(char c)
+{
+	switch (c)
+	{
+	case '\r':
+	case '\n':
+	case '\t':
+	case ' ':
+		return true;
+	}
+	return false;
+}
+
 inline char*
 sp_strchr(const char *s, char c)
 {
