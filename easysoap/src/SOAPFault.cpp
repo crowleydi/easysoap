@@ -50,26 +50,37 @@ SOAPFault::WriteSOAPPacket(SOAPPacketWriter& packet) const
 	return true;
 }
 
-const SOAPParameter&
+const SOAPParameter*
 SOAPFault::GetFaultCode() const
 {
-	return m_params[faultcode_attr];
+	Struct::Iterator i = m_params.Find(faultcode_attr);
+	if (i)
+		return *i;
+	return 0;
 }
 
-const SOAPParameter&
+const SOAPParameter*
 SOAPFault::GetFaultString() const
-{
-	return m_params[faultstring_attr];
+{	Struct::Iterator i = m_params.Find(faultstring_attr);
+	if (i)
+		return *i;
+	return 0;
 }
 
-const SOAPParameter&
+const SOAPParameter*
 SOAPFault::GetFaultActor() const
 {
-	return m_params[faultactor_attr];
+	Struct::Iterator i = m_params.Find(faultactor_attr);
+	if (i)
+		return *i;
+	return 0;
 }
 
-const SOAPParameter&
+const SOAPParameter*
 SOAPFault::GetDetail() const
 {
-	return m_params[faultdetail_attr];
+	Struct::Iterator i = m_params.Find(faultdetail_attr);
+	if (i)
+		return *i;
+	return 0;
 }

@@ -26,7 +26,7 @@
 
 class SOAPFaultHandler;
 
-class EASYSOAP_EXPORT SOAPFault
+class EASYSOAP_EXPORT SOAPFault : protected SOAPParameter
 {
 public:
 	friend class SOAPFaultHandler;
@@ -44,29 +44,26 @@ public:
 		SetFaultValue(faultstring_attr, faultstring);
 	}
 
+	/*  This is incorrect
 	void SetDetail(const char *detail)
 	{
 		SetFaultValue(faultdetail_attr, detail);
 	}
+	*/
 
 	void SetFaultActor(const char *faultactor)
 	{
 		SetFaultValue(faultactor_attr, faultactor);
 	}
 
-	const SOAPParameter& GetFaultString() const;
-	const SOAPParameter& GetFaultActor() const;
-	const SOAPParameter& GetFaultCode() const;
-	const SOAPParameter& GetDetail() const;
+	const SOAPParameter* GetFaultString() const;
+	const SOAPParameter* GetFaultActor() const;
+	const SOAPParameter* GetFaultCode() const;
+	const SOAPParameter* GetDetail() const;
 
 	bool WriteSOAPPacket(SOAPPacketWriter& packet) const;
 
 private:
-
-	SOAPParameter& AddParameter(const char *name)
-	{
-		return m_params[name];
-	}
 
 	void SetFaultValue(const char *param, const char *value)
 	{
@@ -78,7 +75,7 @@ private:
 	static const char *faultactor_attr;
 	static const char *faultdetail_attr;
 
-	mutable SOAPParameter::Struct	m_params;
+	SOAPParameter::Struct	m_params;
 };
 
 #endif // !defined(AFX_SOAPFAULT_H__290FC204_F572_4249_8E5E_D52E987FFAD0__INCLUDED_)
