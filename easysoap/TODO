@@ -23,6 +23,13 @@ In order of how hard I think they are:
 
 *	Improve the existing HTTP/HTTPS transports.
 
+*	Create a factory class for handing out transports.  Set things up
+	so a transport can be registered for a specific protocol.
+	
+*	SOAPUrl might need to keep protocol around as a string instead of
+	an enum to help the factory.  Need to get the full URL back as a
+	string as well as a partial URL containing only "proto://hostname."
+
 *	Need to be able to specify different encodingStyle (see
 	SOAPEnvelope::WriteSoapPacket())
 
