@@ -41,9 +41,6 @@ struct SOAPStruct
 			varFloat != other.varFloat ||
 			varString != other.varString;
 	}
-
-	static const char *soap_name;
-	static const char *soap_namespace;
 };
 
 struct SOAPStructStruct
@@ -68,9 +65,6 @@ struct SOAPStructStruct
 			varFloat != other.varFloat ||
 			varStruct != other.varStruct;
 	}
-
-	static const char *soap_name;
-	static const char *soap_namespace;
 };
 
 struct SOAPArrayStruct
@@ -95,94 +89,85 @@ struct SOAPArrayStruct
 			varFloat != other.varFloat ||
 			varArray != other.varArray;
 	}
-
-	static const char *soap_name;
-	static const char *soap_namespace;
 };
 
-const char *SOAPStruct::soap_name = "SOAPStruct";
-const char *SOAPStruct::soap_namespace = "http://soapinterop.org/xsd";
-const char *SOAPStructStruct::soap_name = "SOAPStructStruct";
-const char *SOAPStructStruct::soap_namespace = "http://soapinterop.org/xsd";
-const char *SOAPArrayStruct::soap_name = "SOAPArrayStruct";
-const char *SOAPArrayStruct::soap_namespace = "http://soapinterop.org/xsd";
-
-
-//
-//  Define how we serialize the structs
-inline SOAPParameter&
-operator<<(SOAPParameter& param, const SOAPStruct& val)
+class SOAPTypeTraits<SOAPStruct>
 {
-	param.SetType(val.soap_name, val.soap_namespace);
-	param.SetIsStruct();
+public:
+	void GetType(SOAPQName& qname)
+	{
+		qname.Set("SOAPStruct", "http://soapinterop.org/xsd");
+	}
 
-	param.AddParameter("varString") << val.varString;
-	param.AddParameter("varInt") << val.varInt;
-	param.AddParameter("varFloat") << val.varFloat;
+	void Serialize(SOAPParameter& param, const SOAPStruct& val)
+	{
+		param.AddParameter("varString") << val.varString;
+		param.AddParameter("varInt") << val.varInt;
+		param.AddParameter("varFloat") << val.varFloat;
+	}
 
-	return param;
-}
+	void Deserialize(const SOAPParameter& param, SOAPStruct& val)
+	{
+		param.GetParameter("varString") >> val.varString;
+		param.GetParameter("varInt") >> val.varInt;
+		param.GetParameter("varFloat") >> val.varFloat;
+	}
+};
 
-inline SOAPParameter&
-operator<<(SOAPParameter& param, const SOAPStructStruct& val)
+class SOAPTypeTraits< SOAPArray<SOAPStruct> > : public SOAPArrayTypeTraits
 {
-	param.SetType(val.soap_name, val.soap_namespace);
-	param.SetIsStruct();
+};
 
-	param.AddParameter("varString") << val.varString;
-	param.AddParameter("varInt") << val.varInt;
-	param.AddParameter("varFloat") << val.varFloat;
-	param.AddParameter("varStruct") << val.varStruct;
-
-	return param;
-}
-
-inline SOAPParameter&
-operator<<(SOAPParameter& param, const SOAPArrayStruct& val)
+class SOAPTypeTraits<SOAPStructStruct>
 {
-	param.SetType(val.soap_name, val.soap_namespace);
-	param.SetIsStruct();
+public:
+	void GetType(SOAPQName& qname)
+	{
+		qname.Set("SOAPStructStruct", "http://soapinterop.org/xsd");
+	}
 
-	param.AddParameter("varString") << val.varString;
-	param.AddParameter("varInt") << val.varInt;
-	param.AddParameter("varFloat") << val.varFloat;
-	param.AddParameter("varArray") << val.varArray;
+	void Serialize(SOAPParameter& param, const SOAPStructStruct& val)
+	{
+		param.AddParameter("varString") << val.varString;
+		param.AddParameter("varInt") << val.varInt;
+		param.AddParameter("varFloat") << val.varFloat;
+		param.AddParameter("varStruct") << val.varStruct;
+	}
 
-	return param;
-}
+	void Deserialize(const SOAPParameter& param, SOAPStructStruct& val)
+	{
+		param.GetParameter("varString") >> val.varString;
+		param.GetParameter("varInt") >> val.varInt;
+		param.GetParameter("varFloat") >> val.varFloat;
+		param.GetParameter("varStruct") >> val.varStruct;
+	}
+};
 
-//
-// Define how we de-serialize the structs
-inline const SOAPParameter&
-operator>>(const SOAPParameter& param, SOAPStruct& val)
+
+class SOAPTypeTraits<SOAPArrayStruct>
 {
-	param.GetParameter("varString") >> val.varString;
-	param.GetParameter("varInt") >> val.varInt;
-	param.GetParameter("varFloat") >> val.varFloat;
+public:
+	void GetType(SOAPQName& qname)
+	{
+		qname.Set("SOAPArrayStruct", "http://soapinterop.org/xsd");
+	}
 
-	return param;
-}
+	void Serialize(SOAPParameter& param, const SOAPArrayStruct& val)
+	{
+		param.AddParameter("varString") << val.varString;
+		param.AddParameter("varInt") << val.varInt;
+		param.AddParameter("varFloat") << val.varFloat;
+		param.AddParameter("varArray") << val.varArray;
+	}
 
-inline const SOAPParameter&
-operator>>(const SOAPParameter& param, SOAPStructStruct& val)
-{
-	param.GetParameter("varString") >> val.varString;
-	param.GetParameter("varInt") >> val.varInt;
-	param.GetParameter("varFloat") >> val.varFloat;
-	param.GetParameter("varStruct") >> val.varStruct;
+	void Deserialize(const SOAPParameter& param, SOAPArrayStruct& val)
+	{
+		param.GetParameter("varString") >> val.varString;
+		param.GetParameter("varInt") >> val.varInt;
+		param.GetParameter("varFloat") >> val.varFloat;
+		param.GetParameter("varArray") >> val.varArray;
+	}
+};
 
-	return param;
-}
-
-inline const SOAPParameter&
-operator>>(const SOAPParameter& param, SOAPArrayStruct& val)
-{
-	param.GetParameter("varString") >> val.varString;
-	param.GetParameter("varInt") >> val.varInt;
-	param.GetParameter("varFloat") >> val.varFloat;
-	param.GetParameter("varArray") >> val.varArray;
-
-	return param;
-}
 
 
