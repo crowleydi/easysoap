@@ -101,6 +101,13 @@ public:
 		Empty();
 	}
 
+	T& Add()
+	{
+		size_t len = Size();
+		Resize(len + 1);
+		return m_array[len];
+	}
+
 	template <typename X>
 	T& Add(const X& val)
 	{
@@ -240,6 +247,23 @@ public:
 	const T& operator[](size_t index) const
 	{
 		return m_array[index];
+	}
+
+	template<typename X>
+	bool operator==(const SOAPArray<X>& x)
+	{
+		if (m_size != x.m_size)
+			return false;
+		for (size_t i = 0; i < m_size; ++i)
+			if (m_array[i] != x[i])
+				return false;
+		return true;
+	}
+
+	template<typename X>
+	bool operator!=(const SOAPArray<X>& x)
+	{
+		return !(*this == x);
 	}
 };
 
