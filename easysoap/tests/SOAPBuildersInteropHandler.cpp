@@ -45,6 +45,9 @@ SOAPBuildersInteropHandler::SOAPBuildersInteropHandler()
 	DispatchMethod("echoBase64",	interop_namespace,
 		&SOAPBuildersInteropHandler::echoBase64);
 
+	DispatchMethod("echoHexBinary",	interop_namespace,
+		&SOAPBuildersInteropHandler::echoHexBinary);
+
 	DispatchMethod("echoDate",	interop_namespace,
 		&SOAPBuildersInteropHandler::echoDate);
 
@@ -70,6 +73,11 @@ SOAPBuildersInteropHandler::SOAPBuildersInteropHandler()
 
 	DispatchMethod("echoNestedArray",	interop_namespace,
 		&SOAPBuildersInteropHandler::echoNestedArray);
+
+	//
+	// Miscellaneous methods
+	DispatchMethod("echoMap",	interop_namespace,
+		&SOAPBuildersInteropHandler::echoMap);
 }
 
 SOAPBuildersInteropHandler::~SOAPBuildersInteropHandler()
@@ -169,8 +177,18 @@ SOAPBuildersInteropHandler::echoBase64(const SOAPMethod& req, SOAPMethod& resp)
 {
 	SOAPArray<char> val;
 
-	req.GetParameter("inputBase64") >> val;
-	resp.AddParameter("return") << val;
+	req.GetParameter("inputBase64") >> SOAPBase64(val);
+	resp.AddParameter("return") << SOAPBase64(val);
+}
+
+
+void
+SOAPBuildersInteropHandler::echoHexBinary(const SOAPMethod& req, SOAPMethod& resp)
+{
+	SOAPArray<char> val;
+
+	req.GetParameter("inputHexBinary") >> SOAPHex(val);
+	resp.AddParameter("return") << SOAPHex(val);
 }
 
 
@@ -233,7 +251,7 @@ SOAPBuildersInteropHandler::echoSimpleTypesAsStruct(const SOAPMethod& req, SOAPM
 void
 SOAPBuildersInteropHandler::echo2DStringArray(const SOAPMethod& req, SOAPMethod& resp)
 {
-	SOAPArray< SOAPArray<SOAPString> > val;
+	SOAP2DArray< SOAPString > val;
 	req.GetParameter("input2DStringArray") >> val;
 	resp.AddParameter("return") << val;
 }
@@ -253,6 +271,20 @@ SOAPBuildersInteropHandler::echoNestedArray(const SOAPMethod& req, SOAPMethod& r
 {
 	SOAPArrayStruct val;
 	req.GetParameter("inputStruct") >> val;
+	resp.AddParameter("return") << val;
+}
+
+
+class SOAPTypeTraits< SOAPHashMap<SOAPString, int> > : public SOAPMapTypeTraits
+{
+};
+
+
+void
+SOAPBuildersInteropHandler::echoMap(const SOAPMethod& req, SOAPMethod& resp)
+{
+	SOAPHashMap<SOAPString, int> val;
+	req.GetParameter((int)0) >> val;
 	resp.AddParameter("return") << val;
 }
 

@@ -34,6 +34,7 @@ public:
 	void echoStructArray(const SOAPMethod& req, SOAPMethod& response);
 	void echoVoid(const SOAPMethod& req, SOAPMethod& response);
 	void echoBase64(const SOAPMethod& req, SOAPMethod& response);
+	void echoHexBinary(const SOAPMethod& req, SOAPMethod& response);
 	void echoDate(const SOAPMethod& req, SOAPMethod& response);
 	void echoDecimal(const SOAPMethod& req, SOAPMethod& response);
 	void echoBoolean(const SOAPMethod& req, SOAPMethod& response);
@@ -45,6 +46,10 @@ public:
 	void echo2DStringArray(const SOAPMethod& req, SOAPMethod& response);
 	void echoNestedStruct(const SOAPMethod& req, SOAPMethod& response);
 	void echoNestedArray(const SOAPMethod& req, SOAPMethod& response);
+
+	//
+	// Miscellaneous methods..
+	void echoMap(const SOAPMethod& req, SOAPMethod& response);
 };
 
 #endif // !defined(AFX_SOAPBUILDERSINTEROPHANDLER_H__C0C1D23F_D31D_4118_BB27_C85AB1FA7645__INCLUDED_)
