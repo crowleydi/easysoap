@@ -99,10 +99,10 @@ SOAPServerDispatch::WriteFault(const SOAPFault& fault)
 
 
 
-int
+bool
 SOAPServerDispatch::Handle(SOAPServerTransport& trans)
 {
-	int retval = 0;
+	bool retval = false;
 	const char *serverfault = "SOAP-ENV:Server";
 	const char *clientfault = "SOAP-ENV:Client";
 	const char *faultcode = serverfault;
@@ -156,17 +156,16 @@ SOAPServerDispatch::Handle(SOAPServerTransport& trans)
 		m_transport->Write(m_response.GetBody().GetMethod(),
 			m_writer.GetBytes(),
 			m_writer.GetLength());
+
+		retval = true;
 	}
 	catch(SOAPFault& fault)
 	{
-		retval = -1;
 		HandleFault(fault);
 		WriteFault(fault);
 	}
 	catch(SOAPMustUnderstandException& mux)
 	{
-		retval = -1;
-
 		SOAPFault fault;
 		fault.SetFaultString(mux.What());
 		fault.SetFaultCode("SOAP-ENV:MustUnderstand");
@@ -176,8 +175,6 @@ SOAPServerDispatch::Handle(SOAPServerTransport& trans)
 	}
 	catch(SOAPException& sex)
 	{
-		retval = -1;
-
 		SOAPFault fault;
 		fault.SetFaultString(sex.What());
 		fault.SetFaultCode(faultcode);
@@ -187,8 +184,6 @@ SOAPServerDispatch::Handle(SOAPServerTransport& trans)
 	}
 	catch (...)
 	{
-		retval = -1;
-
 		SOAPFault fault;
 		fault.SetFaultString("Serious error occured.");
 		fault.SetFaultCode(serverfault);

@@ -28,9 +28,9 @@
 #include <easysoap/SOAPMethod.h>
 #include <easysoap/SOAPEnvelope.h>
 #include <easysoap/SOAPResponse.h>
-#include <easysoap/SOAPPacketWriter.h>
 #include <easysoap/SOAPParse.h>
 #include <easysoap/SOAPUrl.h>
+#include <easysoap/XMLComposer.h>
 
 BEGIN_EASYSOAP_NAMESPACE
 
@@ -108,7 +108,7 @@ private:
 
 	SOAPEnvelope		m_message;
 	SOAPResponse		m_response;
-	SOAPPacketWriter	m_packet;
+	XMLComposer			m_packet;
 	SOAPParser			m_parser;
 	SOAPTransport		*m_transport;
 	bool				m_deltrans;

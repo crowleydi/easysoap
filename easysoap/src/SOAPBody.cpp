@@ -26,7 +26,7 @@
 
 #include <easysoap/SOAP.h>
 #include <easysoap/SOAPBody.h>
-#include <easysoap/SOAPPacketWriter.h>
+#include <easysoap/XMLComposer.h>
 #include <easysoap/SOAPNamespaces.h>
 
 USING_EASYSOAP_NAMESPACE
@@ -67,7 +67,7 @@ SOAPBody::AddParameter()
 }
 
 bool
-SOAPBody::WriteSOAPPacket(SOAPPacketWriter& packet) const
+SOAPBody::WriteSOAPPacket(XMLComposer& packet) const
 {
 	packet.StartTag(SOAPEnv::Body);
 

@@ -55,7 +55,7 @@ public:
 		return m_headers;
 	}
 
-	bool WriteSOAPPacket(SOAPPacketWriter& packet) const;
+	bool WriteSOAPPacket(XMLComposer& packet) const;
 
 	static const char *actorNext;
 private:

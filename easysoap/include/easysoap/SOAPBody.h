@@ -45,7 +45,7 @@ public:
 
 	bool IsFault() const					{return m_isfault;}
 	void SetIsFault(bool isfault = true)	{m_isfault = isfault;}
-	bool WriteSOAPPacket(SOAPPacketWriter& packet) const;
+	bool WriteSOAPPacket(XMLComposer& packet) const;
 
 	void Reset();
 

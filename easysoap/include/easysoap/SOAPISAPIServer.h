@@ -28,23 +28,6 @@
 
 BEGIN_EASYSOAP_NAMESPACE
 
-class EASYSOAP_EXPORT SOAPISAPIServer : public SOAPServer<SOAPISAPIServer>
-{
-public:
-	SOAPISAPIServer() : m_ioport(NULL) {}
-	SOAPISAPIServer(HANDLE ioport) : m_ioport(ioport) {}
-
-	int Handle();
-	int Handle(EXTENSION_CONTROL_BLOCK *pECB);
-
-private:
-
-	SOAPISAPIServer(const SOAPISAPIServer&);
-	SOAPISAPIServer& operator=(const SOAPISAPIServer&);
-
-	HANDLE				m_ioport;
-};
-
 class EASYSOAP_EXPORT SOAPISAPIImpersonateUser
 {
 public:
@@ -56,6 +39,60 @@ private:
 	SOAPISAPIImpersonateUser& operator=(const SOAPISAPIImpersonateUser&);
 
 	EXTENSION_CONTROL_BLOCK	*m_ecb;
+};
+
+class EASYSOAP_EXPORT SOAPISAPITransport : public SOAPServerTransport
+{
+public:
+	SOAPISAPITransport();
+	~SOAPISAPITransport();
+
+	void Initialize(EXTENSION_CONTROL_BLOCK* pECB);
+	const char *GetServerInfo(const char *property);
+	void NoContentType() {m_doContentType = false;}
+	void AddHeader(const char *name, const char *value);
+	size_t Write(const char *payload, size_t payloadsize);
+
+	void SetError();
+	const char *GetCharset() const;
+	const char *GetContentType() const;
+	const char *GetSoapAction() const;
+	size_t Read(char *buffer, size_t buffsize);
+	size_t Write(const SOAPMethod& method, const char *payload, size_t payloadsize);
+
+private:
+	SOAPISAPITransport(const SOAPISAPITransport&);
+	SOAPISAPITransport& operator=(const SOAPISAPITransport&);
+
+	EXTENSION_CONTROL_BLOCK*	m_ecb;
+	const unsigned char *		m_ecbData;
+	bool						m_error;
+	size_t						m_leftRead;
+	SOAPString					m_charset;
+	SOAPString					m_contentType;
+	SOAPString					m_soapaction;
+	SOAPArray<char>				m_buffer;
+	SOAPArray<char>				m_headers;
+	bool						m_doContentType;
+};
+
+class EASYSOAP_EXPORT SOAPISAPIServer : public SOAPServer<SOAPISAPIServer>
+{
+public:
+	SOAPISAPIServer() : m_ioport(NULL) {}
+	SOAPISAPIServer(HANDLE ioport) : m_ioport(ioport) {}
+
+	//
+	// returns false if an error occurred
+	bool Handle(SOAPISAPITransport& trans);
+	int Handle();
+
+private:
+
+	SOAPISAPIServer(const SOAPISAPIServer&);
+	SOAPISAPIServer& operator=(const SOAPISAPIServer&);
+
+	HANDLE				m_ioport;
 };
 
 END_EASYSOAP_NAMESPACE

@@ -26,7 +26,7 @@
 
 #include <easysoap/SOAP.h>
 #include <easysoap/SOAPMethod.h>
-#include <easysoap/SOAPPacketWriter.h>
+#include <easysoap/XMLComposer.h>
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -68,7 +68,7 @@ SOAPMethod::SetSoapAction(const char *sa, bool appendName)
 }
 
 bool
-SOAPMethod::WriteSOAPPacket(SOAPPacketWriter& packet) const
+SOAPMethod::WriteSOAPPacket(XMLComposer& packet) const
 {
 	packet.StartTag(GetName(), "m");
 

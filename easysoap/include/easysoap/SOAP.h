@@ -39,7 +39,7 @@
 
 BEGIN_EASYSOAP_NAMESPACE
 
-class SOAPPacketWriter;
+class XMLComposer;
 
 END_EASYSOAP_NAMESPACE
 

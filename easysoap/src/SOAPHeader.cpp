@@ -113,7 +113,7 @@ SOAPHeader::Sync() const
 }
 
 bool
-SOAPHeader::WriteSOAPPacket(SOAPPacketWriter& packet) const
+SOAPHeader::WriteSOAPPacket(XMLComposer& packet) const
 {
 	if (m_headers.Size() > 0)
 	{

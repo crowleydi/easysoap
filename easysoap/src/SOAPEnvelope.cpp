@@ -27,7 +27,7 @@
 #include <easysoap/SOAP.h>
 #include <easysoap/SOAPEnvelope.h>
 #include <easysoap/SOAPNamespaces.h>
-#include <easysoap/SOAPPacketWriter.h>
+#include <easysoap/XMLComposer.h>
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -46,7 +46,7 @@ SOAPEnvelope::~SOAPEnvelope()
 }
 
 bool
-SOAPEnvelope::WriteSOAPPacket(SOAPPacketWriter& packet) const
+SOAPEnvelope::WriteSOAPPacket(XMLComposer& packet) const
 {
 	packet.Reset();
 	packet.StartTag(SOAPEnv::Envelope, "E");

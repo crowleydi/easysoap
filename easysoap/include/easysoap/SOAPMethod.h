@@ -51,7 +51,7 @@ public:
 		return m_action;
 	}
 
-	bool WriteSOAPPacket(SOAPPacketWriter& packet) const;
+	bool WriteSOAPPacket(XMLComposer& packet) const;
 private:
 
 	SOAPString				m_action;

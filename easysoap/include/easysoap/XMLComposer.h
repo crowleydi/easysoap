@@ -20,23 +20,26 @@
  */
 
 
-#if !defined(AFX_SOAPPACKETWRITER_H__DB61E902_B4A0_4AA3_A0F7_479D6295BD06__INCLUDED_)
-#define AFX_SOAPPACKETWRITER_H__DB61E902_B4A0_4AA3_A0F7_479D6295BD06__INCLUDED_
+#if !defined(AFX_XMLCOMPOSER_H__DB61E902_B4A0_4AA3_A0F7_479D6295BD06__INCLUDED_)
+#define AFX_XMLCOMPOSER_H__DB61E902_B4A0_4AA3_A0F7_479D6295BD06__INCLUDED_
 
 #include <easysoap/SOAPHashMap.h>
 #include <easysoap/SOAPString.h>
 
 BEGIN_EASYSOAP_NAMESPACE
 
-class EASYSOAP_EXPORT SOAPPacketWriter  
+class EASYSOAP_EXPORT XMLComposer  
 {
 public:
-	SOAPPacketWriter();
-	virtual ~SOAPPacketWriter();
-	void Reset();
+	XMLComposer();
+	virtual ~XMLComposer();
+	void Reset(bool addDecl = false);
 
 	const char * GetBytes();
 	unsigned int GetLength();
+
+	void StartPI(const char *name);
+	void EndPI();
 
 	void StartTag(const char *tag);
 	void StartTag(const SOAPQName& tag, const char *prefix = 0);
@@ -55,8 +58,8 @@ public:
 	static void SetAddWhiteSpace(bool ws = true);
 
 private:
-	SOAPPacketWriter(const SOAPPacketWriter&);
-	SOAPPacketWriter& operator=(const SOAPPacketWriter&);
+	XMLComposer(const XMLComposer&);
+	XMLComposer& operator=(const XMLComposer&);
 
 	const char *GetSymbol(char *buff, const char *prefix);
 	void EndStart();
@@ -94,5 +97,5 @@ private:
 
 END_EASYSOAP_NAMESPACE
 
-#endif // !defined(AFX_SOAPPACKETWRITER_H__DB61E902_B4A0_4AA3_A0F7_479D6295BD06__INCLUDED_)
+#endif // !defined(AFX_XMLCOMPOSER_H__DB61E902_B4A0_4AA3_A0F7_479D6295BD06__INCLUDED_)
 

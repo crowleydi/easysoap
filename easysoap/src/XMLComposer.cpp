@@ -21,13 +21,13 @@
 
 
 #include <easysoap/SOAP.h>
-#include <easysoap/SOAPPacketWriter.h>
+#include <easysoap/XMLComposer.h>
 
 USING_EASYSOAP_NAMESPACE
 
-bool SOAPPacketWriter::g_makePretty = false;
+bool XMLComposer::g_makePretty = false;
 
-SOAPPacketWriter::SOAPPacketWriter()
+XMLComposer::XMLComposer()
 : m_instart(false)
 , m_buffer(0)
 , m_buffptr(0)
@@ -38,19 +38,19 @@ SOAPPacketWriter::SOAPPacketWriter()
 {
 }
 
-SOAPPacketWriter::~SOAPPacketWriter()
+XMLComposer::~XMLComposer()
 {
 	delete [] m_buffer;
 }
 
 void
-SOAPPacketWriter::SetAddWhiteSpace(bool ws)
+XMLComposer::SetAddWhiteSpace(bool ws)
 {
 	g_makePretty = ws;
 }
 
 const char *
-SOAPPacketWriter::GetSymbol(char *buff, const char *prefix)
+XMLComposer::GetSymbol(char *buff, const char *prefix)
 {
 	// A bit dangerious here...
 	sprintf(buff, "%s%d", prefix, ++m_gensym);
@@ -58,7 +58,7 @@ SOAPPacketWriter::GetSymbol(char *buff, const char *prefix)
 }
 
 void
-SOAPPacketWriter::Reset()
+XMLComposer::Reset(bool addDecl)
 {
 	m_gensym = 0;
 	m_level = 0;
@@ -66,23 +66,49 @@ SOAPPacketWriter::Reset()
 	m_buffptr = m_buffer;
 	m_nsmap.Clear();
 	m_nsarray.Resize(0);
+
+	if (addDecl)
+	{
+		StartPI("xml");
+		AddAttr("version", "1.0");
+		AddAttr("encoding", "UTF-8");
+		EndPI();
+	}
 }
 
 const char *
-SOAPPacketWriter::GetBytes()
+XMLComposer::GetBytes()
 {
 	*m_buffptr = 0;
 	return m_buffer;
 }
 
 unsigned int
-SOAPPacketWriter::GetLength()
+XMLComposer::GetLength()
 {
 	return m_buffptr - m_buffer;
 }
 
 void
-SOAPPacketWriter::StartTag(const char *tag)
+XMLComposer::StartPI(const char *tag)
+{
+	EndStart();
+	Write("<?");
+	Write(tag);
+	m_instart = true;
+}
+
+void
+XMLComposer::EndPI()
+{
+	Write("?>");
+	if (g_makePretty)
+		Write("\r\n");
+	m_instart = false;
+}
+
+void
+XMLComposer::StartTag(const char *tag)
 {
 	PushLevel();
 
@@ -93,7 +119,7 @@ SOAPPacketWriter::StartTag(const char *tag)
 }
 
 void
-SOAPPacketWriter::StartTag(const SOAPQName& tag, const char *prefix)
+XMLComposer::StartTag(const SOAPQName& tag, const char *prefix)
 {
 	const char *nsprefix = 0;
 	bool addxmlns = false;
@@ -138,7 +164,7 @@ SOAPPacketWriter::StartTag(const SOAPQName& tag, const char *prefix)
 }
 
 void
-SOAPPacketWriter::AddAttr(const SOAPQName& tag, const char *value)
+XMLComposer::AddAttr(const SOAPQName& tag, const char *value)
 {
 	const char *nsprefix = 0;
 	bool addxmlns = false;
@@ -179,7 +205,7 @@ SOAPPacketWriter::AddAttr(const SOAPQName& tag, const char *value)
 }
 
 void
-SOAPPacketWriter::AddAttr(const SOAPQName& tag, const SOAPQName& value)
+XMLComposer::AddAttr(const SOAPQName& tag, const SOAPQName& value)
 {
 	const char *tnsprefix;
 	const char *vnsprefix = 0;
@@ -248,7 +274,7 @@ SOAPPacketWriter::AddAttr(const SOAPQName& tag, const SOAPQName& value)
 }
 
 void
-SOAPPacketWriter::AddAttr(const char *attr, const char *value)
+XMLComposer::AddAttr(const char *attr, const char *value)
 {
 	if (!m_instart)
 		throw SOAPException("XML serialization error.  Adding attribute when not in start tag.");
@@ -265,7 +291,7 @@ SOAPPacketWriter::AddAttr(const char *attr, const char *value)
 }
 
 void
-SOAPPacketWriter::AddXMLNS(const char *prefix, const char *ns)
+XMLComposer::AddXMLNS(const char *prefix, const char *ns)
 {
 	NamespaceMap::Iterator i = m_nsmap.Find(ns);
 	if (!i)
@@ -295,7 +321,7 @@ SOAPPacketWriter::AddXMLNS(const char *prefix, const char *ns)
 }
 
 void
-SOAPPacketWriter::EndTag(const char *tag)
+XMLComposer::EndTag(const char *tag)
 {
 	if (m_instart)
 	{
@@ -317,7 +343,7 @@ SOAPPacketWriter::EndTag(const char *tag)
 }
 
 void
-SOAPPacketWriter::EndTag(const SOAPQName& tag)
+XMLComposer::EndTag(const SOAPQName& tag)
 {
 	if (tag.GetNamespace().IsEmpty())
 	{
@@ -357,7 +383,7 @@ SOAPPacketWriter::EndTag(const SOAPQName& tag)
 }
 
 void
-SOAPPacketWriter::WriteValue(const char *val)
+XMLComposer::WriteValue(const char *val)
 {
 	if (m_instart)
 	{
@@ -368,7 +394,7 @@ SOAPPacketWriter::WriteValue(const char *val)
 }
 
 void
-SOAPPacketWriter::EndStart()
+XMLComposer::EndStart()
 {
 	if (m_instart)
 	{
@@ -380,7 +406,7 @@ SOAPPacketWriter::EndStart()
 }
 
 void
-SOAPPacketWriter::Resize()
+XMLComposer::Resize()
 {
 	m_buffsize *= 2;
 	if (m_buffsize == 0)
@@ -399,7 +425,7 @@ SOAPPacketWriter::Resize()
 }
 
 void
-SOAPPacketWriter::Write(const char *str)
+XMLComposer::Write(const char *str)
 {
 	if (str)
 	{
@@ -414,7 +440,7 @@ SOAPPacketWriter::Write(const char *str)
 }
 
 void
-SOAPPacketWriter::WriteEscaped(const char *str)
+XMLComposer::WriteEscaped(const char *str)
 {
 	if (str)
 	{
@@ -443,7 +469,7 @@ SOAPPacketWriter::WriteEscaped(const char *str)
 }
 
 void
-SOAPPacketWriter::Write(const char *str, unsigned int len)
+XMLComposer::Write(const char *str, unsigned int len)
 {
 	const char *strend = str + len;
 	while (str != strend)
@@ -455,7 +481,7 @@ SOAPPacketWriter::Write(const char *str, unsigned int len)
 }
 
 void
-SOAPPacketWriter::PopLevel()
+XMLComposer::PopLevel()
 {
 	for (NamespaceArray::Iterator i = m_nsarray.End(); i != m_nsarray.Begin();)
 	{
@@ -469,7 +495,7 @@ SOAPPacketWriter::PopLevel()
 }
 
 void
-SOAPPacketWriter::PushLevel()
+XMLComposer::PushLevel()
 {
 	++m_level;
 }

@@ -27,7 +27,7 @@
 #include <easysoap/SOAP.h>
 #include <easysoap/SOAPParameter.h>
 #include <easysoap/SOAPNamespaces.h>
-#include <easysoap/SOAPPacketWriter.h>
+#include <easysoap/XMLComposer.h>
 
 USING_EASYSOAP_NAMESPACE
 
@@ -364,7 +364,7 @@ SOAPParameter::CheckStructSync() const
 }
 
 bool
-SOAPParameter::WriteSOAPPacket(SOAPPacketWriter& packet) const
+SOAPParameter::WriteSOAPPacket(XMLComposer& packet) const
 {
 	packet.StartTag(m_name);
 

@@ -30,7 +30,9 @@ class EASYSOAP_EXPORT SOAPCGIServer : public SOAPServer<SOAPCGIServer>
 {
 public:
 	SOAPCGIServer() {}
-	int Handle(const char *infile = 0);
+	//
+	// returns false if an error occurred
+	bool Handle(const char *infile = 0);
 
 private:
 

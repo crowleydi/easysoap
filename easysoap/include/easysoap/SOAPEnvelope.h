@@ -42,7 +42,7 @@ public:
 	SOAPBody&			GetBody()			{return m_body;}
 	const SOAPBody&		GetBody() const		{return m_body;}
 
-	bool WriteSOAPPacket(SOAPPacketWriter& packet) const;
+	bool WriteSOAPPacket(XMLComposer& packet) const;
 
 	void Reset()
 	{

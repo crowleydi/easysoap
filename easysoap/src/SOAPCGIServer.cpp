@@ -24,7 +24,7 @@
 
 USING_EASYSOAP_NAMESPACE
 
-int
+bool
 SOAPCGIServer::Handle(const char *infile)
 {
 	SOAPCGITransport	cgi;

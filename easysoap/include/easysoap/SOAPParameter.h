@@ -130,7 +130,7 @@ public:
 	SOAPString& GetStringRef()					{return m_dataPtr->m_strval;}
 	const SOAPString& GetStringRef() const		{return m_dataPtr->m_strval;}
 
-	bool WriteSOAPPacket(SOAPPacketWriter& packet) const;
+	bool WriteSOAPPacket(XMLComposer& packet) const;
 
 	void LinkTo(SOAPParameter& param)
 	{

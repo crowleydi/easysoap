@@ -39,7 +39,9 @@ public:
 	SOAPServerDispatch& DispatchTo(SOAPDispatchHandlerInterface *disp);
 	SOAPServerDispatch& DispatchTo(SOAPHeaderHandlerInterface *disp);
 
-	int Handle(SOAPServerTransport& transport);
+	//
+	// returns false if an error occurred
+	bool Handle(SOAPServerTransport& transport);
 
 protected:
 	virtual bool	HandleRequest(SOAPEnvelope& request, SOAPResponse& response);
@@ -60,7 +62,7 @@ private:
 	SOAPServerTransport	*m_transport;
 	SOAPResponse		m_response;
 	SOAPEnvelope		m_request;
-	SOAPPacketWriter	m_writer;
+	XMLComposer			m_writer;
 	SOAPParser			m_parser;
 	SOAPString			m_respname;
 };

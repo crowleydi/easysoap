@@ -87,7 +87,8 @@ SOAPWinInetTransport::ConnectTo(const SOAPUrl& endpoint)
 	if (m_endpoint.Protocol() != SOAPUrl::http_proto && m_endpoint.Protocol() != SOAPUrl::https_proto)
 		throw SOAPSocketException("Invalid protocol specified.  Only http and https are supported.");
 
-	m_hInternet = InternetOpenA(m_userAgent.IsEmpty() ? DEFAULT_USERAGENT : m_userAgent,
+	m_hInternet = InternetOpenA(
+		m_userAgent.IsEmpty() ? DEFAULT_USERAGENT : (const char *)m_userAgent,
 		INTERNET_OPEN_TYPE_PRECONFIG, NULL, NULL, 0);
 
 	if (m_hInternet == NULL)
@@ -105,8 +106,14 @@ SOAPWinInetTransport::ConnectTo(const SOAPUrl& endpoint, const SOAPUrl& proxy)
 
 	DWORD ptype = INTERNET_OPEN_TYPE_PRECONFIG;
 
-	m_hInternet = InternetOpenA(m_userAgent.IsEmpty() ? DEFAULT_USERAGENT : m_userAgent,
-		INTERNET_OPEN_TYPE_PROXY, (const char *)proxy.GetString(), NULL, 0);
+	char proxystr[256];
+	snprintf(proxystr, sizeof(proxystr), "%s:%u",
+		(const char *)proxy.Hostname(), proxy.Port());
+
+	m_hInternet = InternetOpenA(
+		m_userAgent.IsEmpty() ? DEFAULT_USERAGENT : (const char *)m_userAgent,
+		INTERNET_OPEN_TYPE_PROXY,
+		proxystr, NULL, 0);
 
 	if (m_hInternet == NULL)
 		throw SOAPSocketException("Could not initialize internet connection: %s", GetErrorInfo());
