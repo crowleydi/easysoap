@@ -119,7 +119,10 @@ SOAPHTTPProtocol::Get(const char *path)
 {
 	StartVerb("GET", path);
 	WriteLine("");
-	return GetReply();
+	int ret = GetReply();
+	if (ret == 100)
+		ret = GetReply();
+	return ret;
 }
 
 void
@@ -161,7 +164,7 @@ SOAPHTTPProtocol::StartVerb(const char *verb, const char *path)
 	else
 		Write(path);
 
-	WriteLine(" HTTP/1.0");
+	WriteLine(" HTTP/1.1");
 	WriteHostHeader(m_endpoint);
 	WriteHeader("Connection", "Keep-Alive");
 }
@@ -179,7 +182,10 @@ SOAPHTTPProtocol::PostData(const char *bytes, int len)
 	WriteHeader("Content-Length", len);
 	WriteLine("");
 	Write(bytes, len);
-	return GetReply();
+	int ret = GetReply();
+	if (ret == 100)
+		ret = GetReply();
+	return ret;
 }
 
 void
@@ -288,14 +294,12 @@ SOAPHTTPProtocol::GetReply()
 	m_canread = GetContentLength();
 	m_doclose = false;
 	const char *keepalive = GetHeader("Connection");
-#if 0
 	if (respver > 10)
 	{
 		if (keepalive && sp_strcasecmp(keepalive, "Keep-Alive") != 0)
 			m_doclose = true;
 	}
 	else
-#endif
 	{
 		if (!keepalive || sp_strcasecmp(keepalive, "Keep-Alive") != 0)
 			m_doclose = true;
