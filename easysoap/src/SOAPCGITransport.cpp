@@ -36,10 +36,15 @@ SOAPCGITransport::SOAPCGITransport()
 , m_infile(0)
 , m_canread(-1)
 {
+#ifdef __BORLANDC__
+	setmode(fileno(stdin), O_BINARY);
+	setmode(fileno(stdout), O_BINARY);
+#else
 #ifdef _WIN32
 	_setmode(_fileno(stdin), _O_BINARY);
 	_setmode(_fileno(stdout), _O_BINARY);
 #endif // _WIN32
+#endif //__BORLANDC__
 
 	const char *contentlen = getenv("CONTENT_LENGTH");
 	if (contentlen)

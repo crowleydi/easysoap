@@ -326,7 +326,7 @@ uint32 SocketAvailableReadBytes(TSocket *s);
 #define NAME_MAX	1024
 #endif
 
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(__BORLANDC__)
 #define O_APPEND	_O_APPEND
 #define O_CREAT 	_O_CREAT 
 #define O_EXCL		_O_EXCL
@@ -348,11 +348,13 @@ uint32 SocketAvailableReadBytes(TSocket *s);
 #endif	/* _WIN32 */
 
 #ifdef _WIN32
-
+#ifndef __BORLANDC__
 typedef struct _stati64 TFileStat;
 typedef struct _finddata_t TFileInfo;
 typedef long TFileFind;
-
+#else
+typedef struct stati64 TFileStat;
+#endif // __BORLANDC__
 #else
 
 #include <unistd.h>

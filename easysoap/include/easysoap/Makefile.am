@@ -40,6 +40,7 @@ easysoap_HEADERS = \
     es_comp.h \
     es_config.h \
     es_conf.h \
+    es_borl.h \
     es_msvc.h \
     es_mwerks.h 
 

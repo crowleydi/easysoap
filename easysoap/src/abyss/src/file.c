@@ -51,7 +51,7 @@
 
 int FileOpen(TFile *f, char *name,uint32 attrib)
 {
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(__BORLANDC__)
 	return ((*f=_open(name,attrib))!=(-1));
 #else
 	return ((*f=open(name,attrib))!=(-1));
@@ -60,7 +60,7 @@ int FileOpen(TFile *f, char *name,uint32 attrib)
 
 int FileOpenCreate(TFile *f, char *name,uint32 attrib)
 {
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(__BORLANDC__)
 	return ((*f=_open(name,attrib | O_CREAT,_S_IWRITE | _S_IREAD))!=(-1));
 #else
 	return ((*f=open(name,attrib | O_CREAT,S_IWRITE | S_IREAD))!=(-1));
@@ -69,7 +69,7 @@ int FileOpenCreate(TFile *f, char *name,uint32 attrib)
 
 int FileWrite(TFile *f, void *buffer, uint32 len)
 {
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(__BORLANDC__)
 	return (_write(*f,buffer,len)==(int32)len);
 #else
 	return (write(*f,buffer,len)==(int32)len);

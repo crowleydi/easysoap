@@ -88,11 +88,10 @@ SOAPBuildersInteropHandler::echoNestedStruct(const SOAPMethod& req, SOAPMethod& 
 
 
 BEGIN_EASYSOAP_NAMESPACE
-
+template<>
 class SOAPTypeTraits< SOAPHashMap<SOAPString, int> > : public SOAPMapTypeTraits
 {
 };
-
 END_EASYSOAP_NAMESPACE
 
 void

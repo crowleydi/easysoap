@@ -92,6 +92,7 @@ struct SOAPArrayStruct
 
 BEGIN_EASYSOAP_NAMESPACE
 
+template<>
 class SOAPTypeTraits<SOAPStruct>
 {
 public:
@@ -119,10 +120,12 @@ public:
 	}
 };
 
+template<>
 class SOAPTypeTraits< SOAPArray<SOAPStruct> > : public SOAPArrayTypeTraits
 {
 };
 
+template<>
 class SOAPTypeTraits<SOAPStructStruct>
 {
 public:
@@ -153,6 +156,7 @@ public:
 };
 
 
+template<>
 class SOAPTypeTraits<SOAPArrayStruct>
 {
 public:

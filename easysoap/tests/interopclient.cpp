@@ -1149,6 +1149,7 @@ BEGIN_EASYSOAP_NAMESPACE
 
 //
 // We have to declare the type traits for our map
+template<>
 class SOAPTypeTraits< SOAPHashMap<SOAPString, int> > : public SOAPMapTypeTraits
 {
 };

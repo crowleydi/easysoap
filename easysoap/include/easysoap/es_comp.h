@@ -65,6 +65,9 @@
 # elif defined (__MWERKS__)
 /* Metrowerks CodeWarrior */
 #  include "es_mwerks.h"
+# elif defined(__BORLANDC__)
+/* Borland */
+#  include "es_borl.h"
 # else
 # error "No configuration file found."
 #endif

@@ -1,5 +1,8 @@
 SUBDIRS = include src tests validator simpleserver
-EXTRA_DIST = easysoap.dsw \
+EXTRA_DIST = \
+	README \
+	README.borland \
+	easysoap.dsw \
 	conftools/config.guess \
 	conftools/config.sub \
 	conftools/install-sh \
@@ -7,4 +10,3 @@ EXTRA_DIST = easysoap.dsw \
 	conftools/mkinstalldirs \
 	conftools/ltconfig \
 	conftools/ltmain.sh
-
