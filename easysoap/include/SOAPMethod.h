@@ -36,6 +36,11 @@ public:
 		return GetArray().Size();
 	}
 
+	const SOAPString& GetNamespace() const
+	{
+		return GetName().GetNamespace();
+	}
+
 	void SetSoapAction(const char *sa, bool appendName = true);
 	const SOAPString& GetSoapAction() const
 	{
