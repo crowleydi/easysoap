@@ -291,3 +291,46 @@ SOAPBuildersInteropHandler::echoMap(const SOAPMethod& req, SOAPMethod& resp)
 }
 
 
+
+const char *SOAPBuildersHeaderHandler::echoHeaderNamespace ="http://soapinterop.org/echoheader/";
+
+SOAPBuildersHeaderHandler::SOAPBuildersHeaderHandler()
+{
+	DispatchHeader("echoMeStringRequest", echoHeaderNamespace, echoHdrString);
+	DispatchHeader("echoMeStructRequest", echoHeaderNamespace, echoHdrStruct);
+}
+
+SOAPBuildersHeaderHandler::~SOAPBuildersHeaderHandler()
+{
+}
+
+void
+SOAPBuildersHeaderHandler::echoHdrString(const SOAPParameter& header,
+										 SOAPEnvelope& request,
+										 SOAPEnvelope& response)
+{
+	SOAPString str;
+	header >> str;
+
+	SOAPParameter& resph = response.GetHeader().AddHeader();
+	resph.SetName("echoMeStringResponse", echoHeaderNamespace);
+	
+	resph << str;
+}
+
+void
+SOAPBuildersHeaderHandler::echoHdrStruct(const SOAPParameter& header,
+										 SOAPEnvelope& request,
+										 SOAPEnvelope& response)
+{
+	SOAPStruct str;
+	header >> str;
+
+	SOAPParameter& resph = response.GetHeader().AddHeader();
+	resph.SetName("echoMeStructResponse", echoHeaderNamespace);
+	
+	resph << str;
+}
+
+
+

@@ -32,13 +32,15 @@
 #include "SOAPBuildersInteropHandler.h"
 
 int
-main(int argc, char* argv[], char *env[])
+main(int argc, const char* argv[], const char *env[])
 {
 	SOAPCGIServer server;
-	SOAPBuildersInteropHandler interopHandler;;
+
+	SOAPBuildersInteropHandler interopHandler;
+	SOAPBuildersHeaderHandler headerHandler;
 
 	SOAPPacketWriter::SetAddWhiteSpace();
 
-	return server.DispatchTo(&interopHandler).Handle();
+	return server.DispatchTo(&headerHandler).DispatchTo(&interopHandler).Handle();
 }
 
