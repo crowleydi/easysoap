@@ -174,18 +174,6 @@ HttpExtensionProc( EXTENSION_CONTROL_BLOCK *pECB )
 	if (!pECB)
 		return HSE_STATUS_ERROR;
 
-	if (lstrcmp(pECB->lpszMethod, "GET") == 0)
-	{
-		char buffer[1024];
-		DWORD bsize = sizeof(buffer);
-		char mbuff[1200];
-
-		pECB->GetServerVariable(pECB->ConnID, pECB->lpszQueryString, buffer, &bsize);
-		wsprintf(mbuff, "<H1>%d: %s</H1>", bsize, buffer);
-		WriteErrorMessage(pECB, 405, mbuff);
-		return HSE_STATUS_ERROR;
-	}
-
 	if (lstrcmp(pECB->lpszMethod, "POST"))
 	{
 		WriteErrorMessage(pECB, 405, "<H1>Invalid method, only POST is supported.</H1>");
