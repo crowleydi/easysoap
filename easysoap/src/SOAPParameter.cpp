@@ -359,6 +359,7 @@ SOAPParameter&
 SOAPParameter::AddParameter(const char *name)
 {
 	SOAPParameter& ret = m_array.Add();
+	ret.Reset();
 	ret.SetParent(this);
 	ret.SetName(name);
 	m_outtasync = true;
