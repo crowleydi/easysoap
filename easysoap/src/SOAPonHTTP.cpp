@@ -19,6 +19,10 @@
  * $Id$
  */
 
+/* Modified 20-aug-2001 Tor Molnes ConsultIT AS
+ * Added simple patch to support HTTP Chunked Transfer Encoding
+ */
+
 #ifdef _MSC_VER
 #pragma warning (disable: 4786)
 #endif // _MSC_VER
@@ -314,6 +318,17 @@ SOAPHTTPProtocol::GetReply()
 
 	if (!m_keepAlive)
 		m_doclose = true;
+	//
+	// Check if HTTP is Transfer Endoded: Chunked
+	//
+	const char *chunked = GetHeader("Transfer-Encoding");
+	m_chunked = false;
+	if (chunked && sp_strcasecmp(chunked, "Chunked") == 0)
+	{
+		m_chunked = true;
+		m_canread = 0;
+	}
+	SOAPDebugger::Print(1, "\r\nTransfer is %sChunked!\r\n", (m_chunked?"":"not "));
 
 	return httpreturn;
 }
@@ -339,6 +354,42 @@ SOAPHTTPProtocol::GetContentLength() const
 	return len;
 }
 
+int
+SOAPHTTPProtocol::GetChunkLength()
+{
+	int  nbytes = 0;    // bytes read from socket
+	char hexStg[5];		// hex buffer
+	int  n = 0;         // position in string
+	int  m = 0;         // hex value of character (0-15)
+	int  intValue = 0;  // integer value of hex string
+
+	// skip blank lines
+	while ((nbytes = super::ReadLine(hexStg, sizeof(hexStg))) == 0)
+		;
+
+	if (nbytes < 4)
+		return -1;
+
+	while (n < 4)
+	{
+		if (hexStg[n]=='\0')
+			break;
+		if (hexStg[n] >= '0' && hexStg[n] <= '9')	//if 0 to 9
+			m = hexStg[n] & 0x0f;            //convert to int
+		else if (hexStg[n] >='a' && hexStg[n] <= 'f') //if a to f
+			m = (hexStg[n] & 0x0f) + 9;      //convert to int
+		else if (hexStg[n] >='A' && hexStg[n] <= 'F') //if A to F
+			m = (hexStg[n] & 0x0f) + 9;      //convert to int
+		else
+			break;
+		++n;
+		intValue = intValue * 16 + m;
+	}
+
+	SOAPDebugger::Print(1, "\r\nGetChunkLength: %s = %d\r\n", hexStg, intValue);
+	return intValue;
+}
+
 void
 SOAPHTTPProtocol::Close()
 {
@@ -356,7 +407,29 @@ SOAPHTTPProtocol::CanRead()
 }
 
 size_t
-SOAPHTTPProtocol::Read(char *buffer, int len)
+SOAPHTTPProtocol::ReadChunk(char *buffer, int len)
+{
+	size_t ret = 0;
+	if (m_canread == 0)
+	{
+		// get chunk size, abort on empty chunk
+		if ((m_canread = GetChunkLength()) == 0)
+		{
+			if (m_doclose)
+				Close();
+			return 0;
+		}
+	}
+	if (len > m_canread)
+		len = m_canread;
+
+	ret = super::Read(buffer, len);
+	m_canread -= ret;
+	return ret;
+}
+
+size_t
+SOAPHTTPProtocol::ReadBytes(char *buffer, int len)
 {
 	size_t ret = 0;
 	if (m_canread != 0)
@@ -372,6 +445,15 @@ SOAPHTTPProtocol::Read(char *buffer, int len)
 		}
 	}
 	return ret;
+}
+
+size_t
+SOAPHTTPProtocol::Read(char *buffer, int len)
+{
+	if (m_chunked)
+		return ReadChunk(buffer, len);
+
+	return ReadBytes(buffer, len);
 }
 
 bool

@@ -19,6 +19,9 @@
  * $Id$
  */
 
+/* Modified 20-aug-2001 Tor Molnes ConsultIT AS
+ * Added simple patch to support HTTP Chunked Transfer Encoding
+ */
 
 #if !defined(AFX_SOAPONHTTP_H__7D357522_E8B1_45A2_8CE1_A472A7D58C13__INCLUDED_)
 #define AFX_SOAPONHTTP_H__7D357522_E8B1_45A2_8CE1_A472A7D58C13__INCLUDED_
@@ -43,12 +46,16 @@ private:
 	bool		m_httpproxy;
 	bool		m_doclose;
 	bool		m_keepAlive;
+	bool		m_chunked;
 
 	int		GetReply();
+	int		GetChunkLength();
 	bool	Connect();
 	void	WriteHostHeader(const SOAPUrl&);
 	void	FlushInput();
 	void	StartVerb(const char *verb, const char *path);
+	size_t  ReadChunk(char *buffer, int len);
+	size_t  ReadBytes(char *buffer, int len);
 
 public:
 	SOAPHTTPProtocol()
@@ -56,6 +63,7 @@ public:
 		, m_httpproxy(false)
 		, m_doclose(false)
 		, m_keepAlive(true)
+		, m_chunked(false)
 	{}
 
 	SOAPHTTPProtocol(const SOAPUrl& endpoint)
@@ -63,6 +71,7 @@ public:
 		, m_httpproxy(false)
 		, m_doclose(false)
 		, m_keepAlive(true)
+		, m_chunked(false)
 	{
 		ConnectTo(endpoint);
 	}
@@ -72,6 +81,7 @@ public:
 		, m_httpproxy(false)
 		, m_doclose(false)
 		, m_keepAlive(true)
+		, m_chunked(false)
 	{
 		ConnectTo(endpoint, proxy);
 	}
@@ -91,6 +101,7 @@ public:
 	const char *GetCharset() const {return m_charset;}
 	const char *GetHeader(const char *header) const;
 	int		GetContentLength() const;
+	bool	IsChunked() const {return m_chunked;}
 
 	virtual size_t Read(char *buffer, int len);
 	virtual void Close();
