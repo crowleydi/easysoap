@@ -23,9 +23,12 @@
 
 #define FULL_SOAP_ENV "http://schemas.xmlsoap.org/soap/envelope/"
 #define FULL_SOAP_ENC "http://schemas.xmlsoap.org/soap/encoding/"
-#define FULL_SOAP_XSI "http://www.w3.org/1999/XMLSchema-instance"
-#define FULL_SOAP_XSD "http://www.w3.org/1999/XMLSchema"
+#define FULL_SOAP_XSI_1999 "http://www.w3.org/1999/XMLSchema-instance"
+#define FULL_SOAP_XSD_1999 "http://www.w3.org/1999/XMLSchema"
+#define FULL_SOAP_XSI_2001 "http://www.w3.org/2001/XMLSchema-instance"
 #define FULL_SOAP_XSD_2001 "http://www.w3.org/2001/XMLSchema"
+#define FULL_SOAP_XSI FULL_SOAP_XSI_1999
+#define FULL_SOAP_XSD FULL_SOAP_XSD_1999
 
 #define TAG_SOAP_ENV "SOAP-ENV"
 #define TAG_SOAP_ENC "SOAP-ENC"
@@ -35,4 +38,3 @@
 #define PARSER_NS_SEP "#"
 
 #endif // __SOAPNamesSpaces_h__
-
