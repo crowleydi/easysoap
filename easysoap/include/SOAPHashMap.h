@@ -43,7 +43,6 @@ struct SOAPEqualsFunctor
 template <typename K, typename I,
 	typename H = SOAPHashCodeFunctor<K>,
 	typename E = SOAPEqualsFunctor<K> >
-
 class EASYSOAP_EXPORT SOAPHashMap
 {
 private:
@@ -217,7 +216,7 @@ public:
 		sp_free(m_table);
 	}
 	
-	SOAPHashMap(size_t size = 101, float fillfactor = 0.75) :
+	SOAPHashMap(size_t size = 31, float fillfactor = 0.75) :
 		m_table(0), m_buckets(0), m_numItems(0),
 		m_fillfactor(fillfactor), m_resizeThreshold(0)
 	{
@@ -505,7 +504,7 @@ private:
 				SOAPEqualsFunctorNoCase<K> > super;
 
 public:
-	SOAPHashMapNoCase(size_t size = 101, float fillfactor = 0.75)
+	SOAPHashMapNoCase(size_t size = 31, float fillfactor = 0.75)
 		: super(size, fillfactor)
 	{
 	}
