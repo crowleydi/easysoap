@@ -73,7 +73,6 @@ rm -rf ${RPM_BUILD_ROOT}
 %{prefix}/include/easysoap/SOAP.h
 %{prefix}/include/easysoap/SOAPHashMap.h
 %{prefix}/include/easysoap/SOAPHeader.h
-%{prefix}/include/easysoap/SOAPHTTPServer.h
 %{prefix}/include/easysoap/SOAPMethod.h
 %{prefix}/include/easysoap/SOAPNamespaces.h
 %{prefix}/include/easysoap/SOAPonHTTP.h
