@@ -7,5 +7,4 @@ EXTRA_DIST = \
 	conftools/install-sh \
 	conftools/missing \
 	conftools/mkinstalldirs \
-	conftools/ltconfig \
 	conftools/ltmain.sh
