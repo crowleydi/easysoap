@@ -87,6 +87,9 @@ randdouble()
 	return f1/f2*pow(10.0, f3);
 }
 
+//
+// Exception we throw when there is a problem
+// with floating point accuracy.
 class FPLossException : public SOAPException
 {
 public:
@@ -101,7 +104,23 @@ public:
 	}
 };
 
-bool
+//
+// Exception we throw when something passes that
+// we're not expecting to...
+class UnexpectedSuccessException : public SOAPException
+{
+public:
+	UnexpectedSuccessException(const char *fmt, ...)
+	{
+		va_list args;
+		va_start(args, fmt);
+		FormattedMessage(fmt, args);
+		va_end(args);
+	}
+};
+
+
+inline bool
 almostequal(float a, float b)
 {
 	if (a != b && fabs(a - b) <= fabs(a) * 0.0000005)
@@ -109,7 +128,7 @@ almostequal(float a, float b)
 	return false;
 }
 
-bool
+inline bool
 almostequal(double a, double b)
 {
 	if (a != b && fabs(a - b) <= fabs(a) * 0.0000005)
@@ -117,7 +136,7 @@ almostequal(double a, double b)
 	return false;
 }
 
-bool
+inline bool
 almostequal(const SOAPArray<float>& a, const SOAPArray<float>& b)
 {
 	if (a.Size() != b.Size())
@@ -134,7 +153,7 @@ almostequal(const SOAPArray<float>& a, const SOAPArray<float>& b)
 }
 
 
-bool
+inline bool
 almostequal(const SOAPArray<double>& a, const SOAPArray<double>& b)
 {
 	if (a.Size() != b.Size())
@@ -151,7 +170,7 @@ almostequal(const SOAPArray<double>& a, const SOAPArray<double>& b)
 }
 
 
-bool
+inline bool
 almostequal(const SOAPArray<SOAPStruct>& a, const SOAPArray<SOAPStruct>& b)
 {
 	if (a.Size() != b.Size())
@@ -167,18 +186,6 @@ almostequal(const SOAPArray<SOAPStruct>& a, const SOAPArray<SOAPStruct>& b)
 	return retval;
 }
 
-
-class UnexpectedSuccessException : public SOAPException
-{
-public:
-	UnexpectedSuccessException(const char *fmt, ...)
-	{
-		va_list args;
-		va_start(args, fmt);
-		FormattedMessage(fmt, args);
-		va_end(args);
-	}
-};
 
 //
 // The struct used to hold endpoint information
@@ -248,49 +255,12 @@ typedef enum
 	misc
 } TestType;
 
-void
-TestBogusMethod(SOAPProxy& proxy, const Endpoint& e)
-{
-	SOAPMethod method("BogusMethod", e.nspace, e.soapaction, e.needsappend);
-	proxy.Execute(method);
-}
 
-void
-TestMustUnderstand(SOAPProxy& proxy, const Endpoint& e, const char *mu)
-{
-	SOAPEnvelope mustUnderstand;
-	SOAPParameter& header = mustUnderstand.GetHeader().AddHeader();
-
-	header.SetName("Transaction", "uri:my-transaction");
-	header.SetValue("5");
-	header.AddAttribute(SOAPEnv::mustUnderstand) = mu;
-
-	SOAPMethod& method = mustUnderstand.GetBody().GetMethod();
-	method.SetName("echoVoid", e.nspace);
-	method.SetSoapAction(e.soapaction, e.needsappend);
-
-	proxy.Execute(mustUnderstand);
-}
-
-void
-TestMustUnderstand_1(SOAPProxy& proxy, const Endpoint& e)
-{
-	TestMustUnderstand(proxy, e, "1");
-}
-
-void
-TestMustUnderstand_0(SOAPProxy& proxy, const Endpoint& e)
-{
-	TestMustUnderstand(proxy, e, "0");
-}
-
-void
-TestBogusNamespace(SOAPProxy& proxy, const Endpoint& e)
-{
-	SOAPMethod method("echoVoid", "http://bogusns.com/", e.soapaction, e.needsappend);
-	proxy.Execute(method);
-	throw UnexpectedSuccessException("Method executed with bogus namespace.");
-}
+/////////////////////////////////////////////////////////////////////////////////
+//
+// Round 1 + Round 2 base methods
+//
+////////////////////////////////////////////////////////////////////////////////
 
 void
 TestEchoVoid(SOAPProxy& proxy, const Endpoint& e)
@@ -333,7 +303,7 @@ TestEchoInteger(SOAPProxy& proxy, const Endpoint& e, int value)
 }
 
 const SOAPResponse&
-_TestEchoInteger(SOAPProxy& proxy, const Endpoint& e, const char *value)
+TestEchoInteger(SOAPProxy& proxy, const Endpoint& e, const char *value)
 {
 	SOAPMethod method("echoInteger", e.nspace, e.soapaction, e.needsappend);
 	method.AddParameter("inputInteger").SetInt(value);
@@ -344,7 +314,7 @@ _TestEchoInteger(SOAPProxy& proxy, const Endpoint& e, const char *value)
 void
 TestEchoIntegerForFail(SOAPProxy& proxy, const Endpoint& e, const char *value)
 {
-	const SOAPResponse& response = _TestEchoInteger(proxy, e, value);
+	const SOAPResponse& response = TestEchoInteger(proxy, e, value);
 	throw UnexpectedSuccessException("Returned value: %s",
 			(const char *)response.GetReturnValue().GetString());
 }
@@ -352,7 +322,7 @@ TestEchoIntegerForFail(SOAPProxy& proxy, const Endpoint& e, const char *value)
 void
 TestEchoIntegerForPass(SOAPProxy& proxy, const Endpoint& e, const char *value)
 {
-	const SOAPResponse& response = _TestEchoInteger(proxy, e, value);
+	const SOAPResponse& response = TestEchoInteger(proxy, e, value);
 	int returnValue;
 	response.GetReturnValue() >> returnValue;
 }
@@ -417,7 +387,7 @@ TestEchoFloatStringValue(SOAPProxy& proxy, const Endpoint& e, const char *value)
 }
 
 const SOAPResponse&
-_TestEchoFloat(SOAPProxy& proxy, const Endpoint& e, const char *value)
+TestEchoFloat(SOAPProxy& proxy, const Endpoint& e, const char *value)
 {
 	SOAPMethod method("echoFloat", e.nspace, e.soapaction, e.needsappend);
 	SOAPParameter& inputParam = method.AddParameter("inputFloat");
@@ -429,7 +399,7 @@ _TestEchoFloat(SOAPProxy& proxy, const Endpoint& e, const char *value)
 void
 TestEchoFloatForFail(SOAPProxy& proxy, const Endpoint& e, const char *value)
 {
-	const SOAPResponse& response = _TestEchoFloat(proxy, e, value);
+	const SOAPResponse& response = TestEchoFloat(proxy, e, value);
 	throw UnexpectedSuccessException("Returned value: %s",
 		(const char *)response.GetReturnValue().GetString());
 }
@@ -437,7 +407,7 @@ TestEchoFloatForFail(SOAPProxy& proxy, const Endpoint& e, const char *value)
 void
 TestEchoFloatForPass(SOAPProxy& proxy, const Endpoint& e, const char *value)
 {
-	const SOAPResponse& response = _TestEchoFloat(proxy, e, value);
+	const SOAPResponse& response = TestEchoFloat(proxy, e, value);
 	float result;
 	response.GetReturnValue() >> result;
 }
@@ -458,89 +428,6 @@ TestEchoStruct(SOAPProxy& proxy, const Endpoint& e)
 	SOAPStruct outputValue;
 	response.GetReturnValue() >> outputValue;
 	if (inputValue != outputValue && !almostequal(inputValue.varFloat, outputValue.varFloat))
-		throw SOAPException("Values are not equal");
-}
-
-void
-TestEchoNestedStruct(SOAPProxy& proxy, const Endpoint& e)
-{
-	SOAPStructStruct inputValue;
-	
-	inputValue.varString = "This is a struct string.";
-	inputValue.varInt = 68;
-	inputValue.varFloat = (float)25.24345356;
-	inputValue.varStruct.varFloat = (float)12.5;
-	inputValue.varStruct.varInt = 86;
-	inputValue.varStruct.varString = "This is a nested struct.";
-
-	SOAPMethod method("echoNestedStruct", e.nspace, e.soapaction, e.needsappend);
-	method.AddParameter("inputStruct") << inputValue;
-
-	const SOAPResponse& response = proxy.Execute(method);
-	SOAPStructStruct outputValue;
-	response.GetReturnValue() >> outputValue;
-	if (inputValue != outputValue && !almostequal(inputValue.varFloat, outputValue.varFloat))
-		throw SOAPException("Values are not equal");
-}
-
-void
-TestEchoNestedArray(SOAPProxy& proxy, const Endpoint& e)
-{
-	SOAPArrayStruct inputValue;
-	
-	inputValue.varString = "This is a struct string.";
-	inputValue.varInt = 68;
-	inputValue.varFloat = 12.5;
-	inputValue.varArray.Add() = "This is string 1";
-	inputValue.varArray.Add() = "This is string 2";
-	inputValue.varArray.Add() = "This is string 3";
-	inputValue.varArray.Add() = "This is string 4";
-
-	SOAPMethod method("echoNestedArray", e.nspace, e.soapaction, e.needsappend);
-	method.AddParameter("inputStruct") << inputValue;
-
-	const SOAPResponse& response = proxy.Execute(method);
-	SOAPArrayStruct outputValue;
-	response.GetReturnValue() >> outputValue;
-	if (inputValue != outputValue && !almostequal(inputValue.varFloat, outputValue.varFloat))
-		throw SOAPException("Values are not equal");
-}
-
-void
-TestEchoBooleanJunk(SOAPProxy& proxy, const Endpoint& e)
-{
-	SOAPMethod method("echoBoolean", e.nspace, e.soapaction, e.needsappend);
-	(method.AddParameter("inputBoolean") << "junk").SetType("boolean", SOAP_XSD);
-
-	const SOAPResponse& response = proxy.Execute(method);
-
-	throw UnexpectedSuccessException("Returned value: %s",
-		(const char *)response.GetReturnValue().GetString());
-}
-
-void
-TestEchoBooleanTrue(SOAPProxy& proxy, const Endpoint& e)
-{
-	bool val = true;
-	SOAPMethod method("echoBoolean", e.nspace, e.soapaction, e.needsappend);
-	method.AddParameter("inputBoolean") << val;
-
-	const SOAPResponse& response = proxy.Execute(method);
-	response.GetReturnValue() >> val;
-	if (!val)
-		throw SOAPException("Values are not equal");
-}
-
-void
-TestEchoBooleanFalse(SOAPProxy& proxy, const Endpoint& e)
-{
-	bool val = false;
-	SOAPMethod method("echoBoolean", e.nspace, e.soapaction, e.needsappend);
-	method.AddParameter("inputBoolean") << val;
-
-	const SOAPResponse& response = proxy.Execute(method);
-	response.GetReturnValue() >> val;
-	if (val)
 		throw SOAPException("Values are not equal");
 }
 
@@ -675,126 +562,6 @@ TestEchoStructArray(SOAPProxy& proxy, const Endpoint& e, int numvals)
 }
 
 void
-TestEcho2DStringArray(SOAPProxy& proxy, const Endpoint& e)
-{
-	SOAPMethod method("echo2DStringArray", e.nspace,
-			e.soapaction, e.needsappend);
-
-	SOAP2DArray<SOAPString> twod, result;
-
-	size_t rows = rand() % 5 + 3;
-	size_t cols = rand() % 5 + 3;
-
-	char buff[64];
-	twod.Resize(rows, cols);
-
-	for (size_t i = 0; i < rows; ++i)
-		for (size_t j = 0; j < cols; ++j)
-		{
-			snprintf(buff, sizeof(buff), "%d,%d", i, j);
-			twod[i][j] = buff;
-		}
-
-	method.AddParameter("input2DStringArray") << twod;
-
-	const SOAPResponse& response = proxy.Execute(method);
-	response.GetReturnValue() >> result;
-
-	if (result != twod)
-		throw SOAPException("2D Array values differ.");
-}
-
-void
-TestEchoStructAsSimpleTypes(SOAPProxy& proxy, const Endpoint& e)
-{
-	SOAPMethod method("echoStructAsSimpleTypes", e.nspace,
-			e.soapaction, e.needsappend);
-
-	SOAPStruct s;
-	s.varString = "This is a test";
-	s.varInt = rand() % 10000;
-	s.varFloat = (float)randdouble();
-
-	method.AddParameter("inputStruct") << s;
-
-	const SOAPResponse& response = proxy.Execute(method);
-
-	if (response.GetReturnValue("outputString").GetString() != s.varString)
-		throw SOAPException("String values are not equal.");
-
-	if (response.GetReturnValue("outputInteger").GetInt() != s.varInt)
-		throw SOAPException("Int values are not equal.");
-
-	if (response.GetReturnValue("outputFloat").GetFloat() != s.varFloat)
-		throw SOAPException("Float values are not equal.");
-}
-
-void
-TestEchoSimpleTypesAsStruct(SOAPProxy& proxy, const Endpoint& e)
-{
-	SOAPMethod method("echoSimpleTypesAsStruct", e.nspace,
-			e.soapaction, e.needsappend);
-
-	SOAPStruct s;
-	s.varString = "This is a test";
-	s.varInt = rand() % 10000;
-	s.varFloat = (float)randdouble();
-
-	method.AddParameter("inputString") << s.varString;
-	method.AddParameter("inputInteger") << s.varInt;
-	method.AddParameter("inputFloat") << s.varFloat;
-
-	const SOAPResponse& response = proxy.Execute(method);
-	SOAPStruct out;
-	response.GetReturnValue() >> out;
-
-	if (s != out)
-		throw SOAPException("Values are not equal.");
-}
-
-void
-TestEchoBase64(SOAPProxy& proxy, const Endpoint& e)
-{
-	SOAPArray<char> inputBinary, outputBinary;
-
-	int size = rand() % 501 + 500;
-	inputBinary.Resize(size);
-	for (int i = 0; i < size; ++i)
-		inputBinary[i] = rand();
-
-	SOAPMethod method("echoBase64", e.nspace, e.soapaction, e.needsappend);
-	method.AddParameter("inputBase64") << SOAPBase64(inputBinary);
-	const SOAPResponse& response = proxy.Execute(method);
-
-	SOAPBase64 base64(outputBinary);
-	response.GetReturnValue() >> base64;
-
-	if (inputBinary != outputBinary)
-		throw SOAPException("Values are not equal");
-}
-
-void
-TestEchoHexBinary(SOAPProxy& proxy, const Endpoint& e)
-{
-	SOAPArray<char> inputBinary, outputBinary;
-
-	int size = rand() % 501 + 500;
-	inputBinary.Resize(size);
-	for (int i = 0; i < size; ++i)
-		inputBinary[i] = rand();
-
-	SOAPMethod method("echoHexBinary", e.nspace, e.soapaction, e.needsappend);
-	method.AddParameter("inputHexBinary") << SOAPHex(inputBinary);
-	const SOAPResponse& response = proxy.Execute(method);
-
-	SOAPHex hex(outputBinary);
-	response.GetReturnValue() >> hex;
-
-	if (inputBinary != outputBinary)
-		throw SOAPException("Values are not equal");
-}
-
-void
 TestEchoInteger(SOAPProxy& proxy, const Endpoint& e)
 {
 	TestEchoInteger(proxy, e, rand());
@@ -869,7 +636,7 @@ TestEchoFloat_DoubleOverflow(SOAPProxy& proxy, const Endpoint& e)
 void
 TestEchoFloat_DoubleUnderflow(SOAPProxy& proxy, const Endpoint& e)
 {
-	TestEchoFloatForFail(proxy, e, "2.4e-324");
+	TestEchoFloatForFail(proxy, e, "2.4e-360");
 }
 
 void
@@ -968,6 +735,375 @@ TestEchoDoubleArrayZeroLen(SOAPProxy& proxy, const Endpoint& e)
 	TestEchoDoubleArray(proxy, e, 0);
 }
 
+/////////////////////////////////////////////////////////////////////////////////
+//
+// Additional Round 2 base methods
+//
+////////////////////////////////////////////////////////////////////////////////
+
+void
+TestEchoBooleanJunk(SOAPProxy& proxy, const Endpoint& e)
+{
+	SOAPMethod method("echoBoolean", e.nspace, e.soapaction, e.needsappend);
+	(method.AddParameter("inputBoolean") << "junk").SetType("boolean", SOAP_XSD);
+
+	const SOAPResponse& response = proxy.Execute(method);
+
+	throw UnexpectedSuccessException("Returned value: %s",
+		(const char *)response.GetReturnValue().GetString());
+}
+
+void
+TestEchoBooleanTrue(SOAPProxy& proxy, const Endpoint& e)
+{
+	bool val = true;
+	SOAPMethod method("echoBoolean", e.nspace, e.soapaction, e.needsappend);
+	method.AddParameter("inputBoolean") << val;
+
+	const SOAPResponse& response = proxy.Execute(method);
+	response.GetReturnValue() >> val;
+	if (!val)
+		throw SOAPException("Values are not equal");
+}
+
+void
+TestEchoBooleanFalse(SOAPProxy& proxy, const Endpoint& e)
+{
+	bool val = false;
+	SOAPMethod method("echoBoolean", e.nspace, e.soapaction, e.needsappend);
+	method.AddParameter("inputBoolean") << val;
+
+	const SOAPResponse& response = proxy.Execute(method);
+	response.GetReturnValue() >> val;
+	if (val)
+		throw SOAPException("Values are not equal");
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////
+//
+// Round 2 Group B methods
+//
+////////////////////////////////////////////////////////////////////////////////
+
+
+void
+TestEchoNestedStruct(SOAPProxy& proxy, const Endpoint& e)
+{
+	SOAPStructStruct inputValue;
+	
+	inputValue.varString = "This is a struct string.";
+	inputValue.varInt = 68;
+	inputValue.varFloat = (float)25.24345356;
+	inputValue.varStruct.varFloat = (float)12.5;
+	inputValue.varStruct.varInt = 86;
+	inputValue.varStruct.varString = "This is a nested struct.";
+
+	SOAPMethod method("echoNestedStruct", e.nspace, e.soapaction, e.needsappend);
+	method.AddParameter("inputStruct") << inputValue;
+
+	const SOAPResponse& response = proxy.Execute(method);
+	SOAPStructStruct outputValue;
+	response.GetReturnValue() >> outputValue;
+	if (inputValue != outputValue && !almostequal(inputValue.varFloat, outputValue.varFloat))
+		throw SOAPException("Values are not equal");
+}
+
+void
+TestEchoNestedArray(SOAPProxy& proxy, const Endpoint& e)
+{
+	SOAPArrayStruct inputValue;
+	
+	inputValue.varString = "This is a struct string.";
+	inputValue.varInt = 68;
+	inputValue.varFloat = 12.5;
+	inputValue.varArray.Add() = "This is string 1";
+	inputValue.varArray.Add() = "This is string 2";
+	inputValue.varArray.Add() = "This is string 3";
+	inputValue.varArray.Add() = "This is string 4";
+
+	SOAPMethod method("echoNestedArray", e.nspace, e.soapaction, e.needsappend);
+	method.AddParameter("inputStruct") << inputValue;
+
+	const SOAPResponse& response = proxy.Execute(method);
+	SOAPArrayStruct outputValue;
+	response.GetReturnValue() >> outputValue;
+	if (inputValue != outputValue && !almostequal(inputValue.varFloat, outputValue.varFloat))
+		throw SOAPException("Values are not equal");
+}
+
+void
+TestEcho2DStringArray(SOAPProxy& proxy, const Endpoint& e)
+{
+	SOAPMethod method("echo2DStringArray", e.nspace,
+			e.soapaction, e.needsappend);
+
+	SOAP2DArray<SOAPString> twod, result;
+
+	size_t rows = rand() % 5 + 3;
+	size_t cols = rand() % 5 + 3;
+
+	char buff[64];
+	twod.Resize(rows, cols);
+
+	for (size_t i = 0; i < rows; ++i)
+		for (size_t j = 0; j < cols; ++j)
+		{
+			snprintf(buff, sizeof(buff), "%d,%d", i, j);
+			twod[i][j] = buff;
+		}
+
+	method.AddParameter("input2DStringArray") << twod;
+
+	const SOAPResponse& response = proxy.Execute(method);
+	response.GetReturnValue() >> result;
+
+	if (result != twod)
+		throw SOAPException("2D Array values differ.");
+}
+
+void
+TestEchoStructAsSimpleTypes(SOAPProxy& proxy, const Endpoint& e)
+{
+	SOAPMethod method("echoStructAsSimpleTypes", e.nspace,
+			e.soapaction, e.needsappend);
+
+	SOAPStruct s;
+	s.varString = "This is a test";
+	s.varInt = rand() % 10000;
+	s.varFloat = (float)randdouble();
+
+	method.AddParameter("inputStruct") << s;
+
+	const SOAPResponse& response = proxy.Execute(method);
+
+	if (response.GetReturnValue("outputString").GetString() != s.varString)
+		throw SOAPException("String values are not equal.");
+
+	if (response.GetReturnValue("outputInteger").GetInt() != s.varInt)
+		throw SOAPException("Int values are not equal.");
+
+	if (response.GetReturnValue("outputFloat").GetFloat() != s.varFloat)
+		throw SOAPException("Float values are not equal.");
+}
+
+void
+TestEchoSimpleTypesAsStruct(SOAPProxy& proxy, const Endpoint& e)
+{
+	SOAPMethod method("echoSimpleTypesAsStruct", e.nspace,
+			e.soapaction, e.needsappend);
+
+	SOAPStruct s;
+	s.varString = "This is a test";
+	s.varInt = rand() % 10000;
+	s.varFloat = (float)randdouble();
+
+	method.AddParameter("inputString") << s.varString;
+	method.AddParameter("inputInteger") << s.varInt;
+	method.AddParameter("inputFloat") << s.varFloat;
+
+	const SOAPResponse& response = proxy.Execute(method);
+	SOAPStruct out;
+	response.GetReturnValue() >> out;
+
+	if (s != out)
+		throw SOAPException("Values are not equal.");
+}
+
+void
+TestEchoBase64(SOAPProxy& proxy, const Endpoint& e)
+{
+	SOAPArray<char> inputBinary, outputBinary;
+
+	int size = rand() % 501 + 500;
+	inputBinary.Resize(size);
+	for (int i = 0; i < size; ++i)
+		inputBinary[i] = rand();
+
+	SOAPMethod method("echoBase64", e.nspace, e.soapaction, e.needsappend);
+	method.AddParameter("inputBase64") << SOAPBase64(inputBinary);
+	const SOAPResponse& response = proxy.Execute(method);
+
+	SOAPBase64 base64(outputBinary);
+	response.GetReturnValue() >> base64;
+
+	if (inputBinary != outputBinary)
+		throw SOAPException("Values are not equal");
+}
+
+/////////////////////////////////////////////////////////////////////////////////
+//
+// Round 2 Group C methods
+//
+//
+// echoHdrString
+// echoHdrStruct
+//
+// Variations:
+//  mustUnderstand = "1", "0"
+//  namespace = "http://soapinterop.org/echoheader/", other
+//  actor = none (default), next, other
+//
+/////////////////////////////////////////////////////////////////////////////////
+
+void
+TestEchoHdrString(SOAPProxy& proxy, const Endpoint& e,
+				  bool mustUnderstand,
+				  bool understandable,
+				  int actor)
+{
+	static const char *headerNamespace = "http://soapinterop.org/echoheader/";
+	static const char *otherNamespace = "http://other.soapinterop.org/echoheader/";
+
+	SOAPQName headname("echoMeStringRequest", understandable ? headerNamespace : otherNamespace);
+
+	SOAPEnvelope env;
+	SOAPParameter& header = env.GetHeader().AddHeader(headname);
+	SOAPMethod& method = env.GetBody().GetMethod();
+
+	method.SetName("echoVoid", e.nspace);
+	method.SetSoapAction(e.soapaction, e.needsappend);
+
+	SOAPString str = "This is a string in the header";
+	header << str;
+
+	if (actor == 1)
+		header.AddAttribute(SOAPEnv::actor) = SOAP_ACTOR_NEXT;
+	else if (actor == 2)
+		header.AddAttribute(SOAPEnv::actor) = "http://jackandjill.com/wentup/thehill";
+
+	const SOAPResponse& response = proxy.Execute(env);
+
+	if (understandable && actor != 2)
+	{
+		SOAPQName rheadname("echoMeStringResponse", understandable ? headerNamespace : otherNamespace);
+		const SOAPParameter& rhead = response.GetHeader().GetHeader(rheadname);
+
+		SOAPString rstr;
+		rhead >> rstr;
+
+		if (rstr != str)
+			throw SOAPException("Values are not equal: '%s' and '%s'",
+				(const char *)str,
+				(const char *)rstr);
+	}
+}
+
+void
+TestEchoHdrStruct(SOAPProxy& proxy, const Endpoint& e,
+				  bool mustUnderstand,
+				  bool understandable,
+				  int actor)
+{
+	static const char *headerNamespace = "http://soapinterop.org/echoheader/";
+	static const char *otherNamespace = "http://other.soapinterop.org/echoheader/";
+
+	SOAPQName headname("echoMeStructRequest", understandable ? headerNamespace : otherNamespace);
+
+	SOAPEnvelope env;
+	SOAPParameter& header = env.GetHeader().AddHeader(headname);
+	SOAPMethod& method = env.GetBody().GetMethod();
+
+	method.SetName("echoVoid", e.nspace);
+	method.SetSoapAction(e.soapaction, e.needsappend);
+
+	SOAPStruct str;
+
+	str.varString = "This is a string in the header";
+	str.varFloat = randdouble();
+	str.varInt = rand();
+
+	header << str;
+
+	if (actor == 1)
+		header.AddAttribute(SOAPEnv::actor) = SOAP_ACTOR_NEXT;
+	else if (actor == 2)
+		header.AddAttribute(SOAPEnv::actor) = "http://jackandjill.com/wentup/thehill";
+
+	const SOAPResponse& response = proxy.Execute(env);
+
+	if (understandable && actor != 2)
+	{
+		SOAPQName rheadname("echoMeStructResponse", understandable ? headerNamespace : otherNamespace);
+		const SOAPParameter& rhead = response.GetHeader().GetHeader(rheadname);
+
+		SOAPStruct rstr;
+		rhead >> rstr;
+
+		if (rstr != str)
+			throw SOAPException("Values are not equal");
+	}
+}
+
+static bool HeaderMustUnderstand;
+static bool HeaderUnderstandable;
+static int HeaderActor;
+
+void
+TestEchoHdrString(SOAPProxy& proxy, const Endpoint& e)
+{
+	TestEchoHdrString(proxy, e, HeaderMustUnderstand, HeaderUnderstandable, HeaderActor);
+}
+
+void
+TestEchoHdrStruct(SOAPProxy& proxy, const Endpoint& e)
+{
+	TestEchoHdrStruct(proxy, e, HeaderMustUnderstand, HeaderUnderstandable, HeaderActor);
+}
+
+/////////////////////////////////////////////////////////////////////////////////
+//
+// Miscellaneous methods
+//
+/////////////////////////////////////////////////////////////////////////////////
+
+void
+TestBogusMethod(SOAPProxy& proxy, const Endpoint& e)
+{
+	SOAPMethod method("BogusMethod", e.nspace, e.soapaction, e.needsappend);
+	proxy.Execute(method);
+}
+
+void
+TestBogusNamespace(SOAPProxy& proxy, const Endpoint& e)
+{
+	SOAPMethod method("echoVoid", "http://bogusns.com/", e.soapaction, e.needsappend);
+	proxy.Execute(method);
+	throw UnexpectedSuccessException("Method executed with bogus namespace.");
+}
+
+void
+TestMustUnderstand(SOAPProxy& proxy, const Endpoint& e, const char *mu)
+{
+	SOAPEnvelope mustUnderstand;
+	SOAPParameter& header = mustUnderstand.GetHeader().AddHeader();
+
+	header.SetName("Transaction", "uri:my-transaction");
+	header.SetValue("5");
+	header.AddAttribute(SOAPEnv::mustUnderstand) = mu;
+
+	SOAPMethod& method = mustUnderstand.GetBody().GetMethod();
+	method.SetName("echoVoid", e.nspace);
+	method.SetSoapAction(e.soapaction, e.needsappend);
+
+	proxy.Execute(mustUnderstand);
+}
+
+void
+TestMustUnderstand_1(SOAPProxy& proxy, const Endpoint& e)
+{
+	TestMustUnderstand(proxy, e, "1");
+}
+
+void
+TestMustUnderstand_0(SOAPProxy& proxy, const Endpoint& e)
+{
+	TestMustUnderstand(proxy, e, "0");
+}
+
+
+//
+// We have to declare the type traits for our map
 class SOAPTypeTraits< SOAPHashMap<SOAPString, int> > : public SOAPMapTypeTraits
 {
 };
@@ -990,6 +1126,32 @@ TestEchoMap(SOAPProxy& proxy, const Endpoint& e)
     if (map.Size() != outmap.Size())
         throw SOAPException("Maps have differing number of values.");
 }
+
+void
+TestEchoHexBinary(SOAPProxy& proxy, const Endpoint& e)
+{
+	SOAPArray<char> inputBinary, outputBinary;
+
+	int size = rand() % 501 + 500;
+	inputBinary.Resize(size);
+	for (int i = 0; i < size; ++i)
+		inputBinary[i] = rand();
+
+	SOAPMethod method("echoHexBinary", e.nspace, e.soapaction, e.needsappend);
+	method.AddParameter("inputHexBinary") << SOAPHex(inputBinary);
+	const SOAPResponse& response = proxy.Execute(method);
+
+	SOAPHex hex(outputBinary);
+	response.GetReturnValue() >> hex;
+
+	if (inputBinary != outputBinary)
+		throw SOAPException("Values are not equal");
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////
+
+
 
 typedef void (*TestFunction)(SOAPProxy&, const Endpoint&);
 
@@ -1299,6 +1461,41 @@ TestInterop(const Endpoint& e, TestType test)
 	TestForPass(proxy, e, "echo2DStringArray",			TestEcho2DStringArray);
 	TestForPass(proxy, e, "echoNestedStruct",			TestEchoNestedStruct);
 	TestForPass(proxy, e, "echoNestedArray",			TestEchoNestedArray);
+	}
+
+	if (test == round2c)
+	{
+		//
+		// Round 2/Group C methods
+		for (int actor = 0; actor < 3; ++actor)
+			for (int mu = 0; mu < 2; ++mu)
+				for (int und = 0; und < 2; ++und)
+				{
+					char stringbuff[64];
+					char structbuff[64];
+
+					snprintf(stringbuff, sizeof(stringbuff), "echoHdrString mu=%d understandable=%d actor=%s",
+						mu, und, (actor == 0 ? "default" : (actor == 1 ? "next" : "other")));
+
+					snprintf(structbuff, sizeof(structbuff), "echoHdrStructg mu=%d understandable=%d actor=%s",
+						mu, und, (actor == 0 ? "default" : (actor == 1 ? "next" : "other")));
+
+					HeaderMustUnderstand = (mu != 0);
+					HeaderUnderstandable = (und != 0);
+					HeaderActor = actor;
+
+					if (!und && mu && actor != 2)
+					{
+						TestForFault(proxy, e, stringbuff,	TestEchoHdrString);
+						TestForFault(proxy, e, structbuff,	TestEchoHdrStruct);
+					}
+					else
+					{
+						TestForPass(proxy, e, stringbuff,	TestEchoHdrString);
+						TestForPass(proxy, e, structbuff,	TestEchoHdrStruct);
+					}
+				}
+
 	}
 
 	if (test == misc)
