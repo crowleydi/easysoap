@@ -55,7 +55,7 @@ libeasysoap_a_LIBADD = abyss/src/libabyss.la
 
 EXTRA_DIST = \
 	easysoap.dsp \
-	SOAPWinInetServer.cpp \
+	SOAPWinInetTransport.cpp \
 	SOAPISAPIServer.cpp \
 	isapi.cpp \
 	isapi.def

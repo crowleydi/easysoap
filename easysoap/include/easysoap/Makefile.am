@@ -43,6 +43,6 @@ easysoap_HEADERS = \
     es_mwerks.h 
 
 EXTRA_DIST = \
-	SOAPWinInetServer.cpp \
+	SOAPWinInetTransport.h \
 	SOAPISAPIServer.h
 
