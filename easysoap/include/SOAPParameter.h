@@ -48,14 +48,12 @@ public:
 
 	void	Reset();
 
-	void SetName(const char *name);
-	const SOAPString& GetName() const
-	{
-		return m_name;
-	}
+	const SOAPQName& GetName() const		{return m_name;}
+	void SetName(const SOAPQName& name)		{m_name = name;}
+	void SetName(const char *name, const char *ns = 0);
 
-	const SOAPString& GetType() const;
-	const SOAPString& GetTypeNamespace() const;
+	const SOAPQName& GetType() const		{return m_type;}
+	void SetType(const SOAPQName& type)		{m_type = type;}
 	void SetType(const char *type, const char *ns = 0);
 
 	void SetValue(bool val);
@@ -97,7 +95,15 @@ public:
 	const Struct& GetStruct() const;
 
 	SOAPParameter& AddParameter(const char *name = "item");
-	const SOAPParameter *GetParameter(const char *name) const;
+	SOAPParameter& AddParameter(const SOAPParameter& p);
+
+	const SOAPParameter& GetParameter(const char *name) const;
+	const SOAPParameter& GetParameter(size_t i) const
+	{
+		if (m_array.Size() < i)
+			throw SOAPException("Array index out of bounds.");
+		return m_array[i];
+	}
 
 	bool WriteSOAPPacket(SOAPPacketWriter& packet) const;
 
@@ -116,9 +122,8 @@ private:
 	friend class SOAPParameterHandler;
 
 	SOAPParameter	*m_parent;
-	SOAPString		m_name;
-	SOAPString		m_type;
-	SOAPString		m_typens;
+	SOAPQName		m_name;
+	SOAPQName		m_type;
 
 	int				m_flags;
 
