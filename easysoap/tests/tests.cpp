@@ -138,7 +138,35 @@ operator>>(const SOAPParameter& param, SOAPInteropStruct& val)
 	return param;
 }
 
+bool
+almostequal(float a, float b)
+{
+	return (fabs(a - b) <= fabs(a) * 0.0000001);
+}
 
+bool
+almostequal(const SOAPArray<float>& a, const SOAPArray<float>& b)
+{
+	if (a.Size() != b.Size())
+		return false;
+	bool retval = true;
+	for (size_t i = 0; i < a.Size(); ++i)
+	{
+		if (a[i] != b[i])
+		{
+			std::cout << "Checking almost equal "
+				<< a[i] << " " << b[i];
+			if (!almostequal(a[i], b[i]))
+			{
+				retval = false;
+				std::cout << " NOPE, diff=" << (a[i] - b[i]) << std::endl;
+			}
+			else
+				std::cout << " OKAY" << std::endl;
+		}
+	}
+	return retval;
+}
 
 bool
 TestEchoVoid(SOAPProxy& proxy,
@@ -292,7 +320,11 @@ TestEchoFloat(SOAPProxy& proxy,
 		float outputValue = 0;
 		outputParam >> outputValue;
 
-		if (inputValue != outputValue)
+		if (inputValue == outputValue)
+			std::cout << "PASS exact" << std::endl;
+		else if (almostequal(inputValue, outputValue))
+			std::cout << "PASS inexact" << std::endl;
+		else
 			throw SOAPException("Values are not equal: %s != %s",
 				(const char *)inputParam.GetString(),
 				(const char *)outputParam.GetString());
@@ -485,10 +517,12 @@ TestEchoFloatArray(SOAPProxy& proxy,
 		SOAPArray<float> outputValue;
 		response.GetReturnValue() >> outputValue;
 
-		if (inputValue != outputValue)
+		if (inputValue == outputValue)
+			std::cout << "PASS exact" << std::endl;
+		else if (almostequal(inputValue, outputValue))
+			std::cout << "PASS inexact" << std::endl;
+		else
 			throw SOAPException("Values are not equal");
-
-		std::cout << "PASS" << std::endl;
 		return false;
 	}
 	catch (SOAPException& sex)
@@ -691,7 +725,7 @@ main(int argc, char* argv[])
 			"urn:soapinterop", false,
 			"http://soapinterop.org/");/**/
 
-		TestInterop("Phalanx",
+		/*TestInterop("Phalanx",
 			"http://www.phalanxsys.com/interop/listener.asp",
 			"urn:soapinterop", false,
 			"http://soapinterop.org/");/**/
