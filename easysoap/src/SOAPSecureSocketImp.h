@@ -36,10 +36,11 @@ private:
 	typedef SOAPClientSocketImp super;
 
 protected:
-	ssl_st		*m_ssl;
-	ssl_ctx_st	*m_ctx;
-
-	bool	HandleError(const char *context, int retcode);
+	ssl_st				*m_ssl;
+	ssl_ctx_st			*m_ctx;
+	SOAPString 			m_keyfile;
+	static SOAPString 	m_password;
+	bool HandleError(const char *context, int retcode);
 public:
 	SOAPSecureSocketImp();
 	virtual ~SOAPSecureSocketImp();
@@ -49,7 +50,9 @@ public:
 	virtual size_t Read(char *buffer, size_t len);
 	virtual size_t Write(const char *buffer, size_t len);
 	virtual bool WaitRead(int sec, int usec);
+	virtual void SetCertificateInfo(const char* keyfile, const char* password);
 
+	static int password_cb(char *buf, int num, int rwflag, void *userdata);
 	void InitSSL();
 };
 
