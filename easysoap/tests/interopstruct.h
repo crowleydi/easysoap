@@ -84,10 +84,7 @@ struct SOAPArrayStruct
 
 	bool operator!=(const SOAPArrayStruct& other) const
 	{
-		return varString != other.varString ||
-			varInt != other.varInt ||
-			varFloat != other.varFloat ||
-			varArray != other.varArray;
+		return !(*this == other);
 	}
 };
 
