@@ -755,6 +755,9 @@ main(int argc, char* argv[])
 		SOAPArray<Endpoint> endpoints;
 		SOAPPacketWriter::SetAddWhiteSpace(true);
 
+		const char *soapaction = default_interop_soapaction;
+		const char *nspace = default_interop_namespace;
+
 		for (int i = 1; i < argc; ++i)
 		{
 			if (sp_strcmp(argv[i], "-a") == 0)
@@ -774,6 +777,14 @@ main(int argc, char* argv[])
 			{
 				servicename = argv[++i];
 			}
+			else if (sp_strcmp(argv[i], "-ns") == 0)
+			{
+				nspace = argv[++i];
+			}
+			else if (sp_strcmp(argv[i], "-sa") == 0)
+			{
+				soapaction = argv[++i];
+			}
 			else if (argv[i][0] == '-')
 			{
 				throw SOAPException("Unknown commandline argument: %s", argv[i]);
@@ -784,8 +795,8 @@ main(int argc, char* argv[])
 				Endpoint& e = endpoints.Add();
 				e.name = servicename ? servicename : argv[i];
 				e.endpoint = argv[i];
-				e.nspace = default_interop_namespace;
-				e.soapaction = default_interop_soapaction;
+				e.nspace = nspace;
+				e.soapaction = soapaction;
 				e.needsappend = false;
 				servicename = 0;
 			}
