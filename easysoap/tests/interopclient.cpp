@@ -35,6 +35,7 @@
 #include <iostream>
 #include <math.h>
 #include <time.h>
+#include <direct.h>
 
 #include <SOAP.h>
 #include <SOAPDebugger.h>
@@ -84,10 +85,44 @@ randdouble()
 	return f1/f2*pow(10.0, f3);
 }
 
-class SOAPPassException : public SOAPException
+class FPLossException : public SOAPException
 {
 public:
-	SOAPPassException(const char *fmt, ...)
+	FPLossException(float a, float b)
+		: SOAPException("Floating point loss: expecting %.9G, got %.9G", a, b)
+	{
+	}
+};
+
+bool
+almostequal(float a, float b)
+{
+	if (fabs(a - b) <= fabs(a) * 0.0000005)
+		throw FPLossException(a, b);
+	return false;
+}
+
+bool
+almostequal(const SOAPArray<float>& a, const SOAPArray<float>& b)
+{
+	if (a.Size() != b.Size())
+		return false;
+	bool retval = true;
+	for (size_t i = 0; i < a.Size(); ++i)
+	{
+		if (a[i] != b[i] && !almostequal(a[i], b[i]))
+		{
+			retval = false;
+		}
+	}
+	return retval;
+}
+
+
+class UnexpectedSuccessException : public SOAPException
+{
+public:
+	UnexpectedSuccessException(const char *fmt, ...)
 	{
 		va_list args;
 		va_start(args, fmt);
@@ -159,7 +194,7 @@ TestBogusNamespace(SOAPProxy& proxy, const Endpoint& e)
 {
 	SOAPMethod method("echoVoid", "http://bogusns.com/", e.soapaction, e.needsappend);
 	proxy.Execute(method);
-	throw SOAPPassException("Method executed with bogus namespace.");
+	throw UnexpectedSuccessException("Method executed with bogus namespace.");
 }
 
 void
@@ -211,7 +246,7 @@ TestEchoInteger(SOAPProxy& proxy, const Endpoint& e, const char *value)
 	const SOAPResponse& response = proxy.Execute(method);
 	SOAPString outputValue = 0;
 	response.GetReturnValue() >> outputValue;
-	throw SOAPPassException("Returned value: %s", (const char *)outputValue);
+	throw UnexpectedSuccessException("Returned value: %s", (const char *)outputValue);
 }
 
 void
@@ -228,7 +263,7 @@ TestEchoFloat(SOAPProxy& proxy, const Endpoint& e, float value)
 	float outputValue = 0;
 	outputParam >> outputValue;
 
-	if (inputValue != outputValue)
+	if (inputValue != outputValue && !almostequal(inputValue, outputValue))
 		throw SOAPException("Values are not equal: %s != %s",
 			(const char *)inputParam.GetString(),
 			(const char *)outputParam.GetString());
@@ -255,7 +290,7 @@ TestEchoFloatForFail(SOAPProxy& proxy, const Endpoint& e, const char *value)
 	inputParam.SetFloat(value);
 
 	const SOAPResponse& response = proxy.Execute(method);
-	throw SOAPPassException("Returned value: %s",
+	throw UnexpectedSuccessException("Returned value: %s",
 		(const char *)response.GetReturnValue().GetString());
 }
 
@@ -270,7 +305,7 @@ TestEchoStruct(SOAPProxy& proxy, const Endpoint& e)
 	const SOAPResponse& response = proxy.Execute(method);
 	SOAPInteropStruct outputValue;
 	response.GetReturnValue() >> outputValue;
-	if (inputValue != outputValue)
+	if (inputValue != outputValue && !almostequal(inputValue.varFloat, outputValue.varFloat))
 		throw SOAPException("Values are not equal");
 }
 
@@ -321,7 +356,7 @@ TestEchoFloatArray(SOAPProxy& proxy, const Endpoint& e, int numvals)
 	SOAPArray<float> outputValue;
 	response.GetReturnValue() >> outputValue;
 
-	if (inputValue != outputValue)
+	if (inputValue != outputValue && !almostequal(inputValue, outputValue))
 		throw SOAPException("Values are not equal");
 }
 
@@ -538,20 +573,30 @@ TestForPass(SOAPProxy& proxy, const Endpoint& e, const char *testname, TestFunct
 		type = "PASS";
 		msg = "PASS";
 	}
+	catch (FPLossException& sex)
+	{
+		type = "FP LOSS";
+		msg = sex.What();
+	}
 	catch (SOAPSocketException& sex)
 	{
 		type = "NETWORK ERROR";
 		msg = sex.What();
 	}
+	catch (SOAPFaultException& sex)
+	{
+		type = "FAULT";
+		msg = sex.What();
+	}
 	catch (SOAPException& sex)
 	{
-		type = "FAILED";
+		type = "FAIL";
 		msg = sex.What();
 	}
 	catch (...)
 	{
 		type = "UNKNOWN";
-		msg = "Unknown error, problem with EasySoap";
+		msg = "Unknown error, problem with EasySoap++";
 	}
 
 	std::cout << type;
@@ -574,7 +619,7 @@ TestForPass(SOAPProxy& proxy, const Endpoint& e, const char *testname, TestFunct
 }
 
 void
-TestForFail(SOAPProxy& proxy, const Endpoint& e, const char *testname, TestFunction func)
+TestForFault(SOAPProxy& proxy, const Endpoint& e, const char *testname, TestFunction func)
 {
 	const char *type;
 	SOAPString msg;
@@ -586,19 +631,24 @@ TestForFail(SOAPProxy& proxy, const Endpoint& e, const char *testname, TestFunct
 		type = "FAIL";
 		msg = "FAIL";
 	}
+	catch (SOAPFaultException& sex)
+	{
+		type = "PASS";
+		msg = sex.What();
+	}
+	catch (UnexpectedSuccessException& sex)
+	{
+		type = "FAIL";
+		msg = sex.What();
+	}
 	catch (SOAPSocketException& sex)
 	{
 		type = "NETWORK ERROR";
 		msg = sex.What();
 	}
-	catch (SOAPPassException& sex)
-	{
-		type = "FAIL";
-		msg = sex.What();
-	}
 	catch (SOAPException& sex)
 	{
-		type = "PASS";
+		type = "FAIL";
 		msg = sex.What();
 	}
 	catch (...)
@@ -646,20 +696,20 @@ TestInterop(const Endpoint& e)
 	testresults.WriteValue(e.nspace);
 	testresults.EndTag("NameSpace");
 
-	TestForFail(proxy, e, "BogusMethod",				TestBogusMethod);
-	TestForFail(proxy, e, "BogusNamespace",				TestBogusNamespace);
+	TestForFault(proxy, e, "BogusMethod",				TestBogusMethod);
+	TestForFault(proxy, e, "BogusNamespace",			TestBogusNamespace);
 	TestForPass(proxy, e, "echoVoid",					TestEchoVoid);
 	TestForPass(proxy, e, "echoInteger",				TestEchoInteger);
 	TestForPass(proxy, e, "echoInteger_MostPositive",	TestEchoIntegerMostPositive);
 	TestForPass(proxy, e, "echoInteger_MostNegative",	TestEchoIntegerMostNegative);
-	TestForFail(proxy, e, "echoInteger_Overflow",		TestEchoIntegerOverflow);
-	TestForFail(proxy, e, "echoInteger_Underflow",		TestEchoIntegerUnderflow);
+	TestForFault(proxy, e, "echoInteger_Overflow",		TestEchoIntegerOverflow);
+	TestForFault(proxy, e, "echoInteger_Underflow",		TestEchoIntegerUnderflow);
 	TestForPass(proxy, e, "echoFloat",					TestEchoFloat);
 	TestForPass(proxy, e, "echoFloat_NaN",				TestEchoFloat_NaN);
 	TestForPass(proxy, e, "echoFloat_INF",				TestEchoFloat_INF);
 	TestForPass(proxy, e, "echoFloat_negINF",			TestEchoFloat_negINF);
-	TestForFail(proxy, e, "echoFloat_Overflow",			TestEchoFloat_Overflow);
-	TestForFail(proxy, e, "echoFloat_Underflow",		TestEchoFloat_Underflow);
+	TestForFault(proxy, e, "echoFloat_Overflow",		TestEchoFloat_Overflow);
+	TestForFault(proxy, e, "echoFloat_Underflow",		TestEchoFloat_Underflow);
 	TestForPass(proxy, e, "echoString",					TestEchoString);
 	TestForPass(proxy, e, "echoStruct",					TestEchoStruct);
 	TestForPass(proxy, e, "echoIntegerArray",			TestEchoIntegerArray);
@@ -688,61 +738,72 @@ main(int argc, char* argv[])
 		bool doall = false;
 		bool execute = true;
 		bool doappend = false;
+		bool makedirs = false;
 
 		SOAPArray<Endpoint> endpoints;
 		SOAPPacketWriter::SetAddWhiteSpace(true);
+		SOAPHashMapNoCase<SOAPString, bool> skips;
 
 		const char *soapaction = default_interop_soapaction;
 		const char *nspace = default_interop_namespace;
 
-		for (int i = 1; i < argc; ++i)
+		for (int i = 1; i < argc;)
 		{
-			if (sp_strcmp(argv[i], "-a") == 0)
+			SOAPString val = argv[i++];
+			if (val == "-a")
 			{
 				doall = true;
 				testlocal = false;
 			}
-			else if (sp_strcmp(argv[i], "-xml") == 0)
+			else if (val == "-xml")
 			{
-				xmlname = argv[++i];
+				xmlname = argv[i++];
 			}
-			else if (sp_strcmp(argv[i], "-l") == 0)
+			else if (val == "-l")
 			{
 				execute = false;
 			}
-			else if (sp_strcmp(argv[i], "-a+") == 0)
+			else if (val == "-a+")
 			{
 				doappend = true;
 			}
-			else if (sp_strcmp(argv[i], "-a-") == 0)
+			else if (val == "-a-")
 			{
 				doappend = false;
 			}
-			else if (sp_strcmp(argv[i], "-p") == 0)
+			else if (val == "-p")
 			{
-				httpproxy = argv[++i];
+				httpproxy = argv[i++];
 			}
-			else if (sp_strcmp(argv[i], "-n") == 0)
+			else if (val == "-n")
 			{
-				servicename = argv[++i];
+				servicename = argv[i++];
 			}
-			else if (sp_strcmp(argv[i], "-ns") == 0)
+			else if (val == "-ns")
 			{
 				nspace = argv[++i];
 			}
-			else if (sp_strcmp(argv[i], "-sa") == 0)
+			else if (val == "-sa")
 			{
-				soapaction = argv[++i];
+				soapaction = argv[i++];
 			}
-			else if (argv[i][0] == '-')
+			else if (val == "-skip")
 			{
-				throw SOAPException("Unknown commandline argument: %s", argv[i]);
+				skips[argv[i++]] = true;
+			}
+			else if (val == "-mkdir")
+			{
+				makedirs = true;
+			}
+			else if (val[0] == '-')
+			{
+				throw SOAPException("Unknown commandline argument: %s", (const char *)val);
 			}
 			else
 			{
 				testlocal = false;
 				Endpoint& e = endpoints.Add();
-				e.endpoint = argv[i];
+				e.endpoint = val;
 				e.name = servicename ? servicename : (const char *)e.endpoint.Hostname();
 				e.nspace = nspace;
 				e.soapaction = soapaction;
@@ -779,8 +840,12 @@ main(int argc, char* argv[])
 						<< "SOAPAction: " << e.soapaction
 						<< (e.needsappend ? "(method)" : "") <<	std::endl
 						<< std::endl;
-			if (execute)
-				TestInterop(endpoints[j]);
+
+			if (makedirs)
+				_mkdir(e.name);
+
+			if (execute && !skips.Find(e.name))
+				TestInterop(e);
 
 			std::cout
 				<< std::endl
