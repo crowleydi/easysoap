@@ -487,6 +487,14 @@ SOURCE=.\abyss\src\thread.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\abyss\src\threadpool.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\abyss\src\threadpool.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\abyss\src\trace.c
 # End Source File
 # End Group
