@@ -532,7 +532,7 @@ TestEchoInteger_Junk1(SOAPProxy& proxy, const Endpoint& e)
 void
 TestEchoInteger_Junk2(SOAPProxy& proxy, const Endpoint& e)
 {
-	TestEchoIntegerForPass(proxy, e, "\r\n\t 1234 \r\n\t");
+	TestEchoIntegerForPass(proxy, e, "\n\t 1234 \n\t");
 }
 
 void
@@ -592,7 +592,7 @@ TestEchoFloat_Junk1(SOAPProxy& proxy, const Endpoint& e)
 void
 TestEchoFloat_Junk2(SOAPProxy& proxy, const Endpoint& e)
 {
-	TestEchoFloatForPass(proxy, e, "\r\n\t 1234 \r\n\t");
+	TestEchoFloatForPass(proxy, e, "\n\t 1234 \n\t");
 }
 
 void
@@ -831,9 +831,6 @@ main(int argc, char* argv[])
 	const char *xmlname = 0;
 	try
 	{
-		SOAPDebugger::SetFile("foo.txt");
-		SOAPDebugger::SetMessageLevel(4);
-
 		const char *servicename = 0;
 		bool testlocal = true;
 		bool doall = false;
@@ -923,7 +920,7 @@ main(int argc, char* argv[])
 			// Just test against localhost
 			Endpoint& e = endpoints.Add();
 			e.name = "localhost";
-			e.endpoint = "http://localhost:80/cgi-bin/interopserver";
+			e.endpoint = "http://localhost:80/cgi-bin/interopserver.exe";
 			e.nspace = default_interop_namespace;
 			e.soapaction = default_interop_soapaction;
 			e.needsappend = false;
