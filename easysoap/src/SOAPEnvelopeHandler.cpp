@@ -48,7 +48,6 @@ SOAPEnvelopeHandler::~SOAPEnvelopeHandler()
 void
 SOAPEnvelopeHandler::SetEnvelope(SOAPEnvelope& env)
 {
-	env.Reset();
 	m_envelope = &env;
 	m_done = false;
 	m_bodyHandler.SetBody(m_envelope->GetBody());
