@@ -14,7 +14,7 @@ SOAPBuildersInteropHandler::SOAPBuildersInteropHandler()
 	const char *interop_namespace = "http://soapinterop.org/";
 
 	//
-	// Group A/base methods
+	// Round 1
 	DispatchMethod("echoString",	interop_namespace,
 		&SOAPBuildersInteropHandler::echoString);
 
@@ -42,11 +42,10 @@ SOAPBuildersInteropHandler::SOAPBuildersInteropHandler()
 	DispatchMethod("echoVoid",	interop_namespace,
 		&SOAPBuildersInteropHandler::echoVoid);
 
+	//
+	// Round 2 Base
 	DispatchMethod("echoBase64",	interop_namespace,
 		&SOAPBuildersInteropHandler::echoBase64);
-
-	DispatchMethod("echoHexBinary",	interop_namespace,
-		&SOAPBuildersInteropHandler::echoHexBinary);
 
 	DispatchMethod("echoDate",	interop_namespace,
 		&SOAPBuildersInteropHandler::echoDate);
@@ -76,8 +75,17 @@ SOAPBuildersInteropHandler::SOAPBuildersInteropHandler()
 
 	//
 	// Miscellaneous methods
+	DispatchMethod("echoHexBinary",	interop_namespace,
+		&SOAPBuildersInteropHandler::echoHexBinary);
+
 	DispatchMethod("echoMap",	interop_namespace,
 		&SOAPBuildersInteropHandler::echoMap);
+
+	DispatchMethod("echoDouble",	interop_namespace,
+		&SOAPBuildersInteropHandler::echoDouble);
+
+	DispatchMethod("echoDoubleArray",	interop_namespace,
+		&SOAPBuildersInteropHandler::echoDoubleArray);
 }
 
 SOAPBuildersInteropHandler::~SOAPBuildersInteropHandler()
@@ -107,6 +115,16 @@ SOAPBuildersInteropHandler::echoFloat(const SOAPMethod& req, SOAPMethod& resp)
 	float val;
 
 	req.GetParameter("inputFloat") >> val;
+
+	resp.AddParameter("return") << val;
+}
+
+void
+SOAPBuildersInteropHandler::echoDouble(const SOAPMethod& req, SOAPMethod& resp)
+{
+	double val;
+
+	req.GetParameter("inputDouble") >> val;
 
 	resp.AddParameter("return") << val;
 }
@@ -147,6 +165,16 @@ SOAPBuildersInteropHandler::echoFloatArray(const SOAPMethod& req, SOAPMethod& re
 	SOAPArray<float> val;
 
 	req.GetParameter("inputFloatArray") >> val;
+
+	resp.AddParameter("return") << val;
+}
+
+void
+SOAPBuildersInteropHandler::echoDoubleArray(const SOAPMethod& req, SOAPMethod& resp)
+{
+	SOAPArray<double> val;
+
+	req.GetParameter("inputDoubleArray") >> val;
 
 	resp.AddParameter("return") << val;
 }

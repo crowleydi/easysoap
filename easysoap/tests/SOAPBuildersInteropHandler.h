@@ -23,7 +23,7 @@ public:
 	}
 
 	//
-	// Base test suite
+	// Round 1
 	void echoString(const SOAPMethod& req, SOAPMethod& response);
 	void echoStringArray(const SOAPMethod& req, SOAPMethod& response);
 	void echoInteger(const SOAPMethod& req, SOAPMethod& response);
@@ -33,8 +33,10 @@ public:
 	void echoStruct(const SOAPMethod& req, SOAPMethod& response);
 	void echoStructArray(const SOAPMethod& req, SOAPMethod& response);
 	void echoVoid(const SOAPMethod& req, SOAPMethod& response);
+
+	//
+	// Round 2 Base
 	void echoBase64(const SOAPMethod& req, SOAPMethod& response);
-	void echoHexBinary(const SOAPMethod& req, SOAPMethod& response);
 	void echoDate(const SOAPMethod& req, SOAPMethod& response);
 	void echoDecimal(const SOAPMethod& req, SOAPMethod& response);
 	void echoBoolean(const SOAPMethod& req, SOAPMethod& response);
@@ -50,6 +52,9 @@ public:
 	//
 	// Miscellaneous methods..
 	void echoMap(const SOAPMethod& req, SOAPMethod& response);
+	void echoDouble(const SOAPMethod& req, SOAPMethod& response);
+	void echoDoubleArray(const SOAPMethod& req, SOAPMethod& response);
+	void echoHexBinary(const SOAPMethod& req, SOAPMethod& response);
 };
 
 class SOAPBuildersHeaderHandler

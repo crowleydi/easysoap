@@ -94,10 +94,23 @@ public:
 		: SOAPException("Floating point loss: expecting %.9G, got %.9G", a, b)
 	{
 	}
+
+	FPLossException(double a, double b)
+		: SOAPException("Floating point loss: expecting %.18G, got %.18G", a, b)
+	{
+	}
 };
 
 bool
 almostequal(float a, float b)
+{
+	if (a != b && fabs(a - b) <= fabs(a) * 0.0000005)
+		throw FPLossException(a, b);
+	return false;
+}
+
+bool
+almostequal(double a, double b)
 {
 	if (a != b && fabs(a - b) <= fabs(a) * 0.0000005)
 		throw FPLossException(a, b);
@@ -112,7 +125,24 @@ almostequal(const SOAPArray<float>& a, const SOAPArray<float>& b)
 	bool retval = true;
 	for (size_t i = 0; i < a.Size(); ++i)
 	{
-		if (a[i] != b[i] && !almostequal(a[i], b[i]))
+		if (!almostequal(a[i], b[i]))
+		{
+			retval = false;
+		}
+	}
+	return retval;
+}
+
+
+bool
+almostequal(const SOAPArray<double>& a, const SOAPArray<double>& b)
+{
+	if (a.Size() != b.Size())
+		return false;
+	bool retval = true;
+	for (size_t i = 0; i < a.Size(); ++i)
+	{
+		if (!almostequal(a[i], b[i]))
 		{
 			retval = false;
 		}
@@ -348,6 +378,32 @@ TestEchoFloat(SOAPProxy& proxy, const Endpoint& e, float value)
 }
 
 void
+TestEchoDouble(SOAPProxy& proxy, const Endpoint& e, double value)
+{
+	double inputValue = value;
+
+	SOAPMethod method("echoDouble", e.nspace, e.soapaction, e.needsappend);
+	SOAPParameter& inputParam = method.AddParameter("inputDouble");
+	inputParam << inputValue;
+
+	const SOAPResponse& response = proxy.Execute(method);
+	const SOAPParameter& outputParam = response.GetReturnValue();
+	double outputValue = 0;
+	outputParam >> outputValue;
+
+	if (inputValue != outputValue && !almostequal(inputValue, outputValue))
+		throw SOAPException("Values are not equal: %s != %s",
+			(const char *)inputParam.GetString(),
+			(const char *)outputParam.GetString());
+}
+
+void
+TestEchoDouble(SOAPProxy& proxy, const Endpoint& e)
+{
+	TestEchoDouble(proxy, e, 12445e63);
+}
+
+void
 TestEchoFloatStringValue(SOAPProxy& proxy, const Endpoint& e, const char *value)
 {
 	SOAPMethod method("echoFloat", e.nspace, e.soapaction, e.needsappend);
@@ -530,6 +586,31 @@ TestEchoFloatArray(SOAPProxy& proxy, const Endpoint& e, int numvals)
 	const SOAPResponse& response = proxy.Execute(method);
 
 	SOAPArray<float> outputValue;
+	response.GetReturnValue() >> outputValue;
+
+	if (inputValue != outputValue && !almostequal(inputValue, outputValue))
+		throw SOAPException("Values are not equal");
+}
+
+
+void
+TestEchoDoubleArray(SOAPProxy& proxy, const Endpoint& e, int numvals)
+{
+	SOAPArray<double> inputValue;
+	for (int i = 0; i < numvals; ++i)
+		inputValue.Add(randdouble());
+
+	SOAPMethod method("echoDoubleArray", e.nspace, e.soapaction, e.needsappend);
+	// Here I call SetArrayType() to make sure that for zero-length
+	// arrays the array type is correct.  We have to set it manually
+	// for zero length arrays because we can't determine the type from
+	// elements in the array!
+	SOAPParameter& param = method.AddParameter("inputDoubleArray");
+	param << inputValue;
+
+	const SOAPResponse& response = proxy.Execute(method);
+
+	SOAPArray<double> outputValue;
 	response.GetReturnValue() >> outputValue;
 
 	if (inputValue != outputValue && !almostequal(inputValue, outputValue))
@@ -822,6 +903,12 @@ TestEchoString(SOAPProxy& proxy, const Endpoint& e)
 }
 
 void
+TestEchoString_newlines(SOAPProxy& proxy, const Endpoint& e)
+{
+	TestEchoString(proxy, e, "This\ris\na\r\ntest\tstring\n\rfrom EasySoap++");
+}
+
+void
 TestEchoIntegerArray(SOAPProxy& proxy, const Endpoint& e)
 {
 	TestEchoIntegerArray(proxy, e, rand() % 10 + 5);
@@ -867,6 +954,18 @@ void
 TestEchoStructArrayZeroLen(SOAPProxy& proxy, const Endpoint& e)
 {
 	TestEchoStructArray(proxy, e, 0);
+}
+
+void
+TestEchoDoubleArray(SOAPProxy& proxy, const Endpoint& e)
+{
+	TestEchoDoubleArray(proxy, e, rand() % 10 + 5);
+}
+
+void
+TestEchoDoubleArrayZeroLen(SOAPProxy& proxy, const Endpoint& e)
+{
+	TestEchoDoubleArray(proxy, e, 0);
 }
 
 class SOAPTypeTraits< SOAPHashMap<SOAPString, int> > : public SOAPMapTypeTraits
@@ -1147,10 +1246,6 @@ TestInterop(const Endpoint& e, TestType test)
 	{
 	//
 	// Round 1
-	TestForFault(proxy, e, "BogusMethod",				TestBogusMethod);
-	TestForFault(proxy, e, "BogusNamespace",			TestBogusNamespace);
-	TestForFault(proxy, e, "MustUnderstand=1",			TestMustUnderstand_1);
-	TestForPass(proxy, e, "MustUnderstand=0",			TestMustUnderstand_0);
 	TestForPass(proxy, e, "echoVoid",					TestEchoVoid);
 	TestForPass(proxy, e, "echoInteger",				TestEchoInteger);
 	TestForPass(proxy, e, "echoInteger_MostPositive",	TestEchoInteger_MostPositive);
@@ -1170,6 +1265,7 @@ TestInterop(const Endpoint& e, TestType test)
 	TestForFault(proxy, e, "echoFloat_Junk1",			TestEchoFloat_Junk1);
 	TestForPass(proxy, e, "echoFloat_Junk2",			TestEchoFloat_Junk2);
 	TestForPass(proxy, e, "echoString",					TestEchoString);
+	TestForPass(proxy, e, "echoString_newlines",		TestEchoString_newlines);
 	TestForPass(proxy, e, "echoStruct",					TestEchoStruct);
 	TestForPass(proxy, e, "echoIntegerArray",			TestEchoIntegerArray);
 	TestForPass(proxy, e, "echoFloatArray",				TestEchoFloatArray);
@@ -1208,7 +1304,14 @@ TestInterop(const Endpoint& e, TestType test)
 	if (test == misc)
 	{
 	// Miscellaneous methods
+	TestForFault(proxy, e, "BogusMethod",				TestBogusMethod);
+	TestForFault(proxy, e, "BogusNamespace",			TestBogusNamespace);
+	TestForFault(proxy, e, "MustUnderstand=1",			TestMustUnderstand_1);
+	TestForPass(proxy, e, "MustUnderstand=0",			TestMustUnderstand_0);
 	TestForPass(proxy, e, "echoMap",					TestEchoMap);
+	TestForPass(proxy, e, "echoDouble",					TestEchoDouble);
+	TestForPass(proxy, e, "echoDoubleArray",			TestEchoDoubleArray);
+	TestForPass(proxy, e, "echoDoubleArray_ZeroLen",	TestEchoDoubleArrayZeroLen);
 	TestForPass(proxy, e, "echoHexBinary",				TestEchoHexBinary);
 	}
 
