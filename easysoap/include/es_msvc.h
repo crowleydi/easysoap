@@ -44,4 +44,6 @@
 #endif // EASYSOAP_EXPORTS
 #endif // EASYSOAP_STATIC
 
+#define MEMBER_TYPE(T) T
+
 #endif // __ES_MSVC_H_
