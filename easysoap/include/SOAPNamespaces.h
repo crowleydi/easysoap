@@ -27,8 +27,8 @@
 #define SOAP_XSD_1999 "http://www.w3.org/1999/XMLSchema"
 #define SOAP_XSI_2001 "http://www.w3.org/2001/XMLSchema-instance"
 #define SOAP_XSD_2001 "http://www.w3.org/2001/XMLSchema"
-#define SOAP_XSI SOAP_XSI_1999
-#define SOAP_XSD SOAP_XSD_1999
+#define SOAP_XSI SOAP_XSI_2001
+#define SOAP_XSD SOAP_XSD_2001
 
 #define PARSER_NS_SEP "#"
 
