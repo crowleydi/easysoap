@@ -47,7 +47,7 @@ noinst_HEADERS = \
 
 INCLUDES=-I@top_srcdir@/include 
 
-libeasysoap_la_LDFLAGS = -no-undefined
+libeasysoap_la_LDFLAGS = -no-undefined -version-info 0:6:1
 
 
 AM_CFLAGS=-Wall
