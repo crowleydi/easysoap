@@ -48,7 +48,7 @@ bool
 SOAPEnvelope::WriteSOAPPacket(SOAPPacketWriter& packet) const
 {
 	packet.Reset();
-	packet.StartTag(EnvelopeTag);
+	packet.StartTag(EnvelopeTag, "V");
 
 	// TODO: automagically add only the tags we need...
 	packet.AddXMLNS("C", SOAP_ENC);
