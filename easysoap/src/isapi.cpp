@@ -1,6 +1,7 @@
 //
 // isapi.c : Defines the entry point for the DLL application.
 //
+// $Ident$
 //
 // This file implements the standard DLL entry points for an
 // ISAPI module.  This is free code.  It was taken and derived
