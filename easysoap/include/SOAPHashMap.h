@@ -46,7 +46,7 @@ struct SOAPEqualsFunctor
 
 
 #include <SOAPUtil.h>
-#include <SOAPArray.h>
+#include <SOAPPool.h>
 
 
 template <typename K, typename I,
@@ -57,12 +57,9 @@ class EASYSOAP_EXPORT SOAPHashMap
 private:
 	// structure for keeping a linked-list of elements
 	struct HashElement {
-		HashElement(size_t hash, const K& key, const I& item)
-			: m_hash(hash), m_key(key), m_item(item), m_next(0)
-		{}
-		HashElement(size_t hash, const K& key)
-			: m_hash(hash), m_key(key), m_next(0)
-		{}
+		HashElement(): m_hash(0), m_next(0)
+		{
+		}
 
 		HashElement	*m_next;
 		size_t		m_hash;
@@ -75,11 +72,11 @@ private:
 
 	typedef SOAPArray<HashElement*>	Elements;
 
-	Elements	m_elements;
-	Elements	m_pool;
-	size_t		m_numElements;
-	float		m_fillfactor;
-	size_t		m_resizeThreshold;
+	Elements				m_elements;
+	SOAPPool<HashElement>	m_pool;
+	size_t					m_numElements;
+	float					m_fillfactor;
+	size_t					m_resizeThreshold;
 
 	// our Iterator class
 	class ForwardHashMapIterator
@@ -288,7 +285,8 @@ public:
 
 
 	// find & set or add
-	I& Add(const K& key, const I& item)
+	template <typename X>
+	I& Add(const X& key, const I& item)
 	{
 		// see if we can find it
 		size_t hash = hashcode(key);
@@ -299,7 +297,8 @@ public:
 	}
 
 	// find or add
-	I& operator[](const K& key)
+	template <typename X>
+	I& operator[](const X& key)
 	{
 		// see if we can find it
 		size_t hash = hashcode(key);
@@ -311,7 +310,8 @@ public:
 
 
 	// returns true if we found the key and removed it.
-	bool Remove(const K& key)
+	template <typename X>
+	bool Remove(const X& key)
 	{
 		if (m_elements.Size() > 0)
 		{
@@ -363,8 +363,8 @@ public:
 				he = next;
 			}
 		}
-		for (i = m_pool.Begin(); i != m_pool.End(); ++i)
-			delete (*i);
+
+		m_pool.Empty();
 	}
 
 	size_t Size() const
@@ -374,7 +374,8 @@ public:
 
 	// find the item associated with the given key.
 	// returns null if we can't find the key.
-	Iterator Find(const K& key) const
+	template <typename X>
+	Iterator Find(const X& key) const
 	{
 		size_t hash = hashcode(key);
 		return Find(key, hash);
@@ -396,7 +397,8 @@ public:
 private:
 	// Does the actual find.  We pass in the hashcode so we don't have
 	// to recompute it since it is used in other places.
-	Iterator Find(const K& key, size_t hash) const
+	template <typename X>
+	Iterator Find(const X& key, size_t hash) const
 	{
 		if (m_elements.Size() > 0)
 		{
@@ -444,12 +446,8 @@ private:
 
 	void PutBackHashElement(HashElement *he)
 	{
-		if (he)
-		{
-			he->m_next = 0;
-			m_pool.Add(he);
-			--m_numElements;
-		}
+		m_pool.Return(he);
+		--m_numElements;
 	}
 
 	HashElement *GetNextHashElement(
@@ -457,35 +455,23 @@ private:
 			const K& key,
 			const I& item)
 	{
+		HashElement *he = m_pool.Get();
+		he->m_hash = hash;
+		he->m_key = key;
+		he->m_item = item;
 		++m_numElements;
-		if (m_pool.Size() > 0)
-		{
-			HashElement *he = m_pool[m_pool.Size() - 1];
-			m_pool.Resize(m_pool.Size() - 1);
-
-			he->m_hash = hash;
-			he->m_key = key;
-			he->m_item = item;
-			return he;
-		}
-		return new HashElement(hash, key, item);
+		return he;
 	}
 
 	HashElement *GetNextHashElement(
 			size_t hash,
 			const K& key)
 	{
+		HashElement *he = m_pool.Get();
+		he->m_hash = hash;
+		he->m_key = key;
 		++m_numElements;
-		if (m_pool.Size() > 0)
-		{
-			HashElement *he = m_pool[m_pool.Size() - 1];
-			m_pool.Resize(m_pool.Size() - 1);
-
-			he->m_hash = hash;
-			he->m_key = key;
-			return he;
-		}
-		return new HashElement(hash, key);
+		return he;
 	}
 
 
