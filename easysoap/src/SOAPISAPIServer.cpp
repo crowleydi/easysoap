@@ -130,24 +130,37 @@ SOAPISAPITransport::Read(char *buffer, size_t buffsize)
 
 	DWORD dwSize = buffsize > m_leftRead ? m_leftRead : buffsize;
 
-	if (m_ecb->cbTotalBytes > m_ecb->cbAvailable)
-	{
-		if (!m_ecb->ReadClient(m_ecb->ConnID, (void *)buffer, &dwSize))
-			throw SOAPException("ReadClient() failed, err=0x%08x",
-					GetLastError());
-		if (dwSize == 0)
-			m_leftRead = 0;
-	}
-	else
+	if (m_leftRead > 0)
 	{
 		if (!m_ecbData)
 			m_ecbData = m_ecb->lpbData;
-		const unsigned char *end = m_ecbData + dwSize;
-		while (m_ecbData != end)
-			*buffer++ = *m_ecbData++;
-	}
 
-	m_leftRead -= dwSize;
+		if (m_ecbData == m_ecb->lpbData + m_ecb->cbAvailable)
+		{
+			if (m_ecb->cbTotalBytes > m_ecb->cbAvailable)
+			{
+				if (!m_ecb->ReadClient(m_ecb->ConnID, (void *)buffer, &dwSize))
+					throw SOAPException("ReadClient() failed, err=0x%08x",
+							GetLastError());
+				if (dwSize == 0)
+					m_leftRead = 0;
+			}
+			else
+			{
+				dwSize = 0;
+			}
+		}
+		else
+		{
+			if (!m_ecbData)
+				m_ecbData = m_ecb->lpbData;
+			const unsigned char *end = m_ecbData + dwSize;
+			while (m_ecbData != end)
+				*buffer++ = *m_ecbData++;
+		}
+
+		m_leftRead -= dwSize;
+	}
 	return dwSize;
 }
 
