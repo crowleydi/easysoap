@@ -18,313 +18,483 @@
 inline std::ostream&
 operator<<(std::ostream& os, const SOAPString& str)
 {
-	return os << (const char *)str;
-}
-
-void
-WriteParameter(const SOAPParameter& param)
-{
-	switch (param.GetType())
-	{
-	case SOAPTypes::xsd_null:
-		std::cout << "null: " << param.GetName();
-		break;
-	case SOAPTypes::xsd_int:
-		std::cout << "int: " << param.GetName() << "=" << param.GetInt();
-		break;
-	case SOAPTypes::xsd_float:
-		std::cout << "float: " << param.GetName() << "=" << param.GetFloat();
-		break;
-	case SOAPTypes::xsd_double:
-		std::cout << "double: " << param.GetName() << "=" << param.GetDouble();
-		break;
-	case SOAPTypes::xsd_string:
-		std::cout << "string: " << param.GetName() << "=" << param.GetString();
-		break;
-
-	case SOAPTypes::soap_array:
-		{
-			std::cout << "Array {" << std::endl;
-
-			const SOAPParameter::Array& val = param.GetArray();
-			for (SOAPParameter::Array::ConstIterator i = val.Begin(); i != val.End(); ++i)
-				WriteParameter(*i);
-
-			std::cout << "}";
-		}
-		break;
-	case SOAPTypes::soap_struct:
-		{
-			std::cout << "Struct {" << std::endl;
-
-			const SOAPParameter::Struct& val = param.GetStruct();
-			for (SOAPParameter::Struct::Iterator i = val.Begin(); i != val.End(); ++i)
-				WriteParameter(*i);
-
-			std::cout << "}";
-		}
-		break;
-	default:
-		std::cout << "unknown type";
-		break;
-	}
-
-	std::cout << std::endl;
-}
-
-const SOAPResponse&
-WriteResponse(const SOAPResponse& response)
-{
-	if (response.GetBody().IsFault())
-	{
-		const SOAPFault& fault = response.GetBody().GetFault();
-		std::cout << response.GetBody().GetMethod().GetName() << ":" << std::endl
-			<< "  code: " << fault.GetFaultCode().GetString() << std::endl
-			<< "string: " << fault.GetFaultString().GetString() << std::endl
-			<< "detail: " << fault.GetDetail().GetString() << std::endl
-			<< " actor: " << fault.GetFaultActor().GetString() << std::endl;
-	}
-	else
-	{
-		std::cout << response.GetBody().GetMethod().GetName() << std::endl;
-
-		const SOAPMethod& method = response.GetBody().GetMethod();
-		for (size_t i = 0; i < method.GetNumParameters(); ++i)
-			WriteParameter(method.GetParameter(i));
-
-		std::cout << std::endl;
-	}
-	return response;
-}
-
-SOAPString
-getStateName(SOAPProxy& soap, int statenum)
-{
-	SOAPMethod	getStateName("getStateName", "/My/Examples");
-	SOAPParameter& param = getStateName.AddParameter();
-	param.SetValue(statenum);
-
-	return soap.Execute(getStateName).GetReturnValue().GetString();
-}
-
-void
-getStateList(SOAPProxy& soap)
-{
-	SOAPMethod	getStateList("getStateList", "/My/Examples");
-	SOAPParameter& listParam = getStateList.AddParameter();
-	listParam.AddParameter().SetValue(13);
-	listParam.AddParameter().SetValue(79);
-	listParam.AddParameter().SetValue(15);
-
-	WriteResponse(soap.Execute(getStateList));
-}
-
-void
-getStateStruct(SOAPProxy& soap)
-{
-	SOAPMethod	getStateStruct("getStateStruct", "/My/Examples");
-
-	SOAPParameter& structParam = getStateStruct.AddParameter();
-	structParam.AddParameter("a").SetValue(1);
-	structParam.AddParameter("b").SetValue(5);
-
-	WriteResponse(soap.Execute(getStateStruct));
-}
-
-void
-bogusCall(SOAPProxy& soap)
-{
-	SOAPMethod	getStateStruct("bogus", "/My/Examples");
-	getStateStruct.AddParameter("value").SetValue(10);
-
-	WriteResponse(soap.Execute(getStateStruct));
+	const char *s = str;
+	return os << (s ? s : "(null)");
 }
 
 //
-// ITFinity Currency Conversion
+// Little helper function
+const SOAPParameter&
+SafeGetParameter(const SOAPParameter& param, const char *pname)
+{
+	const SOAPParameter *p = 0;
+	if (!(p = param.GetParameter(pname)))
+		throw SOAPException("Invalid struct, member '%s' is missing", pname);
+	return *p;
+}
+
 //
-void
-CurrencyConversion()
+//  The struct used for interop tests
+//
+struct SOAPInteropStruct
 {
-	SOAPProxy soap("http://www.itfinity.net/soap/exrates/default.asp");
-	SOAPMethod GetRate("GetRate", "http://www.itfinity.net/soap/exrates/exrates.xsd");
-
-	GetRate.AddParameter("fromCurr").SetValue("USD");
-	GetRate.AddParameter("ToCurr").SetValue("JPY");
-
-	WriteResponse(soap.Execute(GetRate));
-}
-
-void
-GetInternetTime()
-{
-	SOAPProxy soap("http://www.lemurlabs.com/rpcrouter");
-	SOAPMethod getInternetTime("getInternetTime", "urn:lemurlabs-ITimeService");
-	WriteResponse(soap.Execute(getInternetTime));
-}
-
-void
-PingService()
-{
-	SOAPProxy soap("http://www.lemurlabs.com/rpcrouter");
-	SOAPMethod getInternetTime("getInternetTime", "urn:lemurlabs-ITimeService");
-	WriteResponse(soap.Execute(getInternetTime));
-}
-
-void
-Whois(const char *who)
-{
-	SOAPProxy soap("http://www.razorsoft.net/ssss4c/whois.asp");
-	SOAPMethod whois("whois", "http://www.pocketsoap.com/whois");
-
-	whois.AddParameter("name").SetValue(who);
-
-	WriteResponse(soap.Execute(whois));
-}
-
-void FortuneDictionaryList()
-{
-	SOAPProxy soap("http://www.lemurlabs.com:80/rpcrouter");
-	SOAPMethod fortune("getDictionaryNameList", "urn:lemurlabs-Fortune");
-
-	WriteResponse(soap.Execute(fortune));
-}
-
-void Fortune(const char *dictionary = 0)
-{
-	SOAPProxy soap("http://www.lemurlabs.com:80/rpcrouter");
-	SOAPMethod fortune;
-
-	fortune.SetNamespace("urn:lemurlabs-Fortune");
-	if (dictionary)
+	SOAPInteropStruct()
 	{
-		fortune.SetName("getFortuneByDictionary");
-		fortune.AddParameter("dictionaryName").SetValue(dictionary);
-	}
-	else
-	{
-		fortune.SetName("getAnyFortune");
+		varInt = 0;
+		varFloat = 0.0;
 	}
 
-	WriteResponse(soap.Execute(fortune));
-}
+	SOAPInteropStruct(const char *str, int i, float f)
+	{
+		varString = str;
+		varInt = i;
+		varFloat = f;
+	}
 
-float
-StockQuote(const char *symbol)
+	bool operator==(const SOAPInteropStruct& other) const
+	{
+		return varInt == other.varInt &&
+			varFloat == other.varFloat &&
+			varString == other.varString;
+	}
+
+	bool operator!=(const SOAPInteropStruct& other) const
+	{
+		return varInt != other.varInt ||
+			varFloat != other.varFloat ||
+			varString != other.varString;
+	}
+
+	SOAPString	varString;
+	int			varInt;
+	float		varFloat;
+
+	static const char *soap_namespace;
+};
+const char *SOAPInteropStruct::soap_namespace = "http://soapinterop.org/xsd";
+
+//
+//  Define how we load up the struct
+SOAPParameter&
+operator<<(SOAPParameter& param, const SOAPInteropStruct& val)
 {
-	SOAPProxy soap("http://services.xmethods.net:80/soap");
-	SOAPMethod stockquote("getQuote", "urn:xmethods-delayed-quotes");
+	param.SetType("SOAPStruct", SOAPInteropStruct::soap_namespace);
+	param.SetBaseType(SOAPTypes::soap_struct);
 
-	stockquote.AddParameter("symbol").SetValue(symbol);
+	param.AddParameter("varString") << val.varString;
+	param.AddParameter("varInt") << val.varInt;
+	param.AddParameter("varFloat") << val.varFloat;
 
-	return soap.Execute(stockquote).GetReturnValue();
+	return param;
 }
 
-float
-GetTemperature(const char *zipcode)
+//
+// Define how we read the struct
+const SOAPParameter&
+operator>>(const SOAPParameter& param, SOAPInteropStruct& val)
 {
-	SOAPProxy soap("http://services.xmethods.net:80/soap/servlet/rpcrouter");
-	SOAPMethod gettemp("getTemp", "urn:xmethods-Temperature");
+	SafeGetParameter(param, "varString") >> val.varString;
+	SafeGetParameter(param, "varInt") >> val.varInt;
+	SafeGetParameter(param, "varFloat") >> val.varFloat;
 
-	gettemp.AddParameter("zipcode").SetValue(zipcode);
-
-	return soap.Execute(gettemp).GetReturnValue();
+	return param;
 }
 
-int
-TestSOAPUrlParsing()
+
+//
+// Define how we load up arrays
+template<typename T>
+inline const SOAPParameter&
+operator<<(SOAPParameter& param, const SOAPArray<T>& val)
+{
+	param.SetType(SOAPTypes::soap_array);
+	for (SOAPArray<T>::ConstIterator i = val.Begin(); i != val.End(); ++i)
+		param.AddParameter() << *i;
+	return param;
+}
+
+//
+// Define how we read arrays
+template <typename T>
+inline const SOAPParameter&
+operator>>(const SOAPParameter& param, SOAPArray<T>& val)
+{
+	val.Resize(0);
+	for (SOAPArray<SOAPParameter>::ConstIterator i = param.GetArray().Begin();
+		i != param.GetArray().End();
+		++i)
+		*i >> val.Add();
+	return param;
+}
+
+bool
+TestEchoVoid(SOAPProxy& proxy,
+			const char *uri,
+			const char *soapAction,
+			bool appendMethod)
 {
 	try
 	{
-		std::cerr << "Testing url parsing...";
-		SOAPUrl url;
+		SOAPMethod method("echoVoid", uri, soapAction, appendMethod);
+		std::cout << "Testing " << method.GetName() << ": ";
 
-		url = "http://www.yahoo.com";
-		url = "ftp://dcrowley@scitegic.com/";
-		url = "http://www.yahoo.com/search?soap";
-		url = "https://:password@scitegic.com";
+		const SOAPResponse& response = proxy.Execute(method);
+
+		std::cout << "SUCCESS" << std::endl;
+		return false;
 	}
-	catch (SOAPException& ex)
+	catch (SOAPException& sex)
 	{
-		std::cerr << "failed: " << ex.What() << std::endl;
-		return 1;
+		std::cout << "FAILED: " << sex.What() << std::endl;
 	}
-
-	std::cerr << "okay." << std::endl;
-	return 0;
+	catch (...)
+	{
+		std::cout << "FAILED (badly)" << std::endl;
+	}
+	return true;
 }
 
-void
-TestInterop(SOAPProxy& proxy)
+bool
+TestEchoString(SOAPProxy& proxy,
+			const char *uri,
+			const char *soapAction,
+			bool appendMethod)
 {
 	try
 	{
-		SOAPMethod echoVoid				("echoVoid",			"urn:xmethodsInterop");
-		SOAPMethod echoString			("echoString",			"urn:xmethodsInterop");
-		SOAPMethod echoStringArray		("echoStringArray",		"urn:xmethodsInterop");
-		SOAPMethod echoInteger			("echoInteger",			"urn:xmethodsInterop");
-		SOAPMethod echoIntegerArray		("echoIntegerArray",	"urn:xmethodsInterop");
-		SOAPMethod echoFloat			("echoFloat",			"urn:xmethodsInterop");
-		SOAPMethod echoFloatArray		("echoFloatArray",		"urn:xmethodsInterop");
-		SOAPMethod echoStructure		("echoStructure",		"urn:xmethodsInterop");
-		SOAPMethod echoStructureArray	("echoStructureArray",	"urn:xmethodsInterop");
+		SOAPString inputValue = "This is a test input string.";
+		SOAPString outputValue;
 
-		WriteResponse(proxy.Execute(echoVoid));
+		SOAPMethod method("echoString", uri, soapAction, appendMethod);
+		method.AddParameter("inputString") << inputValue;
 
-		echoString.AddParameter("inputString").SetValue("This is a test string.");
-		WriteResponse(proxy.Execute(echoString));
+		std::cout << "Testing " << method.GetName() << ": ";
 
-		SOAPParameter& strarray = echoStringArray.AddParameter("inputStringArray");
-		strarray.AddParameter().SetValue("String 1");
-		strarray.AddParameter().SetValue("String 2");
-		strarray.AddParameter().SetValue("String 3");
-		WriteResponse(proxy.Execute(echoStringArray));
+		const SOAPResponse& response = proxy.Execute(method);
+		response.GetReturnValue() >> outputValue;
+		if (inputValue != outputValue)
+			throw SOAPException("Values are not equal");
 
-		echoInteger.AddParameter("inputInteger").SetValue(1691);
-		WriteResponse(proxy.Execute(echoInteger));
-
-		SOAPParameter& intarray = echoIntegerArray.AddParameter("inputIntegerArray");
-		intarray.AddParameter().SetValue(34);
-		intarray.AddParameter().SetValue(44);
-		intarray.AddParameter().SetValue(4);
-		intarray.AddParameter().SetValue(1245);
-		intarray.AddParameter().SetValue(315);
-		WriteResponse(proxy.Execute(echoIntegerArray));
-
-		echoFloat.AddParameter("inputFloat").SetValue((float)8.946);
-		WriteResponse(proxy.Execute(echoFloat));
-
-		SOAPParameter& floatarray = echoFloatArray.AddParameter("inputFloatArray");
-		floatarray.AddParameter().SetValue((float)34.26);
-		floatarray.AddParameter().SetValue((float)3.44);
-		floatarray.AddParameter().SetValue((float)124.5);
-		floatarray.AddParameter().SetValue((float)31.4635);
-		WriteResponse(proxy.Execute(echoFloatArray));
-
-		/*
-		*  This doesn't seem to be implemented on the server as of yet...
-		*
-		SOAPParameter& structure = echoStructure.AddParameter();
-		structure.AddParameter("integer").SetValue(45);
-		structure.AddParameter("string").SetValue("This is a string in a structure");
-		structure.AddParameter("floatarray") = floatarray;
-		WriteResponse(proxy.Execute(echoStructure));
-		*/
-
-		std::cout << "Success!" << std::endl << std::endl;
+		std::cout << "SUCCESS" << std::endl;
+		return false;
 	}
-	catch (SOAPException& ex)
+	catch (SOAPException& sex)
 	{
-		std::cout << "Caught SOAP exception: " << ex.What() << std::endl;
+		std::cout << "FAILED: " << sex.What() << std::endl;
 	}
+	catch (...)
+	{
+		std::cout << "FAILED (badly)" << std::endl;
+	}
+	return true;
 }
 
-void TestInterop(const char *name, const char *url)
+bool
+TestEchoInteger(SOAPProxy& proxy,
+			const char *uri,
+			const char *soapAction,
+			bool appendMethod)
+{
+	try
+	{
+		int inputValue = 252456;
+		int outputValue = 0;
+
+		SOAPMethod method("echoInteger", uri, soapAction, appendMethod);
+		method.AddParameter("inputInteger") << inputValue;
+
+		std::cout << "Testing " << method.GetName() << ": ";
+
+		const SOAPResponse& response = proxy.Execute(method);
+		response.GetReturnValue() >> outputValue;
+		if (inputValue != outputValue)
+			throw SOAPException("Values are not equal");
+
+		std::cout << "SUCCESS" << std::endl;
+		return false;
+	}
+	catch (SOAPException& sex)
+	{
+		std::cout << "FAILED: " << sex.What() << std::endl;
+	}
+	catch (...)
+	{
+		std::cout << "FAILED (badly)" << std::endl;
+	}
+	return true;
+}
+
+bool
+TestEchoFloat(SOAPProxy& proxy,
+			const char *uri,
+			const char *soapAction,
+			bool appendMethod)
+{
+	try
+	{
+		float inputValue = (float)25.2456;
+		float outputValue = 0;
+
+		SOAPMethod method("echoFloat", uri, soapAction, appendMethod);
+		method.AddParameter("inputFloat") << inputValue;
+
+		std::cout << "Testing " << method.GetName() << ": ";
+
+		const SOAPResponse& response = proxy.Execute(method);
+		response.GetReturnValue() >> outputValue;
+		if (inputValue != outputValue)
+			throw SOAPException("Values are not equal");
+
+		std::cout << "SUCCESS" << std::endl;
+		return false;
+	}
+	catch (SOAPException& sex)
+	{
+		std::cout << "FAILED: " << sex.What() << std::endl;
+	}
+	catch (...)
+	{
+		std::cout << "FAILED (badly)" << std::endl;
+	}
+	return true;
+}
+
+bool
+TestEchoStruct(SOAPProxy& proxy,
+			const char *uri,
+			const char *soapAction,
+			bool appendMethod)
+{
+	try
+	{
+		SOAPInteropStruct inputValue("This is a struct string.", 68, (float)25.2456);
+		SOAPInteropStruct outputValue;
+
+		SOAPMethod method("echoStruct", uri, soapAction, appendMethod);
+		method.AddParameter("inputStruct") << inputValue;
+
+		std::cout << "Testing " << method.GetName() << ": ";
+
+		const SOAPResponse& response = proxy.Execute(method);
+		response.GetReturnValue() >> outputValue;
+		if (inputValue != outputValue)
+			throw SOAPException("Values are not equal");
+
+		std::cout << "SUCCESS" << std::endl;
+		return false;
+	}
+	catch (SOAPException& sex)
+	{
+		std::cout << "FAILED: " << sex.What() << std::endl;
+	}
+	catch (...)
+	{
+		std::cout << "FAILED (badly)" << std::endl;
+	}
+	return true;
+}
+
+
+bool
+TestEchoIntegerArray(SOAPProxy& proxy,
+			const char *uri,
+			const char *soapAction,
+			bool appendMethod)
+{
+	try
+	{
+		SOAPArray<int> inputValue;
+		SOAPArray<int> outputValue;
+
+		inputValue.Add(1);
+		inputValue.Add(66);
+		inputValue.Add(-73);
+		inputValue.Add(927353);
+		inputValue.Add(16);
+		inputValue.Add(0);
+
+		SOAPMethod method("echoIntegerArray", uri, soapAction, appendMethod);
+		method.AddParameter("inputIntegerArray") << inputValue;
+
+		std::cout << "Testing " << method.GetName() << ": ";
+
+		const SOAPResponse& response = proxy.Execute(method);
+		response.GetReturnValue() >> outputValue;
+		if (inputValue != outputValue)
+			throw SOAPException("Values are not equal");
+
+		std::cout << "SUCCESS" << std::endl;
+		return false;
+	}
+	catch (SOAPException& sex)
+	{
+		std::cout << "FAILED: " << sex.What() << std::endl;
+	}
+	catch (...)
+	{
+		std::cout << "FAILED (badly)" << std::endl;
+	}
+	return true;
+}
+
+
+bool
+TestEchoFloatArray(SOAPProxy& proxy,
+			const char *uri,
+			const char *soapAction,
+			bool appendMethod)
+{
+	try
+	{
+		SOAPArray<float> inputValue;
+		SOAPArray<float> outputValue;
+
+		inputValue.Add(1.3);
+		inputValue.Add(6.6535);
+		inputValue.Add(73.235);
+		inputValue.Add(92735.3e2);
+		inputValue.Add(-16e30);
+
+		SOAPMethod method("echoFloatArray", uri, soapAction, appendMethod);
+		method.AddParameter("inputFloatArray") << inputValue;
+
+		std::cout << "Testing " << method.GetName() << ": ";
+
+		const SOAPResponse& response = proxy.Execute(method);
+		response.GetReturnValue() >> outputValue;
+		if (inputValue != outputValue)
+			throw SOAPException("Values are not equal");
+
+		std::cout << "SUCCESS" << std::endl;
+		return false;
+	}
+	catch (SOAPException& sex)
+	{
+		std::cout << "FAILED: " << sex.What() << std::endl;
+	}
+	catch (...)
+	{
+		std::cout << "FAILED (badly)" << std::endl;
+	}
+	return true;
+}
+
+
+bool
+TestEchoStringArray(SOAPProxy& proxy,
+			const char *uri,
+			const char *soapAction,
+			bool appendMethod)
+{
+	try
+	{
+		SOAPArray<SOAPString> inputValue;
+		SOAPArray<SOAPString> outputValue;
+
+		inputValue.Add("String 1");
+		inputValue.Add("String 2");
+		inputValue.Add("Third String");
+		inputValue.Add("A Fourth and last string.");
+
+		SOAPMethod method("echoStringArray", uri, soapAction, appendMethod);
+		method.AddParameter("inputStringArray") << inputValue;
+
+		std::cout << "Testing " << method.GetName() << ": ";
+
+		const SOAPResponse& response = proxy.Execute(method);
+		response.GetReturnValue() >> outputValue;
+		if (inputValue != outputValue)
+			throw SOAPException("Values are not equal");
+
+		std::cout << "SUCCESS" << std::endl;
+		return false;
+	}
+	catch (SOAPException& sex)
+	{
+		std::cout << "FAILED: " << sex.What() << std::endl;
+	}
+	catch (...)
+	{
+		std::cout << "FAILED (badly)" << std::endl;
+	}
+	return true;
+}
+
+
+bool
+TestEchoStructArray(SOAPProxy& proxy,
+			const char *uri,
+			const char *soapAction,
+			bool appendMethod)
+{
+	try
+	{
+		SOAPArray<SOAPInteropStruct> inputValue;
+		SOAPArray<SOAPInteropStruct> outputValue;
+
+		SOAPInteropStruct val;
+		val.varFloat = (float)46.346;
+		val.varInt = -2352;
+		val.varString = "Array struct string.";
+
+		inputValue.Add(val);
+		inputValue.Add(val);
+		inputValue.Add(val);
+
+		SOAPMethod method("echoStructArray", uri, soapAction, appendMethod);
+		method.AddParameter("inputStructArray") << inputValue;
+
+		std::cout << "Testing " << method.GetName() << ": ";
+
+		const SOAPResponse& response = proxy.Execute(method);
+		response.GetReturnValue() >> outputValue;
+		if (inputValue != outputValue)
+			throw SOAPException("Values are not equal");
+
+		std::cout << "SUCCESS" << std::endl;
+		return false;
+	}
+	catch (SOAPException& sex)
+	{
+		std::cout << "FAILED: " << sex.What() << std::endl;
+	}
+	catch (...)
+	{
+		std::cout << "FAILED (badly)" << std::endl;
+	}
+	return true;
+}
+
+
+void
+TestInterop(SOAPProxy& proxy,
+			const char *uri,
+			const char *soapAction,
+			bool appendMethod)
+{
+	TestEchoVoid(proxy, uri, soapAction, appendMethod);
+
+	TestEchoInteger(proxy, uri, soapAction, appendMethod);
+	TestEchoFloat(proxy, uri, soapAction, appendMethod);
+	TestEchoString(proxy, uri, soapAction, appendMethod);
+	TestEchoStruct(proxy, uri, soapAction, appendMethod);
+
+	TestEchoIntegerArray(proxy, uri, soapAction, appendMethod);
+	TestEchoFloatArray(proxy, uri, soapAction, appendMethod);
+	TestEchoStringArray(proxy, uri, soapAction, appendMethod);
+	TestEchoStructArray(proxy, uri, soapAction, appendMethod);
+}
+
+void TestInterop(const char *name,
+				 const char *endpoint,
+				 const char *soapaction,
+				 bool appendMethod,
+				 const char *nspace)
 {
 	std::cout << "Testing " << name << " interopability." << std::endl;
 
-	SOAPProxy proxy(url);
-	TestInterop(proxy);
+	SOAPProxy proxy(endpoint);//, "http://localhost:8080");
+	TestInterop(proxy, nspace, soapaction, appendMethod);
 }
 
 int
@@ -333,12 +503,61 @@ main(int argc, char* argv[])
 	try
 	{
 		// See: http://www.xmethods.net/ilab/ilab.html
-		TestInterop("Apache 2.1 RC",			"http://services.xmethods.net/soap/servlet/rpcrouter");
-		TestInterop("4s4c 1.3",					"http://services2.xmethods.net/ssss4c/ilab/soap.asp");
-		//TestInterop("MS SOAP 2.0 B1",			"http://services.xmethods.net/XMethodsInterop/XMethodsInterop.asp");
-		//TestInterop("MS .NET Beta 1",			"http://services2.xmethods.net/DotNet/XMInterop.asmx");
-		TestInterop("SOAP::Lite 0.46",			"http://services.xmethods.net/perl/soaplite.cgi");
-		//TestInterop("White Mesa SOAP RPC 1.4",	"http://delta/interop");
+		TestInterop("4s4c 1.3",
+			"http://soap.4s4c.com/ilab/soap.asp",
+			"urn:soapinterop", false,
+			"http://soapinterop.org/");/**/
+
+		/*TestInterop(
+			"Apache 2.1 RC",
+			"http://services.xmethods.net:8080/soap/servlet/rpcrouter",
+			"urn:soapinterop", false,
+			"http://soapinterop.org/");/**/
+
+		TestInterop("Frontier 7.0 (Userland)",
+			"http://www.soapware.org:80/xmethodsInterop",
+			//"http://localhost:8080/xmethodsInterop",
+			"/xmethodsInterop", false,
+			"urn:xmethodsInterop");/**/
+
+		TestInterop("Kafka XSLT",
+			"http://www.vbxml.com/soapworkshop/services/kafka10/services/endpoint.asp?service=ilab",
+			"urn:soapinterop", false,
+			"http://soapinterop.org/");/**/
+
+		TestInterop("SOAP::Lite 0.47",
+			"http://services.soaplite.com/interop.cgi",
+			"urn:soapinterop", false,
+			"http://soapinterop.org/");/**/
+
+		TestInterop("SQLData SOAP Server",
+			"http://www.soapclient.com/interop/sqldatainterop.wsdl",
+			//"http://localhost:8080/interop/sqldatainterop.wsdl",
+			"/soapinterop", false,
+			"http://tempuri.org/message/");/**/
+
+		TestInterop("White Mesa SOAP RPC 1.4",
+			"http://services2.xmethods.net:8080/interop",
+			"urn:interopLab#", true,
+			"urn:xmethodsInterop");/**/
+
+		/*  Doesn't work:  No name resolution for ranier.extreme.indiana.edu*/
+		/*TestInterop("SOAP RMI",
+			"http://ranier.extreme.indiana.edu:1568",
+			"urn:soapinterop", false,
+			"http://soapinterop.org/");/**/
+
+		/*  Doesn't work.  Crappy namespaces.*/
+		/*TestInterop("MS SOAP Toolkit 2.0",
+			"http://131.107.72.13/stk/InteropTypedService.asp",
+			"urn:soapinterop", false,
+			"http://soapinterop.org/");/**/
+
+		/*  Doesn't work.  CRASHES HARD!  BOM*/
+		/*TestInterop("MS .NET Beta 2",
+			"http://131.107.72.13/test/typed.asmx",
+			"http://soapinterop.org/", true,
+			"http://soapinterop.org/");/**/
 
 		// Lets go over the internet and make some calls
 		// some methods from www.xmethods.com
@@ -352,6 +571,7 @@ main(int argc, char* argv[])
 
 		//Whois("scitegic.com");
 
+		/*
 		std::cout << "Temperature in La Jolla, CA: ";
 		std::cout.flush();
 		std::cout << GetTemperature("92122") << std::endl;
@@ -361,6 +581,7 @@ main(int argc, char* argv[])
 		std::cout << "MSFT " << StockQuote("MSFT") << std::endl;
 		std::cout << "IBM  " << StockQuote("IBM") << std::endl;
 		std::cout << "DELL " << StockQuote("DELL") << std::endl;
+		*/
 	}
 	catch (const SOAPMemoryException&)
 	{
