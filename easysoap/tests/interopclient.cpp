@@ -219,6 +219,23 @@ TestBogusMethod(SOAPProxy& proxy, const Endpoint& e)
 }
 
 void
+TestMustUnderstand(SOAPProxy& proxy, const Endpoint& e)
+{
+	SOAPEnvelope mustUnderstand;
+	SOAPParameter& header = mustUnderstand.GetHeader().AddHeader();
+
+	header.SetName("Transaction", "uri:my-transaction");
+	header.SetValue("5");
+	header.AddAttribute(SOAPEnvelope::MustUnderstand, "1");
+
+	SOAPMethod& method = mustUnderstand.GetBody().GetMethod();
+	method.SetName("echoVoid", e.nspace);
+	method.SetSoapAction(e.soapaction, e.needsappend);
+
+	proxy.Execute(mustUnderstand);
+}
+
+void
 TestBogusNamespace(SOAPProxy& proxy, const Endpoint& e)
 {
 	SOAPMethod method("echoVoid", "http://bogusns.com/", e.soapaction, e.needsappend);
@@ -790,6 +807,7 @@ TestInterop(const Endpoint& e)
 
 	TestForFault(proxy, e, "BogusMethod",				TestBogusMethod);
 	TestForFault(proxy, e, "BogusNamespace",			TestBogusNamespace);
+	TestForFault(proxy, e, "MustUnderstand",			TestMustUnderstand);
 	TestForPass(proxy, e, "echoVoid",					TestEchoVoid);
 	TestForPass(proxy, e, "echoInteger",				TestEchoInteger);
 	TestForPass(proxy, e, "echoInteger_MostPositive",	TestEchoInteger_MostPositive);
