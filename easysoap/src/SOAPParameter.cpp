@@ -83,7 +83,10 @@ void
 SOAPParameter::Reset()
 {
 	for (Array::Iterator i = m_array.Begin(); i != m_array.End(); ++i)
+	{
+		(*i)->Reset();
 		m_pool.Return(*i);
+	}
 
 	m_array.Resize(0);
 	m_struct.Clear();
