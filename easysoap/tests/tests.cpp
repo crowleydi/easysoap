@@ -37,6 +37,7 @@
 #include "SOAP.h"
 #include "SOAPDebugger.h"
 
+const char *httpproxy = 0; // "http://localhost:8080";
 
 //
 // The main library doesn't include iostream,
@@ -49,25 +50,18 @@ operator<<(std::ostream& os, const SOAPString& str)
 	return os << (s ? s : "(null)");
 }
 
+inline std::ostream&
+operator<<(std::ostream& os, const SOAPQName& name)
+{
+	return os << name.GetName() << "[" << name.GetNamespace() << "]";
+}
+
 void
 SetTraceFile(const char *server, const char *test)
 {
 	char buffer[256];
 	snprintf(buffer, sizeof(buffer), "%s/%s.txt", server, test);
 	SOAPDebugger::SetFile(buffer);
-}
-
-//
-// Little helper function used by the structure
-// accessors
-//
-const SOAPParameter&
-SafeGetParameter(const SOAPParameter& param, const char *pname)
-{
-	const SOAPParameter *p = 0;
-	if (!(p = param.GetParameter(pname)))
-		throw SOAPException("Invalid struct, member '%s' is missing", pname);
-	return *p;
 }
 
 //
@@ -87,12 +81,12 @@ struct Endpoint
 const SOAPParameter&
 operator>>(const SOAPParameter& param, Endpoint& e)
 {
-	SafeGetParameter(param, "name") >> e.name;
-	SafeGetParameter(param, "wsdl") >> e.wsdl;
-	SafeGetParameter(param, "endpoint") >> e.endpoint;
-	SafeGetParameter(param, "soapaction") >> e.soapaction;
-	e.needsappend = SafeGetParameter(param, "soapactionNeedsMethod").GetInt() != 0;
-	SafeGetParameter(param, "namespace") >> e.nspace;
+	param.GetParameter("name") >> e.name;
+	param.GetParameter("wsdl") >> e.wsdl;
+	param.GetParameter("endpoint") >> e.endpoint;
+	param.GetParameter("soapaction") >> e.soapaction;
+	e.needsappend = (param.GetParameter("soapactionNeedsMethod").GetInt() != 0);
+	param.GetParameter("methodNamespace") >> e.nspace;
 
 	return param;
 }
@@ -100,7 +94,7 @@ operator>>(const SOAPParameter& param, Endpoint& e)
 void
 GetAllEndpoints(SOAPArray<Endpoint>& e)
 {
-	SOAPProxy proxy("http://www.xmethods.net/perl/soaplite.cgi");
+	SOAPProxy proxy("http://www.xmethods.net/perl/soaplite.cgi", httpproxy);
 	SOAPMethod getAllEndpoints("getAllEndpoints",
 		"http://soapinterop.org/ilab",
 		"http://soapinterop.org/ilab#", true);
@@ -174,9 +168,9 @@ operator>>(const SOAPParameter& param, SOAPInteropStruct& val)
 {
 	// We should probably confirm the type is
 	// correct...
-	SafeGetParameter(param, "varString") >> val.varString;
-	SafeGetParameter(param, "varInt") >> val.varInt;
-	SafeGetParameter(param, "varFloat") >> val.varFloat;
+	param.GetParameter("varString") >> val.varString;
+	param.GetParameter("varInt") >> val.varInt;
+	param.GetParameter("varFloat") >> val.varFloat;
 
 	return param;
 }
@@ -713,7 +707,7 @@ void TestInterop(const Endpoint& e)
 
 	std::cout << "Testing " << name << " interopability." << std::endl;
 
-	SOAPProxy proxy(endpoint);//, "http://localhost:8080");
+	SOAPProxy proxy(endpoint, httpproxy);
 
 #if 1
 	SetTraceFile(name, "echoVoid");
