@@ -37,8 +37,6 @@ SOAPBodyHandler::SOAPBodyHandler()
 : m_body(0)
 , m_gotMethod(false)
 {
-	m_paramHandler.SetIgnoreId();
-	m_paramHandler.SetIgnoreName();
 }
 
 SOAPBodyHandler::~SOAPBodyHandler()
