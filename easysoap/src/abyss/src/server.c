@@ -601,14 +601,14 @@ void ServerFunc(TConn *c)
 
 	ka=c->server->keepalivemaxconn;
 
-//GWK: change to resolve memory leak
+/* GWK: change to resolve memory leak */
 	RequestInit(&r,c);
-//GWK: end change
+/* GWK: end change */
 	while (ka--)
 	{
-//GWK: change to resolve memory leak
+/* GWK: change to resolve memory leak */
 		RequestFree(&r);
-//GWK: end change
+/* GWK: end change */
 		RequestInit(&r,c);
 
 		/* Wait to read until timeout */
@@ -716,8 +716,11 @@ void ServerRun(TServer *srv)
 		}
 		else {
 			if (srv->stopped)
+			{
+				SocketClose(&s);
 				break;
 			/*TraceMsg("Socket Error=%d\n", SocketError());*/
+			}
 		}
 	};
 }
@@ -761,8 +764,11 @@ void ServerRun(TServer *srv)
 				SocketClose(&ns);
 		} else {
 			if (srv->stopped)
+			{
+				SocketClose(&s);
 				break;
 			/*TraceMsg("Socket Error=%d\n", SocketError());*/
+			}
 		}
 	};
 }
