@@ -24,8 +24,6 @@
 
 #include "SOAPClientSocketImp.h"
 
-
-
 #if defined (_WIN32)
 #if !defined (__MWERKS__)
 #include <winsock2.h>
@@ -180,11 +178,15 @@ SOAPClientSocketImp::Connect(const char *server, unsigned int port)
 			sockAddr.sin_addr.s_addr = ((struct in_addr *)lphost->h_addr)->s_addr;
 		}
 		else
+		{
+			Close();
 			throw SOAPSocketException("Could not resolve host name: %s", server);
+		}
 	}
 
 	if (connect(m_socket, (struct sockaddr*)&sockAddr, sizeof(sockAddr)) == SOCKET_ERROR)
 	{
+		Close();
 		throw SOAPSocketException("Could not connect to host: %s", server);
 	}
 
