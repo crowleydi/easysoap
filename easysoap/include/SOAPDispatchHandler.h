@@ -98,13 +98,12 @@ private:
 
 	bool HandleHeader(const SOAPParameter& header, SOAPEnvelope& request, SOAPEnvelope& response)
 	{
-		const SOAPMethod& method = request.GetBody().GetMethod();
-		DispatchMap::Iterator i = m_dispatchMap.Find(method.GetName());
+		DispatchMap::Iterator i = m_dispatchMap.Find(header.GetName());
 
 		if (i)
 		{
 			T *target= GetTarget(request);
-			(target->*(*i))(method, request, response);
+			(target->*(*i))(header, request, response);
 			return true;
 		}
 		return false;
