@@ -278,6 +278,45 @@ SOAPTypeTraits<int>::Deserialize(const SOAPParameter& param, int& val)
 
 
 //
+//  Trait info for unsigned int
+void SOAPTypeTraits<unsigned int>::GetType(SOAPQName& type)
+{
+	type = XMLSchema2001::unsignedInt;
+}
+
+SOAPParameter&
+SOAPTypeTraits<unsigned int>::Serialize(SOAPParameter& param, unsigned int val)
+{
+	char buffer[64];
+	sp_itoa(val, buffer);
+	Serialize(param, buffer);
+	return param;
+}
+
+SOAPParameter&
+SOAPTypeTraits<unsigned int>::Serialize(SOAPParameter& param, const char *val)
+{
+	if (!val)
+		param.AddAttribute(XMLSchema2001::nil) = "true";
+	param.GetStringRef() = val;
+	return param;
+}
+
+const SOAPParameter&
+SOAPTypeTraits<unsigned int>::Deserialize(const SOAPParameter& param, unsigned int& val)
+{
+	const SOAPString& str = param.GetString();
+    if (param.IsStruct())
+        throw SOAPException("Cannot convert a struct to an unsigned integer.");
+
+    if (param.IsNull() || str.IsEmpty())
+        throw SOAPException("Cannot convert null value to unsigned integer.");
+
+	val = sp_strtol(str);
+	return param;
+}
+
+//
 //  Trait info for float
 void SOAPTypeTraits<float>::GetType(SOAPQName& type)
 {

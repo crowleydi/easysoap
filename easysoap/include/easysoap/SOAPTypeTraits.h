@@ -97,6 +97,33 @@ class EASYSOAP_EXPORT SOAPTypeTraits<long> : public SOAPTypeTraits<int>
 {
 };
 
+template <>
+class EASYSOAP_EXPORT SOAPTypeTraits<unsigned int>
+{
+public:
+	static void GetType(SOAPQName& type);
+	static SOAPParameter& Serialize(SOAPParameter& param, unsigned int val);
+	static SOAPParameter& Serialize(SOAPParameter& param, const char *val);
+	static const SOAPParameter& Deserialize(const SOAPParameter&, unsigned int& val);
+	static const SOAPParameter& Deserialize(const SOAPParameter& param, unsigned long& val)
+	{
+		unsigned int tval;
+		Deserialize(param, tval);
+		val = tval;
+		return param;
+	}
+};
+
+//
+// assume unsigned long and unsigned int are the same, 32 bit integers
+/**
+*
+*/
+template <>
+class EASYSOAP_EXPORT SOAPTypeTraits<unsigned long> : public SOAPTypeTraits<unsigned int>
+{
+};
+
 /**
 *
 */
