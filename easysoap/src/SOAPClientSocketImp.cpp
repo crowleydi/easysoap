@@ -136,7 +136,7 @@ SOAPClientSocketImp::SOAPClientSocketImp()
 {
 #if defined (_WIN32)
 	__winsockinit.Init();
-#endif;
+#endif
 }
 
 SOAPClientSocketImp::~SOAPClientSocketImp()
