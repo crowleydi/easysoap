@@ -42,12 +42,6 @@ public:
 
 private:
 
-	static const char *SOAP_ENV_ns;
-	static const char *SOAP_ENC_ns;
-	static const char *SOAP_xsi_ns;
-	static const char *SOAP_xsd_ns;
-
-	static const char *write_tag;
 	static const char *parse_tag;
 
 	SOAPHeader	m_header;

@@ -92,8 +92,25 @@ SOAPParameterHandler::start(SOAPParser& parser, const XML_Char *name, const XML_
 		}
 		else if (sp_strcmp(tag, FULL_SOAP_XSI PARSER_NS_SEP "type") == 0)
 		{
-			parser.ResolveName(val, m_typestr);
-			val = m_typestr;
+			char *sep = sp_strchr(val, ':');
+			if (sep)
+			{
+				*sep = 0;
+				const char *typens = parser.ExpandNamespace(val);
+				*sep = ':';
+				if (typens)
+				{
+					m_param->SetType(++sep, typens);
+				}
+				else
+				{
+					throw SOAPException("Could not resolve namespace for xsi:type: %s", val);
+				}
+			}
+			else
+			{
+				throw SOAPException("xsi:type is not namespace qualified: %s", val);
+			}
 		}
 		else if (sp_strcmp(tag, FULL_SOAP_XSI PARSER_NS_SEP "null") == 0)
 		{
@@ -103,8 +120,6 @@ SOAPParameterHandler::start(SOAPParser& parser, const XML_Char *name, const XML_
 				m_setvalue = false;
 			}
 		}
-
-		m_param->SetAttribute(tag, val);
 	}
 
 	if (haveArrayType)
@@ -129,8 +144,7 @@ SOAPParameterHandler::startElement(SOAPParser& parser, const XML_Char *name, con
 	if (!m_structHandler)
 		m_structHandler = new SOAPStructHandler();
 	m_structHandler->SetParameter(m_param);
-	m_param->SetType(SOAPTypes::soap_struct);
-	return m_structHandler->startElement(parser, name, attrs);
+	return m_structHandler->start(parser, 0, 0)->startElement(parser, name, attrs);
 }
 
 void

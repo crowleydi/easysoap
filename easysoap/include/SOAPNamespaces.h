@@ -30,11 +30,6 @@
 #define FULL_SOAP_XSI FULL_SOAP_XSI_1999
 #define FULL_SOAP_XSD FULL_SOAP_XSD_1999
 
-#define TAG_SOAP_ENV "SOAP-ENV"
-#define TAG_SOAP_ENC "SOAP-ENC"
-#define TAG_SOAP_XSD "xsd"
-#define TAG_SOAP_XSI "xsi"
-
 #define PARSER_NS_SEP "#"
 
 #endif // __SOAPNamesSpaces_h__

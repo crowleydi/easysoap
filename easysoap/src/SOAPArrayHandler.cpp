@@ -44,7 +44,7 @@ SOAPArrayHandler::~SOAPArrayHandler()
 SOAPParseEventHandler *
 SOAPArrayHandler::start(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs)
 {
-	m_param->SetType(SOAPTypes::soap_array);
+	m_param->SetIsArray();
 	return this;
 }
 

@@ -31,13 +31,6 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-const char *SOAPEnvelope::SOAP_ENV_ns = FULL_SOAP_ENV;
-const char *SOAPEnvelope::SOAP_ENC_ns = FULL_SOAP_ENC;
-const char *SOAPEnvelope::SOAP_xsi_ns = FULL_SOAP_XSI;
-const char *SOAPEnvelope::SOAP_xsd_ns = FULL_SOAP_XSD;
-
-const char *SOAPEnvelope::write_tag = TAG_SOAP_ENV ":Envelope";
-
 SOAPEnvelope::SOAPEnvelope()
 {
 
@@ -52,21 +45,21 @@ bool
 SOAPEnvelope::WriteSOAPPacket(SOAPPacketWriter& packet) const
 {
 	packet.Reset();
-	packet.StartTag(write_tag);
+	packet.StartNSTag(FULL_SOAP_ENV, "Envelope", "V");
 
 	// TODO: automagically add only the tags we need...
-	packet.AddAttr("xmlns:" TAG_SOAP_ENC, SOAP_ENC_ns);
-	packet.AddAttr("xmlns:" TAG_SOAP_ENV, SOAP_ENV_ns);
-	packet.AddAttr("xmlns:" TAG_SOAP_XSI, SOAP_xsi_ns);
-	packet.AddAttr("xmlns:" TAG_SOAP_XSD, SOAP_xsd_ns);
+	packet.AddXMLNS("C", FULL_SOAP_ENC);
+	packet.AddXMLNS("i", FULL_SOAP_XSI);
+	packet.AddXMLNS("d", FULL_SOAP_XSD);
 
-	// Some services seem to need this:
-	packet.AddAttr("SOAP-ENV:encodingStyle", SOAP_ENC_ns);
+	// TODO: allow user to set encoding style
+	packet.AddNSAttr(FULL_SOAP_ENV, "encodingStyle", FULL_SOAP_ENC);
 
 	m_header.WriteSOAPPacket(packet);
 	m_body.WriteSOAPPacket(packet);
 
-	packet.EndTag(write_tag);
+	packet.EndNSTag(FULL_SOAP_ENV, "Envelope");
+
 	return true;
 }
 

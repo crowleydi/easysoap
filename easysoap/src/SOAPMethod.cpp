@@ -76,13 +76,12 @@ SOAPMethod::WriteSOAPPacket(SOAPPacketWriter& packet) const
 	if (m_namespace.Length() == 0)
 		throw SOAPException("Namespace is required for the SOAP method.");
 
-	packet.StartTag("m", m_name);
-	packet.AddAttr("xmlns:m", m_namespace);
+	packet.StartNSTag(m_namespace, m_name, "m");
 
 	for (size_t i = 0; i < m_params.Size(); ++i)
 		m_params[i].WriteSOAPPacket(packet);
 
-	packet.EndTag("m", m_name);
+	packet.EndNSTag(m_namespace, m_name);
 
 	return true;
 }

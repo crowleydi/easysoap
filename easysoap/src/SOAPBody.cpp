@@ -31,8 +31,6 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-const char *SOAPBody::write_tag = TAG_SOAP_ENV ":Body";
-
 SOAPBody::SOAPBody()
 {
 	m_isfault = false;
@@ -46,14 +44,14 @@ SOAPBody::~SOAPBody()
 bool
 SOAPBody::WriteSOAPPacket(SOAPPacketWriter& packet) const
 {
-	packet.StartTag(write_tag);
+	packet.StartNSTag(FULL_SOAP_ENV, "Body");
 
 	if (m_isfault)
 		m_fault.WriteSOAPPacket(packet);
 	else
 		m_method.WriteSOAPPacket(packet);
 
-	packet.EndTag(write_tag);
+	packet.EndNSTag(FULL_SOAP_ENV, "Body");
 
 	return true;
 }

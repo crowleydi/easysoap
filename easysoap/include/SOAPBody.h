@@ -45,7 +45,6 @@ public:
 
 private:
 
-	static const char *write_tag;
 	static const char *parse_tag;
 
 	SOAPMethod	m_method;

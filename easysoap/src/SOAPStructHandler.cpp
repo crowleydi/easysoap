@@ -44,7 +44,7 @@ SOAPStructHandler::~SOAPStructHandler()
 SOAPParseEventHandler *
 SOAPStructHandler::start(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs)
 {
-	m_param->SetType(SOAPTypes::soap_struct);
+	m_param->SetIsStruct();
 	return this;
 }
 
