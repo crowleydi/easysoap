@@ -60,7 +60,7 @@ class SOAPTypeTraits<std::string>
 public:
 	static void GetType(SOAPQName& type)
 	{
-		type.Set("string", SOAP_XSD);
+		type = XMLSchema2001::string;
 	}
 
 	static SOAPParameter& Serialize(SOAPParameter& param, const std::string& val)
