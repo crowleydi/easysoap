@@ -270,6 +270,54 @@ sp_maximum(const T& a, const T& b)
 	return (a < b) ? b : a;
 }
 
+template <typename L, typename T>
+inline T*
+// The incoming buffer should be at least 12 bytes for a long
+sp_itoa(L a, T *const buffer)
+{
+    T *ptr = buffer;
+	T *begin = buffer;
+
+	// check if we're negative
+	bool neg = (a < 0);
+
+	// handle first char before we make the
+	// number positive
+    int rem = a % 10;
+    a /= 10;
+
+	// since we just did the divide, we know we're
+	// not max int.  so it's now safe to do a=-a.
+    if (neg)
+    {
+        rem = -rem;
+        a = -a;
+		*begin++ = '-';
+    }
+    *ptr++ = rem + '0';
+
+	// while we have a non-zero value
+	// get the base 10 remainder
+    while (a != 0)
+    {
+        *ptr++ = (a % 10) + '0';
+        a /= 10;
+    }
+
+	// null terminate
+	*ptr = 0;
+
+	// now reverse the string
+    T *b = begin;
+	while (b < --ptr)
+	{
+		T keep = *b;
+		*b++ = *ptr;
+		*ptr = keep;
+	}
+
+    return buffer;
+}
 
 //
 // Functions to convert between
