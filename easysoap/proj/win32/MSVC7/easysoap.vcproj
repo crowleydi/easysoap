@@ -21,7 +21,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../../../include,../../../../expat-1.95.2/source/lib"
+				AdditionalIncludeDirectories="../../../include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;EASYSOAP_DLL"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -38,7 +38,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
-				AdditionalDependencies="../../../../Expat-1.95.2/Libs/expat.lib wsock32.lib wininet.lib"
+				AdditionalDependencies="../../../../Expat-1.95.3/Libs/libexpat.lib wsock32.lib wininet.lib"
 				OutputFile=".\../../../win32/Debug/easysoap.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="TRUE"
@@ -78,7 +78,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="../../../include,../../../../expat-1.95.2/source/lib"
+				AdditionalIncludeDirectories="../../../include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;EASYSOAP_DLL"
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
@@ -95,7 +95,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
-				AdditionalDependencies="../../../../Expat-1.95.2/Libs/expat.lib wsock32.lib wininet.lib"
+				AdditionalDependencies="../../../../Expat-1.95.3/Libs/libexpat.lib wsock32.lib wininet.lib"
 				OutputFile=".\../../../win32/Release/easysoap.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
@@ -134,7 +134,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="../../../include,../../../../expat-1.95.2/source/lib"
+				AdditionalIncludeDirectories="../../../include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;EASYSOAP_DLL"
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
@@ -152,7 +152,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
-				AdditionalDependencies="../../../../Expat-1.95.2/Libs/expat.lib wsock32.lib wininet.lib"
+				AdditionalDependencies="../../../../Expat-1.95.3/Libs/libexpat.lib wsock32.lib wininet.lib"
 				OutputFile=".\../../../win32/ReleaseSymbols/easysoap.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
@@ -281,6 +281,24 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\XMLParser.cpp">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories="../../../../expat-1.95.3/source/lib"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories="../../../../expat-1.95.3/source/lib"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="ReleaseSymbols|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories="../../../../expat-1.95.3/source/lib"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\..\src\isapi.cpp">
