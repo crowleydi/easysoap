@@ -35,6 +35,8 @@ private:
 	HeaderMap	m_headers;
 	SOAPUrl		m_endpoint;
 	SOAPUrl		m_proxy;
+	bool		m_httpproxy;
+	SOAPString	m_httpmsg;
 
 	int		GetReply();
 	bool	Connect();

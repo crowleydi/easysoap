@@ -82,6 +82,7 @@ int
 SOAPHTTPProtocol::Get(const char *path)
 {
 	StartVerb("GET", path);
+	WriteLine("");
 	return GetReply();
 }
 
@@ -96,16 +97,24 @@ SOAPHTTPProtocol::FlushInput()
 void
 SOAPHTTPProtocol::StartVerb(const char *verb, const char *path)
 {
+	if (!path)
+		throw SOAPException("Invalid NULL path");
+
+	FlushInput();
+	if (!Connect())
+		throw SOAPSocketException("Unable to make socket connection");
 	Write(verb);
 	Write(" ");
 
-	if (m_proxy.Protocol() != SOAPUrl::no_proto)
+	if (m_httpproxy)
+	{
 		Write(m_endpoint.GetBaseString());
-
-	if (path && *path)
+		if (*path == '/')
+			++path;
 		Write(path);
+	}
 	else
-		Write("/");
+		Write(path);
 
 	WriteLine(" HTTP/1.0");
 	WriteHostHeader(m_endpoint);
@@ -115,9 +124,6 @@ SOAPHTTPProtocol::StartVerb(const char *verb, const char *path)
 void
 SOAPHTTPProtocol::BeginPost(const char *path)
 {
-	FlushInput();
-	if (!Connect())
-		throw SOAPSocketException("Unable to make socket connection");
 	StartVerb("POST", path);
 }
 
@@ -164,10 +170,13 @@ SOAPHTTPProtocol::GetReply()
 	char *httpretcode = sp_strchr(buff, ' ');
 	if (httpretcode)
 	{
+		m_httpmsg = httpretcode;
 		httpreturn = atoi(httpretcode);
 		if (httpreturn == 0)
 			httpreturn = 500;
 	}
+	else
+		m_httpmsg = buff;
 
 	while (1)
 	{
@@ -219,11 +228,12 @@ SOAPHTTPProtocol::Connect()
 {
 	if (!IsOpen())
 	{
-		bool proxy = m_proxy.Protocol() != SOAPUrl::no_proto;
+		// See if we have to talk through an HTTP proxy
+		m_httpproxy = (m_proxy.Protocol() == SOAPUrl::http_proto);
 
-		int port					= proxy ? m_proxy.Port()		: m_endpoint.Port();
-		const char *host			= proxy ? m_proxy.Hostname()	: m_endpoint.Hostname();
-		SOAPUrl::UrlProtocol proto	= proxy ? m_proxy.Protocol()	: m_endpoint.Protocol();
+		int port					= m_httpproxy ? m_proxy.Port()		: m_endpoint.Port();
+		const char *host			= m_httpproxy ? m_proxy.Hostname()	: m_endpoint.Hostname();
+		SOAPUrl::UrlProtocol proto	= m_endpoint.Protocol();
 
 		switch (proto)
 		{
@@ -235,7 +245,7 @@ SOAPHTTPProtocol::Connect()
 				SOAPSecureSocketImp *socket = new SOAPSecureSocketImp();
 				socket->SOAPClientSocketImp::Connect(host, port);
 				SOAPProtocolBase::SetSocket(socket);
-				if (proxy)
+				if (m_httpproxy)
 				{
 					char buffer[1024];
 					snprintf(buffer, 1024, "CONNECT %s:%d HTTP/1.0",
@@ -243,10 +253,17 @@ SOAPHTTPProtocol::Connect()
 							m_endpoint.Port());
 					WriteLine(buffer);
 					WriteHostHeader(m_endpoint);
+					WriteLine("");
+
+					if (GetReply() != 200)
+						throw SOAPException("Error setting up tunnel through proxy: %s",
+							(const char *)m_httpmsg);
 					//
-					// TODO: Check return
-					//
-					GetReply();
+					// we turn the proxy flag off because at this point
+					// we have a connection which looks like a direct
+					// connection.  So we don't have to do anything
+					// fancy with the GET/POST commands.
+					m_httpproxy = false;
 				}
 				socket->InitSSL();
 			}
