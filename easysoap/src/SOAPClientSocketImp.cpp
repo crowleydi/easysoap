@@ -120,38 +120,52 @@ bool
 SOAPClientSocketImp::WaitRead(int sec, int usec)
 {
 	struct timeval tv;
-	fd_set fset;
+	fd_set rset, eset;
 
-	FD_ZERO(&fset);
-	FD_SET(m_socket, &fset);
+	FD_ZERO(&rset);
+	FD_SET(m_socket, &rset);
+	FD_ZERO(&eset);
+	FD_SET(m_socket, &eset);
 
 	tv.tv_sec = sec;
-	tv.tv_usec = usec;
+	tv.tv_usec = 40;
 
-	int ret = select(m_socket+1, &fset, 0, 0, sec == -1 ? 0 : &tv);
+	int ret = select(m_socket+1, &rset, 0, &eset, sec == -1 ? 0 : &tv);
+	int rsetresult = FD_ISSET(m_socket, &rset);
+	int esetresult = FD_ISSET(m_socket, &eset);
+	SOAPDebugger::Print(3, "read select() return: %d\r\n", ret);
+	SOAPDebugger::Print(4, "write select() wset: %d\r\n", rsetresult);
+	SOAPDebugger::Print(4, "write select() eset: %d\r\n", esetresult);
 	if (ret == (int)SOCKET_ERROR)
 		throw SOAPException("WaitRead select error");
 
-	return ret == 1;
+	return rsetresult != 0;
 }
 
 bool
 SOAPClientSocketImp::WaitWrite(int sec, int usec)
 {
 	struct timeval tv;
-	fd_set fset;
+	fd_set wset, eset;
 
-	FD_ZERO(&fset);
-	FD_SET(m_socket, &fset);
+	FD_ZERO(&eset);
+	FD_SET(m_socket, &eset);
+	FD_ZERO(&wset);
+	FD_SET(m_socket, &wset);
 
 	tv.tv_sec = sec;
-	tv.tv_usec = usec;
+	tv.tv_usec = 40;
 
-	int ret = select(m_socket+1, 0, &fset, 0, sec == -1 ? 0 : &tv);
+	int ret = select(m_socket+1, 0, &wset, &eset, sec == -1 ? 0 : &tv);
+	int wsetresult = FD_ISSET(m_socket, &wset);
+	int esetresult = FD_ISSET(m_socket, &eset);
+	SOAPDebugger::Print(3, "write select() return: %d\r\n", ret);
+	SOAPDebugger::Print(4, "write select() wset: %d\r\n", wsetresult);
+	SOAPDebugger::Print(4, "write select() eset: %d\r\n", esetresult);
 	if (ret == (int)SOCKET_ERROR)
 		throw SOAPException("WaitWrite select error");
 
-	return ret == 1;
+	return wsetresult != 0;
 }
 
 bool
