@@ -56,35 +56,12 @@ size_t SOAPSecureSocketImp::Read(char *, size_t) {return 0;}
 size_t SOAPSecureSocketImp::Write(const char *, size_t) {return 0;}
 bool SOAPSecureSocketImp::WaitRead(int, int) {return false;}
 void SOAPSecureSocketImp::InitSSL() {}
-void SOAPSecureSocketImp::SetCertificateInfo(const char* , const char*) {}
 #else
 
 extern "C" {
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 #include <openssl/rand.h>
-};
-
-//
-// Initialize OpenSSL
-//
-class OpenSSLinit
-{
-public:
-	OpenSSLinit()
-	{
-		static const char rnd_seed[] = 
-			"string to make the random number generator"
-			"think it has some entropy.";
-
-		SSL_library_init();
-		SSL_load_error_strings();
-		RAND_seed(rnd_seed, sizeof rnd_seed);
-	}
-
-	~OpenSSLinit()
-	{
-	}
 };
 
 //////////////////////////////////////////////////////////////////////
@@ -94,19 +71,22 @@ public:
 
 SOAPSecureSocketImp::SOAPSecureSocketImp()
 : m_ssl(0)
-, m_ctx(0)
+, m_delctx(true)
 {
-	static OpenSSLinit __opensslinit;
+	m_context = new SOAPSSLContext;
 }
 
-void SOAPSecureSocketImp::SetCertificateInfo(const char* keyfile, const char* password)
+SOAPSecureSocketImp::SOAPSecureSocketImp(SOAPSSLContext& ctx) 
+: m_ssl(0)
+, m_context(&ctx)
+, m_delctx(false)
 {
-	m_keyfile = keyfile;
-	m_password = password;
 }
 
 SOAPSecureSocketImp::~SOAPSecureSocketImp()
 {
+	if (m_delctx)
+			delete m_context;
 	Close();
 }
 
@@ -158,51 +138,17 @@ SOAPSecureSocketImp::HandleError(const char *context, int retcode)
 	return retry;
 }
 
-// password callback function for retrieving the password.
-// Since we can't have user interaction, it will have to be
-// stored somehow.. Gulp
-int SOAPSecureSocketImp::password_cb(char* buf, int size, int rwflag, void *userdata) 
-{
-	const SOAPString& password = ((SOAPSecureSocketImp*)userdata)->m_password;
-	if (size < sp_strlen(password.Str())+1)
-		return 0;
-	sp_strcpy(buf, password.Str());
-	return(sp_strlen(password.Str()));
-}
-
 void
 SOAPSecureSocketImp::InitSSL()
 {
 	//
 	// set up SSL
 	//
-	m_ctx = SSL_CTX_new(SSLv23_client_method());
-	if (!m_ctx)
-		throw SOAPMemoryException();
-
-	m_ssl = SSL_new(m_ctx);
+	m_ssl = SSL_new(m_context->GetContext());
 	if (!m_ssl)
 		throw SOAPMemoryException();
 	
 	int retcode;
-	// set up our keys and password, if required
-	if (!m_keyfile.IsEmpty() ) {
-			if ((retcode = SSL_CTX_use_certificate_chain_file(m_ctx, m_keyfile.Str()))!= 1)
-					HandleError("Error trying to use the certificate file: %s\n", retcode);
-
-			// now set our password callback function...
-			SSL_CTX_set_default_passwd_cb(m_ctx, &password_cb);
-			// setup the callback userdata.
-			SSL_CTX_set_default_passwd_cb_userdata(m_ctx, this);
-			
-			retcode = SSL_CTX_use_PrivateKey_file(m_ctx, m_keyfile.Str(), SSL_FILETYPE_PEM);
-			if (retcode != 1) 
-					HandleError("Error trying to use the private key from the certificate file : %s\n", retcode);
-
-			if ((retcode = SSL_CTX_check_private_key(m_ctx) != 1))
-					HandleError("Error while checking the private key : %s\n", retcode);
-
-	}
 
 	if ((retcode = SSL_set_fd(m_ssl, m_socket)) != 1)
 		HandleError("Error attaching security layer to socket : %s\n", retcode);
@@ -314,11 +260,6 @@ SOAPSecureSocketImp::Close()
 		m_ssl = 0;
 	}
 
-	if (m_ctx)
-	{
-		SSL_CTX_free(m_ctx);
-		m_ctx = 0;
-	}
 }
 
 #endif // EASYSOAP_SSL

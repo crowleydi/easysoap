@@ -138,8 +138,8 @@ void
 SOAPonHTTP::ConnectTo(const SOAPUrl& endpoint)
 {
 	m_endpoint = endpoint;
-	if (!m_keyfile.IsEmpty())
-			m_http.SetCertificateInfo(m_keyfile.Str(), m_password.Str());
+	if (m_ctx)
+			m_http.SetContext(*m_ctx);
 	m_http.ConnectTo(endpoint);
 }
 
@@ -147,8 +147,8 @@ void
 SOAPonHTTP::ConnectTo(const SOAPUrl& endpoint, const SOAPUrl& proxy)
 {
 	m_endpoint = endpoint;
-	if (!m_keyfile.IsEmpty()) 
-			m_http.SetCertificateInfo(m_keyfile.Str(), m_password.Str());
+	if (m_ctx)
+			m_http.SetContext(*m_ctx);
 	m_http.ConnectTo(endpoint, proxy);
 }
 
@@ -536,11 +536,12 @@ SOAPHTTPProtocol::Connect()
 			break;
 		case SOAPUrl::https_proto:
 			{
-				SOAPSecureSocketImp *socket = new SOAPSecureSocketImp();
-				// if we have information about the certificate to be used. 
-				if (!m_keyfile.IsEmpty()) {	
-					socket->SetCertificateInfo(m_keyfile.Str(), m_password.Str());
-				}
+				SOAPSecureSocketImp * socket;
+				if (m_ctx)
+					socket = new SOAPSecureSocketImp(*m_ctx);
+				else
+					socket = new SOAPSecureSocketImp();
+
 				socket->SOAPClientSocketImp::Connect(host, port);
 				SOAPProtocolBase::SetSocket(socket);
 				if (m_httpproxy)
