@@ -1,7 +1,16 @@
 
+0.6, 27-Mar-2002
+	Tons of stuff.  bug fixes, namespaces, bug fixes, changed header
+	file location.  Tons of stuff.  TONS of stuff.  Still no documentation.
+
+0.5
+	I forgot.  Too long ago.
+
+0.4, aka WROX
 	Added SOAPHTTPServer.   Bertrand nudged me at the right time.
 	Moved build system to autoconf/automake.  Thanks to Mike Anothony.
 	Switched keep-alive back to being default.
+	This release was pushed out for the WROX book.
 
 0.3, 21-Jun-2001
 	Mostly a bug fix release.

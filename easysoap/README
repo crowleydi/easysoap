@@ -48,7 +48,15 @@ Major changes in this release:
 	all kinds of cool stuff comes for free (client certificates, SSL,
 	etc.)
 
-Please submit bug reports and comments to:
+Numerous people (Scott Deerwester, Haitao Song, Patrick McConnell,
+I've missed many, apologies) have sent me great feedback and have
+helped me catch and fix many bugs.  I really appreciate the bug reports
+and the positive feedback I have received.  I also appreciate all
+the help Blaise has put in for this release.  Thanks to all of
+you!
+
+
+Please submit bug reports and constructive comments to:
 dcrowley@users.sourceforge.net.
 
 
@@ -69,6 +77,7 @@ HOW TO BUILD EASYSOAP
 	./configure --disable-shared (see below)
 	make
 	make install
+
 
 HOW TO DOWNLOAD AND BUILD EXPAT
 =====================================
