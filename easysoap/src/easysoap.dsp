@@ -108,6 +108,10 @@ SOURCE=.\SOAPClientSocketImp.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\SOAPDebugger.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\SOAPEnvelope.cpp
 # End Source File
 # Begin Source File
@@ -141,6 +145,10 @@ SOURCE=.\SOAPMethodHandler.cpp
 # Begin Source File
 
 SOURCE=.\SOAPonHTTP.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\SOAPPacketWriter.cpp
 # End Source File
 # Begin Source File
 
@@ -180,10 +188,6 @@ SOURCE=.\SOAPStructHandler.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\SOAPTypes.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=.\SOAPUrl.cpp
 # End Source File
 # Begin Source File
@@ -217,6 +221,10 @@ SOURCE=.\SOAPBodyHandler.h
 # Begin Source File
 
 SOURCE=.\SOAPClientSocketImp.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\SOAPDebugger.h
 # End Source File
 # Begin Source File
 
@@ -317,10 +325,6 @@ SOURCE=.\SOAPStructHandler.h
 # Begin Source File
 
 SOURCE=..\include\SOAPTransport.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\SOAPTypes.h
 # End Source File
 # Begin Source File
 
