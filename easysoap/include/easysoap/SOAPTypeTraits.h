@@ -23,7 +23,7 @@
 #if !defined(AFX_SOAPTYPETRAITS_H__C5FEAF2C_BF9D_4B2A_BA32_516712F68E78__INCLUDED_)
 #define AFX_SOAPTYPETRAITS_H__C5FEAF2C_BF9D_4B2A_BA32_516712F68E78__INCLUDED_
 
-#include <SOAPBase64.h>
+#include <easysoap/SOAPBase64.h>
 
 template<typename T>
 class SOAPTypeTraits;
@@ -213,9 +213,21 @@ public:
 	static const SOAPParameter& Deserialize(const SOAPParameter& param, V& val)
 	{
 		const SOAPParameter::Array& arr = param.GetArray();
+		SOAPParameter::Attrs::Iterator attr;
+		//
+		// check for xsi:nil
+		attr = param.GetAttributes().Find(XMLSchemaInstance::nil);
+		if (attr && arr.Size() == 0)
+		{
+			val.resize(0);
+			return param;
+		}
+		else if (attr)
+			throw SOAPException("Got xsi:nil attribute on array but parameter has values..");
+
 		//
 		// parse arrayType attribute
-		SOAPParameter::Attrs::Iterator attr = param.GetAttributes().Find(SOAPEnc::arrayType);
+		attr = param.GetAttributes().Find(SOAPEnc::arrayType);
 		if (!attr)
 			throw SOAPException("Cannot de-serialize array without arrayType attribute.");
 
@@ -463,10 +475,21 @@ public:
 	static const SOAPParameter& Deserialize(const SOAPParameter& param, V& val)
 	{
 		const SOAPParameter::Array& arr = param.GetArray();
+		SOAPParameter::Attrs::Iterator attr;
+		//
+		// check xsi:nil attribute
+		attr = param.GetAttributes().Find(XMLSchemaInstance::nil);
+		if (attr && arr.Size() == 0)
+		{
+			val.resize(0, 0);
+			return param;
+		}
+		else if (attr)
+			throw SOAPException("Got xsi:nil attribute on array but parameter has values..");
 
 		//
 		// parse arrayType attribute
-		SOAPParameter::Attrs::Iterator attr = param.GetAttributes().Find(SOAPEnc::arrayType);
+		attr = param.GetAttributes().Find(SOAPEnc::arrayType);
 		if (!attr)
 			throw SOAPException("Cannot de-serialize 2D-array without arrayType attribute.");
 
