@@ -117,13 +117,13 @@ private:
 	{
 	private:
 		const SOAPHashMap				*m_map;
-		typename Elements::Iterator		m_index;
+		TYPENAME(Elements::Iterator)	m_index;
 		HashElement						*m_he;
 		
 		friend class SOAPHashMap<K,I,H,E>;
 
 		// private constuctor that can only be called by SOAPHashMap
-		ForwardHashMapIterator(const SOAPHashMap *map, typename Elements::Iterator index)
+		ForwardHashMapIterator(const SOAPHashMap *map, TYPENAME(Elements::Iterator) index)
 			: m_map(map), m_index(index), m_he(0)
 		{
 			if (m_map)
@@ -134,7 +134,7 @@ private:
 			}
 		}
 
-		ForwardHashMapIterator(const SOAPHashMap *map, typename Elements::Iterator index, HashElement *he)
+		ForwardHashMapIterator(const SOAPHashMap *map, TYPENAME(Elements::Iterator) index, HashElement *he)
 			: m_map(map), m_index(index), m_he(he)
 		{
 		}

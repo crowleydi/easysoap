@@ -61,7 +61,7 @@ protected:
 	bool ExecuteMethod(const SOAPEnvelope& request, SOAPMethod& response)
 	{
 		const SOAPMethod& method = request.GetBody().GetMethod();
-		MEMBER_TYPE(DispatchMap::Iterator) i = m_dispatchMap.Find(method.GetName());
+		TYPENAME(DispatchMap::Iterator) i = m_dispatchMap.Find(method.GetName());
 		if (i)
 		{
 			T *target= GetTarget(request);
@@ -109,7 +109,7 @@ private:
 
 	bool HandleHeader(const SOAPParameter& header, SOAPEnvelope& request, SOAPEnvelope& response)
 	{
-		MEMBER_TYPE(DispatchMap::Iterator) i = m_dispatchMap.Find(header.GetName());
+		TYPENAME(DispatchMap::Iterator) i = m_dispatchMap.Find(header.GetName());
 
 		if (i)
 		{

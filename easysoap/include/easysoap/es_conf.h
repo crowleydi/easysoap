@@ -35,9 +35,9 @@
 // bit ....
 */
 #ifdef HAVE_TEMPLATE_KEYWORD_QUALIFIER
-#define MEMBER_TYPE(T) typename T
+#define TYPENAME(T) typename T
 #else
-#define MEMBER_TYPE(T) T
+#define TYPENAME(T) T
 #endif
 
 /*

@@ -178,7 +178,7 @@ public:
 	static SOAPParameter& Serialize(SOAPParameter& param, const V& val)
 	{
 		param.SetIsStruct();
-		for (MEMBER_TYPE(V::const_iterator) i = val.begin(); i != val.end(); ++i)
+		for (TYPENAME(V::const_iterator) i = val.begin(); i != val.end(); ++i)
 		{
 			SOAPParameter& p = param.AddParameter();
 			p.SetIsStruct();
@@ -191,7 +191,7 @@ public:
 	template <typename V>
 	static const SOAPParameter& Deserialize(const SOAPParameter& param, V& val)
 	{
-		MEMBER_TYPE(V::key_type) key;
+		TYPENAME(V::key_type) key;
 		const SOAPParameter::Array& arr = param.GetArray();
 		for (SOAPParameter::Array::ConstIterator i = arr.Begin(); i != arr.End(); ++i)
 		{
@@ -256,15 +256,15 @@ public:
 		char buffer[32];
 
 		SOAPQName& atype = param.AddAttribute(SOAPEnc::arrayType);
-		SOAPTypeTraits<MEMBER_TYPE(V::value_type)>::GetType(atype);
+		SOAPTypeTraits<TYPENAME(V::value_type)>::GetType(atype);
 		snprintf(buffer, sizeof(buffer), "[%d]", val.size());
 		atype.GetName().Append(buffer);
 
 		//
 		// Serialize the array values
 		param.SetIsStruct();
-		for (MEMBER_TYPE(V::const_iterator) i = val.begin(); i != val.end(); ++i)
-			SOAPTypeTraits<MEMBER_TYPE(V::value_type)>::Serialize(param.AddParameter(), *i);
+		for (TYPENAME(V::const_iterator) i = val.begin(); i != val.end(); ++i)
+			SOAPTypeTraits<TYPENAME(V::value_type)>::Serialize(param.AddParameter(), *i);
 		return param;
 	}
 
@@ -323,7 +323,7 @@ public:
 
 				pos = newpos;
 			}
-			SOAPTypeTraits<MEMBER_TYPE(V::value_type)>::Deserialize(**i, val[pos++]);
+			SOAPTypeTraits<TYPENAME(V::value_type)>::Deserialize(**i, val[pos++]);
 		}
 		return param;
 	}
@@ -564,7 +564,7 @@ public:
 		char buffer[64];
 
 		SOAPQName& atype = param.AddAttribute(SOAPEnc::arrayType);
-		SOAPTypeTraits<MEMBER_TYPE(V::value_type)>::GetType(atype);
+		SOAPTypeTraits<TYPENAME(V::value_type)>::GetType(atype);
 		snprintf(buffer, sizeof(buffer), "[%d,%d]", val.GetNumRows(), val.GetNumCols());
 		atype.GetName().Append(buffer);
 
@@ -573,7 +573,7 @@ public:
 		param.SetIsStruct();
 		for (size_t r = 0; r < val.GetNumRows(); ++r)
 			for (size_t c = 0; c < val.GetNumCols(); ++c)
-				SOAPTypeTraits<MEMBER_TYPE(V::value_type)>::Serialize(param.AddParameter(), val[r][c]);
+				SOAPTypeTraits<TYPENAME(V::value_type)>::Serialize(param.AddParameter(), val[r][c]);
 		return param;
 	}
 
@@ -637,7 +637,7 @@ public:
 				row = newrow;
 				col = newcol;
 			}
-			SOAPTypeTraits<MEMBER_TYPE(V::value_type)>::Deserialize(**i, val[row][col]);
+			SOAPTypeTraits<TYPENAME(V::value_type)>::Deserialize(**i, val[row][col]);
 			if (++col == numcols)
 			{
 				++row;
