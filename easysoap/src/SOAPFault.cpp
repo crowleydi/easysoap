@@ -85,6 +85,7 @@ SOAPFault::GetDetail() const
 }
 
 SOAPFaultException::SOAPFaultException(const SOAPFault& fault)
+: m_fault(fault)
 {
 		const SOAPParameter *p;
 		m_what = "SOAP Fault";

@@ -88,8 +88,12 @@ private:
 
 class SOAPFaultException : public SOAPException
 {
+private:
+	SOAPFault	m_fault;
+
 public:
 	SOAPFaultException(const SOAPFault&);
+	const SOAPFault& GetFault() const {return m_fault;}
 };
 
 END_EASYSOAP_NAMESPACE
