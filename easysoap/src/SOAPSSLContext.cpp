@@ -83,49 +83,81 @@ rsa_st* OpenSSLinit::m_tmpRSAKey = 0;
 // *******************************************************************
 
 
-SOAPSSLContext::SOAPSSLContext() 
+SOAPSSLContext::SOAPSSLContext(MethodType methodType)
 	:	m_ctx(0)
 	, m_verifyserver(true)
+        , m_verifycb(0)
 {
 	sslinit();
-	m_ctx = SSL_CTX_new(SSLv23_client_method());
+	m_ctx = SSL_CTX_new(getMethod(methodType));
 	if (!m_ctx)
 		throw SOAPMemoryException();
 }
 
-SOAPSSLContext::SOAPSSLContext(const char* cafile) 
+SOAPSSLContext::SOAPSSLContext(const char* cafile, MethodType methodType) 
 		: m_cafile(cafile)
 		, m_ctx(0)
 	, m_verifyserver(true)
+        , m_verifycb(0)
 {
 	sslinit();
-	m_ctx = SSL_CTX_new(SSLv23_client_method());
+	m_ctx = SSL_CTX_new(getMethod(methodType));
 	if (!m_ctx)
 		throw SOAPMemoryException();
 	SetCAInfo(cafile);
 }
 
-SOAPSSLContext::SOAPSSLContext(const char* certfile, const char* keyfile, const char* password, const char* cafile)
-		: m_cafile(cafile)
-		, m_certfile(certfile)
-		, m_keyfile(keyfile)
-		, m_password(password)
-		, m_ctx(0)
-	, m_verifyserver(true)
+SOAPSSLContext::SOAPSSLContext(const char* certfile, const char* keyfile, const char* password, const char* cafile, MethodType methodType)
+                : m_cafile(cafile)
+                , m_certfile(certfile)
+                , m_keyfile(keyfile)
+                , m_password(password)
+                , m_ctx(0)
+        , m_verifyserver(true)
+        , m_verifycb(0)
 {
-	sslinit();
-	m_ctx = SSL_CTX_new(SSLv23_client_method());
-	if (!m_ctx)
-		throw SOAPMemoryException();
-	SetCertInfo(certfile, keyfile, password);
-	if (cafile)
-		SetCAInfo(cafile);
+        sslinit();
+	m_ctx = SSL_CTX_new(getMethod(methodType));
+        if (!m_ctx)
+                throw SOAPMemoryException();
+
+        SetCertInfo(certfile, keyfile, password);
+        if (cafile)
+                SetCAInfo(cafile);
 }
 
 void
 SOAPSSLContext::sslinit()
 {
 		static OpenSSLinit __opensslinit;
+}
+
+SSL_METHOD* SOAPSSLContext::getMethod(MethodType methodType)
+{
+        SSL_METHOD* method = 0;
+
+        switch(methodType)
+        {
+        case SOAPSSLContext::SSL_v2:
+                method = SSLv2_client_method();
+                break;
+        case SOAPSSLContext::SSL_v23:
+                method = SSLv23_client_method();
+                break; 
+        case SOAPSSLContext::SSL_v3:
+                method = SSLv3_client_method();
+                break; 
+        case SOAPSSLContext::TLS_v1:
+                method = TLSv1_client_method();
+                break; 
+        default:
+                break;
+        }
+
+        if (!method)
+                throw SOAPException("SSL Method Type Not Supported");
+
+        return method;
 }
 
 /*

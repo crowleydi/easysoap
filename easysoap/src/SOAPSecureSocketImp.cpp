@@ -39,7 +39,7 @@ SOAPSecureSocketImp::SOAPSecureSocketImp()
 	throw SOAPSocketException("Secure sockets not supported.");
 }
 
-SOAPSecureSocketImp::SOAPSecureSocketImp(SOAPSSLContext& ctx) 
+SOAPSecureSocketImp::SOAPSecureSocketImp(SOAPSSLContext& ctx, void* cbdata) 
 {
 	throw SOAPSocketException("Secure sockets not supported.");
 }
@@ -77,14 +77,16 @@ extern "C" {
 SOAPSecureSocketImp::SOAPSecureSocketImp()
 : m_ssl(0)
 , m_delctx(true)
+, m_cbdata(0)
 {
 	m_context = new SOAPSSLContext;
 }
 
-SOAPSecureSocketImp::SOAPSecureSocketImp(SOAPSSLContext& ctx) 
+SOAPSecureSocketImp::SOAPSecureSocketImp(SOAPSSLContext& ctx, void* cbdata) 
 : m_ssl(0)
 , m_context(&ctx)
 , m_delctx(false)
+, m_cbdata(cbdata)
 {
 }
 
@@ -180,7 +182,6 @@ SOAPSecureSocketImp::HandleError(const char *context, int retcode)
 	
 }
 
-	
 void
 SOAPSecureSocketImp::InitSSL()
 {
@@ -277,17 +278,31 @@ SOAPSecureSocketImp::VerifyCert(const char* host)
 	if (!server_cert)
 		throw SOAPSSLException("Error getting server certificate.");
 
-	int rc = SSL_get_verify_result(m_ssl);
+        try  {
+	        int rc = SSL_get_verify_result(m_ssl);
 	
-	const char *msg = CheckForCertError(rc);
-	if (msg)
-		throw SOAPSSLException("Error verifying peer certificate: %s", msg);
+	        const char *msg = CheckForCertError(rc);
+	        if (msg)
+		        throw SOAPSSLException("Error verifying peer certificate: %s", msg);
 
-	char buf[256];
-	X509_NAME_get_text_by_NID(X509_get_subject_name(server_cert),
+                SOAPSSLContext::VerifyPeerCallback cb = m_context->GetVerifyPeerCallback();
+                if (cb) {
+                        if (!cb(server_cert, m_cbdata)) {
+		                throw SOAPSSLException("Server certificate failed callback verification");
+                        }
+                }
+                else {
+	                char buf[256];
+	                X509_NAME_get_text_by_NID(X509_get_subject_name(server_cert),
 							  NID_commonName, buf, sizeof(buf));
-	if (sp_strcasecmp(buf, host))
-		throw SOAPSSLException("Server certificate hostname does not match (%s != %s)", buf, host);
+	                if (sp_strcasecmp(buf, host))
+		                throw SOAPSSLException("Server certificate hostname does not match (%s != %s)", buf, host);
+                }
+        }
+        catch(...) {
+	        X509_free(server_cert);
+                throw;
+        }
 
 	X509_free(server_cert);
 }

@@ -26,6 +26,8 @@
 struct ssl_st;
 struct ssl_ctx_st;
 struct rsa_st;
+struct x509_st;
+struct ssl_method_st;
 
 BEGIN_EASYSOAP_NAMESPACE
 
@@ -36,14 +38,21 @@ BEGIN_EASYSOAP_NAMESPACE
 class EASYSOAP_EXPORT SOAPSSLContext
 {
 public:
-	SOAPSSLContext(){
+        typedef enum {
+                SSL_v2,
+                SSL_v23,
+                SSL_v3,
+                TLS_v1
+        } MethodType;
+
+	SOAPSSLContext(MethodType methodType=SSL_v23){
 		throw SOAPException("HTTPS NOT SUPPORTED WITHOUT OpenSSL");
 	}
-	SOAPSSLContext(const char* cafile) {
+	SOAPSSLContext(const char* cafile, MethodType methodType=SSL_v23) {
 
 		throw SOAPException("HTTPS NOT SUPPORTED WITHOUT OpenSSL");
 	}
-	SOAPSSLContext(const char* certfile, const char* keyfile, const char* password, const char* cafile=0) {
+	SOAPSSLContext(const char* certfile, const char* keyfile, const char* password, const char* cafile=0, MethodType methodType=SSL_v23) {
 
 		throw SOAPException("HTTPS NOT SUPPORTED WITHOUT OpenSSL");
 	}
@@ -51,8 +60,13 @@ public:
 	ssl_ctx_st*	GetContext() {return 0;}
 	void SetCAInfo(const char* cafile);
 	void SetCertInfo(const char* certfile, const char* keyfile, const char* password) {}
+
 	bool VerifyServerCert() { return false; };
 	void SetVerifyServerCert (bool v) { } ;
+
+        typedef bool (*VerifyPeerCallback) (struct x509_st* peercert, void* cbdata);
+        VerifyPeerCallback GetVerifyPeerCallback() { return 0; }
+        void SetVerifyPeerCallback(VerifyPeerCallback)  { }
 
 	bool IgnoreCertError(int rc ) { return false; } ;
 	void AddCertErrorToIgnoreList(int rc) { };
@@ -68,9 +82,16 @@ public:
 class EASYSOAP_EXPORT SOAPSSLContext
 {
 public:
-	SOAPSSLContext();
-	SOAPSSLContext(const char* cafile);
-	SOAPSSLContext(const char* certfile, const char* keyfile, const char* password, const char* cafile=0);
+        typedef enum {
+                SSL_v2,
+                SSL_v23,
+                SSL_v3,
+                TLS_v1
+        } MethodType;
+
+	SOAPSSLContext(MethodType methodType=SSL_v23);
+	SOAPSSLContext(const char* cafile, MethodType methodType=SSL_v23);
+	SOAPSSLContext(const char* certfile, const char* keyfile, const char* password, const char* cafile=0, MethodType methodType=SSL_v23);
 	~SOAPSSLContext();
 	//SOAPSSLContext(const SOAPSSLContext& ctx);
 	//SOAPSSLContext& operator=(const SOAPSSLContext& ctx);
@@ -83,7 +104,11 @@ public:
 	static int 	password_cb(char *buf, int num, int rwflag, void *userdata);
 	
 	bool VerifyServerCert() { return m_verifyserver; } ;
-	void SetVerifyServerCert(bool v) { m_verifyserver = v; } ;
+	void SetVerifyServerCert (bool v)  { m_verifyserver = v; } ;
+
+        typedef bool (*VerifyPeerCallback) (struct x509_st* peercert, void* cbdata);
+        VerifyPeerCallback GetVerifyPeerCallback() { return m_verifycb; }
+        void SetVerifyPeerCallback(VerifyPeerCallback cb)  { m_verifycb = cb; }
 
 	bool IgnoreCertError(int rc );
 	void AddCertErrorToIgnoreList(int rc) ;
@@ -105,9 +130,11 @@ private:
 
 	bool				m_verifyserver;
 	SOAPArray<int> 		m_certerrors;
+        VerifyPeerCallback      m_verifycb;
 
 
 	void sslinit();
+        ssl_method_st* getMethod(MethodType methodType);
 	// handles error, returns true if they are recoverable, false if not.
 	void HandleError(const char* context, int retcode);
 };

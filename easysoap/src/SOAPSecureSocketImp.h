@@ -39,15 +39,17 @@ private:
 
 protected:
 	ssl_st				*m_ssl;
-	SOAPSSLContext		*m_context;
+	SOAPSSLContext		        *m_context;
 	bool				m_delctx;
+        void                            *m_cbdata;
+
 	bool HandleError(const char *context, int retcode);
 	void InitSSL();
 	void VerifyCert(const char* host);
 	const char* CheckForCertError(int rc);
 public:
 	SOAPSecureSocketImp();
-	SOAPSecureSocketImp(SOAPSSLContext& ctx);
+	SOAPSecureSocketImp(SOAPSSLContext& ctx, void* cbdata=0);
 	virtual ~SOAPSecureSocketImp();
 
 	virtual bool WaitRead(int sec = -1, int usec = 0);

@@ -57,6 +57,7 @@ private:
 	SOAPSSLContext	*m_ctx;
 	SOAPSocketInterface * m_sslsocket;
 	bool		m_delsslsocket;
+        void            *m_cbdata;
 
 	int		GetReply();
 	size_t	GetChunkLength();
@@ -77,6 +78,7 @@ public:
 		, m_ctx(0)
 		, m_sslsocket(0)
 		, m_delsslsocket(false)
+		, m_cbdata(0)
 	{}
 
 	SOAPHTTPProtocol(const SOAPUrl& endpoint)
@@ -88,6 +90,7 @@ public:
 		, m_ctx(0)
 		, m_sslsocket(0)
 		, m_delsslsocket(false)
+		, m_cbdata(0)
 
 	{
 		ConnectTo(endpoint);
@@ -102,6 +105,7 @@ public:
 		, m_ctx(0)
 		, m_sslsocket(0)
 		, m_delsslsocket(false)
+		, m_cbdata(0)
 
 	{
 		ConnectTo(endpoint, proxy);
@@ -119,6 +123,9 @@ public:
 	void 	SetContext(SOAPSSLContext& context) { 
 		m_ctx = &context; 
 	}
+        void SetVerifyCBData(void* cbdata) {
+                m_cbdata = cbdata;
+        }
 	void	ConnectTo(const SOAPUrl& endpoint);
 	void	ConnectTo(const SOAPUrl& endpoint, const SOAPUrl& proxy);
 	int		Get(const char *path);
@@ -154,17 +161,18 @@ private:
 	SOAPString			m_userAgent;
 	SOAPUrl				m_endpoint;
 	SOAPSSLContext 		*m_ctx;
+        void                    *m_cbdata;
 
 public:
-	SOAPonHTTP(SOAPSSLContext * ctx = 0) : m_ctx(ctx){}
+	SOAPonHTTP(SOAPSSLContext * ctx = 0) : m_ctx(ctx), m_cbdata(0) {}
 	SOAPonHTTP(const SOAPUrl& endpoint, SOAPSSLContext * ctx = 0)
-		: m_ctx(ctx)
+		: m_ctx(ctx), m_cbdata(0)
 	{
 		ConnectTo(endpoint);
 	}
 
 	SOAPonHTTP(const SOAPUrl& endpoint, SOAPUrl& proxy, SOAPSSLContext * ctx = 0)
-		: m_ctx(ctx)
+		: m_ctx(ctx), m_cbdata(0)
 	{
 		ConnectTo(endpoint);
 	}
@@ -187,6 +195,12 @@ public:
 			throw SOAPException("attempting to replace context on active connection!");
 		}	
 	}
+
+        void SetVerifyCBData(void* cbdata)
+        {
+                m_cbdata = cbdata;
+        }
+
 	//
 	//  Return charset if we know it
 	virtual const char *GetCharset() const;

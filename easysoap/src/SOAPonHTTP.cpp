@@ -172,6 +172,8 @@ SOAPonHTTP::ConnectTo(const SOAPUrl& endpoint)
 	m_endpoint = endpoint;
 	if (m_ctx)
 			m_http.SetContext(*m_ctx);
+	if (m_cbdata)
+			m_http.SetVerifyCBData(m_cbdata);
 
 	const char *proxy_str = getenv("http_proxy");
 	if (proxy_str)
@@ -189,6 +191,8 @@ SOAPonHTTP::ConnectTo(const SOAPUrl& endpoint, const SOAPUrl& proxy)
 	m_endpoint = endpoint;
 	if (m_ctx)
 			m_http.SetContext(*m_ctx);
+	if (m_cbdata)
+			m_http.SetVerifyCBData(m_cbdata);
 	m_http.ConnectTo(endpoint, proxy);
 }
 
@@ -578,7 +582,7 @@ SOAPHTTPProtocol::Connect()
 		case SOAPUrl::https_proto:
 			{
 				if (m_ctx)
-					m_sslsocket = new SOAPSecureSocketImp(*m_ctx);
+					m_sslsocket = new SOAPSecureSocketImp(*m_ctx, m_cbdata);
 				else
 					m_sslsocket = new SOAPSecureSocketImp();
 
@@ -586,7 +590,7 @@ SOAPHTTPProtocol::Connect()
 					throw SOAPMemoryException();
 				m_delsslsocket = true;
 				SOAPProtocolBase::SetSocket(m_sslsocket);
-				
+
 				m_sslsocket->Connect(host, port);
 
 				if (m_httpproxy)
