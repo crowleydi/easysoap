@@ -186,66 +186,93 @@ SOAPWinInetTransport::Write(const SOAPMethod& method, const char *packet, size_t
 	if (m_hRequest)
 		InternetCloseHandle(m_hRequest);
 
-	m_hRequest = HttpOpenRequestA(m_hConnect, "POST", m_endpoint.Path(), NULL, NULL, NULL, cflags, 0);
+	m_hRequest = HttpOpenRequestA(m_hConnect, "POST",
+		m_endpoint.Path(), NULL, NULL, NULL, cflags, 0);
 	if (m_hRequest == NULL)
 		throw SOAPSocketException("Failed to open request: %s", GetErrorInfo());
 
 	if (m_canRead != -1 && m_canRead > 0)
 		throw SOAPException("Didn't finish reading request!");
 
-	char headers[256];
-	snprintf(headers, sizeof(headers), "Content-Type: text/xml; charset=\"UTF-8\"\r\n"
-			"SOAPAction: \"%s\"\r\n", (const char *)method.GetSoapAction());
-
 	bool sentCert = false;
 	DWORD dwCode = 0;
 	DWORD dwSize = sizeof(dwCode);
-
-	while (!HttpSendRequestA(m_hRequest, headers, -1, (void *)packet, packetlen))
+	char headers[256];
+	if (method.GetSoapAction())
 	{
-		if (sentCert)
-		{
-			if ( !HttpQueryInfoA(m_hRequest,
-					HTTP_QUERY_STATUS_CODE |
-					HTTP_QUERY_FLAG_NUMBER, &dwCode, &dwSize, NULL))
-			{
-				throw SOAPException("Failed to get back server status code.");
-			}
-
-			if (dwCode == 403)
-			{
-				//
-				// Okay, we tried once already to send a certificate
-				// and it failed.  This means the user hit "cancel"
-				throw SOAPException("Endpoint requires a client certificate.");
-			}
-		}
-
-		DWORD dwError = GetLastError();
-		if (dwError == ERROR_INTERNET_CLIENT_AUTH_CERT_NEEDED)
-		{
-			if( InternetErrorDlg(	GetDesktopWindow(), 
-									m_hRequest,
-									ERROR_INTERNET_CLIENT_AUTH_CERT_NEEDED,
-									FLAGS_ERROR_UI_FILTER_FOR_ERRORS       |
-									FLAGS_ERROR_UI_FLAGS_GENERATE_DATA     |
-									FLAGS_ERROR_UI_FLAGS_CHANGE_OPTIONS, 
-									NULL) != ERROR_SUCCESS )
-			{
-				throw SOAPException("Failed to select client authentication certificate.");
-			}
-			sentCert = true;
-		}
-		else
-			throw SOAPSocketException("Failed to send request: %s", GetErrorInfo());
+		snprintf(headers, sizeof(headers), "Content-Type: text/xml; charset=\"UTF-8\"\r\n"
+			"SOAPAction: \"%s\"\r\n", (const char *)method.GetSoapAction());
+	}
+	else
+	{
+		snprintf(headers, sizeof(headers), "Content-Type: text/xml; charset=\"UTF-8\"\r\n"
+			"SOAPAction:\r\n");
 	}
 
-	if ( !HttpQueryInfo (m_hRequest,
+	BOOL sendSuccess = FALSE;
+	do
+	{
+		sendSuccess = HttpSendRequestA(m_hRequest, headers, -1,
+			(void *)packet, packetlen);
+
+		if ( !HttpQueryInfoA(m_hRequest,
 			HTTP_QUERY_STATUS_CODE |
 			HTTP_QUERY_FLAG_NUMBER, &dwCode, &dwSize, NULL))
-	{
-		throw SOAPException("Failed to get back server status code.");
-	}
+		{
+			throw SOAPException("Failed to get back server status code.");
+		}
+
+		if (!sendSuccess)
+		{
+			if (sentCert)
+			{
+				if (dwCode == 403)
+				{
+					//
+					// Okay, we tried once already to send a certificate
+					// and it failed.  This means the user hit "cancel"
+					throw SOAPException("Endpoint requires a client certificate.");
+				}
+			}
+
+			DWORD dwError = GetLastError();
+			if (dwError == ERROR_INTERNET_CLIENT_AUTH_CERT_NEEDED)
+			{
+				if (InternetErrorDlg(	GetDesktopWindow(),
+										m_hRequest,
+										ERROR_INTERNET_CLIENT_AUTH_CERT_NEEDED,
+										FLAGS_ERROR_UI_FILTER_FOR_ERRORS		|
+										FLAGS_ERROR_UI_FLAGS_GENERATE_DATA		|
+										FLAGS_ERROR_UI_FLAGS_CHANGE_OPTIONS,
+										NULL) != ERROR_SUCCESS )
+				{
+					throw SOAPException("Failed to select client authentication certificate.");
+				}
+				sentCert = true;
+			}
+			else
+			{
+				throw SOAPSocketException("Failed to send request: %s", GetErrorInfo());
+			}
+		}
+		else
+		{
+			if (dwCode == HTTP_STATUS_PROXY_AUTH_REQ)
+			{
+				sendSuccess = FALSE;
+				if ( InternetErrorDlg(GetDesktopWindow(),
+						m_hRequest, ERROR_INTERNET_INCORRECT_PASSWORD,
+						FLAGS_ERROR_UI_FILTER_FOR_ERRORS |
+						FLAGS_ERROR_UI_FLAGS_GENERATE_DATA |
+						FLAGS_ERROR_UI_FLAGS_CHANGE_OPTIONS,
+						NULL) == ERROR_SUCCESS )
+						// this looks wrong but ERROR_SUCCESS is returned if the user cancels
+				{
+					throw SOAPException("Failed to authenticate with the proxy.");
+				}
+			}
+		}
+	} while (!sendSuccess);
 
 	if (dwCode != 500 && dwCode != 200)
 	{
@@ -256,8 +283,8 @@ SOAPWinInetTransport::Write(const SOAPMethod& method, const char *packet, size_t
 
 	if (!HttpQueryInfo (m_hRequest,
 			HTTP_QUERY_CONTENT_LENGTH |
-			HTTP_QUERY_FLAG_NUMBER,	&m_canRead, &qsize, NULL))
-			m_canRead = -1;
+			HTTP_QUERY_FLAG_NUMBER, &m_canRead, &qsize, NULL))
+		m_canRead = -1;
 
 	char contenttype[256];
 	qsize = sizeof(contenttype);
