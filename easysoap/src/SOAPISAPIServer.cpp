@@ -31,12 +31,8 @@ public:
 	SOAPISAPITransport(EXTENSION_CONTROL_BLOCK* pECB)
 		: m_ecb(pECB), m_error(false), m_leftRead(0), m_ecbData(0)
 	{
-		
 		if (m_ecb)
 		{
-			if (sp_strcmp(m_ecb->lpszMethod, "POST"))
-				throw SOAPException("Invalid HTTP method '%s', only POST is supported.", m_ecb->lpszMethod);
-
 			SOAPHTTPProtocol::ParseContentType(m_contentType, m_charset, m_ecb->lpszContentType);
 			m_leftRead = m_ecb->cbTotalBytes;
 
@@ -91,6 +87,12 @@ public:
 	{
 		if (!m_ecb)
 			throw SOAPException("Invalid EXTENSION_CONTROL_BLOCK");
+
+		if (sp_strcmp(m_ecb->lpszMethod, "POST"))
+		{
+			SetError();
+			throw SOAPException("Invalid HTTP method '%s', only POST is supported.", m_ecb->lpszMethod);
+		}
 
 		DWORD dwSize = buffsize > m_leftRead ? m_leftRead : buffsize;
 
