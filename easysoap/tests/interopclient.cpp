@@ -49,14 +49,16 @@
 
 #include "interopstruct.h"
 
-const char *httpproxy = 0; // "http://localhost:8080";
+static const char *httpproxy = 0; // "http://localhost:8080";
 
-const char *default_interop_namespace = "http://soapinterop.org/";
-const char *default_interop_soapaction = "urn:soapinterop";
-const char *round2_soapaction = "http://soapinterop.org/";
+static const char *default_server = "http://easysoap.sourceforge.net/cgi-bin/interopserver";
+static const char *default_server_name = "EasySoap++ at Sourceforge";
+static const char *default_interop_namespace = "http://soapinterop.org/";
+static const char *default_interop_soapaction = "urn:soapinterop";
+static const char *round2_soapaction = "http://soapinterop.org/";
+
+
 SOAPPacketWriter testresults;
-
-
 bool cgimode = false;
 
 //
@@ -1367,7 +1369,7 @@ TestForFault(SOAPProxy& proxy, const Endpoint& e, const SOAPString& testname, Te
 	catch (...)
 	{
 		type = "UNKNOWN";
-		msg = "Unknown error, problem with EasySoap";
+		msg = "Unknown error, problem with EasySoap++";
 	}
 
 	EndTest(e, type, msg);
@@ -1589,7 +1591,6 @@ main(int argc, char* argv[])
 	try
 	{
 		const char *servicename = 0;
-		bool testlocal = true;
 		bool doall = false;
 		bool execute = true;
 		bool doappend = false;
@@ -1614,7 +1615,6 @@ main(int argc, char* argv[])
 				SOAPHashMap<SOAPString,SOAPString> jar;
 				cgimode = true;
 				makedirs = true;
-				testlocal = false;
 
 				ParseCGIQuery(jar, getenv("QUERY_STRING"));
 
@@ -1671,7 +1671,6 @@ main(int argc, char* argv[])
 			else if (val == "-a")
 			{
 				doall = true;
-				testlocal = false;
 			}
 			else if (val == "-xml")
 			{
@@ -1719,7 +1718,6 @@ main(int argc, char* argv[])
 			}
 			else
 			{
-				testlocal = false;
 				Endpoint& e = endpoints.Add();
 				e.endpoint = val;
 				e.name = servicename ? servicename : (const char *)e.endpoint.Hostname();
@@ -1735,25 +1733,6 @@ main(int argc, char* argv[])
 			GetAllEndpoints(endpoints);
 		}
 
-		if (testlocal)
-		{
-			// Just test against localhost
-			Endpoint& e = endpoints.Add();
-			e.name = "localhost";
-
-//  FIX ME:
-//  Make this configurable from the makefile
-#ifdef _WIN32
-			e.endpoint = "http://localhost/cgi-bin/interopserver.exe";
-#else
-			e.endpoint = "http://localhost/cgi-bin/interopserver";
-#endif // _WIN32
-
-			e.nspace = default_interop_namespace;
-			e.soapaction = default_interop_soapaction;
-			e.needsappend = false;
-		}
-
 		char buffer[256];
 		time_t ltime = time(0);
 		struct tm *ltm = localtime(&ltime);
@@ -1764,6 +1743,17 @@ main(int argc, char* argv[])
 		testresults.WriteValue(buffer);
 		testresults.EndTag("Date");
 
+
+		if (endpoints.Size() == 0)
+		{
+			// Just test against sourceforge
+			Endpoint& e = endpoints.Add();
+			e.name = default_server_name;
+			e.endpoint = default_server;
+			e.nspace = default_interop_namespace;
+			e.soapaction = default_interop_soapaction;
+			e.needsappend = false;
+		}
 
 		std::sort(endpoints.Begin(), endpoints.End());
 
@@ -1794,12 +1784,12 @@ main(int argc, char* argv[])
 	}
 	catch (const SOAPMemoryException&)
 	{
-		std::cout << "SOAP out of memory." << std::endl;
+		std::cerr << "SOAP out of memory." << std::endl;
 		ret = -1;
 	}
 	catch (const SOAPException& ex)
 	{
-		std::cout << "Caught SOAP exception: " << ex.What() << std::endl;
+		std::cerr << "Caught SOAP exception: " << ex.What() << std::endl;
 		ret = 1;
 	}
 
