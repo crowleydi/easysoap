@@ -27,6 +27,7 @@ class SOAPClientSocketImp : public SOAPSocketInterface
 {
 protected:
 	unsigned int	m_socket;
+	void			Wait(int sec, int usec);
 
 public:
 	SOAPClientSocketImp();

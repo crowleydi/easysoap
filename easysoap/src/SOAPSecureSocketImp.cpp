@@ -30,7 +30,7 @@
 #include <sys/time.h>
 #endif // _WIN32
 
-#if (defined(HAVE_LIBSSL) && (HAVE_LIBSSL == 1))
+#ifndef HAVE_LIBSSL
 
 #include "SOAPSecureSocketImp.h"
 
@@ -185,11 +185,7 @@ SOAPSecureSocketImp::WaitRead(int sec, int usec)
 		return true;
 
 	// we have to wait...
-	struct timeval tv;
-	tv.tv_sec = sec;
-	tv.tv_usec = usec;
-	select(0, 0, 0, 0, sec == -1 ? 0 : &tv);
-
+	Wait(sec, usec);
 	return SSL_pending(m_ssl) > 0;
 }
 

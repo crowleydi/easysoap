@@ -61,26 +61,51 @@ public:
 	}
 } __winsockinit;
 
-#elif defined(__CYGWIN__)
-#include <sys/socket.h>
-#include <netdb.h>
-#include <netinet/in.h>
-#include <sys/unistd.h>
-#include <arpa/inet.h>
-#define INVALID_SOCKET 0xFFFFFFFF
-#define SOCKET_ERROR 0xFFFFFFFF
-#define closesocket close
-
 #else // not _WIN32
+
+#ifdef HAVE_SYS_TYPES_H
 #include <sys/types.h>
+#endif
+
+#ifdef TIME_WITH_SYS_TIME
 #include <sys/time.h>
+#endif
+
+#ifdef HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
+#endif
+
+#ifdef HAVE_NETINET_IN_H
 #include <netinet/in.h>
+#endif
+
+#ifdef HAVE_NETINET_TCP_H
 #include <netinet/tcp.h>
+#endif
+
+#ifdef HAVE_ARPA_INET_H
 #include <arpa/inet.h>
+#endif
+
+#ifdef HAVE_RESOLV_H
 #include <resolv.h>
+#endif
+
+#ifdef HAVE_NETDB_H
 #include <netdb.h>
+#endif
+
+#ifdef STDC_HEADERS
+#include <string.h>
+#endif
+
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
+#else
+#ifdef HAVE_SYS_UNISTD_H
+#include <sys/unistd.h>
+#endif
+#endif
 
 #define INVALID_SOCKET 0xFFFFFFFF
 #define SOCKET_ERROR -1
@@ -116,6 +141,15 @@ SOAPClientSocketImp::Close()
 	m_socket = INVALID_SOCKET;
 }
 
+
+void
+SOAPClientSocketImp::Wait(int sec, int usec)
+{
+	struct timeval tv;
+	tv.tv_sec = sec;
+	tv.tv_usec = usec;
+	select(0, 0, 0, 0, sec == -1 ? 0 : &tv);
+}
 
 bool
 SOAPClientSocketImp::WaitRead(int sec, int usec)
