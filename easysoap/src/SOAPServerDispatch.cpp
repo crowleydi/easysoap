@@ -104,6 +104,12 @@ SOAPServerDispatch::Handle(SOAPTransport& trans)
 		respname.Append("Response");
 		responseMethod.SetName(respname, requestMethod.GetName().GetNamespace());
 
+		//
+		// Handle any headers we have...
+		HandleHeaders(m_request, m_response);
+
+		//
+		// Now handle the request
 		if (!HandleRequest(m_request, m_response))
 		{
 			faultcode = clientfault;
@@ -165,7 +171,7 @@ SOAPServerDispatch::HandleRequest(SOAPEnvelope& request, SOAPResponse& response)
 }
 
 void
-SOAPServerDispatch::HandleHeaders(SOAPEnvelope& request)
+SOAPServerDispatch::HandleHeaders(SOAPEnvelope& request, SOAPResponse& response)
 {
 	const SOAPHeader::Headers& headers = request.GetHeader().GetHeaders();
 	for (SOAPHeader::Headers::ConstIterator h = headers.Begin(); h != headers.End(); ++h)
@@ -177,7 +183,7 @@ SOAPServerDispatch::HandleHeaders(SOAPEnvelope& request)
 		{
 			//
 			// We found a handler.  Now dispatch the method
-			if ((*i)->HandleHeader(*h, request))
+			if ((*i)->HandleHeader(*h, request, response))
 			{
 				handled = true;
 				break;
@@ -192,10 +198,10 @@ SOAPServerDispatch::HandleHeaders(SOAPEnvelope& request)
 		if (!handled)
 		{
 			// check for mustUnderstand = 1
-			SOAPParameter::Attrs::Iterator mu = h->GetAttributes().Find(SOAPEnvelope::MustUnderstand);
+			SOAPParameter::Attrs::Iterator mu = h->GetAttributes().Find(SOAPEnv::mustUnderstand);
 			if (mu && *mu == "1")
-				throw SOAPException("Failed to understand header %s:%s",
-					(const char *)h->GetName().GetName(), (const char *)h->GetName().GetNamespace());
+				throw SOAPException("Failed to understand header {%s}:%s",
+					(const char *)h->GetName().GetNamespace(), (const char *)h->GetName().GetName());
 		}
 	}
 }
