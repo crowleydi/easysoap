@@ -125,7 +125,7 @@ almostequal(const SOAPArray<float>& a, const SOAPArray<float>& b)
 
 
 bool
-almostequal(const SOAPArray<SOAPInteropStruct>& a, const SOAPArray<SOAPInteropStruct>& b)
+almostequal(const SOAPArray<SOAPStruct>& a, const SOAPArray<SOAPStruct>& b)
 {
 	if (a.Size() != b.Size())
 		return false;
@@ -382,13 +382,17 @@ TestEchoFloatForPass(SOAPProxy& proxy, const Endpoint& e, const char *value)
 void
 TestEchoStruct(SOAPProxy& proxy, const Endpoint& e)
 {
-	SOAPInteropStruct inputValue("This is a struct string.", 68, (float)25.24345356);
+	SOAPStruct inputValue;
+	
+	inputValue.varString = "This is a struct string.";
+	inputValue.varInt = 68;
+	inputValue.varFloat = (float)25.24345356;
 
 	SOAPMethod method("echoStruct", e.nspace, e.soapaction, e.needsappend);
 	method.AddParameter("inputStruct") << inputValue;
 
 	const SOAPResponse& response = proxy.Execute(method);
-	SOAPInteropStruct outputValue;
+	SOAPStruct outputValue;
 	response.GetReturnValue() >> outputValue;
 	if (inputValue != outputValue && !almostequal(inputValue.varFloat, outputValue.varFloat))
 		throw SOAPException("Values are not equal");
@@ -477,10 +481,10 @@ TestEchoStringArray(SOAPProxy& proxy, const Endpoint& e, int numvals)
 void
 TestEchoStructArray(SOAPProxy& proxy, const Endpoint& e, int numvals)
 {
-	SOAPArray<SOAPInteropStruct> inputValue;
+	SOAPArray<SOAPStruct> inputValue;
 	for (int i = 0; i < numvals; ++i)
 	{
-		SOAPInteropStruct& val = inputValue.Add();
+		SOAPStruct& val = inputValue.Add();
 		char buffer[256];
 		sprintf(buffer, "This is struct string #%d, rn=%d", i, rand());
 		val.varString = buffer;
@@ -495,13 +499,69 @@ TestEchoStructArray(SOAPProxy& proxy, const Endpoint& e, int numvals)
 	// elements in the array!
 	SOAPParameter& param = method.AddParameter("inputStructArray");
 	param << inputValue;
-	param.SetArrayType(SOAPInteropStruct::soap_name, SOAPInteropStruct::soap_namespace);
+	param.SetArrayType(SOAPStruct::soap_name, SOAPStruct::soap_namespace);
 
 	const SOAPResponse& response = proxy.Execute(method);
-	SOAPArray<SOAPInteropStruct> outputValue;
+	SOAPArray<SOAPStruct> outputValue;
 	response.GetReturnValue() >> outputValue;
 	if (inputValue != outputValue && !almostequal(inputValue, outputValue))
 		throw SOAPException("Values are not equal");
+}
+
+void
+TestEcho2DStringArray(SOAPProxy& proxy, const Endpoint& e)
+{
+	SOAPMethod method("echo2DStringArray", e.nspace,
+			e.soapaction, e.needsappend);
+
+	SOAPArray< SOAPArray<SOAPString> > twod;
+	SOAPArray< SOAPArray<SOAPString> > result;
+
+	twod.Resize(3);
+	twod[0].Resize(3);
+	twod[1].Resize(3);
+	twod[2].Resize(3);
+
+	twod[0][0] = "0,0";
+	twod[0][1] = "0,1";
+	twod[0][2] = "0,2";
+	twod[1][0] = "1,0";
+	twod[1][1] = "1,1";
+	twod[1][2] = "1,2";
+	twod[2][0] = "2,0";
+	twod[2][1] = "2,1";
+	twod[2][2] = "2,2";
+
+	method.AddParameter("input2DStringArray") << twod;
+
+	const SOAPResponse& response = proxy.Execute(method);
+	response.GetReturnValue() >> result;
+
+	if (result != twod)
+		throw SOAPException("2D Array values differ.");
+}
+
+void
+TestEchoStructAsSimpleTypes(SOAPProxy& proxy, const Endpoint& e)
+{
+	SOAPMethod method("echoStructAsSimpleTypes", e.nspace,
+			e.soapaction, e.needsappend);
+
+	SOAPStruct s;
+	s.varString = "This is a test";
+	s.varInt = 1;
+	s.varFloat = 2.2;
+
+	method.AddParameter("inputStruct") << s;
+
+	const SOAPResponse& response = proxy.Execute(method);
+
+	if (response.GetReturnValue("outputString").GetString() != s.varString)
+		throw SOAPException("String values are not equal.");
+	if (response.GetReturnValue("outputInteger").GetInt() != s.varInt)
+		throw SOAPException("Int values are not equal.");
+	if (response.GetReturnValue("outputFloat").GetFloat() != s.varFloat)
+		throw SOAPException("Float values are not equal.");
 }
 
 void
@@ -850,6 +910,8 @@ TestInterop(const Endpoint& e)
 	TestForPass(proxy, e, "echoStringArray_ZeroLen",	TestEchoStringArrayZeroLen);
 	TestForPass(proxy, e, "echoStructArray_ZeroLen",	TestEchoStructArrayZeroLen);
 	TestForPass(proxy, e, "echoBase64",					TestEchoBase64);
+	TestForPass(proxy, e, "echoStructAsSimpleTypes",	TestEchoStructAsSimpleTypes);
+	TestForPass(proxy, e, "echo2DStringArray",	TestEcho2DStringArray);
 
 	testresults.EndTag("Server");
 }

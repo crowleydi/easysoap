@@ -22,50 +22,96 @@
 //  the interopclient and interopserver programs.
 //
 
-struct SOAPInteropStruct
+struct SOAPStruct
 {
-	SOAPInteropStruct()
-	{
-		varInt = 0;
-		varFloat = 0.0;
-	}
+	SOAPString	varString;
+	int			varInt;
+	float		varFloat;
 
-	SOAPInteropStruct(const char *str, int i, float f)
-	{
-		varString = str;
-		varInt = i;
-		varFloat = f;
-	}
-
-	bool operator==(const SOAPInteropStruct& other) const
+	bool operator==(const SOAPStruct& other) const
 	{
 		return varInt == other.varInt &&
 			varFloat == other.varFloat &&
 			varString == other.varString;
 	}
 
-	bool operator!=(const SOAPInteropStruct& other) const
+	bool operator!=(const SOAPStruct& other) const
 	{
 		return varInt != other.varInt ||
 			varFloat != other.varFloat ||
 			varString != other.varString;
 	}
 
+	static const char *soap_name;
+	static const char *soap_namespace;
+};
+
+struct SOAPStructStruct
+{
 	SOAPString	varString;
 	int			varInt;
 	float		varFloat;
+	SOAPStruct	varStruct;
+
+	bool operator==(const SOAPStructStruct& other) const
+	{
+		return varString == other.varString &&
+			varInt == other.varInt &&
+			varFloat == other.varFloat &&
+			varStruct == other.varStruct;
+	}
+
+	bool operator!=(const SOAPStructStruct& other) const
+	{
+		return varString != other.varString ||
+			varInt != other.varInt ||
+			varFloat != other.varFloat ||
+			varStruct != other.varStruct;
+	}
 
 	static const char *soap_name;
 	static const char *soap_namespace;
 };
-const char *SOAPInteropStruct::soap_name = "SOAPStruct";
-const char *SOAPInteropStruct::soap_namespace = "http://soapinterop.org/xsd";
+
+struct SOAPArrayStruct
+{
+	SOAPString				varString;
+	int						varInt;
+	float					varFloat;
+	SOAPArray<SOAPString>	varArray;
+
+	bool operator==(const SOAPArrayStruct& other) const
+	{
+		return varString == other.varString &&
+			varInt == other.varInt &&
+			varFloat == other.varFloat &&
+			varArray == other.varArray;
+	}
+
+	bool operator!=(const SOAPArrayStruct& other) const
+	{
+		return varString != other.varString ||
+			varInt != other.varInt ||
+			varFloat != other.varFloat ||
+			varArray != other.varArray;
+	}
+
+	static const char *soap_name;
+	static const char *soap_namespace;
+};
+
+const char *SOAPStruct::soap_name = "SOAPStruct";
+const char *SOAPStruct::soap_namespace = "http://soapinterop.org/xsd";
+const char *SOAPStructStruct::soap_name = "SOAPStructStruct";
+const char *SOAPStructStruct::soap_namespace = "http://soapinterop.org/xsd";
+const char *SOAPArrayStruct::soap_name = "SOAPArrayStruct";
+const char *SOAPArrayStruct::soap_namespace = "http://soapinterop.org/xsd";
 
 
 //
-//  Define how we serialize the struct
+//  Define how we serialize the structs
 inline SOAPParameter&
-operator<<(SOAPParameter& param, const SOAPInteropStruct& val)
+operator<<(SOAPParameter& param, const SOAPStruct& val)
 {
 	param.SetType(val.soap_name, val.soap_namespace);
 	param.SetIsStruct();
@@ -77,16 +123,64 @@ operator<<(SOAPParameter& param, const SOAPInteropStruct& val)
 	return param;
 }
 
-//
-// Define how we de-serialize the struct
-inline const SOAPParameter&
-operator>>(const SOAPParameter& param, SOAPInteropStruct& val)
+inline SOAPParameter&
+operator<<(SOAPParameter& param, const SOAPStructStruct& val)
 {
-	// We should probably confirm the types are
-	// correct...
+	param.SetType(val.soap_name, val.soap_namespace);
+	param.SetIsStruct();
+
+	param.AddParameter("varString") << val.varString;
+	param.AddParameter("varInt") << val.varInt;
+	param.AddParameter("varFloat") << val.varFloat;
+	param.AddParameter("varStruct") << val.varStruct;
+
+	return param;
+}
+
+inline SOAPParameter&
+operator<<(SOAPParameter& param, const SOAPArrayStruct& val)
+{
+	param.SetType(val.soap_name, val.soap_namespace);
+	param.SetIsStruct();
+
+	param.AddParameter("varString") << val.varString;
+	param.AddParameter("varInt") << val.varInt;
+	param.AddParameter("varFloat") << val.varFloat;
+	param.AddParameter("varArray") << val.varArray;
+
+	return param;
+}
+
+//
+// Define how we de-serialize the structs
+inline const SOAPParameter&
+operator>>(const SOAPParameter& param, SOAPStruct& val)
+{
 	param.GetParameter("varString") >> val.varString;
 	param.GetParameter("varInt") >> val.varInt;
 	param.GetParameter("varFloat") >> val.varFloat;
+
+	return param;
+}
+
+inline const SOAPParameter&
+operator>>(const SOAPParameter& param, SOAPStructStruct& val)
+{
+	param.GetParameter("varString") >> val.varString;
+	param.GetParameter("varInt") >> val.varInt;
+	param.GetParameter("varFloat") >> val.varFloat;
+	param.GetParameter("varStruct") >> val.varStruct;
+
+	return param;
+}
+
+inline const SOAPParameter&
+operator>>(const SOAPParameter& param, SOAPArrayStruct& val)
+{
+	param.GetParameter("varString") >> val.varString;
+	param.GetParameter("varInt") >> val.varInt;
+	param.GetParameter("varFloat") >> val.varFloat;
+	param.GetParameter("varArray") >> val.varArray;
 
 	return param;
 }

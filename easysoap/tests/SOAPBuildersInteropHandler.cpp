@@ -13,38 +13,63 @@ SOAPBuildersInteropHandler::SOAPBuildersInteropHandler()
 {
 	const char *interop_namespace = "http://soapinterop.org/";
 
-	DispatchMethod("echoVoid",	interop_namespace,
-		&SOAPBuildersInteropHandler::echoVoid);
-
-	DispatchMethod("echoInteger",	interop_namespace,
-		&SOAPBuildersInteropHandler::echoInteger);
-
-	DispatchMethod("echoFloat",		interop_namespace,
-		&SOAPBuildersInteropHandler::echoFloat);
-
+	//
+	// Group A/base methods
 	DispatchMethod("echoString",	interop_namespace,
 		&SOAPBuildersInteropHandler::echoString);
-
-	DispatchMethod("echoStruct",	interop_namespace,
-		&SOAPBuildersInteropHandler::echoStruct);
-
-	DispatchMethod("echoIntegerArray",	interop_namespace,
-		&SOAPBuildersInteropHandler::echoIntegerArray);
-
-	DispatchMethod("echoFloatArray",	interop_namespace,
-		&SOAPBuildersInteropHandler::echoFloatArray);
 
 	DispatchMethod("echoStringArray",	interop_namespace,
 		&SOAPBuildersInteropHandler::echoStringArray);
 
+	DispatchMethod("echoInteger",	interop_namespace,
+		&SOAPBuildersInteropHandler::echoInteger);
+
+	DispatchMethod("echoIntegerArray",	interop_namespace,
+		&SOAPBuildersInteropHandler::echoIntegerArray);
+
+	DispatchMethod("echoFloat",		interop_namespace,
+		&SOAPBuildersInteropHandler::echoFloat);
+
+	DispatchMethod("echoFloatArray",	interop_namespace,
+		&SOAPBuildersInteropHandler::echoFloatArray);
+
+	DispatchMethod("echoStruct",	interop_namespace,
+		&SOAPBuildersInteropHandler::echoStruct);
+
 	DispatchMethod("echoStructArray",	interop_namespace,
 		&SOAPBuildersInteropHandler::echoStructArray);
+
+	DispatchMethod("echoVoid",	interop_namespace,
+		&SOAPBuildersInteropHandler::echoVoid);
+
+	DispatchMethod("echoBase64",	interop_namespace,
+		&SOAPBuildersInteropHandler::echoBase64);
 
 	DispatchMethod("echoDate",	interop_namespace,
 		&SOAPBuildersInteropHandler::echoDate);
 
-	DispatchMethod("echoBase64",	interop_namespace,
-		&SOAPBuildersInteropHandler::echoBase64);
+	DispatchMethod("echoDecimal",	interop_namespace,
+		&SOAPBuildersInteropHandler::echoDecimal);
+
+	DispatchMethod("echoBoolean",	interop_namespace,
+		&SOAPBuildersInteropHandler::echoBoolean);
+
+	//
+	// Group B methods
+	DispatchMethod("echoSimpleTypesAsStruct",	interop_namespace,
+		&SOAPBuildersInteropHandler::echoSimpleTypesAsStruct);
+
+	DispatchMethod("echoStructAsSimpleTypes",	interop_namespace,
+		&SOAPBuildersInteropHandler::echoStructAsSimpleTypes);
+
+	DispatchMethod("echo2DStringArray",	interop_namespace,
+		&SOAPBuildersInteropHandler::echo2DStringArray);
+
+	DispatchMethod("echoNestedStruct",	interop_namespace,
+		&SOAPBuildersInteropHandler::echoNestedStruct);
+
+	DispatchMethod("echoNestedArray",	interop_namespace,
+		&SOAPBuildersInteropHandler::echoNestedArray);
 }
 
 SOAPBuildersInteropHandler::~SOAPBuildersInteropHandler()
@@ -56,9 +81,6 @@ SOAPBuildersInteropHandler::~SOAPBuildersInteropHandler()
 void
 SOAPBuildersInteropHandler::echoVoid(const SOAPMethod& req, SOAPMethod& resp)
 {
-	// We could do things like
-	// check the number of passed in parameters
-	// But that is really a job for WSDL.
 }
 
 void
@@ -94,7 +116,7 @@ SOAPBuildersInteropHandler::echoString(const SOAPMethod& req, SOAPMethod& resp)
 void
 SOAPBuildersInteropHandler::echoStruct(const SOAPMethod& req, SOAPMethod& resp)
 {
-	SOAPInteropStruct val;
+	SOAPStruct val;
 
 	req.GetParameter("inputStruct") >> val;
 
@@ -134,7 +156,7 @@ SOAPBuildersInteropHandler::echoStringArray(const SOAPMethod& req, SOAPMethod& r
 void
 SOAPBuildersInteropHandler::echoStructArray(const SOAPMethod& req, SOAPMethod& resp)
 {
-	SOAPArray<SOAPInteropStruct> val;
+	SOAPArray<SOAPStruct> val;
 
 	req.GetParameter("inputStructArray") >> val;
 
@@ -148,19 +170,90 @@ SOAPBuildersInteropHandler::echoBase64(const SOAPMethod& req, SOAPMethod& resp)
 	SOAPArray<char> val;
 
 	req.GetParameter("inputBase64") >> val;
-
 	resp.AddParameter("return") << val;
 }
+
 
 void
 SOAPBuildersInteropHandler::echoDate(const SOAPMethod& req, SOAPMethod& resp)
 {
 	SOAPString val;
 
-	const SOAPParameter& inputDate = req.GetParameter("inputDate");
-	inputDate >> val;
-
+	req.GetParameter("inputDate") >> val;
+	// we don't support the type natively so we have to set it.
 	(resp.AddParameter("return") << val).SetType("dateTime");
+}
+
+
+void
+SOAPBuildersInteropHandler::echoBoolean(const SOAPMethod& req, SOAPMethod& resp)
+{
+	bool val;
+
+	req.GetParameter("inputBoolean") >> val;
+	resp.AddParameter("return") << val;
+}
+
+
+void
+SOAPBuildersInteropHandler::echoDecimal(const SOAPMethod& req, SOAPMethod& resp)
+{
+	SOAPString val;
+
+	req.GetParameter("inputDecimal") >> val;
+	// we don't support the type natively so we have to set it.
+	(resp.AddParameter("return") << val).SetType("decimal");
+}
+
+
+void
+SOAPBuildersInteropHandler::echoStructAsSimpleTypes(const SOAPMethod& req, SOAPMethod& resp)
+{
+	SOAPStruct val;
+	req.GetParameter("inputStruct") >> val;
+
+	resp.AddParameter("outputString") << val.varString;
+	resp.AddParameter("outputInteger") << val.varInt;
+	resp.AddParameter("outputFloat") << val.varFloat;
+}
+
+
+void
+SOAPBuildersInteropHandler::echoSimpleTypesAsStruct(const SOAPMethod& req, SOAPMethod& resp)
+{
+	SOAPStruct val;
+	req.GetParameter("inputString") >> val.varString;
+	req.GetParameter("inputInteger") >> val.varInt;
+	req.GetParameter("inputFloat") >> val.varFloat;
+
+	resp.AddParameter("return") << val;
+}
+
+
+void
+SOAPBuildersInteropHandler::echo2DStringArray(const SOAPMethod& req, SOAPMethod& resp)
+{
+	SOAPArray< SOAPArray<SOAPString> > val;
+	req.GetParameter("input2DStringArray") >> val;
+	resp.AddParameter("return") << val;
+}
+
+
+void
+SOAPBuildersInteropHandler::echoNestedStruct(const SOAPMethod& req, SOAPMethod& resp)
+{
+	SOAPStructStruct val;
+	req.GetParameter("inputStruct") >> val;
+	resp.AddParameter("return") << val;
+}
+
+
+void
+SOAPBuildersInteropHandler::echoNestedArray(const SOAPMethod& req, SOAPMethod& resp)
+{
+	SOAPArrayStruct val;
+	req.GetParameter("inputStruct") >> val;
+	resp.AddParameter("return") << val;
 }
 
 
