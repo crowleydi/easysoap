@@ -32,33 +32,77 @@
 //////////////////////////////////////////////////////////////////////
 
 SOAPHeader::SOAPHeader()
+: m_outtasync(false)
 {
-
 }
 
 SOAPHeader::~SOAPHeader()
 {
-
+	Reset();
 }
 
 SOAPParameter&
 SOAPHeader::AddHeader()
 {
-	return m_headers.Add();
+	m_outtasync = true;
+	return *m_headers.Add(m_pool.Get());
 }
 
-const SOAPHeader::Headers&
-SOAPHeader::GetHeaders() const
+SOAPParameter&
+SOAPHeader::AddHeader(const SOAPQName& name)
 {
-	return m_headers;
+	SOAPParameter *p = m_pool.Get();
+	p->SetName(name);
+	m_headermap[name] = p;
+	return *m_headers.Add(p);
 }
 
 void
 SOAPHeader::Reset()
 {
 	for (Headers::Iterator i = m_headers.Begin(); i != m_headers.End(); ++i)
-		i->Reset();
+		m_pool.Return(*i);
+
+	m_outtasync = false;
 	m_headers.Resize(0);
+	m_headermap.Clear();
+}
+
+const SOAPParameter&
+SOAPHeader::GetHeader(const SOAPQName& name) const
+{
+	if (m_outtasync)
+		Sync();
+
+	HeaderMap::Iterator found = m_headermap.Find(name);
+	if (!found)
+		throw SOAPException("Could not find header {%s}:%s",
+			(const char *)name.GetNamespace(),
+			(const char *)name.GetName());
+	return **found;
+}
+
+SOAPParameter&
+SOAPHeader::GetHeader(const SOAPQName& name)
+{
+	if (m_outtasync)
+		Sync();
+
+	HeaderMap::Iterator found = m_headermap.Find(name);
+	if (!found)
+		throw SOAPException("Could not find header {%s}:%s",
+			(const char *)name.GetNamespace(),
+			(const char *)name.GetName());
+	return **found;
+}
+
+void
+SOAPHeader::Sync() const
+{
+	m_headermap.Clear();
+	for (Headers::ConstIterator i = m_headers.Begin(); i != m_headers.End(); ++i)
+		m_headermap[(*i)->GetName()] = (*i);
+	m_outtasync = false;
 }
 
 bool
@@ -69,12 +113,10 @@ SOAPHeader::WriteSOAPPacket(SOAPPacketWriter& packet) const
 		packet.StartTag(SOAPEnv::Header);
 
 		for (Headers::ConstIterator i = m_headers.Begin(); i != m_headers.End(); ++i)
-			i->WriteSOAPPacket(packet);
+			(*i)->WriteSOAPPacket(packet);
 
 		packet.EndTag(SOAPEnv::Header);
 	}
 	return true;
 }
-
-
 

@@ -24,6 +24,7 @@
 #define AFX_SOAPHEADER_H__9717994A_8D5C_42BE_9F48_E0B7990C59E3__INCLUDED_
 
 #include <SOAP.h>
+#include <SOAPPool.h>
 
 class EASYSOAP_EXPORT SOAPHeader
 {
@@ -31,17 +32,40 @@ public:
 	SOAPHeader();
 	virtual ~SOAPHeader();
 
-	typedef SOAPArray<SOAPParameter> Headers;
+	typedef SOAPArray<SOAPParameter*>				Headers;
+	typedef SOAPHashMap<SOAPQName,SOAPParameter*>	HeaderMap;
 
 	void Reset();
+
+	//
+	// Adds a header
 	SOAPParameter& AddHeader();
-	const Headers& GetHeaders() const;
+	SOAPParameter& AddHeader(const SOAPQName&);
+
+	//
+	// Gets a header by name.  Throws an exception
+	// if one is not found.
+	const SOAPParameter& GetHeader(const SOAPQName&) const;
+	SOAPParameter& GetHeader(const SOAPQName&);
+
+	const Headers& GetAllHeaders() const
+	{
+		return m_headers;
+	}
 
 	bool WriteSOAPPacket(SOAPPacketWriter& packet) const;
 
 private:
 
-	Headers	m_headers;
+	SOAPParameter*	GetNewHeader();
+	void	ReturnHeader(SOAPParameter *& param);
+
+	void Sync() const;
+
+	Headers					m_headers;
+	SOAPPool<SOAPParameter>	m_pool;
+	mutable HeaderMap		m_headermap;
+	mutable bool			m_outtasync;
 };
 
 #endif // !defined(AFX_SOAPHEADER_H__9717994A_8D5C_42BE_9F48_E0B7990C59E3__INCLUDED_)
