@@ -103,7 +103,7 @@ public:
 	SOAPParameter& AddParameter(const char *name = "item");
 	SOAPParameter& AddParameter(const SOAPParameter& p);
 
-	const SOAPParameter& GetParameter(const char *name) const;
+	const SOAPParameter& GetParameter(const char *) const;
 	const SOAPParameter& GetParameter(size_t i) const
 	{
 		if (m_array.Size() < i)
@@ -128,6 +128,10 @@ public:
 	bool WriteSOAPPacket(SOAPPacketWriter& packet) const;
 
 private:
+	SOAPParameter *GetNewParam();
+	SOAPParameter *GetNewParam(const SOAPParameter& param);
+	void PutBackParam(SOAPParameter*& param);
+
 	void SetParent(SOAPParameter *parent) {m_parent = parent;}
 	void Assign(const SOAPParameter&);
 	void CheckStructSync() const;
@@ -138,6 +142,7 @@ private:
 	bool			m_isstruct;	// true for array, struct types
 	SOAPString		m_strval;	// value legal only if m_isstruct == false
 
+	Array			m_pool;
 	Array			m_array;
 	Attrs			m_attrs;
 	mutable Struct	m_struct;

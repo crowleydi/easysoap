@@ -48,6 +48,8 @@ SOAPParameter::SOAPParameter(const SOAPParameter& param)
 SOAPParameter::~SOAPParameter()
 {
 	Reset();
+	for (Array::Iterator i = m_pool.Begin(); i != m_pool.End(); ++i)
+		delete (*i);
 }
 
 void
@@ -63,7 +65,7 @@ SOAPParameter::Assign(const SOAPParameter& param)
 	m_array.Resize(params.Size());
 	for (size_t i = 0; i < params.Size(); ++i)
 	{
-		m_array[i] = new SOAPParameter(*params[i]);
+		m_array[i] = GetNewParam(*params[i]);
 		m_array[i]->SetParent(this);
 	}
 
@@ -83,10 +85,7 @@ void
 SOAPParameter::Reset()
 {
 	for (Array::Iterator i = m_array.Begin(); i != m_array.End(); ++i)
-	{
-		delete *i;
-		*i = 0;
-	}
+		PutBackParam(*i);
 
 	m_array.Resize(0);
 	m_struct.Clear();
@@ -277,7 +276,7 @@ SOAPParameter::AddParameter(const char *name)
 {
 	//
 	// FIXME: Use a pool
-	SOAPParameter *ret = new SOAPParameter();
+	SOAPParameter *ret = GetNewParam();
 	ret->SetParent(this);
 	ret->SetName(name);
 	m_array.Add(ret);
@@ -292,7 +291,7 @@ SOAPParameter::AddParameter(const SOAPParameter& p)
 {
 	//
 	// FIXME: Use a pool
-	SOAPParameter *ret = new SOAPParameter(p);
+	SOAPParameter *ret = GetNewParam(p);
 	m_array.Add(ret);
 	ret->SetParent(this);
 	m_outtasync = true;
@@ -353,4 +352,41 @@ SOAPParameter::WriteSOAPPacket(SOAPPacketWriter& packet) const
 }
 
 
+//
+//  Keep a pool of our SOAPParameters
+SOAPParameter *
+SOAPParameter::GetNewParam()
+{
+	if (m_pool.IsEmpty())
+		return new SOAPParameter();
+
+	size_t s = m_pool.Size() - 1;
+	SOAPParameter *p = m_pool[s];
+	m_pool.Resize(s);
+
+	p->Reset();
+	return p;
+}
+
+SOAPParameter *
+SOAPParameter::GetNewParam(const SOAPParameter& param)
+{
+	if (m_pool.IsEmpty())
+		return new SOAPParameter(param);
+
+	size_t s = m_pool.Size() - 1;
+	SOAPParameter *p = m_pool[s];
+	m_pool.Resize(s);
+
+	*p = param;
+	return p;
+}
+
+void
+SOAPParameter::PutBackParam(SOAPParameter*& param)
+{
+	param->Reset();
+	m_pool.Add(param);
+	param = 0;
+}
 

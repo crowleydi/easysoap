@@ -3,7 +3,7 @@ Microsoft Developer Studio Workspace File, Format Version 6.00
 
 ###############################################################################
 
-Project: "simpleisapi"=.\simpleserver\simpleisapi.dsp - Package Owner=<4>
+Project: "easysoap"=.\src\easysoap.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -11,14 +11,11 @@ Package=<5>
 
 Package=<4>
 {{{
-    Begin Project Dependency
-    Project_Dep_Name easysoap
-    End Project Dependency
 }}}
 
 ###############################################################################
 
-Project: "easysoap"=.\src\easysoap.dsp - Package Owner=<4>
+Project: "expat"="..\Expat-1.95.2\Source\lib\expat.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -76,6 +73,21 @@ Package=<4>
     End Project Dependency
     Begin Project Dependency
     Project_Dep_Name simpleisapi
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "simpleisapi"=.\simpleserver\simpleisapi.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name easysoap
     End Project Dependency
 }}}
 
