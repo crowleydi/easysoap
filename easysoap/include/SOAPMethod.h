@@ -43,35 +43,44 @@ public:
 		return *this;
 	}
 
-	const char *GetName() const						{return m_name.c_str();}
-	const char *GetNamespace() const				{return m_namespace.c_str();}
+	const SOAPString& GetName() const
+	{
+		return m_name;
+	}
 
-	void Reset()									{m_params.clear();}
-	int GetNumParameters() const					{return m_params.size();}
+	const SOAPString& GetNamespace() const
+	{
+		return m_namespace;
+	}
+
+	void Reset();
+
+	size_t GetNumParameters() const
+	{
+		return m_params.Size();
+	}
 
 	SOAPParameter& AddParameter()
 	{
-		int size = m_params.size();
-		m_params.resize(size + 1);
+		size_t size = m_params.Size();
+		m_params.Resize(size + 1);
 		return m_params[size];
 	}
 
 	SOAPParameter& AddParameter(const char *name)
 	{
-		int size = m_params.size();
-		m_params.resize(size + 1);
+		size_t size = m_params.Size();
+		m_params.Resize(size + 1);
 		m_params[size].SetName(name);
 		return m_params[size];
 	}
 
 	SOAPParameter& AddParameter(const SOAPParameter& param)
 	{
-		m_params.push_back(param);
-		int size = m_params.size();
-		return m_params[size];
+		return m_params.Add(param);
 	}
 
-	const SOAPParameter& GetParameter(int i) const
+	const SOAPParameter& GetParameter(size_t i) const
 	{
 		return m_params[i];
 	}
@@ -80,8 +89,8 @@ public:
 private:
 
 	SOAPParameter::Array	m_params;
-	std::string				m_name;
-	std::string				m_namespace;
+	SOAPString				m_name;
+	SOAPString				m_namespace;
 };
 
 #endif // !defined(AFX_SOAPMETHOD_H__B3726AD6_5844_4059_8ECD_36A553A918AD__INCLUDED_)

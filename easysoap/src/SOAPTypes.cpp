@@ -22,7 +22,6 @@
 #pragma warning (disable: 4786)
 #endif // _WIN32
 
-#include <map>
 #include <string>
 
 #include "SOAP.h"
@@ -32,7 +31,7 @@
 //////////////////////////////////////////////////////////////////////
 // Setup the typemap
 //////////////////////////////////////////////////////////////////////
-typedef std::map<std::string, SOAPTypes::xsd_type> TypeMap;
+typedef SOAPHashMap<SOAPString, SOAPTypes::xsd_type> TypeMap;
 
 static TypeMap typemap;
 static int init_typemap()
@@ -84,10 +83,10 @@ SOAPTypes::GetXsdString(xsd_type type)
 SOAPTypes::xsd_type
 SOAPTypes::GetXsdType(const char *str)
 {
-	TypeMap::iterator i = typemap.find(str);
+	TypeMap::Iterator i = typemap.Find(str);
 
-	if (i == typemap.end())
+	if (i == typemap.End())
 		return xsd_none;
 
-	return i->second;
+	return *i;
 }

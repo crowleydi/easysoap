@@ -45,8 +45,6 @@ In order of how hard I think they are:
 	Those are the methods that can be called on that service.  This
 	should map well with WSDL.
 
-*	Rip out STL to make it more portable.
-
 *	SOAPParameter is really ugly.
 
 *	More types.

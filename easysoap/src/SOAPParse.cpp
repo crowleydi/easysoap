@@ -31,13 +31,6 @@
 
 #define BUFF_SIZE 1024
 
-template <typename T>
-inline T
-Minimum(const T& a, const T& b)
-{
-	return (a > b) ? b : a;
-}
-
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -91,7 +84,7 @@ SOAPParser::Parse(SOAPResponse& resp, SOAPTransport& trans)
 		//
 		// read the HTTP payload
 		//
-		int read = trans.Read((char *)buffer, Minimum(BUFF_SIZE, msglen));
+		int read = trans.Read((char *)buffer, sp_minimum(BUFF_SIZE, msglen));
 
 		//
 		// figure out if we've finished reading the payload

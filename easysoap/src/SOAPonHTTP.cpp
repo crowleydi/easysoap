@@ -34,10 +34,10 @@ SOAPonHTTP::Write(const SOAPMethod& method, const char *payload, int payloadsize
 {
 	char buff[128];
 	snprintf(buff, sizeof(buff), "\"%s#%s\"",
-		method.GetNamespace(),
-		method.GetName());
+		(const char *)method.GetNamespace(),
+		(const char *)method.GetName());
 
-	m_http.BeginPost(m_path.c_str());
+	m_http.BeginPost(m_path);
 	m_http.WriteHeader("User-Agent", SOAPUSER_AGENT);
 	m_http.WriteHeader("Content-Type", "text/xml");
 	m_http.WriteHeader("SOAPAction", buff);
@@ -70,7 +70,9 @@ SOAPHTTPProtocol::WriteHostHeader(const SOAPUrl& url)
 	else
 	{
 		char buffer[256];
-		snprintf(buffer, sizeof(buffer), "%s:%d", url.Hostname(), url.Port());
+		snprintf(buffer, sizeof(buffer), "%s:%d",
+				(const char *)url.Hostname(),
+				url.Port());
 		WriteHeader("Host", buffer);
 	}
 }
@@ -169,7 +171,7 @@ int
 SOAPHTTPProtocol::GetReply()
 {
 	char buff[2048];
-	m_headers.clear();
+	m_headers.Clear();
 
 	int httpreturn = 500;
 
@@ -215,10 +217,10 @@ SOAPHTTPProtocol::GetReply()
 const char *
 SOAPHTTPProtocol::GetHeader(const char *header)
 {
-	HeaderMap::iterator i = m_headers.find(header);
-	if (i != m_headers.end())
+	HeaderMap::Iterator i = m_headers.Find(header);
+	if (i != m_headers.End())
 	{
-		return i->second.c_str();
+		return (const char *)(*i);
 	}
 	return 0;
 }

@@ -82,7 +82,7 @@ SOAPParameterHandler::startElement(const XML_Char *name, const XML_Char **attrs)
 void
 SOAPParameterHandler::characterData(const XML_Char *str, int len)
 {
-	m_str.append(str, len);
+	m_str.Append(str, len);
 }
 
 void
@@ -91,23 +91,23 @@ SOAPParameterHandler::endElement(const XML_Char *name)
 	switch (m_type)
 	{
 	case SOAPTypes::xsd_int:
-		m_param->SetValue(atoi(m_str.c_str()));
+		m_param->SetInteger(m_str);
 		break;
 	case SOAPTypes::xsd_float:
-		m_param->SetValue((float)atof(m_str.c_str()));
+		m_param->SetFloat(m_str);
 		break;
 	case SOAPTypes::xsd_double:
-		m_param->SetValue(atof(m_str.c_str()));
+		m_param->SetDouble(m_str);
 		break;
 	case SOAPTypes::xsd_string:
-		m_param->SetValue(m_str.c_str());
+		m_param->SetValue(m_str);
 		break;
 	case SOAPTypes::xsd_null:
 		m_param->SetNull();
 		break;
 	case SOAPTypes::xsd_none:
 		// What to do here.. I guess assume we got a string back?
-		m_param->SetValue(m_str.c_str());
+		m_param->SetValue(m_str);
 		break;
 	default:
 		break;

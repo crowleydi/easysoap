@@ -27,7 +27,6 @@
 #pragma warning (disable: 4786)
 #pragma warning (disable: 4251)
 
-#define strcasecmp stricmp
 #define snprintf _snprintf
 #define vsnprintf _vsnprintf
 
@@ -45,12 +44,15 @@
 #define EASYSOAP_EXPORT
 #endif // _WIN32
 
-#include <string>
+#include "SOAPUtil.h"
+#include "SOAPTypes.h"
+#include "SOAPHashMap.h"
+#include "SOAPArray.h"
+#include "SOAPString.h"
+#include "SOAPException.h"
 
 class SOAPPacketWriter;
 
-#include "SOAPTypes.h"
-#include "SOAPException.h"
 #include "SOAPProxy.h"
 
 #endif // __SOAP_h__

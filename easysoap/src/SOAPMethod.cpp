@@ -40,21 +40,28 @@ SOAPMethod::~SOAPMethod()
 
 }
 
+void
+SOAPMethod::Reset()
+{
+	for (size_t i = 0; i < m_params.Size(); ++i)
+		m_params[i].Reset();
+	m_params.Resize(0);
+}
+
+
 bool
 SOAPMethod::WriteSOAPPacket(SOAPPacketWriter& packet) const
 {
-	if (m_namespace.empty())
-	{
+	if (m_namespace.Length() == 0)
 		throw SOAPException("Namespace is required for the SOAP method.");
-	}
 
-	packet.StartTag("m", m_name.c_str());
-	packet.AddAttr("xmlns:m", m_namespace.c_str());
+	packet.StartTag("m", m_name);
+	packet.AddAttr("xmlns:m", m_namespace);
 
-	for (size_t i = 0; i < m_params.size(); ++i)
+	for (size_t i = 0; i < m_params.Size(); ++i)
 		m_params[i].WriteSOAPPacket(packet);
 
-	packet.EndTag("m", m_name.c_str());
+	packet.EndTag("m", m_name);
 
 	return true;
 }

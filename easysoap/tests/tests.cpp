@@ -15,6 +15,12 @@
 
 #include <iostream>
 
+inline std::ostream&
+operator<<(std::ostream& os, const SOAPString& str)
+{
+	return os << (const char *)str;
+}
+
 void
 WriteParameter(const SOAPParameter& param)
 {
@@ -41,7 +47,7 @@ WriteParameter(const SOAPParameter& param)
 			std::cout << "Array {" << std::endl;
 
 			const SOAPParameter::Array& val = param.GetArray();
-			for (SOAPParameter::Array::const_iterator i = val.begin(); i != val.end(); ++i)
+			for (SOAPParameter::Array::ConstIterator i = val.Begin(); i != val.End(); ++i)
 				WriteParameter(*i);
 
 			std::cout << "}";
@@ -52,8 +58,8 @@ WriteParameter(const SOAPParameter& param)
 			std::cout << "Struct {" << std::endl;
 
 			const SOAPParameter::Struct& val = param.GetStruct();
-			for (SOAPParameter::Struct::const_iterator i = val.begin(); i != val.end(); ++i)
-				WriteParameter(i->second);
+			for (SOAPParameter::Struct::Iterator i = val.Begin(); i != val.End(); ++i)
+				WriteParameter(*i);
 
 			std::cout << "}";
 		}
@@ -83,7 +89,7 @@ WriteResponse(const SOAPResponse& response)
 		std::cout << response.GetBody().GetMethod().GetName() << std::endl;
 
 		const SOAPMethod& method = response.GetBody().GetMethod();
-		for (int i = 0; i < method.GetNumParameters(); ++i)
+		for (size_t i = 0; i < method.GetNumParameters(); ++i)
 			WriteParameter(method.GetParameter(i));
 
 		std::cout << std::endl;
@@ -91,7 +97,7 @@ WriteResponse(const SOAPResponse& response)
 	return response;
 }
 
-std::string
+SOAPString
 getStateName(SOAPProxy& soap, int statenum)
 {
 	SOAPMethod	getStateName("getStateName", "/My/Examples");

@@ -25,37 +25,60 @@
 #pragma warning (disable: 4786)
 #endif // _WIN32
 
-#include <vector>
-#include <string>
-#include <map>
-
+#include <stdlib.h>
 #include "SOAP.h"
 
 class EASYSOAP_EXPORT SOAPParameter
 {
 public:
 
-	SOAPParameter()					{init();}
+	typedef SOAPArray<SOAPParameter>				Array;
+	typedef SOAPHashMap<SOAPString, SOAPParameter>	Struct;
+
+	SOAPParameter()
+	{
+		init();
+	}
+
 	SOAPParameter(const SOAPParameter& param);
 	virtual ~SOAPParameter();
 
 	SOAPParameter& operator=(const SOAPParameter& param);
 
-	typedef std::vector<SOAPParameter>				Array;
-	typedef std::map<std::string, SOAPParameter>	Struct;
+	SOAPTypes::xsd_type GetType() const
+	{
+		return m_type;
+	}
 
-	SOAPTypes::xsd_type GetType() const				{return m_type;}
-	void	Reset()									{SetType(SOAPTypes::xsd_none);}
-	void	SetType(SOAPTypes::xsd_type type)		{m_type = type;}
+	void	Reset();
 
-	void	SetName(const char *name)	{m_name = name;}
-	const std::string& GetName() const	{return m_name;}
+	void	SetType(SOAPTypes::xsd_type type)
+	{
+		m_type = type;
+	}
 
-	void SetValue(int val)			{m_intval = val; m_type = SOAPTypes::xsd_int;}
-	void SetValue(float val)		{m_fltval = val; m_type = SOAPTypes::xsd_float;}
-	void SetValue(double val)		{m_dblval = val; m_type = SOAPTypes::xsd_double;}
-	void SetValue(const char *val)	{m_strval = val; m_type = SOAPTypes::xsd_string;}
-	void SetNull()					{m_type = SOAPTypes::xsd_null;}
+	void SetName(const char *name)
+	{
+		m_name = name;
+	}
+
+	const SOAPString& GetName() const
+	{
+		return m_name;
+	}
+
+	void SetValue(int val);
+	void SetInteger(const char *val);
+	void SetValue(float val);
+	void SetFloat(const char *val);
+	void SetValue(double val);
+	void SetDouble(const char *val);
+
+	void SetValue(const char *val)
+		{m_strval = val; m_type = SOAPTypes::xsd_string;}
+
+	void SetNull()			
+		{m_type = SOAPTypes::xsd_null;}
 
 	void SetValue(const Array& val)
 	{
@@ -69,41 +92,37 @@ public:
 		m_type = SOAPTypes::soap_struct;
 	}
 
-	int GetInt() const						{return m_intval;}
+	int GetInt() const						{return atoi(m_strval);}
 	operator int() const					{return GetInt();}
 
-	float GetFloat() const					{return m_fltval;}
+	float GetFloat() const					{return atof(m_strval);}
 	operator float() const					{return GetFloat();}
 
-	double GetDouble() const				{return m_dblval;}
+	double GetDouble() const				{return atof(m_strval);}
 	operator double() const					{return GetDouble();}
 
-	std::string& GetString()				{return m_strval;}
-	const std::string& GetString() const	{return m_strval;}
-	operator const std::string&() const		{return GetString();}
+	SOAPString& GetString()				{return m_strval;}
+	const SOAPString& GetString() const	{return m_strval;}
+	operator const SOAPString&() const		{return GetString();}
 
 	Array& GetArray()
 	{
-		if (!m_array)
-			m_array = new Array();
-		return *m_array;
+		return m_array;
 	}
-	const Array& GetArray() const	{return *m_array;}
+	const Array& GetArray() const	{return m_array;}
 
 	Struct& GetStruct()
 	{
-		if (!m_struct)
-			m_struct = new Struct();
-		return *m_struct;
+		return m_struct;
 	}
-	const Struct& GetStruct() const	{return *m_struct;}
+	const Struct& GetStruct() const	{return m_struct;}
 
 
 	SOAPParameter& AddParameter()
 	{
 		m_type = SOAPTypes::soap_array;
-		int size = GetArray().size();
-		GetArray().resize(size + 1);
+		size_t size = GetArray().Size();
+		GetArray().Resize(size + 1);
 		return GetArray()[size];
 	}
 
@@ -122,24 +141,19 @@ private:
 	void init()
 	{
 		m_type = SOAPTypes::xsd_none;
-		m_intval = 0;
-		m_fltval = 0.0;
-		m_dblval = 0.0;
+		m_strval = "";
 		m_struct = 0;
 		m_array = 0;
 	}
 
 	static unsigned int		m_gensym;
 
-	std::string				m_name;
+	SOAPString				m_name;
 	SOAPTypes::xsd_type		m_type;
 
-	int				m_intval;
-	float			m_fltval;
-	double			m_dblval;
-	std::string		m_strval;
-	Array			*m_array;
-	Struct			*m_struct;
+	SOAPString		m_strval;
+	Array			m_array;
+	Struct			m_struct;
 };
 
 #endif // !defined(AFX_SOAPPARAMETER_H__30811BAD_D6A1_4535_B256_9EEB56A84026__INCLUDED_)

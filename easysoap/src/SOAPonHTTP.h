@@ -30,7 +30,7 @@ class EASYSOAP_EXPORT SOAPHTTPProtocol : public SOAPProtocolBase
 {
 private:
 	typedef	SOAPProtocolBase super;
-	typedef std::map<std::string, std::string>	HeaderMap;
+	typedef SOAPHashMapNoCase<SOAPString, SOAPString>	HeaderMap;
 
 	HeaderMap	m_headers;
 	SOAPUrl		m_endpoint;
@@ -76,7 +76,7 @@ class EASYSOAP_EXPORT SOAPonHTTP : public SOAPTransport
 {
 private:
 	SOAPHTTPProtocol	m_http;
-	std::string			m_path;
+	SOAPString			m_path;
 
 public:
 	SOAPonHTTP() {}

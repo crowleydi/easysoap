@@ -38,13 +38,13 @@ SOAPUrl::Reset()
 {
 	m_proto = no_proto;
 
-	m_user.erase();
-	m_password.erase();
-	m_hostname.erase();
+	m_user = "";
+	m_password = "";
+	m_hostname = "";
 
 	m_port = 0;
 
-	m_path.erase();
+	m_path = "";
 }
 
 void
@@ -64,7 +64,7 @@ SOAPUrl::Set(const char *url)
 		char *work;
 
 		const char * const workend = buffer + 1023;
-		const char * const urlend = url + strlen(url);
+		const char * const urlend = url + sp_strlen(url);
 
 		// parse out the protocol name
 		work = buffer;
@@ -75,22 +75,22 @@ SOAPUrl::Set(const char *url)
 		// found protocol name
 		if (*url++ == ':')
 		{
-			if (!strcasecmp(buffer, "http"))
+			if (!sp_strcasecmp(buffer, "http"))
 			{
 				m_proto = http_proto;
 				m_port = http_default_port;
 			}
-			else if (!strcasecmp(buffer, "https"))
+			else if (!sp_strcasecmp(buffer, "https"))
 			{
 				m_proto = https_proto;
 				m_port = https_default_port;
 			}
-			else if (!strcasecmp(buffer, "ftp"))
+			else if (!sp_strcasecmp(buffer, "ftp"))
 			{
 				m_proto = ftp_proto;
 				m_port = ftp_default_port;
 			}
-			else if (!strcasecmp(buffer, "file"))
+			else if (!sp_strcasecmp(buffer, "file"))
 			{
 				m_proto = file_proto;
 				m_port = 0;

@@ -43,7 +43,7 @@ public:
 private:
 	SOAPParameter			*m_param;
 	SOAPTypes::xsd_type		m_type;
-	std::string				m_str;
+	SOAPString				m_str;
 };
 
 #endif // !defined(AFX_SOAPPARAMETERHANDLER_H__124ED3B5_721D_4AB5_8B65_32D5C4F86420__INCLUDED_)

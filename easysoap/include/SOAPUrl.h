@@ -21,7 +21,6 @@
 #if !defined(AFX_SOAPURL_H__592D82D9_B93F_431A_BB8D_F658609814C4__INCLUDED_)
 #define AFX_SOAPURL_H__592D82D9_B93F_431A_BB8D_F658609814C4__INCLUDED_
 
-#include <string>
 #include "SOAP.h"
 
 class EASYSOAP_EXPORT SOAPUrl  
@@ -43,22 +42,22 @@ public:
 	} UrlProtocol;
 
 	UrlProtocol	Protocol() const		{return m_proto;}
-	const char *User() const		{return m_user.c_str();}
-	const char *Password() const	{return m_password.c_str();}
-	const char *Hostname() const	{return m_hostname.c_str();}
-	unsigned int Port() const		{return m_port;}
+	const SOAPString& User() const		{return m_user;}
+	const SOAPString& Password() const	{return m_password;}
+	const SOAPString& Hostname() const	{return m_hostname;}
+	unsigned int Port() const			{return m_port;}
 	bool PortIsDefault() const;
-	const char *Path() const		{return m_path.c_str();}
+	const SOAPString& Path() const		{return m_path;}
 
 private:
 	void		Reset();
 
 	UrlProtocol		m_proto;
-	std::string		m_user;
-	std::string		m_password;
-	std::string		m_hostname;
+	SOAPString		m_user;
+	SOAPString		m_password;
+	SOAPString		m_hostname;
 	unsigned int	m_port;
-	std::string		m_path;
+	SOAPString		m_path;
 };
 
 #endif // !defined(AFX_SOAPURL_H__592D82D9_B93F_431A_BB8D_F658609814C4__INCLUDED_)

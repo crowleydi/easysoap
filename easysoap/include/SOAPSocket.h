@@ -21,16 +21,13 @@
 #if !defined(AFX_SIMPLESOCKET_H__10CE9068_BA2E_4BE4_8AE2_D48D2FCA40AF__INCLUDED_)
 #define AFX_SIMPLESOCKET_H__10CE9068_BA2E_4BE4_8AE2_D48D2FCA40AF__INCLUDED_
 
-#include <map>
-#include <string>
-
 #include "SOAP.h"
 #include "SOAPUrl.h"
 
 class EASYSOAP_EXPORT SOAPSocketException : public SOAPException
 {
 public:
-	SOAPSocketException(const std::string& what)
+	SOAPSocketException(const SOAPString& what)
 		: SOAPException(what) {}
 	SOAPSocketException(const char *fmt, ...)
 	{

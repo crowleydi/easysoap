@@ -173,7 +173,7 @@ SOAPProtocolBase::Write(const char *str)
 {
 	if (str)
 	{
-		int len = strlen(str);
+		int len = sp_strlen(str);
 		return Write(str, len);
 	}
 	return 0;

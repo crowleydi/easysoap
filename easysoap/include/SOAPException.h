@@ -28,10 +28,12 @@
 #include <stdio.h>
 #include <stdarg.h>
 
+#include "SOAPString.h"
+
 class EASYSOAP_EXPORT SOAPException  
 {
 private:
-	std::string m_what;
+	SOAPString	 m_what;
 
 protected:
 	SOAPException() {}
@@ -44,7 +46,7 @@ protected:
 	}
 
 public:
-	SOAPException(const std::string& what)
+	SOAPException(const SOAPString& what)
 		: m_what(what) {}
 	SOAPException(const char *fmt, ...)
 	{
@@ -56,7 +58,7 @@ public:
 
 	virtual ~SOAPException() {}
 
-	const std::string& What() const {return m_what;}
+	const SOAPString& What() const {return m_what;}
 };
 
 class EASYSOAP_EXPORT SOAPMemoryException : public SOAPException
