@@ -190,8 +190,8 @@ UserlandValidatorHandler::moderateSizeArrayCheck(const SOAPMethod& req, SOAPMeth
 	size_t numels = p.GetArray().Size();
 
 	SOAPString result;
-	result += p.GetArray()[0].GetString();
-	result += p.GetArray()[numels - 1].GetString();
+	result += p.GetArray()[0]->GetString();
+	result += p.GetArray()[numels - 1]->GetString();
 
 	resp.AddParameter("Result") << result;
 }

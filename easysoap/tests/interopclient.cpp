@@ -34,7 +34,11 @@
 #include <iostream>
 #include <math.h>
 #include <time.h>
+#ifdef _WIN32
+#include <direct.h>
+#else
 #include <sys/stat.h>
+#endif
 
 #include <SOAP.h>
 #include <SOAPDebugger.h>
@@ -118,6 +122,23 @@ almostequal(const SOAPArray<float>& a, const SOAPArray<float>& b)
 }
 
 
+bool
+almostequal(const SOAPArray<SOAPInteropStruct>& a, const SOAPArray<SOAPInteropStruct>& b)
+{
+	if (a.Size() != b.Size())
+		return false;
+	bool retval = true;
+	for (size_t i = 0; i < a.Size(); ++i)
+	{
+		if (a[i] != b[i] && !almostequal(a[i].varFloat, b[i].varFloat))
+		{
+			retval = false;
+		}
+	}
+	return retval;
+}
+
+
 class UnexpectedSuccessException : public SOAPException
 {
 public:
@@ -173,11 +194,13 @@ GetAllEndpoints(SOAPArray<Endpoint>& ea)
 	const SOAPResponse& response = proxy.Execute(getAllEndpoints);
 	const SOAPParameter& p = response.GetReturnValue();
 
-	SOAPParameter::Array::ConstIterator i = p.GetArray().Begin();
-	while (i != p.GetArray().End())
+	
+	for (SOAPParameter::Array::ConstIterator i = p.GetArray().Begin();
+			i != p.GetArray().End();
+			++i)
 	{
 		Endpoint& e = ea.Add();
-		*(i++) >> e;
+		*(*i) >> e;
 	}
 }
 
@@ -414,7 +437,7 @@ TestEchoStructArray(SOAPProxy& proxy, const Endpoint& e, int numvals)
 	const SOAPResponse& response = proxy.Execute(method);
 	SOAPArray<SOAPInteropStruct> outputValue;
 	response.GetReturnValue() >> outputValue;
-	if (inputValue != outputValue)
+	if (inputValue != outputValue && !almostequal(inputValue, outputValue))
 		throw SOAPException("Values are not equal");
 }
 
@@ -855,7 +878,11 @@ main(int argc, char* argv[])
 						<< std::endl;
 
 			if (makedirs)
+#ifdef _WIN32
+				_mkdir(e.name);
+#else
 				mkdir(e.name, 0755);
+#endif
 
 			if (execute && !skips.Find(e.name))
 				TestInterop(e);
