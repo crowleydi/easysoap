@@ -70,6 +70,36 @@ public:
 
 	static const SOAPQName type;
 	static const SOAPQName nil;
+
+	//
+	//// some basic types
+	static const SOAPQName string;
+	static const SOAPQName boolean;
+	static const SOAPQName decimal;
+	static const SOAPQName float_;
+	static const SOAPQName double_;
+	static const SOAPQName duration;
+	static const SOAPQName dateTime;
+	static const SOAPQName time;
+	static const SOAPQName date;
+	static const SOAPQName base64Binary;
+	static const SOAPQName hexBinary;
+
+	//
+	//// derived types
+	static const SOAPQName integer;
+	static const SOAPQName nonPositiveInteger;
+	static const SOAPQName long_;
+	static const SOAPQName int_;
+	static const SOAPQName short_;
+	static const SOAPQName byte;
+
+	static const SOAPQName nonNegativeInteger;
+	static const SOAPQName unsignedLong;
+	static const SOAPQName unsignedInt;
+	static const SOAPQName unsignedShort;
+	static const SOAPQName unsignedByte;
+	static const SOAPQName positiveInteger;
 };
 
 class EASYSOAP_EXPORT XMLSchema1999

@@ -55,3 +55,27 @@ const char *XMLSchema2001::xsd = SOAP_XSD_2001;
 const SOAPQName XMLSchema2001::nil("nil", XMLSchema2001::xsi);
 const SOAPQName XMLSchema2001::type("type", XMLSchema2001::xsi);
 
+const SOAPQName XMLSchema2001::string("string", XMLSchema2001::xsd);
+const SOAPQName XMLSchema2001::boolean("boolean", XMLSchema2001::xsd);
+const SOAPQName XMLSchema2001::decimal("decimal", XMLSchema2001::xsd);
+const SOAPQName XMLSchema2001::float_("float", XMLSchema2001::xsd);
+const SOAPQName XMLSchema2001::double_("double", XMLSchema2001::xsd);
+const SOAPQName XMLSchema2001::duration("duration", XMLSchema2001::xsd);
+const SOAPQName XMLSchema2001::dateTime("dateTime", XMLSchema2001::xsd);
+const SOAPQName XMLSchema2001::time("time", XMLSchema2001::xsd);
+const SOAPQName XMLSchema2001::date("date", XMLSchema2001::xsd);
+const SOAPQName XMLSchema2001::base64Binary("base64Binary", XMLSchema2001::xsd);
+const SOAPQName XMLSchema2001::hexBinary("hexBinary", XMLSchema2001::xsd);
+const SOAPQName XMLSchema2001::integer("integer", XMLSchema2001::xsd);
+const SOAPQName XMLSchema2001::nonPositiveInteger("nonPositiveInteger", XMLSchema2001::xsd);
+const SOAPQName XMLSchema2001::long_("long", XMLSchema2001::xsd);
+const SOAPQName XMLSchema2001::int_("int", XMLSchema2001::xsd);
+const SOAPQName XMLSchema2001::short_("short", XMLSchema2001::xsd);
+const SOAPQName XMLSchema2001::byte("byte", XMLSchema2001::xsd);
+const SOAPQName XMLSchema2001::nonNegativeInteger("nonNegativeInteger", XMLSchema2001::xsd);
+const SOAPQName XMLSchema2001::unsignedLong("unsignedLong", XMLSchema2001::xsd);
+const SOAPQName XMLSchema2001::unsignedInt("unsignedInt", XMLSchema2001::xsd);
+const SOAPQName XMLSchema2001::unsignedShort("unsignedShort", XMLSchema2001::xsd);
+const SOAPQName XMLSchema2001::unsignedByte("unsignedByte", XMLSchema2001::xsd);
+const SOAPQName XMLSchema2001::positiveInteger("positiveInteger", XMLSchema2001::xsd);
+
