@@ -1,0 +1,49 @@
+
+List of things TODO
+==================================
+
+In order of how hard I think they are:
+
+*	Move everyting into a namespace.
+
+*	Implement copy constructors, copy operators for things that need
+	them.  Declare private ones that don't make sense.
+
+*	Move the XML payload serialization into a single class instead of
+	the ugly WriteSOAPPacket method on a bunch of classes.
+
+*	Write real regression tests.
+
+*	Write a file Transport that can be used to read/write files for
+	regression testing (files will have pre-composed SOAP payloads
+	that will be read/sent as the response to a method invocation.  The
+	request is also compared against a file.)
+
+*	Write POP/SMTP/FTP/raw TCP transports
+
+*	Improve the existing HTTP/HTTPS transports.
+
+*	Need to be able to specify different encodingStyle (see
+	SOAPEnvelope::WriteSoapPacket())
+
+*	Need to be able to declare Structs with a namespace other than
+	the default (so it will work w/ interop tests at
+	http://www.xmethods.net/detail.html?id=10)
+
+*	Have the SOAPProxy::Execute() method take a SOAPMethod AND
+	SOAPParameters instead of adding parameters to the SOAPMethod.
+
+*	Rename SOAPProxy to SOAPService.  Change SOAPService to contain
+	a map of methods (instead of the single funky method it has now).
+	Those are the methods that can be called on that service.  This
+	should map well with WSDL.
+
+*	Rip out STL to make it more portable.
+
+*	SOAPParameter is really ugly.
+
+*	More types.
+
+*	Read about WSDL.  Support WSDL.  Construct a SOAPService by parsing
+	a WSDL document.  Create stub code by parsing a WSDL document.
+
