@@ -181,18 +181,11 @@ SOAPCGITransport::Write(const SOAPMethod& method, const char *payload, size_t pa
 	return payloadsize;
 }
 
-int
-SOAPCGIServer::Handle()
-{
-	SOAPCGITransport	cgi;
-	return m_dispatch.Handle(cgi);
-}
-
-
 SOAPCGIServer::Handle(const char *infile)
 {
 	SOAPCGITransport	cgi;
-	cgi.SetInFile(infile);
+	if (infile)
+		cgi.SetInFile(infile);
 	return m_dispatch.Handle(cgi);
 }
 

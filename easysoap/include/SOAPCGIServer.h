@@ -37,7 +37,7 @@ public:
 		return *this;
 	}
 
-	int Handle();
+	int Handle(const char *infile = 0);
 
 private:
 
