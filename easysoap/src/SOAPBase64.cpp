@@ -249,6 +249,7 @@ SOAPHexBase::Decode(const SOAPString& str, char *bytes, size_t& byteslen)
 			throw SOAPException("");
 
 		*bytes++ = ((getHexValue(ub) << 4) + getHexValue(lb));
+		++outlen;
 	}
 
 	byteslen = outlen;
