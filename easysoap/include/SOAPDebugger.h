@@ -34,7 +34,7 @@ public:
 
 private:
 	SOAPDebugger();
-	~SOAPDebugger();
+	//~SOAPDebugger();
 
 	static FILE	*m_file;
 };
