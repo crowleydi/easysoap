@@ -21,6 +21,7 @@
 #if !defined(AFX_SOAPARRAYHANDLER_H__3A318691_8E69_43B1_9733_39FE84CA7565__INCLUDED_)
 #define AFX_SOAPARRAYHANDLER_H__3A318691_8E69_43B1_9733_39FE84CA7565__INCLUDED_
 
+#include "SOAP.h"
 #include "SOAPParseEventHandler.h"
 
 class SOAPParameterHandler;
@@ -33,6 +34,7 @@ public:
 	virtual ~SOAPArrayHandler();
 
 	void	SetParameter(SOAPParameter* param)	{m_param = param;}
+	void	SetArrayType(const XML_Char* type, const XML_Char *typens);
 
 	virtual SOAPParseEventHandler* start(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs);
 	virtual SOAPParseEventHandler* startElement(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs);

@@ -47,11 +47,11 @@ SOAPParameterHandler::~SOAPParameterHandler()
 	delete m_structHandler;
 }
 
-const SOAPQName xsitype_1999("type", SOAP_XSI_1999);
-const SOAPQName xsitype_2001("type", SOAP_XSI_2001);
-const SOAPQName xsinull_1999("null", SOAP_XSI_1999);
-const SOAPQName xsinull_2001("null", SOAP_XSI_2001);
-const SOAPQName arrayType("arrayType", SOAP_ENC);
+const SOAPQName AttrXsiType1999("type", SOAP_XSI_1999);
+const SOAPQName AttrXsiType2001("type", SOAP_XSI_2001);
+const SOAPQName AttrXsiNull1999("null", SOAP_XSI_1999);
+const SOAPQName AttrXsiNull2001("null", SOAP_XSI_2001);
+const SOAPQName AttrArrayType("arrayType", SOAP_ENC);
 
 SOAPParseEventHandler *
 SOAPParameterHandler::start(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs)
@@ -62,7 +62,9 @@ SOAPParameterHandler::start(SOAPParser& parser, const XML_Char *name, const XML_
 	m_setvalue = true;
 	m_str = "";
 
-	bool haveArrayType = false;
+	const XML_Char *elementType = 0;
+	const XML_Char *arrayType = 0;
+
 	while (*attrs)
 	{
 		const XML_Char *tag = *attrs++;
@@ -92,12 +94,13 @@ SOAPParameterHandler::start(SOAPParser& parser, const XML_Char *name, const XML_
 			}
 			return 0;
 		}
-		else if (arrayType == tag)
+		else if (AttrArrayType == tag)
 		{
-			haveArrayType = true;
+			arrayType = val;
 		}
-		else if (xsitype_1999 == tag || xsitype_2001 == tag)
+		else if (AttrXsiType1999 == tag || AttrXsiType2001 == tag)
 		{
+			elementType = val;
 			char *sep = sp_strchr(val, ':');
 			if (sep)
 			{
@@ -110,15 +113,15 @@ SOAPParameterHandler::start(SOAPParser& parser, const XML_Char *name, const XML_
 				}
 				else
 				{
-					throw SOAPException("Could not resolve namespace for xsi:type: %s", val);
+					throw SOAPException("Could not resolve typename for element %s: %s", name, val);
 				}
 			}
 			else
 			{
-				throw SOAPException("xsi:type is not namespace qualified: %s", val);
+				throw SOAPException("Typename is not namespace qualified for element %s: %s", name, val);
 			}
 		}
-		else if (xsinull_1999 == tag || xsinull_2001 == tag)
+		else if (AttrXsiNull1999 == tag || AttrXsiNull1999 == tag)
 		{
 			if (sp_strcmp(val, "1") == 0 || sp_strcasecmp(val, "true") == 0)
 			{
@@ -128,12 +131,44 @@ SOAPParameterHandler::start(SOAPParser& parser, const XML_Char *name, const XML_
 		}
 	}
 
-	if (haveArrayType)
+	if (!elementType)
 	{
-		m_setvalue = false;
+		m_param->SetType(m_paramType);
+	}
+
+	if (arrayType)
+	{
 		if (!m_arrayHandler)
 			m_arrayHandler = new SOAPArrayHandler();
 		m_arrayHandler->SetParameter(m_param);
+		m_setvalue = false;
+
+		char *sep = sp_strchr(arrayType, ':');
+		if (sep)
+		{
+			*sep = 0;
+			const char *typens = parser.ExpandNamespace(arrayType);
+			*sep++ = ':';
+			if (typens)
+			{
+				char *b = sp_strchr(sep, '[');
+				if (b)
+					*b = 0;
+				m_arrayHandler->SetArrayType(sep, typens);
+				m_param->SetArrayType(sep, typens);
+				if (b)
+					*b = '[';
+			}
+			else
+			{
+				throw SOAPException("Could not resolve arrayType for element %s: %s", name, arrayType);
+			}
+		}
+		else
+		{
+			throw SOAPException("Array typename is not namespace qualified for element %s: %s", name, arrayType);
+		}
+
 		return m_arrayHandler->start(parser, name, attrs);
 	}
 

@@ -106,8 +106,10 @@ public:
 	}
 
 	void SetIsArray();
+	void SetArrayType(const char *name, const char *ns = 0);
 	void SetIsStruct();
 	void SetNull(bool isnull = true);
+
 	bool IsNull() const;
 	bool IsStruct() const;
 	bool IsArray() const;
@@ -124,6 +126,7 @@ private:
 	SOAPParameter	*m_parent;
 	SOAPQName		m_name;
 	SOAPQName		m_type;
+	SOAPQName		m_arrayType;
 
 	int				m_flags;
 

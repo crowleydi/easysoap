@@ -55,4 +55,8 @@ SOAPArrayHandler::startElement(SOAPParser& parser, const XML_Char *name, const X
 	return m_paramHandler->start(parser, name, attrs);
 }
 
-
+void
+SOAPArrayHandler::SetArrayType(const XML_Char *type, const XML_Char *typens)
+{
+	m_paramHandler->SetParameterType(type, typens);
+}

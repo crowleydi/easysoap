@@ -35,17 +35,23 @@ public:
 	SOAPParameterHandler();
 	virtual ~SOAPParameterHandler();
 
-	void SetParameter(SOAPParameter& param)	{m_param = &param;}
+	void SetIgnoreName(bool val = true)				{m_ignoreName = val;}
+	void SetIgnoreId(bool val = true)				{m_ignoreId = val;}
+	void SetParameter(SOAPParameter& param)			{m_param = &param;}
+	void SetParameterType(const XML_Char *type, const XML_Char *typens)
+	{
+		m_paramType.Set(type, typens);
+	}
 
 	virtual SOAPParseEventHandler* start(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs);
 	virtual SOAPParseEventHandler* startElement(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs);
 	virtual void endElement(const XML_Char *name);
 	virtual void characterData(const XML_Char *str, int len);
 
-	void SetIgnoreName(bool val = true)	{m_ignoreName = val;}
-	void SetIgnoreId(bool val = true)	{m_ignoreId = val;}
 private:
 	SOAPParameter			*m_param;
+	SOAPQName				m_paramType;
+
 	SOAPString				m_str;
 	SOAPString				m_typestr;
 	SOAPStructHandler		*m_structHandler;

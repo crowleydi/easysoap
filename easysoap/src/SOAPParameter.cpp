@@ -64,6 +64,7 @@ SOAPParameter::Assign(const SOAPParameter& param)
 	m_outtasync = true;
 	m_name = param.m_name;
 	m_type = param.m_type;
+	m_arrayType = param.m_arrayType;
 	m_strval = param.m_strval;
 	m_flags= param.m_flags;
 
@@ -110,10 +111,7 @@ SOAPParameter::SetName(const char *name, const char *ns)
 void
 SOAPParameter::SetType(const char *type, const char *ns)
 {
-	if (ns)
-		m_type.Set(type, ns);
-	else
-		m_type.Set(type, "___easysoap_default_ns");
+	m_type.Set(type, ns ? ns : "___easysoap_default_ns");
 }
 
 bool
@@ -154,6 +152,15 @@ SOAPParameter::SetIsArray()
 {
 	m_flags = ARRAY_FLAG;
 	SetType("Array", SOAP_ENC);
+	m_arrayType.Clear();
+}
+
+void
+SOAPParameter::SetArrayType(const char *type, const char *ns)
+{
+	if (!IsArray())
+		SetIsArray();
+	m_arrayType.Set(type, ns ? ns : "___easysoap_default_ns");
 }
 
 void
@@ -415,29 +422,31 @@ SOAPParameter::WriteSOAPPacket(SOAPPacketWriter& packet, bool writetype) const
 	}
 	else if (IsArray())
 	{
-		SOAPQName atype;
-		writetype = false;
-		if (GetArray().Size() > 0)
-		{
-			atype = GetArray()[0].GetType();
+		SOAPQName atype(m_arrayType);
 
-			for (size_t i = 1; i < GetArray().Size(); ++i)
+		if (atype.IsUndefined())
+		{
+			writetype = false;
+			bool gottype = false;
+			if (GetArray().Size() > 0)
 			{
-				if (atype != GetArray()[i].GetType())
+				gottype = true;
+				atype = GetArray()[0].GetType();
+
+				for (size_t i = 1; i < GetArray().Size(); ++i)
 				{
-					atype.Set("ur-type", SOAP_XSD);
-					writetype = true;
-					break;
+					if (atype != GetArray()[i].GetType())
+					{
+						writetype = true;
+						gottype = false;
+						break;
+					}
 				}
 			}
-
-		}
-		else
-		{
-			// TODO: With no elements, we obviously can't discern the
-			// type so... we probably should have a way for the user to
-			// set the type to use...
-			atype.Set("ur-type", SOAP_XSD);
+			if (!gottype)
+			{
+				atype.Set("ur-type", SOAP_XSD);
+			}
 		}
 
 		char lenbuff[48];
