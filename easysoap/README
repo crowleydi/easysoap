@@ -1,9 +1,8 @@
 
-
 Alpha release. 0.4
 =====================================
 
-The Expat XML parsing library 1.95.1 is required.  You can download it
+The Expat XML parsing library 1.95.2 is required.  You can download it
 from expat.sourceforge.net. See below.
 
 To run the tests program you will need to install  SOAP::Lite.
@@ -33,61 +32,23 @@ HOW TO BUILD EASYSOAP
 HOW TO DOWNLOAD AND BUILD EXPAT
 =====================================
 
-Download and untar source from:
-	http://download.sourceforge.net/expat/expat-1.95.1.tar.gz
 
 For Linux :
-	cd expat
+	Download source from:
+		http://prdownloads.sourceforge.net/expat/expat-1.95.2.tar.gz
+	
+	tar xzf expat-1.95.2.tar.gz
+	cd expat-1.95.2
 	./configure
-	(SEE NOTE BELOW FOR GCC USERS)
 	make
 	make install (must be root to install into /usr/local)
 
 
 For Win32 :
-	DO NOT bother downloading the Win32 binaries for expat-1.95.1.
-	The ".lib" file is missing from the binary distribution so
-	You will not be able to link against it.  You will have to
-	build from source...
-
-	Using MSVC++ 6:
-	Load the .dsp (File/Open.  Select "Projects(.dsp)", double click on
-	expat-1.95.1/lib/expat.dsp)
-	Hit F7 to start the build.
-	Copy Debug/expat.lib to easysoap/win32/Debug
-	Copy Debug/expat.dll to easysoap/win32/Debug
-
-	The Debug build should compile out of the box.  The Release build
-	has some problems...
-
-	1) Turn off precompiled headers - Go to Project/Settings.  Select
-	the "expat" project and make sure that "Settings For" is set to
-	"Win32 Release."  Select the "C/C++" tab.  Select category
-	"Precompiled Headers."  Select "Not using precompiled headers."
-
-	2) Remove compile rule for 2 files - Select the "+" to expand the
-	expat project.  Select the "+" to expand "Source files."  Select
-	"xmltok_impl.c"  Select the "General" tab.  Click "Exclude file
-	from build."  Repeat for "xmltok_ns.c"
-
-	3)  VERSION define macro is wrong for xmplarse.c - select the
-	"xmlrole.c" file.  Click on the C/C++ tab.  Select the
-	"Preprocessor category"  select the entire value for
-	"Preprocessor definitions.'  Press ctrl-c (copy).  Select the
-	xmlparse.c file, select entire "Preprocessor definitions."
-	Press ctrl-v (paste).  Hit "OK."
-
-	Now it should compile.  I'm quite sure all of this is fixed in
-	the expat CVS repository and thus will be fixed in the expat
-	2.0 release....
-
-
-COMPLILING EXPAT WITH GCC
-=========================
-
-Because EasySoap++ uses exceptions, the Expat library must be compiled
-to handle exceptions correctly or crashes will occur when a C++ exception
-is thrown.  After you run the configure command you must edit lib/Makefile
-and add the flag "-fexceptions" to the CFLAGS proeprty.
-
-
+	Dowload the install binary from:
+		http://prdownloads.sourceforge.net/expat/expat_win32bin_1_95_2.exe
+	Run the program.  The EasySoap++ project file is set up to look
+	for Expat in a directory parallel to EasySoap++-0.4.  So if you
+	unpacked EasySoap++-0.4 into C:\code\EasySoap++-0.4 then install
+	Expat into C:\code\Expat-1.95.2.  Otherwise you will have to modify
+	the project settings to find the necessary include files.
