@@ -21,9 +21,10 @@
 #if !defined(AFX_SOAPARRAYHANDLER_H__3A318691_8E69_43B1_9733_39FE84CA7565__INCLUDED_)
 #define AFX_SOAPARRAYHANDLER_H__3A318691_8E69_43B1_9733_39FE84CA7565__INCLUDED_
 
-#include "SOAPParameterHandler.h"
+#include "SOAPParseEventHandler.h"
 
-class SOAPStructHandler;
+class SOAPParameterHandler;
+class SOAPParameter;
 
 class SOAPArrayHandler : public SOAPParseEventHandler  
 {
@@ -31,7 +32,7 @@ public:
 	SOAPArrayHandler();
 	virtual ~SOAPArrayHandler();
 
-	void	SetParameter(SOAPParameter& param)	{m_param = &param;}
+	void	SetParameter(SOAPParameter* param)	{m_param = param;}
 
 	virtual SOAPParseEventHandler* start(const XML_Char *name, const XML_Char **attrs);
 	virtual SOAPParseEventHandler* startElement(const XML_Char *name, const XML_Char **attrs);
@@ -41,11 +42,7 @@ public:
 private:
 
 	SOAPParameter			*m_param;
-	SOAPParameterHandler	m_paramHandler;
-
-	// for nested arrays/structs
-	SOAPArrayHandler		*m_arrayHandler;
-	SOAPStructHandler		*m_structHandler;
+	SOAPParameterHandler	*m_paramHandler;
 };
 
 #endif // !defined(AFX_SOAPARRAYHANDLER_H__3A318691_8E69_43B1_9733_39FE84CA7565__INCLUDED_)

@@ -51,49 +51,6 @@ SOAPMethodHandler::start(const XML_Char *name, const XML_Char **attrs)
 SOAPParseEventHandler *
 SOAPMethodHandler::startElement(const XML_Char *name, const XML_Char **attrs)
 {
-	// to find what type of handler we need to use,
-	// we have to iterate over the attributes.  ugly.
-
-	const XML_Char **work = attrs;
-	while (*work)
-	{
-		const char *tag = *work++;
-		const char *val = *work++;
-
-		if (sp_strcmp(tag, FULL_SOAP_XSI PARSER_NS_SEP "type") == 0)
-		{
-			SOAPTypes::xsd_type type = SOAPTypes::GetXsdType(val);
-
-			//
-			// TODO:  Expand the value of the namespace identifier in the
-			// value incase other namespaces (other than xsi, xsd) are used.
-
-			if (type == SOAPTypes::soap_array ||
-				// this is hack because we don't disambiguate
-				(type == SOAPTypes::xsd_none && sp_strstr(val, ":Array") != 0))
-			{
-				m_arrayHandler.SetParameter(m_method->AddParameter());
-				return m_arrayHandler.start(name, attrs);
-			}
-
-			if (type == SOAPTypes::soap_struct ||
-				// this is hack because we don't disambiguate
-				(type == SOAPTypes::xsd_none && sp_strstr(val, ":Struct") != 0))
-			{
-				m_structHandler.SetParameter(m_method->AddParameter());
-				return m_structHandler.start(name, attrs);
-			}
-
-			if (type == SOAPTypes::xsd_none)
-			{
-				// throw after we implement more types
-				return 0;
-			}
-
-			break;
-		}
-	}
-
 	m_paramHandler.SetParameter(m_method->AddParameter());
 	return m_paramHandler.start(name, attrs);
 }

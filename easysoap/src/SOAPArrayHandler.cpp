@@ -23,6 +23,7 @@
 #endif // _MSC_VER
 
 #include "SOAPArrayHandler.h"
+#include "SOAPParameterHandler.h"
 #include "SOAPParameter.h"
 
 //////////////////////////////////////////////////////////////////////
@@ -31,14 +32,13 @@
 
 SOAPArrayHandler::SOAPArrayHandler()
 : m_param(0)
-, m_arrayHandler(0)
 {
-
+	m_paramHandler = new SOAPParameterHandler();
 }
 
 SOAPArrayHandler::~SOAPArrayHandler()
 {
-
+	delete m_paramHandler;
 }
 
 SOAPParseEventHandler *
@@ -51,8 +51,8 @@ SOAPArrayHandler::start(const XML_Char *name, const XML_Char **attrs)
 SOAPParseEventHandler *
 SOAPArrayHandler::startElement(const XML_Char *name, const XML_Char **attrs)
 {
-	m_paramHandler.SetParameter(m_param->AddParameter());
-	return m_paramHandler.start(name, attrs);
+	m_paramHandler->SetParameter(m_param->AddParameter());
+	return m_paramHandler->start(name, attrs);
 }
 
 void

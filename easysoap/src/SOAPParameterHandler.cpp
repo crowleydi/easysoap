@@ -22,6 +22,8 @@
 #endif // _MSC_VER
 
 #include "SOAPParameterHandler.h"
+#include "SOAPArrayHandler.h"
+#include "SOAPStructHandler.h"
 #include "SOAPNamespaces.h"
 #include "SOAPParameter.h"
 
@@ -31,12 +33,16 @@
 
 SOAPParameterHandler::SOAPParameterHandler()
 : m_param(0)
+, m_structHandler(0)
+, m_arrayHandler(0)
+, m_setvalue(false)
 {
 }
 
 SOAPParameterHandler::~SOAPParameterHandler()
 {
-
+	delete m_arrayHandler;
+	delete m_structHandler;
 }
 
 SOAPParseEventHandler *
@@ -45,7 +51,11 @@ SOAPParameterHandler::start(const XML_Char *name, const XML_Char **attrs)
 	m_param->SetName(name);
 	m_param->Reset();
 	m_type = SOAPTypes::xsd_none;
+	m_setvalue = true;
+	m_str = "";
 
+	bool haveArrayType = false;
+	bool haveType = false;
 	while (*attrs)
 	{
 		const XML_Char *tag = *attrs++;
@@ -54,29 +64,59 @@ SOAPParameterHandler::start(const XML_Char *name, const XML_Char **attrs)
 		if (sp_strcmp(tag, FULL_SOAP_XSI PARSER_NS_SEP "type") == 0)
 		{
 			m_type = SOAPTypes::GetXsdType(val);
-			if (m_type == SOAPTypes::xsd_none)
-			{
-				// throw, unknown type
-				return 0;
-			}
-			break;
+			haveType = true;
+		}
+		else if (sp_strcmp(tag, FULL_SOAP_ENC PARSER_NS_SEP "arrayType") == 0)
+		{
+			haveArrayType = true;
 		}
 		else if (sp_strcmp(tag, FULL_SOAP_XSI PARSER_NS_SEP "null") == 0)
 		{
-			if (*val == '1')
-				m_type = SOAPTypes::xsd_null;
+			if (sp_strcmp(val, "1") == 0 || sp_strcmp(val, "true") == 0)
+			{
+				m_param->SetNull();
+				m_setvalue = false;
+			}
 		}
 	}
 
-	m_str = "";
+	if (haveArrayType && m_type == SOAPTypes::xsd_none)
+		m_type = SOAPTypes::soap_array;
+
+	if (m_type == SOAPTypes::soap_array)
+	{
+		if (!m_arrayHandler)
+			m_arrayHandler = new SOAPArrayHandler();
+		m_arrayHandler->SetParameter(m_param);
+		return m_arrayHandler->start(name, attrs);
+	}
+	else if (m_type == SOAPTypes::soap_struct)
+	{
+		if (!m_structHandler)
+			m_structHandler = new SOAPStructHandler();
+		m_structHandler->SetParameter(m_param);
+		return m_structHandler->start(name, attrs);
+	}
+	else if (m_type == SOAPTypes::xsd_none)
+	{
+		return this;
+	}
+
 	return this;
 }
 
 SOAPParseEventHandler *
 SOAPParameterHandler::startElement(const XML_Char *name, const XML_Char **attrs)
 {
-	// we shouldn't get in here...
-	return 0;
+	//
+	// If a parameter has an element, then it must
+	// be a struct!
+	if (!m_structHandler)
+		m_structHandler = new SOAPStructHandler();
+	m_type  = SOAPTypes::soap_struct;
+	m_structHandler->SetParameter(m_param);
+	m_param->SetType(SOAPTypes::soap_struct);
+	return m_structHandler->startElement(name, attrs);
 }
 
 void
@@ -88,28 +128,26 @@ SOAPParameterHandler::characterData(const XML_Char *str, int len)
 void
 SOAPParameterHandler::endElement(const XML_Char *name)
 {
-	switch (m_type)
+	if (m_setvalue)
 	{
-	case SOAPTypes::xsd_int:
-		m_param->SetInteger(m_str);
-		break;
-	case SOAPTypes::xsd_float:
-		m_param->SetFloat(m_str);
-		break;
-	case SOAPTypes::xsd_double:
-		m_param->SetDouble(m_str);
-		break;
-	case SOAPTypes::xsd_string:
-		m_param->SetValue(m_str);
-		break;
-	case SOAPTypes::xsd_null:
-		m_param->SetNull();
-		break;
-	case SOAPTypes::xsd_none:
-		// What to do here.. I guess assume we got a string back?
-		m_param->SetValue(m_str);
-		break;
-	default:
-		break;
+		switch (m_type)
+		{
+		case SOAPTypes::xsd_int:
+		case SOAPTypes::xsd_integer:
+			m_param->SetInteger(m_str);
+			break;
+		case SOAPTypes::xsd_float:
+			m_param->SetFloat(m_str);
+			break;
+		case SOAPTypes::xsd_double:
+			m_param->SetDouble(m_str);
+			break;
+		case SOAPTypes::xsd_string:
+		case SOAPTypes::xsd_none:// What to do here.. I guess assume we got a string back?
+			m_param->SetValue(m_str);
+			break;
+		default:
+			break;
+		}
 	}
 }

@@ -22,8 +22,6 @@
 #define AFX_SOAPMETHODHANDLER_H__986E8F0F_4214_4C89_A3E6_FA2BD4444667__INCLUDED_
 
 #include "SOAPParameterHandler.h"
-#include "SOAPArrayHandler.h"
-#include "SOAPStructHandler.h"
 
 class SOAPMethod;
 
@@ -41,14 +39,7 @@ public:
 private:
 
 	SOAPMethod				*m_method;
-
-	// for handling simple values
 	SOAPParameterHandler	m_paramHandler;
-
-	// for handling arrays/structs
-	SOAPArrayHandler		m_arrayHandler;
-	SOAPStructHandler		m_structHandler;
-
 };
 
 #endif // !defined(AFX_SOAPMETHODHANDLER_H__986E8F0F_4214_4C89_A3E6_FA2BD4444667__INCLUDED_)

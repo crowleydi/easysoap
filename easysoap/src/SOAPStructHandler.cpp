@@ -24,6 +24,7 @@
 
 #include "SOAPStructHandler.h"
 
+#include "SOAPParameterHandler.h"
 #include "SOAPParameter.h"
 
 //////////////////////////////////////////////////////////////////////
@@ -32,12 +33,12 @@
 
 SOAPStructHandler::SOAPStructHandler()
 {
-
+	m_paramHandler = new SOAPParameterHandler();
 }
 
 SOAPStructHandler::~SOAPStructHandler()
 {
-
+	delete m_paramHandler;
 }
 
 SOAPParseEventHandler *
@@ -50,8 +51,8 @@ SOAPStructHandler::start(const XML_Char *name, const XML_Char **attrs)
 SOAPParseEventHandler *
 SOAPStructHandler::startElement(const XML_Char *name, const XML_Char **attrs)
 {
-	m_paramHandler.SetParameter(m_param->AddParameter(name));
-	return m_paramHandler.start(name, attrs);
+	m_paramHandler->SetParameter(m_param->AddParameter(name));
+	return m_paramHandler->start(name, attrs);
 }
 
 void
