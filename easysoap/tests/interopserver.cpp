@@ -40,8 +40,9 @@ main(int argc, const char* argv[], const char *env[])
 	SOAPBuildersInteropHandler interopHandler;
 	SOAPBuildersHeaderHandler headerHandler;
 
-	SOAPPacketWriter::SetAddWhiteSpace();
+	XMLComposer::SetAddWhiteSpace();
 
-	return server.DispatchTo(&headerHandler).DispatchTo(&interopHandler).Handle();
+	server.DispatchTo(&headerHandler).DispatchTo(&interopHandler).Handle();
+	return 0;
 }
 

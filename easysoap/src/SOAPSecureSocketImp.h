@@ -26,7 +26,7 @@
 
 #include "SOAPClientSocketImp.h"
 
-struct SSL;
+struct ssl_st;
 
 BEGIN_EASYSOAP_NAMESPACE
 
@@ -38,7 +38,7 @@ private:
 	typedef SOAPClientSocketImp super;
 
 protected:
-	SSL					*m_ssl;
+	ssl_st				*m_ssl;
 	SOAPSSLContext		*m_context;
 	bool				m_delctx;
 	bool HandleError(const char *context, int retcode);

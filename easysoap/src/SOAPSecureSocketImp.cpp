@@ -36,6 +36,7 @@
 #include <easysoap/SOAPDebugger.h>
 
 #include "SOAPSecureSocketImp.h"
+#include "SOAPSSLContext.h"
 
 USING_EASYSOAP_NAMESPACE
 

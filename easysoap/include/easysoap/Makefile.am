@@ -16,7 +16,6 @@ easysoap_HEADERS = \
     SOAPHeader.h \
     SOAPMethod.h \
     SOAPNamespaces.h \
-    SOAPPacketWriter.h \
     SOAPParameter.h \
     SOAPParseEventHandler.h \
     SOAPParse.h \
@@ -36,6 +35,7 @@ easysoap_HEADERS = \
     SOAPUrl.h \
     SOAPUtil.h \
     SOAPonHTTP.h \
+    XMLComposer.h \
     XMLParser.h \
     es_comp.h \
     es_config.h \

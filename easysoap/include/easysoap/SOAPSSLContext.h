@@ -23,7 +23,8 @@
 
 #include <easysoap/SOAP.h>
 
-struct SSL_CTX;
+struct ssl_st;
+struct ssl_ctx_st;
 
 BEGIN_EASYSOAP_NAMESPACE
 
@@ -36,7 +37,7 @@ public:
 	//SOAPSSLContext(const SOAPSSLContext& ctx);
 	//SOAPSSLContext& operator=(const SOAPSSLContext& ctx);
 
-	SSL_CTX*	GetContext();
+	ssl_ctx_st*	GetContext();
 	void SetCertInfo(const char* certfile, const char* keyfile, const char* password);
 
 	// callbacks required by openSSL
@@ -48,7 +49,7 @@ public:
 	} CertType;
 
 private:
-	SSL_CTX*			m_ctx;
+	ssl_ctx_st*			m_ctx;
 	SOAPString 			m_certfile;
 	SOAPString 			m_keyfile;
 	SOAPString 			m_password;

@@ -58,7 +58,7 @@ static const char *default_interop_soapaction = "urn:soapinterop";
 static const char *round2_soapaction = "http://soapinterop.org/";
 
 
-SOAPPacketWriter testresults;
+XMLComposer testresults;
 bool cgimode = false;
 
 //
@@ -1640,7 +1640,7 @@ main(int argc, char* argv[])
 		TestType test = round1;
 
 		SOAPArray<Endpoint> endpoints;
-		SOAPPacketWriter::SetAddWhiteSpace(true);
+		XMLComposer::SetAddWhiteSpace(true);
 		SOAPHashMapNoCase<SOAPString, bool> skips;
 
 		const char *soapaction = default_interop_soapaction;

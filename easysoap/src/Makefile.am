@@ -18,7 +18,6 @@ THESOURCES = \
 	SOAPMethod.cpp \
 	SOAPMethodHandler.cpp \
 	SOAPNamespaces.cpp \
-	SOAPPacketWriter.cpp \
 	SOAPParameter.cpp \
 	SOAPParameterHandler.cpp \
 	SOAPParse.cpp \
@@ -32,6 +31,7 @@ THESOURCES = \
 	SOAPTypeTraits.cpp \
 	SOAPUrl.cpp \
 	SOAPonHTTP.cpp \
+	XMLComposer.cpp \
 	XMLParser.cpp 
 
 libeasysoap_la_SOURCES = $(THESOURCES)
