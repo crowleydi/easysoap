@@ -23,6 +23,9 @@
 #pragma warning (disable: 4786)
 #pragma warning (disable: 4251)
 
+#define STDC_HEADERS
+#define HAVE_FLOAT_H
+
 #define snprintf _snprintf
 #define vsnprintf _vsnprintf
 #define isnan _isnan
