@@ -38,6 +38,7 @@
 
 #include <SOAP.h>
 #include <SOAPDebugger.h>
+#include <SOAPSocket.h>
 
 #include "interopstruct.h"
 
@@ -45,6 +46,7 @@ const char *httpproxy = 0; // "http://localhost:8080";
 
 const char *default_interop_namespace = "http://soapinterop.org/";
 const char *default_interop_soapaction = "urn:soapinterop";
+SOAPPacketWriter testresults;
 
 //
 // The main library doesn't include iostream,
@@ -71,7 +73,7 @@ SetTraceFile(const char *server, const char *test)
 	SOAPDebugger::SetFile(buffer);
 }
 
-float
+double
 randdouble()
 {
 	double f1 = rand();
@@ -81,6 +83,18 @@ randdouble()
 		return 0.0;
 	return f1/f2*pow(10.0, f3);
 }
+
+class SOAPPassException : public SOAPException
+{
+public:
+	SOAPPassException(const char *fmt, ...)
+	{
+		va_list args;
+		va_start(args, fmt);
+		FormattedMessage(fmt, args);
+		va_end(args);
+	}
+};
 
 //
 // The struct used to hold endpoint information
@@ -106,9 +120,9 @@ operator>>(const SOAPParameter& param, Endpoint& e)
 	e.needsappend = (param.GetParameter("soapactionNeedsMethod").GetInt() != 0);
 	param.GetParameter("methodNamespace") >> e.nspace;
 
-	// Try and fix wrong values.
+	// Try to fix wrong values.
 	if (e.nspace == "http://soapinterop.org")
-		e.nspace = "http://soapinterop.org/";
+		e.nspace = default_interop_namespace;
 
 	return param;
 }
@@ -116,9 +130,6 @@ operator>>(const SOAPParameter& param, Endpoint& e)
 void
 GetAllEndpoints(SOAPArray<Endpoint>& ea)
 {
-	//
-	// TODO: Change this to just add values to the
-	// array instead of replacing the array values.
 	SOAPProxy proxy("http://www.xmethods.net/perl/soaplite.cgi", httpproxy);
 	SOAPMethod getAllEndpoints("getAllEndpoints",
 		"http://soapinterop.org/ilab",
@@ -135,636 +146,509 @@ GetAllEndpoints(SOAPArray<Endpoint>& ea)
 	}
 }
 
-bool
-almostequal(float a, float b)
+void
+TestBogusMethod(SOAPProxy& proxy, const Endpoint& e)
 {
-	return (fabs(a - b) <= fabs(a) * 0.0000005);
+	SOAPMethod method("BogusMethod", e.nspace, e.soapaction, e.needsappend);
+	proxy.Execute(method);
 }
 
-bool
-almostequal(const SOAPArray<float>& a, const SOAPArray<float>& b)
+void
+TestBogusNamespace(SOAPProxy& proxy, const Endpoint& e)
 {
-	if (a.Size() != b.Size())
-		return false;
-	bool retval = true;
-	for (size_t i = 0; i < a.Size(); ++i)
+	SOAPMethod method("echoVoid", "http://bogusns.com/", e.soapaction, e.needsappend);
+	proxy.Execute(method);
+}
+
+void
+TestEchoVoid(SOAPProxy& proxy, const Endpoint& e)
+{
+	SOAPMethod method("echoVoid", e.nspace, e.soapaction, e.needsappend);
+
+	const SOAPResponse& response = proxy.Execute(method);
+	if (response.GetBody().GetMethod().GetNumParameters() != 0)
+		throw SOAPException("Received unexpected return values.");
+}
+
+void
+TestEchoString(SOAPProxy& proxy, const Endpoint& e, const char *value)
+{
+	SOAPString inputValue = value;
+
+	SOAPMethod method("echoString", e.nspace, e.soapaction, e.needsappend);
+	method.AddParameter("inputString") << inputValue;
+
+	const SOAPResponse& response = proxy.Execute(method);
+	SOAPString outputValue;
+	response.GetReturnValue() >> outputValue;
+	if (inputValue != outputValue)
+		throw SOAPException("Values are not equal");
+}
+
+void
+TestEchoInteger(SOAPProxy& proxy, const Endpoint& e, int value)
+{
+	int inputValue = value;
+
+	SOAPMethod method("echoInteger", e.nspace, e.soapaction, e.needsappend);
+	method.AddParameter("inputInteger") << inputValue;
+
+	const SOAPResponse& response = proxy.Execute(method);
+	int outputValue = 0;
+	response.GetReturnValue() >> outputValue;
+	if (inputValue != outputValue)
+		throw SOAPException("Values are not equal");
+}
+
+void
+TestEchoInteger(SOAPProxy& proxy, const Endpoint& e, const char *value)
+{
+	SOAPMethod method("echoInteger", e.nspace, e.soapaction, e.needsappend);
+	method.AddParameter("inputInteger").SetInt(value);
+
+	const SOAPResponse& response = proxy.Execute(method);
+}
+
+void
+TestEchoFloat(SOAPProxy& proxy, const Endpoint& e, float value)
+{
+	float inputValue = value;
+
+	SOAPMethod method("echoFloat", e.nspace, e.soapaction, e.needsappend);
+	SOAPParameter& inputParam = method.AddParameter("inputFloat");
+	inputParam << inputValue;
+
+	const SOAPResponse& response = proxy.Execute(method);
+	const SOAPParameter& outputParam = response.GetReturnValue();
+	float outputValue = 0;
+	outputParam >> outputValue;
+
+	if (inputValue != outputValue)
+		throw SOAPException("Values are not equal: %s != %s",
+			(const char *)inputParam.GetString(),
+			(const char *)outputParam.GetString());
+}
+
+void
+TestEchoFloatStringValue(SOAPProxy& proxy, const Endpoint& e, const char *value)
+{
+	SOAPMethod method("echoFloat", e.nspace, e.soapaction, e.needsappend);
+	SOAPParameter& inputParam = method.AddParameter("inputFloat");
+	inputParam.SetFloat(value);
+
+	const SOAPResponse& response = proxy.Execute(method);
+	if (response.GetReturnValue().GetString() != value)
+		throw SOAPException("Wrong return value: %s",
+			(const char *)response.GetReturnValue().GetString());
+}
+
+void
+TestEchoFloatForFail(SOAPProxy& proxy, const Endpoint& e, const char *value)
+{
+	SOAPMethod method("echoFloat", e.nspace, e.soapaction, e.needsappend);
+	SOAPParameter& inputParam = method.AddParameter("inputFloat");
+	inputParam.SetFloat(value);
+
+	const SOAPResponse& response = proxy.Execute(method);
+	throw SOAPPassException("Returned value: %s",
+		(const char *)response.GetReturnValue().GetString());
+}
+
+void
+TestEchoStruct(SOAPProxy& proxy, const Endpoint& e)
+{
+	SOAPInteropStruct inputValue("This is a struct string.", 68, (float)25.24345356);
+
+	SOAPMethod method("echoStruct", e.nspace, e.soapaction, e.needsappend);
+	method.AddParameter("inputStruct") << inputValue;
+
+	const SOAPResponse& response = proxy.Execute(method);
+	SOAPInteropStruct outputValue;
+	response.GetReturnValue() >> outputValue;
+	if (inputValue != outputValue)
+		throw SOAPException("Values are not equal");
+}
+
+
+void
+TestEchoIntegerArray(SOAPProxy& proxy, const Endpoint& e, int numvals)
+{
+	SOAPArray<int> inputValue;
+	SOAPArray<int> outputValue;
+
+	for (int i = 0; i < numvals; ++i)
+		inputValue.Add(rand());
+
+	SOAPMethod method("echoIntegerArray", e.nspace, e.soapaction, e.needsappend);
+	// Here I call SetArrayType() to make sure that for zero-length
+	// arrays the array type is correct.  We have to set it manually
+	// for zero length arrays because we can't determine the type from
+	// elements in the array!
+	SOAPParameter& param = method.AddParameter("inputIntegerArray");
+	param << inputValue;
+	param.SetArrayType("int");
+
+	const SOAPResponse& response = proxy.Execute(method);
+	response.GetReturnValue() >> outputValue;
+	if (inputValue != outputValue)
+		throw SOAPException("Values are not equal");
+}
+
+
+void
+TestEchoFloatArray(SOAPProxy& proxy, const Endpoint& e, int numvals)
+{
+	SOAPArray<float> inputValue;
+	for (int i = 0; i < numvals; ++i)
+		inputValue.Add(randdouble());
+
+	SOAPMethod method("echoFloatArray", e.nspace, e.soapaction, e.needsappend);
+	// Here I call SetArrayType() to make sure that for zero-length
+	// arrays the array type is correct.  We have to set it manually
+	// for zero length arrays because we can't determine the type from
+	// elements in the array!
+	SOAPParameter& param = method.AddParameter("inputFloatArray");
+	param << inputValue;
+	param.SetArrayType("float");
+
+	const SOAPResponse& response = proxy.Execute(method);
+
+	SOAPArray<float> outputValue;
+	response.GetReturnValue() >> outputValue;
+
+	if (inputValue != outputValue)
+		throw SOAPException("Values are not equal");
+}
+
+
+void
+TestEchoStringArray(SOAPProxy& proxy, const Endpoint& e, int numvals)
+{
+	SOAPArray<SOAPString> inputValue;
+	for (int i = 0; i < numvals; ++i)
 	{
-		if (a[i] != b[i])
-		{
-			if (!almostequal(a[i], b[i]))
-			{
-				retval = false;
-			}
-		}
+		char buffer[256];
+		sprintf(buffer, "This is test string #%d, rn=%d", i, rand());
+		inputValue.Add(buffer);
 	}
-	return retval;
+
+	SOAPMethod method("echoStringArray", e.nspace, e.soapaction, e.needsappend);
+	// Here I call SetArrayType() to make sure that for zero-length
+	// arrays the array type is correct.  We have to set it manually
+	// for zero length arrays because we can't determine the type from
+	// elements in the array!
+	SOAPParameter& param = method.AddParameter("inputStringArray");
+	param << inputValue;
+	param.SetArrayType("string");
+
+	const SOAPResponse& response = proxy.Execute(method);
+	SOAPArray<SOAPString> outputValue;
+	response.GetReturnValue() >> outputValue;
+	if (inputValue != outputValue)
+		throw SOAPException("Values are not equal");
 }
 
-bool
-TestBogusMethod(SOAPProxy& proxy,
-			const char *uri,
-			const char *soapAction,
-			bool appendMethod)
+
+void
+TestEchoStructArray(SOAPProxy& proxy, const Endpoint& e, int numvals)
 {
+	SOAPArray<SOAPInteropStruct> inputValue;
+	for (int i = 0; i < numvals; ++i)
+	{
+		SOAPInteropStruct& val = inputValue.Add();
+		char buffer[256];
+		sprintf(buffer, "This is struct string #%d, rn=%d", i, rand());
+		val.varString = buffer;
+		val.varFloat = randdouble();
+		val.varInt = rand();
+	}
+
+	SOAPMethod method("echoStructArray", e.nspace, e.soapaction, e.needsappend);
+	// Here I call SetArrayType() to make sure that for zero-length
+	// arrays the array type is correct.  We have to set it manually
+	// for zero length arrays because we can't determine the type from
+	// elements in the array!
+	SOAPParameter& param = method.AddParameter("inputStructArray");
+	param << inputValue;
+	param.SetArrayType(SOAPInteropStruct::soap_name, SOAPInteropStruct::soap_namespace);
+
+	const SOAPResponse& response = proxy.Execute(method);
+	SOAPArray<SOAPInteropStruct> outputValue;
+	response.GetReturnValue() >> outputValue;
+	if (inputValue != outputValue)
+		throw SOAPException("Values are not equal");
+}
+
+void
+TestEchoInteger(SOAPProxy& proxy, const Endpoint& e)
+{
+	TestEchoInteger(proxy, e, rand());
+}
+
+void
+TestEchoIntegerMostPositive(SOAPProxy& proxy, const Endpoint& e)
+{
+	TestEchoInteger(proxy, e, 2147483647);
+}
+
+void
+TestEchoIntegerMostNegative(SOAPProxy& proxy, const Endpoint& e)
+{
+	TestEchoInteger(proxy, e, -2147483648);
+}
+
+void
+TestEchoIntegerOverflow(SOAPProxy& proxy, const Endpoint& e)
+{
+	TestEchoInteger(proxy, e, "2147483648");
+}
+
+void
+TestEchoIntegerUnderflow(SOAPProxy& proxy, const Endpoint& e)
+{
+	TestEchoInteger(proxy, e, "-2147483649");
+}
+
+void
+TestEchoFloat(SOAPProxy& proxy, const Endpoint& e)
+{
+	TestEchoFloat(proxy, e, 31391236.0);
+}
+
+void
+TestEchoFloat_NaN(SOAPProxy& proxy, const Endpoint& e)
+{
+	TestEchoFloatStringValue(proxy, e, "NaN");
+}
+
+void
+TestEchoFloat_INF(SOAPProxy& proxy, const Endpoint& e)
+{
+	TestEchoFloatStringValue(proxy, e, "INF");
+}
+
+void
+TestEchoFloat_negINF(SOAPProxy& proxy, const Endpoint& e)
+{
+	TestEchoFloatStringValue(proxy, e, "-INF");
+}
+
+void
+TestEchoFloat_Overflow(SOAPProxy& proxy, const Endpoint& e)
+{
+	TestEchoFloatForFail(proxy, e, "1.6e555");
+}
+
+void
+TestEchoFloat_Underflow(SOAPProxy& proxy, const Endpoint& e)
+{
+	TestEchoFloatForFail(proxy, e, "1.6e-555");
+}
+
+void
+TestEchoString(SOAPProxy& proxy, const Endpoint& e)
+{
+	TestEchoString(proxy, e, "This is a test string from EasySoap++");
+}
+
+void
+TestEchoIntegerArray(SOAPProxy& proxy, const Endpoint& e)
+{
+	TestEchoIntegerArray(proxy, e, rand() % 10 + 5);
+}
+
+void
+TestEchoFloatArray(SOAPProxy& proxy, const Endpoint& e)
+{
+	TestEchoFloatArray(proxy, e, rand() % 10 + 5);
+}
+
+void
+TestEchoStringArray(SOAPProxy& proxy, const Endpoint& e)
+{
+	TestEchoStringArray(proxy, e, rand() % 10 + 5);
+}
+
+void
+TestEchoStructArray(SOAPProxy& proxy, const Endpoint& e)
+{
+	TestEchoStructArray(proxy, e, rand() % 10 + 5);
+}
+
+void
+TestEchoIntegerArrayZeroLen(SOAPProxy& proxy, const Endpoint& e)
+{
+	TestEchoIntegerArray(proxy, e, 0);
+}
+
+void
+TestEchoFloatArrayZeroLen(SOAPProxy& proxy, const Endpoint& e)
+{
+	TestEchoFloatArray(proxy, e, 0);
+}
+
+void
+TestEchoStringArrayZeroLen(SOAPProxy& proxy, const Endpoint& e)
+{
+	TestEchoStringArray(proxy, e, 0);
+}
+
+void
+TestEchoStructArrayZeroLen(SOAPProxy& proxy, const Endpoint& e)
+{
+	TestEchoStructArray(proxy, e, 0);
+}
+
+typedef void (*TestFunction)(SOAPProxy&, const Endpoint&);
+
+void
+TestForPass(SOAPProxy& proxy, const Endpoint& e, const char *testname, TestFunction func)
+{
+	const char *type = 0;
+	SOAPString msg;
+
 	try
 	{
-		SOAPMethod method("BogusMethod", uri, soapAction, appendMethod);
-		std::cout << "Testing " << method.GetName() << ": ";
-		proxy.Execute(method);
-		std::cout << "FAIL" << std::endl;
-		return true;
+		SetTraceFile(e.name , testname);
+		std::cout << "Testing " << testname << ": ";
+		func(proxy, e);
+		type = "PASS";
+		msg = "PASS";
+	}
+	catch (SOAPSocketException& sex)
+	{
+		type = "NETWORK ERROR";
+		msg = sex.What();
 	}
 	catch (SOAPException& sex)
 	{
-		std::cout << "PASS: " << sex.What() << std::endl;
+		type = "FAILED";
+		msg = sex.What();
 	}
 	catch (...)
 	{
-		std::cout << "FAILED (badly)" << std::endl;
+		type = "UNKNOWN";
+		msg = "Unknown error, problem with EasySoap";
 	}
-	return false;
+
+	std::cout << type;
+	if (msg)
+		std::cout << ": " << msg;
+	std::cout << std::endl;
+
+	testresults.StartTag("Test");
+	testresults.AddAttr("name", testname);
+
+	testresults.StartTag("Result");
+	testresults.WriteValue(type);
+	testresults.EndTag("Result");
+
+	testresults.StartTag("Message");
+	testresults.WriteValue(msg);
+	testresults.EndTag("Message");
+
+	testresults.EndTag("Test");
 }
 
-bool
-TestEchoVoid(SOAPProxy& proxy,
-			const char *uri,
-			const char *soapAction,
-			bool appendMethod)
+void
+TestForFail(SOAPProxy& proxy, const Endpoint& e, const char *testname, TestFunction func)
 {
+	const char *type;
+	SOAPString msg;
 	try
 	{
-		SOAPMethod method("echoVoid", uri, soapAction, appendMethod);
-		std::cout << "Testing " << method.GetName() << ": ";
-
-		const SOAPResponse& response = proxy.Execute(method);
-		if (response.GetBody().GetMethod().GetNumParameters() != 0)
-			throw SOAPException("Received unexpected return values.");
-
-		std::cout << "PASS" << std::endl;
-		return false;
+		SetTraceFile(e.name , testname);
+		std::cout << "Testing " << testname << ": ";
+		func(proxy, e);
+		type = "FAIL";
+		msg = "FAIL";
+	}
+	catch (SOAPSocketException& sex)
+	{
+		type = "NETWORK ERROR";
+		msg = sex.What();
+	}
+	catch (SOAPPassException& sex)
+	{
+		type = "FAIL";
+		msg = sex.What();
 	}
 	catch (SOAPException& sex)
 	{
-		std::cout << "FAILED: " << sex.What() << std::endl;
+		type = "PASS";
+		msg = sex.What();
 	}
 	catch (...)
 	{
-		std::cout << "FAILED (badly)" << std::endl;
+		type = "UNKNOWN";
+		msg = "Unknown error, problem with EasySoap";
 	}
-	return true;
+
+	std::cout << type;
+	if (msg)
+		std::cout << ": " << msg;
+	std::cout << std::endl;
+
+	testresults.StartTag("Test");
+	testresults.AddAttr("name", testname);
+
+	testresults.StartTag("Result");
+	testresults.WriteValue(type);
+	testresults.EndTag("Result");
+
+	testresults.StartTag("Message");
+	testresults.WriteValue(msg);
+	testresults.EndTag("Message");
+
+	testresults.EndTag("Test");
 }
 
-bool
-TestEchoString(SOAPProxy& proxy,
-			const char *uri,
-			const char *soapAction,
-			bool appendMethod, const char *value)
+void
+TestInterop(const Endpoint& e)
 {
-	try
-	{
-		SOAPString inputValue = value;
-
-		SOAPMethod method("echoString", uri, soapAction, appendMethod);
-		method.AddParameter("inputString") << inputValue;
-
-		std::cout << "Testing " << method.GetName() << ": ";
-
-		const SOAPResponse& response = proxy.Execute(method);
-		SOAPString outputValue;
-		response.GetReturnValue() >> outputValue;
-		if (inputValue != outputValue)
-			throw SOAPException("Values are not equal");
-
-		std::cout << "PASS" << std::endl;
-		return false;
-	}
-	catch (SOAPException& sex)
-	{
-		std::cout << "FAILED: " << sex.What() << std::endl;
-	}
-	catch (...)
-	{
-		std::cout << "FAILED (badly)" << std::endl;
-	}
-	return true;
-}
-
-bool
-TestEchoInteger(SOAPProxy& proxy,
-			const char *uri,
-			const char *soapAction,
-			bool appendMethod, int value)
-{
-	try
-	{
-		int inputValue = value;
-
-		SOAPMethod method("echoInteger", uri, soapAction, appendMethod);
-		method.AddParameter("inputInteger") << inputValue;
-
-		std::cout << "Testing " << method.GetName() << ": ";
-
-		const SOAPResponse& response = proxy.Execute(method);
-		int outputValue = 0;
-		response.GetReturnValue() >> outputValue;
-		if (inputValue != outputValue)
-			throw SOAPException("Values are not equal");
-
-		std::cout << "PASS" << std::endl;
-		return false;
-	}
-	catch (SOAPException& sex)
-	{
-		std::cout << "FAILED: " << sex.What() << std::endl;
-	}
-	catch (...)
-	{
-		std::cout << "FAILED (badly)" << std::endl;
-	}
-	return true;
-}
-
-bool
-TestEchoInteger(SOAPProxy& proxy,
-			const char *uri,
-			const char *soapAction,
-			bool appendMethod, const char *value)
-{
-	try
-	{
-		SOAPMethod method("echoInteger", uri, soapAction, appendMethod);
-		SOAPParameter& inputParam = method.AddParameter("inputInteger");
-		inputParam.SetFloat(value);
-
-		std::cout << "Testing " << method.GetName() << ": ";
-
-		const SOAPResponse& response = proxy.Execute(method);
-		const SOAPParameter& outputParam = response.GetReturnValue();
-
-		std::cout << "PASS: input=" << inputParam.GetString()
-			<<" output=" << outputParam.GetString() << std::endl;
-
-		return false;
-	}
-	catch (SOAPException& sex)
-	{
-		std::cout << "FAILED: " << sex.What() << std::endl;
-	}
-	catch (...)
-	{
-		std::cout << "FAILED (badly)" << std::endl;
-	}
-	return true;
-}
-
-bool
-TestEchoIntegerInvalid(SOAPProxy& proxy,
-			const char *uri,
-			const char *soapAction,
-			bool appendMethod, const char *value)
-{
-	try
-	{
-		SOAPString outputValue;
-
-		SOAPMethod method("echoInteger", uri, soapAction, appendMethod);
-		method.AddParameter("inputInteger").SetInt(value);
-
-		std::cout << "Testing " << method.GetName() << ": ";
-
-		const SOAPResponse& response = proxy.Execute(method);
-		response.GetReturnValue() >> outputValue;
-
-		std::cout << "FAILED: " << outputValue << std::endl;
-		return false;
-	}
-	catch (SOAPException& sex)
-	{
-		std::cout << "PASS: " << sex.What() << std::endl;
-	}
-	catch (...)
-	{
-		std::cout << "FAILED (badly)" << std::endl;
-	}
-	return true;
-}
-
-bool
-TestEchoFloat(SOAPProxy& proxy,
-			const char *uri,
-			const char *soapAction,
-			bool appendMethod, float value)
-{
-	try
-	{
-		float inputValue = value;
-
-		SOAPMethod method("echoFloat", uri, soapAction, appendMethod);
-		SOAPParameter& inputParam = method.AddParameter("inputFloat");
-		inputParam << inputValue;
-
-		std::cout << "Testing " << method.GetName() << ": ";
-
-		const SOAPResponse& response = proxy.Execute(method);
-		const SOAPParameter& outputParam = response.GetReturnValue();
-		float outputValue = 0;
-		outputParam >> outputValue;
-
-		const char *exact = 0;
-		if (inputValue == outputValue)
-			exact = "exact";
-		else if (almostequal(inputValue, outputValue))
-			exact = "inexact";
-		else
-			throw SOAPException("Values are not equal: %s != %s",
-				(const char *)inputParam.GetString(),
-				(const char *)outputParam.GetString());
-
-		std::cout << "PASS " << exact << ": (in=" << inputParam.GetString()
-			<< ", out=" << outputParam.GetString() << ")" << std::endl;
-		return false;
-	}
-	catch (SOAPException& sex)
-	{
-		std::cout << "FAILED: " << sex.What() << std::endl;
-	}
-	catch (...)
-	{
-		std::cout << "FAILED (badly)" << std::endl;
-	}
-	return true;
-}
-
-bool
-TestEchoFloat(SOAPProxy& proxy,
-			const char *uri,
-			const char *soapAction,
-			bool appendMethod, const char *value)
-{
-	try
-	{
-		SOAPMethod method("echoFloat", uri, soapAction, appendMethod);
-		SOAPParameter& inputParam = method.AddParameter("inputFloat");
-		inputParam.SetFloat(value);
-
-		std::cout << "Testing " << method.GetName() << ": ";
-
-		const SOAPResponse& response = proxy.Execute(method);
-		const SOAPParameter& outputParam = response.GetReturnValue();
-
-		std::cout << "PASS: input=" << inputParam.GetString()
-			<< " output=" << outputParam.GetString() << std::endl;
-		return false;
-	}
-	catch (SOAPException& sex)
-	{
-		std::cout << "FAILED: " << sex.What() << std::endl;
-	}
-	catch (...)
-	{
-		std::cout << "FAILED (badly)" << std::endl;
-	}
-	return true;
-}
-
-bool
-TestEchoFloatInvalid(SOAPProxy& proxy,
-			const char *uri,
-			const char *soapAction,
-			bool appendMethod, const char *value)
-{
-	try
-	{
-		SOAPString outputValue;
-
-		SOAPMethod method("echoFloat", uri, soapAction, appendMethod);
-		method.AddParameter("inputFloat").SetFloat(value);
-
-		std::cout << "Testing " << method.GetName() << ": ";
-
-		const SOAPResponse& response = proxy.Execute(method);
-		response.GetReturnValue() >> outputValue;
-
-		std::cout << "FAILED: " << outputValue << std::endl;
-		return false;
-	}
-	catch (SOAPException& sex)
-	{
-		std::cout << "PASS: " << sex.What() << std::endl;
-	}
-	catch (...)
-	{
-		std::cout << "FAILED (badly)" << std::endl;
-	}
-	return true;
-}
-
-bool
-TestEchoStruct(SOAPProxy& proxy,
-			const char *uri,
-			const char *soapAction,
-			bool appendMethod)
-{
-	try
-	{
-		SOAPInteropStruct inputValue("This is a struct string.", 68, (float)25.2456);
-
-		SOAPMethod method("echoStruct", uri, soapAction, appendMethod);
-		method.AddParameter("inputStruct") << inputValue;
-
-		std::cout << "Testing " << method.GetName() << ": ";
-
-		const SOAPResponse& response = proxy.Execute(method);
-		SOAPInteropStruct outputValue;
-		response.GetReturnValue() >> outputValue;
-		if (inputValue != outputValue)
-			throw SOAPException("Values are not equal");
-
-		std::cout << "PASS" << std::endl;
-		return false;
-	}
-	catch (SOAPException& sex)
-	{
-		std::cout << "FAILED: " << sex.What() << std::endl;
-	}
-	catch (...)
-	{
-		std::cout << "FAILED (badly)" << std::endl;
-	}
-	return true;
-}
-
-
-bool
-TestEchoIntegerArray(SOAPProxy& proxy,
-			const char *uri,
-			const char *soapAction,
-			bool appendMethod, int numvals)
-{
-	try
-	{
-		SOAPArray<int> inputValue;
-		SOAPArray<int> outputValue;
-
-		for (int i = 0; i < numvals; ++i)
-			inputValue.Add(rand());
-
-		SOAPMethod method("echoIntegerArray", uri, soapAction, appendMethod);
-		// Here I call SetArrayType() to make sure that for zero-length
-		// arrays the array type is correct.  We have to set it manually
-		// for zero length arrays because we can't determine the type from
-		// elements in the array!
-		SOAPParameter& param = method.AddParameter("inputIntegerArray");
-		param << inputValue;
-		param.SetArrayType("int");
-
-		std::cout << "Testing " << method.GetName() << ": ";
-
-		const SOAPResponse& response = proxy.Execute(method);
-		response.GetReturnValue() >> outputValue;
-		if (inputValue != outputValue)
-			throw SOAPException("Values are not equal");
-
-		std::cout << "PASS" << std::endl;
-		return false;
-	}
-	catch (SOAPException& sex)
-	{
-		std::cout << "FAILED: " << sex.What() << std::endl;
-	}
-	catch (...)
-	{
-		std::cout << "FAILED (badly)" << std::endl;
-	}
-	return true;
-}
-
-
-bool
-TestEchoFloatArray(SOAPProxy& proxy,
-			const char *uri,
-			const char *soapAction,
-			bool appendMethod, int numvals)
-{
-	try
-	{
-		SOAPArray<float> inputValue;
-		for (int i = 0; i < numvals; ++i)
-			inputValue.Add(randdouble());
-
-		SOAPMethod method("echoFloatArray", uri, soapAction, appendMethod);
-		// Here I call SetArrayType() to make sure that for zero-length
-		// arrays the array type is correct.  We have to set it manually
-		// for zero length arrays because we can't determine the type from
-		// elements in the array!
-		SOAPParameter& param = method.AddParameter("inputFloatArray");
-		param << inputValue;
-		param.SetArrayType("float");
-
-		std::cout << "Testing " << method.GetName() << ": ";
-
-		const SOAPResponse& response = proxy.Execute(method);
-
-		SOAPArray<float> outputValue;
-		response.GetReturnValue() >> outputValue;
-
-		if (inputValue == outputValue)
-			std::cout << "PASS exact" << std::endl;
-		else if (almostequal(inputValue, outputValue))
-			std::cout << "PASS inexact" << std::endl;
-		else
-			throw SOAPException("Values are not equal");
-		return false;
-	}
-	catch (SOAPException& sex)
-	{
-		std::cout << "FAILED: " << sex.What() << std::endl;
-	}
-	catch (...)
-	{
-		std::cout << "FAILED (badly)" << std::endl;
-	}
-	return true;
-}
-
-
-bool
-TestEchoStringArray(SOAPProxy& proxy,
-			const char *uri,
-			const char *soapAction,
-			bool appendMethod, int numvals)
-{
-	try
-	{
-		SOAPArray<SOAPString> inputValue;
-		for (int i = 0; i < numvals; ++i)
-		{
-			char buffer[256];
-			sprintf(buffer, "This is test string #%d, rn=%d", i, rand());
-			inputValue.Add(buffer);
-		}
-
-		SOAPMethod method("echoStringArray", uri, soapAction, appendMethod);
-		// Here I call SetArrayType() to make sure that for zero-length
-		// arrays the array type is correct.  We have to set it manually
-		// for zero length arrays because we can't determine the type from
-		// elements in the array!
-		SOAPParameter& param = method.AddParameter("inputStringArray");
-		param << inputValue;
-		param.SetArrayType("string");
-
-		std::cout << "Testing " << method.GetName() << ": ";
-
-		const SOAPResponse& response = proxy.Execute(method);
-		SOAPArray<SOAPString> outputValue;
-		response.GetReturnValue() >> outputValue;
-		if (inputValue != outputValue)
-			throw SOAPException("Values are not equal");
-
-		std::cout << "PASS" << std::endl;
-		return false;
-	}
-	catch (SOAPException& sex)
-	{
-		std::cout << "FAILED: " << sex.What() << std::endl;
-	}
-	catch (...)
-	{
-		std::cout << "FAILED (badly)" << std::endl;
-	}
-	return true;
-}
-
-
-bool
-TestEchoStructArray(SOAPProxy& proxy,
-			const char *uri,
-			const char *soapAction,
-			bool appendMethod, int numvals)
-{
-	try
-	{
-		SOAPArray<SOAPInteropStruct> inputValue;
-		for (int i = 0; i < numvals; ++i)
-		{
-			SOAPInteropStruct& val = inputValue.Add();
-			char buffer[256];
-			sprintf(buffer, "This is struct string #%d, rn=%d", i, rand());
-			val.varString = buffer;
-			val.varFloat = randdouble();
-			val.varInt = rand();
-		}
-
-		SOAPMethod method("echoStructArray", uri, soapAction, appendMethod);
-		// Here I call SetArrayType() to make sure that for zero-length
-		// arrays the array type is correct.  We have to set it manually
-		// for zero length arrays because we can't determine the type from
-		// elements in the array!
-		SOAPParameter& param = method.AddParameter("inputStructArray");
-		param << inputValue;
-		param.SetArrayType(SOAPInteropStruct::soap_name, SOAPInteropStruct::soap_namespace);
-
-		std::cout << "Testing " << method.GetName() << ": ";
-
-		const SOAPResponse& response = proxy.Execute(method);
-		SOAPArray<SOAPInteropStruct> outputValue;
-		response.GetReturnValue() >> outputValue;
-		if (inputValue != outputValue)
-			throw SOAPException("Values are not equal");
-
-		std::cout << "PASS" << std::endl;
-		return false;
-	}
-	catch (SOAPException& sex)
-	{
-		std::cout << "FAILED: " << sex.What() << std::endl;
-	}
-	catch (...)
-	{
-		std::cout << "FAILED (badly)" << std::endl;
-	}
-	return true;
-}
-
-
-void TestInterop(const Endpoint& e)
-{
-	const char *name = e.name;
-	const char *endpoint = e.endpoint;
-	const char *soapAction = e.soapaction;
-	bool appendMethod = e.needsappend;
-	const char *uri = e.nspace;
-
-	SOAPProxy proxy(endpoint, httpproxy);
-
-	SetTraceFile(name, "BogusMethod");
-	TestBogusMethod(proxy, uri, soapAction, appendMethod);
-	SetTraceFile(name, "echoVoid");
-	TestEchoVoid(proxy, uri, soapAction, appendMethod);
-
-	SetTraceFile(name, "echoInteger");
-	TestEchoInteger(proxy, uri, soapAction, appendMethod, rand());
-	SetTraceFile(name, "echoFloat");
-	TestEchoFloat(proxy, uri, soapAction, appendMethod, randdouble());
-	SetTraceFile(name, "echoString");
-	TestEchoString(proxy, uri, soapAction, appendMethod, "This is a test string from EasySOAP++");
-	SetTraceFile(name, "echoStruct");
-	TestEchoStruct(proxy, uri, soapAction, appendMethod);
-
-	SetTraceFile(name, "echoIntegerArray");
-	TestEchoIntegerArray(proxy, uri, soapAction, appendMethod, 5);
-	SetTraceFile(name, "echoFloatArray");
-	TestEchoFloatArray(proxy, uri, soapAction, appendMethod, 5);
-	SetTraceFile(name, "echoStringArray");
-	TestEchoStringArray(proxy, uri, soapAction, appendMethod, 5);
-	SetTraceFile(name, "echoStructArray");
-	TestEchoStructArray(proxy, uri, soapAction, appendMethod, 5);
-
-	// Echo zero length arrays
-	SetTraceFile(name, "echoIntegerArray_ZeroLen");
-	TestEchoIntegerArray(proxy, uri, soapAction, appendMethod, 0);
-	SetTraceFile(name, "echoFloatArray_ZeroLen");
-	TestEchoFloatArray(proxy, uri, soapAction, appendMethod, 0);
-	SetTraceFile(name, "echoStringArray_ZeroLen");
-	TestEchoStringArray(proxy, uri, soapAction, appendMethod, 0);
-	SetTraceFile(name, "echoStructArray_ZeroLen");
-	TestEchoStructArray(proxy, uri, soapAction, appendMethod, 0);
-
-	// Lets try echoing integers that are too big
-	SetTraceFile(name, "echoInteger_Overflow");
-	TestEchoIntegerInvalid(proxy, uri, soapAction, appendMethod, "2147483648");
-	SetTraceFile(name, "echoInteger_Underflow");
-	TestEchoIntegerInvalid(proxy, uri, soapAction, appendMethod, "-2147483649");
-	SetTraceFile(name, "echoInteger_BiggestInt");
-	TestEchoInteger(proxy, uri, soapAction, appendMethod, 2147483647);
-	SetTraceFile(name, "echoInteger_SmallestInt");
-	TestEchoInteger(proxy, uri, soapAction, appendMethod, -2147483648);
-
-	// Echo some of the uncommon float/double values
-	SetTraceFile(name, "echoFloat_NaN");
-	TestEchoFloat(proxy, uri, soapAction, appendMethod, "NaN");
-	SetTraceFile(name, "echoFloat_INF");
-	TestEchoFloat(proxy, uri, soapAction, appendMethod, HUGE_VAL);
-	SetTraceFile(name, "echoFloat_nINF");
-	TestEchoFloat(proxy, uri, soapAction, appendMethod, -HUGE_VAL);
-	SetTraceFile(name, "echoFloat_n0");
-	TestEchoFloat(proxy, uri, soapAction, appendMethod, "-0.0");
-	SetTraceFile(name, "echoFloat_Overflow");
-	TestEchoFloatInvalid(proxy, uri, soapAction, appendMethod, "1.65e555");
-	SetTraceFile(name, "echoFloat_Underflow");
-	TestEchoFloatInvalid(proxy, uri, soapAction, appendMethod, "1.65e-555");
-
-#if 0
-	// Lets try echoing null values
-	SetTraceFile(name, "echoString_Null");
-	TestEchoString(proxy, uri, soapAction, appendMethod, 0);
-	SetTraceFile(name, "echoInteger_Null");
-	TestEchoInteger(proxy, uri, soapAction, appendMethod, (const char *)0);
-	SetTraceFile(name, "echoFloat_Null");
-	TestEchoFloat(proxy, uri, soapAction, appendMethod, (const char *)0);
-#endif
-
-	SOAPDebugger::Close();
+	SOAPProxy proxy((const char *)e.endpoint, httpproxy);
+
+	testresults.StartTag("Server");
+	testresults.AddAttr("name", e.name);
+
+	testresults.StartTag("Endpoint");
+	testresults.WriteValue(e.endpoint);
+	testresults.EndTag("Endpoint");
+
+	testresults.StartTag("SoapAction");
+	testresults.WriteValue(e.soapaction);
+	testresults.EndTag("SoapAction");
+
+	testresults.StartTag("NameSpace");
+	testresults.WriteValue(e.nspace);
+	testresults.EndTag("NameSpace");
+
+	TestForFail(proxy, e, "BogusMethod",				TestBogusMethod);
+	TestForFail(proxy, e, "BogusNamespace",				TestBogusNamespace);
+	TestForPass(proxy, e, "echoVoid",					TestEchoVoid);
+	TestForPass(proxy, e, "echoInteger",				TestEchoInteger);
+	TestForPass(proxy, e, "echoInteger_MostPositive",	TestEchoIntegerMostPositive);
+	TestForPass(proxy, e, "echoInteger_MostNegative",	TestEchoIntegerMostNegative);
+	TestForFail(proxy, e, "echoInteger_Overflow",		TestEchoIntegerOverflow);
+	TestForFail(proxy, e, "echoInteger_Underflow",		TestEchoIntegerUnderflow);
+	TestForPass(proxy, e, "echoFloat",					TestEchoFloat);
+	TestForPass(proxy, e, "echoFloat_NaN",				TestEchoFloat_NaN);
+	TestForPass(proxy, e, "echoFloat_INF",				TestEchoFloat_INF);
+	TestForPass(proxy, e, "echoFloat_negINF",			TestEchoFloat_negINF);
+	TestForFail(proxy, e, "echoFloat_Overflow",			TestEchoFloat_Overflow);
+	TestForFail(proxy, e, "echoFloat_Underflow",		TestEchoFloat_Underflow);
+	TestForPass(proxy, e, "echoString",					TestEchoString);
+	TestForPass(proxy, e, "echoStruct",					TestEchoStruct);
+	TestForPass(proxy, e, "echoIntegerArray",			TestEchoIntegerArray);
+	TestForPass(proxy, e, "echoFloatArray",				TestEchoFloatArray);
+	TestForPass(proxy, e, "echoStringArray",			TestEchoStringArray);
+	TestForPass(proxy, e, "echoStructArray",			TestEchoStructArray);
+	TestForPass(proxy, e, "echoIntegerArray_ZeroLen",	TestEchoIntegerArrayZeroLen);
+	TestForPass(proxy, e, "echoFloatArray_ZeroLen",		TestEchoFloatArrayZeroLen);
+	TestForPass(proxy, e, "echoStringArray_ZeroLen",	TestEchoStringArrayZeroLen);
+	TestForPass(proxy, e, "echoStructArray_ZeroLen",	TestEchoStructArrayZeroLen);
+
+	testresults.EndTag("Server");
 }
 
 int
@@ -772,6 +656,7 @@ main(int argc, char* argv[])
 {
 	int ret = 0;
 	srand(time(0));
+	const char *xmlname = 0;
 	try
 	{
 		const char *servicename = 0;
@@ -792,7 +677,11 @@ main(int argc, char* argv[])
 				doall = true;
 				testlocal = false;
 			}
-			else if (sp_strcmp(argv[i], "-e") == 0)
+			else if (sp_strcmp(argv[i], "-xml") == 0)
+			{
+				xmlname = argv[++i];
+			}
+			else if (sp_strcmp(argv[i], "-l") == 0)
 			{
 				execute = false;
 			}
@@ -845,6 +734,8 @@ main(int argc, char* argv[])
 			e.needsappend = false;
 		}
 
+		testresults.StartTag("InteropTests");
+
 		for (size_t j = 0; j < endpoints.Size(); ++j)
 		{
 			Endpoint& e = endpoints[j];
@@ -864,6 +755,8 @@ main(int argc, char* argv[])
 				<< std::endl
 				<< std::endl;
 		}
+
+		testresults.EndTag("InteropTests");
 	}
 	catch (const SOAPMemoryException&)
 	{
@@ -874,6 +767,16 @@ main(int argc, char* argv[])
 	{
 		std::cout << "Caught SOAP exception: " << ex.What() << std::endl;
 		ret = 1;
+	}
+
+	if (xmlname)
+	{
+		FILE *xmlfile = fopen(xmlname, "w");
+		if (xmlfile)
+		{
+			fwrite(testresults.GetBytes(), 1, testresults.GetLength(), xmlfile);
+			fclose(xmlfile);
+		}
 	}
 
 	SOAPDebugger::Close();
