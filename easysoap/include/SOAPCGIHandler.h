@@ -91,6 +91,7 @@ public:
 
 	size_t Write(const SOAPMethod& method, const char *payload, size_t payloadsize)
 	{
+		printf("SOAPServer: %s/%s\n", EASYSOAP_STRING, EASYSOAP_VERSION_STRING);
 		printf("Content-Length: %d\n", payloadsize);
 		printf("Content-Type: text/xml; charset=\"UTF-8\"\n\n");
 
