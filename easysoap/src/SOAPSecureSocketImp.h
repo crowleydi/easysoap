@@ -22,11 +22,10 @@
 
 #if !defined(AFX_SOAPSECURESOCKETIMP_H__7481DF95_30AD_4892_B5E4_44463F2F6D42__INCLUDED_)
 #define AFX_SOAPSECURESOCKETIMP_H__7481DF95_30AD_4892_B5E4_44463F2F6D42__INCLUDED_
-
+#include <openssl/ssl.h>
 #include "SOAPClientSocketImp.h"
+#include <SOAPSSLContext.h>
 
-struct ssl_st;
-struct ssl_ctx_st;
 
 BEGIN_EASYSOAP_NAMESPACE
 
@@ -36,13 +35,13 @@ private:
 	typedef SOAPClientSocketImp super;
 
 protected:
-	ssl_st				*m_ssl;
-	ssl_ctx_st			*m_ctx;
-	SOAPString 			m_keyfile;
-	SOAPString 	m_password;
+	SSL					*m_ssl;
+	SOAPSSLContext		*m_context;
+	bool				m_delctx;
 	bool HandleError(const char *context, int retcode);
 public:
 	SOAPSecureSocketImp();
+	SOAPSecureSocketImp(SOAPSSLContext& ctx);
 	virtual ~SOAPSecureSocketImp();
 
 	virtual void Close();
@@ -50,9 +49,7 @@ public:
 	virtual size_t Read(char *buffer, size_t len);
 	virtual size_t Write(const char *buffer, size_t len);
 	virtual bool WaitRead(int sec, int usec);
-	virtual void SetCertificateInfo(const char* keyfile, const char* password);
 
-	static int password_cb(char *buf, int num, int rwflag, void *userdata);
 	void InitSSL();
 };
 
