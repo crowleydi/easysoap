@@ -87,3 +87,19 @@ SOAPFault::GetDetail() const
 	return 0;
 }
 
+SOAPFaultException::SOAPFaultException(const SOAPFault& fault)
+{
+		const SOAPParameter *p = 0;
+		m_what = "SOAP Fault";
+		if ((p = fault.GetFaultString()))
+		{
+			m_what.Append(": ");
+			m_what.Append(p->GetString());
+		}
+		if ((p = fault.GetFaultActor()))
+		{
+			m_what.Append(": ");
+			m_what.Append(p->GetString());
+		}
+}
+

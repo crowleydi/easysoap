@@ -76,5 +76,13 @@ private:
 	static const char *faultdetail_attr;
 };
 
+
+class SOAPFaultException : public SOAPException
+{
+public:
+	SOAPFaultException(const SOAPFault&);
+};
+
+
 #endif // !defined(AFX_SOAPFAULT_H__290FC204_F572_4249_8E5E_D52E987FFAD0__INCLUDED_)
 
