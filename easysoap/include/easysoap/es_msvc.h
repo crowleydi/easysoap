@@ -25,6 +25,18 @@
 #pragma warning (disable: 4786)
 #pragma warning (disable: 4251)
 
+//
+// Comment this out if you do not want
+// to use the Windows WinInet functions
+// by default.
+#define EASYSOAP_USE_WININET
+
+//
+// Uncomment this line if you want to
+// compile and link against the OpenSSL
+// library.
+//#define HAVE_LIBSSL
+
 #define HAVE_ERRNO_H
 #define HAVE_MATH_H
 #define HAVE_MALLOC_H
