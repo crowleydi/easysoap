@@ -44,19 +44,8 @@ SOAPMethodHandler::~SOAPMethodHandler()
 SOAPParseEventHandler *
 SOAPMethodHandler::start(const XML_Char *name, const XML_Char **attrs)
 {
-	const char *ns = m_method->GetNamespace();
-	const char *n = m_method->GetName();
-	int nslen = strlen(ns);
-
-	if ((strncmp(name, ns, nslen) == 0) &&
-		(strcmp(name + nslen + 1, n) == 0))
-	{
-		m_method->Reset();
-		return this;
-	}
-
-	throw SOAPException("Invalid method response '%s', expecting '%s'",
-			name, n);
+	m_method->Reset();
+	return this;
 }
 
 SOAPParseEventHandler *
