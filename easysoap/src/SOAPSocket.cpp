@@ -27,8 +27,6 @@
 #pragma warning (disable: 4786)
 #endif // _MSC_VER
 
-#include <stdio.h>
-
 #include "SOAPSocket.h"
 #include "SOAPClientSocketImp.h"
 #include "SOAPSecureSocketImp.h"
