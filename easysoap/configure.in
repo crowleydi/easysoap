@@ -107,16 +107,17 @@ AC_CHECK_FUNCS( \
 
 AC_OUTPUT( \
 	Makefile \
+	proj/Makefile \
+	proj/win32/Makefile \
+	proj/win32/BCB5/Makefile \
+	proj/win32/MSVC6/Makefile \
+	proj/win32/MSVC7/Makefile \
 	include/Makefile \
 	include/easysoap/Makefile \
 	src/Makefile \
 	simpleserver/Makefile \
 	validator/Makefile \
 	tests/Makefile \
-	proj/Makefile \
-	proj/win32/Makefile \
-	proj/win32/BCB5/Makefile \
-	proj/win32/MSVC6/Makefile \
-	proj/win32/MSVC7/Makefile \
+	google/Makefile \
 )
 
