@@ -25,8 +25,8 @@
 
 #define EASYSOAP_STRING			"EasySoap++"
 #define EASYSOAP_HOMEPAGE		"http://easysoap.sourceforge.net/"
-#define EASYSOAP_VERSION_STRING	"0.4.5"
-#define EASYSOAP_VERSION		45
+#define EASYSOAP_VERSION_STRING	"0.5"
+#define EASYSOAP_VERSION		50
 
 #include <es_comp.h>
 
