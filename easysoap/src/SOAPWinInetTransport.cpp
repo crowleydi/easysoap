@@ -66,11 +66,19 @@ SOAPWinInetTransport::~SOAPWinInetTransport()
 }
 
 void
-SOAPWinInetTransport::Close()
+SOAPWinInetTransport::CloseRequest()
 {
 	if (m_hRequest != NULL)
+	{
 		InternetCloseHandle(m_hRequest);
+		m_hRequest = NULL;
+	}
+}
 
+void
+SOAPWinInetTransport::Close()
+{
+	CloseRequest();
 	if (m_hConnect != NULL)
 		InternetCloseHandle(m_hConnect);
 
@@ -144,17 +152,29 @@ SOAPWinInetTransport::Read(char *buffer, size_t bufflen)
 {
 	DWORD read = 0;
 
-	if (m_canRead != -1 && m_canRead < bufflen)
-		bufflen = m_canRead;
-
-	if (!InternetReadFile(m_hRequest, buffer, bufflen, &read))
-		throw SOAPSocketException("Failed to read request: %s", GetErrorInfo());
-
-	if (m_canRead != -1)
+	if (m_hRequest)
 	{
-		if (read > m_canRead)
-			throw SOAPException("read > m_canRead");
-		m_canRead -= read;
+		if (m_canRead != -1 && m_canRead < bufflen)
+			bufflen = m_canRead;
+
+		if (!InternetReadFile(m_hRequest, buffer, bufflen, &read))
+		{
+			CloseRequest();
+			throw SOAPSocketException("Failed to read request: %s", GetErrorInfo());
+		}
+
+		if (m_canRead != -1)
+		{
+			if (read > m_canRead)
+			{
+				CloseRequest();
+				throw SOAPException("read > m_canRead");
+			}
+			m_canRead -= read;
+		}
+
+		if (m_canRead == 0 || read == 0)
+			CloseRequest();
 	}
 
 	return read;
@@ -183,16 +203,17 @@ SOAPWinInetTransport::Write(const SOAPMethod& method, const char *packet, size_t
 	if (m_endpoint.Protocol() == SOAPUrl::https_proto)
 		cflags |= INTERNET_FLAG_SECURE;
 
-	if (m_hRequest)
-		InternetCloseHandle(m_hRequest);
-
+	CloseRequest();
 	m_hRequest = HttpOpenRequestA(m_hConnect, "POST",
 		m_endpoint.Path(), NULL, NULL, NULL, cflags, 0);
 	if (m_hRequest == NULL)
 		throw SOAPSocketException("Failed to open request: %s", GetErrorInfo());
 
 	if (m_canRead != -1 && m_canRead > 0)
+	{
+		CloseRequest();
 		throw SOAPException("Didn't finish reading request!");
+	}
 
 	bool sentCert = false;
 	DWORD dwCode = 0;
@@ -200,13 +221,13 @@ SOAPWinInetTransport::Write(const SOAPMethod& method, const char *packet, size_t
 	char headers[256];
 	if (method.GetSoapAction())
 	{
-		snprintf(headers, sizeof(headers), "Content-Type: text/xml; charset=\"UTF-8\"\r\n"
+		snprintf(headers, sizeof(headers), "Content-Type: text/xml; charset=UTF-8\r\n"
 			"SOAPAction: \"%s\"\r\n", (const char *)method.GetSoapAction());
 	}
 	else
 	{
-		snprintf(headers, sizeof(headers), "Content-Type: text/xml; charset=\"UTF-8\"\r\n"
-			"SOAPAction:\r\n");
+		snprintf(headers, sizeof(headers), "Content-Type: text/xml; charset=UTF-8\r\n"
+			"SOAPAction: \"\"\r\n");
 	}
 
 	BOOL sendSuccess = FALSE;
@@ -219,6 +240,7 @@ SOAPWinInetTransport::Write(const SOAPMethod& method, const char *packet, size_t
 			HTTP_QUERY_STATUS_CODE |
 			HTTP_QUERY_FLAG_NUMBER, &dwCode, &dwSize, NULL))
 		{
+			CloseRequest();
 			throw SOAPException("Failed to get back server status code.");
 		}
 
@@ -231,6 +253,7 @@ SOAPWinInetTransport::Write(const SOAPMethod& method, const char *packet, size_t
 					//
 					// Okay, we tried once already to send a certificate
 					// and it failed.  This means the user hit "cancel"
+					CloseRequest();
 					throw SOAPException("Endpoint requires a client certificate.");
 				}
 			}
@@ -246,12 +269,14 @@ SOAPWinInetTransport::Write(const SOAPMethod& method, const char *packet, size_t
 										FLAGS_ERROR_UI_FLAGS_CHANGE_OPTIONS,
 										NULL) != ERROR_SUCCESS )
 				{
+					CloseRequest();
 					throw SOAPException("Failed to select client authentication certificate.");
 				}
 				sentCert = true;
 			}
 			else
 			{
+				CloseRequest();
 				throw SOAPSocketException("Failed to send request: %s", GetErrorInfo());
 			}
 		}
@@ -268,6 +293,7 @@ SOAPWinInetTransport::Write(const SOAPMethod& method, const char *packet, size_t
 						NULL) == ERROR_SUCCESS )
 						// this looks wrong but ERROR_SUCCESS is returned if the user cancels
 				{
+					CloseRequest();
 					throw SOAPException("Failed to authenticate with the proxy.");
 				}
 			}
@@ -276,6 +302,7 @@ SOAPWinInetTransport::Write(const SOAPMethod& method, const char *packet, size_t
 
 	if (dwCode != 500 && dwCode != 200)
 	{
+		CloseRequest();
 		throw SOAPException("Unexpected server response code: %d", dwCode);
 	}
 

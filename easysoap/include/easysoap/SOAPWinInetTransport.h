@@ -52,6 +52,7 @@ private:
 
 	const char * GetErrorInfo();
 	void Close();
+	void CloseRequest();
 
 public:
 	SOAPWinInetTransport();
