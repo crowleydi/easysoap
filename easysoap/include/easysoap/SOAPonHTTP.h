@@ -150,7 +150,7 @@ public:
 
 	void SetUserAgent(const char *userAgent);
 	void SetTimeout(size_t secs) {m_http.SetTimeout(secs);}
-	void SetKeepAlive(bool keepAlive = false)	{m_http.SetKeepAlive(keepAlive);}
+	void SetKeepAlive(bool keepAlive = true)	{m_http.SetKeepAlive(keepAlive);}
 	void SetContext(SOAPSSLContext& context) 
 	{
 			m_ctx = &context;
