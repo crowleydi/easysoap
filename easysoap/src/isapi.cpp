@@ -66,7 +66,7 @@ GetExtensionVersion( HSE_VERSION_INFO* pVer )
 
 	if (pVer)
 	{
-		pVer->dwExtensionVersion = MAKEWORD(HSE_VERSION_MAJOR, HSE_VERSION_MINOR);
+		pVer->dwExtensionVersion = HSE_VERSION;
 		lstrcpyn(pVer->lpszExtensionDesc, extensionDesc, HSE_MAX_EXT_DLL_NAME_LEN);
 	}
 
