@@ -35,7 +35,7 @@
 // main for the CGI handler;
 //
 int
-main(int argc, char* argv[], char *env[])
+main()
 {
 	SOAPCGIServer server;
 	WhichToolkitHandler whichToolkitHandler;

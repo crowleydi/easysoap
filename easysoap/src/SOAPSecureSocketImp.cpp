@@ -34,14 +34,20 @@ USING_EASYSOAP_NAMESPACE
 
 #ifndef HAVE_LIBSSL
 
-SOAPSecureSocketImp::SOAPSecureSocketImp()
+void
+SOAPSecureSocketImp::NotSupported()
 {
 	throw SOAPSocketException("Secure sockets not supported.");
 }
 
-SOAPSecureSocketImp::SOAPSecureSocketImp(SOAPSSLContext& ctx, void* cbdata) 
+SOAPSecureSocketImp::SOAPSecureSocketImp()
 {
-	throw SOAPSocketException("Secure sockets not supported.");
+	NotSupported();
+}
+
+SOAPSecureSocketImp::SOAPSecureSocketImp(SOAPSSLContext& /*ctx*/, void* /*cbdata*/)
+{
+	NotSupported();
 }
 
 SOAPSecureSocketImp::~SOAPSecureSocketImp()
@@ -52,7 +58,7 @@ bool SOAPSecureSocketImp::WaitRead(int, int) {return false;}
 bool SOAPSecureSocketImp::WaitWrite(int, int) { return false; }
 void SOAPSecureSocketImp::Close() { }
 bool SOAPSecureSocketImp::IsOpen() { return false; }
-bool SOAPSecureSocketImp::Connect(const char *, unsigned int, bool client) {return false;}
+bool SOAPSecureSocketImp::Connect(const char *, unsigned int, bool /*client*/) {return false;}
 size_t SOAPSecureSocketImp::Read(char *, size_t) {return 0;}
 size_t SOAPSecureSocketImp::Write(const char *, size_t) {return 0;}
 void SOAPSecureSocketImp::InitSSL() {}

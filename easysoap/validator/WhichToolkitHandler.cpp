@@ -33,7 +33,7 @@
 // the name of the server, and not the SOAP toolkit being used. 
 
 void
-WhichToolkitHandler::whichToolkit(const SOAPMethod& request, SOAPMethod& response)
+WhichToolkitHandler::whichToolkit(const SOAPMethod&, SOAPMethod& response)
 {
 	//response.SetName("whichToolkitResult");
 	SOAPParameter& param = response.AddParameter("Result");

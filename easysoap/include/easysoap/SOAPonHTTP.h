@@ -161,7 +161,7 @@ private:
 	SOAPString			m_userAgent;
 	SOAPUrl				m_endpoint;
 	SOAPSSLContext 		*m_ctx;
-        void                    *m_cbdata;
+	void				*m_cbdata;
 
 public:
 	SOAPonHTTP(SOAPSSLContext * ctx = 0) : m_ctx(ctx), m_cbdata(0) {}
@@ -174,7 +174,7 @@ public:
 	SOAPonHTTP(const SOAPUrl& endpoint, SOAPUrl& proxy, SOAPSSLContext * ctx = 0)
 		: m_ctx(ctx), m_cbdata(0)
 	{
-		ConnectTo(endpoint);
+		ConnectTo(endpoint, proxy);
 	}
 
 

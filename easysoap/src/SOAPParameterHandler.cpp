@@ -140,7 +140,7 @@ SOAPParameterHandler::endElement(const char *)
 {
 	if (m_setvalue)
 	{
-		m_str.Add(0); // null terminate
+		m_str.Add(char(0)); // null terminate
 		m_param->GetStringRef() = m_str.Ptr();
 	}
 }

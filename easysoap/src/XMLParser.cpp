@@ -26,7 +26,7 @@
 #include <expat.h>
 #include <easysoap/XMLParser.h>
 
-#define EXPAT_VER(a,b,c) (((((a)*1000)+(b))*1000)+ (c))
+#define EXPAT_VER(a,b,c) (((((a)*1000)+(b))*1000)+(c))
 #define EXPAT_VERSION EXPAT_VER(XML_MAJOR_VERSION,XML_MINOR_VERSION,XML_MICRO_VERSION)
 
 //////////////////////////////////////////////////////////////////////

@@ -59,7 +59,7 @@ SOAPBuildersInteropHandler::RegisterBasic()
 
 
 void
-SOAPBuildersInteropHandler::echoVoid(const SOAPMethod& req, SOAPMethod& resp)
+SOAPBuildersInteropHandler::echoVoid(const SOAPMethod& /*req*/, SOAPMethod& /*resp*/)
 {
 }
 

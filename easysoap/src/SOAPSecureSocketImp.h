@@ -36,6 +36,7 @@ class SOAPSecureSocketImp : public SOAPSocketInterface
 {
 private:
 	SOAPClientSocketImp m_socket;
+	void NotSupported();
 
 protected:
 	ssl_st				*m_ssl;

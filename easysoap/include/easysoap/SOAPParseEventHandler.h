@@ -57,7 +57,7 @@ public:
 			const char **attrs) = 0;
 
 	virtual void endElement(
-			SOAPParser& parser,
+			SOAPParser& /*parser*/,
 			const char *name)
 	{
 		endElement(name);
@@ -69,7 +69,7 @@ public:
 	};
 
 	virtual void characterData(
-			SOAPParser& parser,
+			SOAPParser& /*parser*/,
 			const char * str,
 			int len)
 	{

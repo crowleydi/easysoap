@@ -55,6 +55,9 @@ public:
 
 private:
 
+	SOAPEnvelope(const SOAPEnvelope&);
+	SOAPEnvelope& operator=(const SOAPEnvelope&);
+
 	SOAPHeader	m_header;
 	SOAPBody	m_body;
 };

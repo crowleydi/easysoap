@@ -22,7 +22,7 @@ public:
 	SOAPBuildersHeaderHandler();
 	virtual ~SOAPBuildersHeaderHandler();
 
-	SOAPBuildersHeaderHandler* GetTarget(const SOAPEnvelope& request)
+	SOAPBuildersHeaderHandler* GetTarget(const SOAPEnvelope& /*request*/)
 	{
 		return this;
 	}

@@ -128,9 +128,9 @@ WriteErrorMessage(EXTENSION_CONTROL_BLOCK *pECB, int error, const char *szBuffer
 	pECB->WriteClient(pECB->ConnID, (void *)szBuffer, &dwBufLen, 0);
 }
 
-BOOL APIENTRY DllMain( HANDLE hModule, 
-                       DWORD  ul_reason_for_call, 
-                       LPVOID lpReserved
+BOOL APIENTRY DllMain( HANDLE /*hModule*/,
+                       DWORD  /*ul_reason_for_call*/,
+                       LPVOID /*lpReserved*/
 					 )
 {
     return TRUE;
@@ -219,7 +219,7 @@ HttpExtensionProc( EXTENSION_CONTROL_BLOCK *pECB )
 // for them, clean up our IoPort and then exit.
 //
 BOOL WINAPI
-TerminateExtension( DWORD dwFlags )
+TerminateExtension( DWORD /*dwFlags*/ )
 {
 	long n;
 	for (n = 0; n < numWorkerThreads; ++n)

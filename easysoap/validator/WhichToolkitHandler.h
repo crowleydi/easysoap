@@ -34,7 +34,7 @@ public:
 		DispatchMethod("whichToolkit", "http://www.soapware.org/", &WhichToolkitHandler::whichToolkit);
 	}
 
-	WhichToolkitHandler* GetTarget(const SOAPEnvelope& request)
+	WhichToolkitHandler* GetTarget(const SOAPEnvelope&)
 	{
 		return this;
 	}

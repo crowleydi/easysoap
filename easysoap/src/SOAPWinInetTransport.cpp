@@ -112,8 +112,6 @@ SOAPWinInetTransport::ConnectTo(const SOAPUrl& endpoint, const SOAPUrl& proxy)
 	if (m_endpoint.Protocol() != SOAPUrl::http_proto && m_endpoint.Protocol() != SOAPUrl::https_proto)
 		throw SOAPSocketException("Invalid protocol specified.  Only http and https are supported.");
 
-	DWORD ptype = INTERNET_OPEN_TYPE_PRECONFIG;
-
 	char proxystr[256];
 	snprintf(proxystr, sizeof(proxystr), "%s:%u",
 		(const char *)proxy.Hostname(), proxy.Port());
@@ -127,7 +125,7 @@ SOAPWinInetTransport::ConnectTo(const SOAPUrl& endpoint, const SOAPUrl& proxy)
 		throw SOAPSocketException("Could not initialize internet connection: %s", GetErrorInfo());
 
 	m_hConnect = InternetConnectA(m_hInternet,
-		m_endpoint.Hostname(), m_endpoint.Port(),
+		m_endpoint.Hostname(), (INTERNET_PORT)m_endpoint.Port(),
 		m_endpoint.User(), m_endpoint.Password(),
 		INTERNET_SERVICE_HTTP, 0, 0);
 
@@ -188,7 +186,7 @@ SOAPWinInetTransport::Write(const SOAPMethod& method, const char *packet, size_t
 	if (!m_hConnect)
 	{
 		m_hConnect = InternetConnectA(m_hInternet,
-			m_endpoint.Hostname(), m_endpoint.Port(),
+			m_endpoint.Hostname(), (INTERNET_PORT)m_endpoint.Port(),
 			m_endpoint.User(), m_endpoint.Password(),
 			INTERNET_SERVICE_HTTP, 0, 0);
 	}
@@ -233,12 +231,12 @@ SOAPWinInetTransport::Write(const SOAPMethod& method, const char *packet, size_t
 	BOOL sendSuccess = FALSE;
 	do
 	{
-		sendSuccess = HttpSendRequestA(m_hRequest, headers, -1,
+		sendSuccess = HttpSendRequestA(m_hRequest, headers, DWORD(-1),
 			(void *)packet, packetlen);
 
-		if ( !HttpQueryInfoA(m_hRequest,
-			HTTP_QUERY_STATUS_CODE |
-			HTTP_QUERY_FLAG_NUMBER, &dwCode, &dwSize, NULL))
+		if (!HttpQueryInfoA(m_hRequest,
+			HTTP_QUERY_STATUS_CODE | HTTP_QUERY_FLAG_NUMBER,
+			&dwCode, &dwSize, NULL))
 		{
 			CloseRequest();
 			throw SOAPException("Failed to get back server status code.");
@@ -311,7 +309,7 @@ SOAPWinInetTransport::Write(const SOAPMethod& method, const char *packet, size_t
 	if (!HttpQueryInfo (m_hRequest,
 			HTTP_QUERY_CONTENT_LENGTH |
 			HTTP_QUERY_FLAG_NUMBER, &m_canRead, &qsize, NULL))
-		m_canRead = -1;
+		m_canRead = size_t(-1);
 
 	char contenttype[256];
 	qsize = sizeof(contenttype);

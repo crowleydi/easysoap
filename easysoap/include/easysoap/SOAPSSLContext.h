@@ -37,6 +37,12 @@ BEGIN_EASYSOAP_NAMESPACE
 */
 class EASYSOAP_EXPORT SOAPSSLContext
 {
+private:
+	void NotSupported()
+	{
+		throw SOAPException("HTTPS NOT SUPPORTED WITHOUT OpenSSL");
+	}
+
 public:
         typedef enum {
                 SSL_v2,
@@ -45,32 +51,43 @@ public:
                 TLS_v1
         } MethodType;
 
-	SOAPSSLContext(MethodType methodType=SSL_v23){
-		throw SOAPException("HTTPS NOT SUPPORTED WITHOUT OpenSSL");
+	SOAPSSLContext(MethodType /*methodType*/=SSL_v23)
+	{
+		NotSupported();
 	}
-	SOAPSSLContext(const char* cafile, MethodType methodType=SSL_v23) {
 
-		throw SOAPException("HTTPS NOT SUPPORTED WITHOUT OpenSSL");
+	SOAPSSLContext(const char* /*cafile*/, MethodType /*methodType*/=SSL_v23)
+	{
+		NotSupported();
 	}
-	SOAPSSLContext(const char* certfile, const char* keyfile, const char* password, const char* cafile=0, MethodType methodType=SSL_v23) {
 
-		throw SOAPException("HTTPS NOT SUPPORTED WITHOUT OpenSSL");
+	SOAPSSLContext(const char* /*certfile*/,
+		const char* /*keyfile*/,
+		const char* /*password*/,
+		const char* /*cafile*/=0,
+		MethodType /*methodType*/=SSL_v23)
+	{
+		NotSupported();
 	}
 
 	ssl_ctx_st*	GetContext() {return 0;}
-	void SetCAInfo(const char* cafile);
-	void SetCertInfo(const char* certfile, const char* keyfile, const char* password) {}
+	void SetCAInfo(const char* /*cafile*/);
+	void SetCertInfo(const char* /*certfile*/,
+		const char* /*keyfile*/,
+		const char* /*password*/)
+	{
+	}
 
 	bool VerifyServerCert() { return false; };
-	void SetVerifyServerCert (bool v) { } ;
+	//void SetVerifyServerCert (bool /*v*/) { } ;
 
         typedef bool (*VerifyPeerCallback) (struct x509_st* peercert, void* cbdata);
         VerifyPeerCallback GetVerifyPeerCallback() { return 0; }
         void SetVerifyPeerCallback(VerifyPeerCallback)  { }
 
-	bool IgnoreCertError(int rc ) { return false; } ;
-	void AddCertErrorToIgnoreList(int rc) { };
-	bool RemoveCertErrorFromIgnoreList(int rc) { return false; };
+	bool IgnoreCertError(int /*rc*/ ) { return false; } ;
+	void AddCertErrorToIgnoreList(int /*rc*/) { };
+	bool RemoveCertErrorFromIgnoreList(int /*rc*/) { return false; };
 	~SOAPSSLContext() {}
 };
 #else

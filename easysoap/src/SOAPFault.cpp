@@ -93,13 +93,13 @@ SOAPFault::WriteSOAPPacket(XMLComposer& packet) const
 
 	//
 	// Enforce element order
-	if ((p = GetFaultCode()))
+	if ((p = GetFaultCode()) != 0)
 		p->WriteSOAPPacket(packet);
-	if ((p = GetFaultString()))
+	if ((p = GetFaultString()) != 0)
 		p->WriteSOAPPacket(packet);
-	if ((p = GetFaultActor()))
+	if ((p = GetFaultActor()) != 0)
 		p->WriteSOAPPacket(packet);
-	if ((p = GetDetail()))
+	if ((p = GetDetail()) != 0)
 		p->WriteSOAPPacket(packet);
 
 	SOAPParameter::Struct::Iterator i = GetStruct().Begin();
@@ -127,12 +127,12 @@ SOAPFaultException::SOAPFaultException(const SOAPFault& fault)
 {
 		const SOAPParameter *p;
 		m_what = "SOAP Fault";
-		if ((p = fault.GetFaultString()))
+		if ((p = fault.GetFaultString()) != 0)
 		{
 			m_what.Append(": ");
 			m_what.Append(p->GetString());
 		}
-		if ((p = fault.GetFaultActor()))
+		if ((p = fault.GetFaultActor()) != 0)
 		{
 			m_what.Append(": ");
 			m_what.Append(p->GetString());

@@ -129,7 +129,7 @@ private:
 			if (m_map)
 			{
 				// Find first bucket with an element
-				while (m_index != m_map->m_elements.End() && !(m_he = *m_index))
+				while (m_index != m_map->m_elements.End() && (m_he = *m_index) == 0)
 						++m_index;
 			}
 		}
@@ -197,8 +197,8 @@ private:
 		 */
 		ForwardHashMapIterator& Next()
 		{
-			if (m_index != m_map->m_elements.End() && !(m_he = m_he->m_next))
-				while (++m_index != m_map->m_elements.End() && !(m_he = *m_index))
+			if (m_index != m_map->m_elements.End() && (m_he = m_he->m_next) == 0)
+				while (++m_index != m_map->m_elements.End() && (m_he = *m_index) == 0)
 					;
 			return *this;
 		}

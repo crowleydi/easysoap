@@ -992,7 +992,7 @@ TestEchoBase64(SOAPProxy& proxy, const Endpoint& e)
 	int size = rand() % 501 + 500;
 	inputBinary.Resize(size);
 	for (int i = 0; i < size; ++i)
-		inputBinary[i] = rand();
+		inputBinary[i] = (char)rand();
 
 	SOAPMethod method;
 	SetupMethod(method, "echoBase64", e);
@@ -1144,7 +1144,7 @@ TestBogusMethod(SOAPProxy& proxy, const Endpoint& e)
 }
 
 void
-TestBogusNamespace(SOAPProxy& proxy, const Endpoint& e)
+TestBogusNamespace(SOAPProxy& proxy, const Endpoint&)
 {
 	SOAPMethod method("echoVoid", "http://bogusns.com/", "http://bogusns.com/");
 	proxy.Execute(method);
@@ -1219,7 +1219,7 @@ TestEchoHexBinary(SOAPProxy& proxy, const Endpoint& e)
 	int size = rand() % 501 + 500;
 	inputBinary.Resize(size);
 	for (int i = 0; i < size; ++i)
-		inputBinary[i] = rand();
+		inputBinary[i] = (char)rand();
 
 	SOAPMethod method;
 	SetupMethod(method, "echoHexBinary", e);
@@ -1286,7 +1286,7 @@ BeginEndpointTesting(const Endpoint& e, TestType test)
 }
 
 void
-EndEndpointTesting(const Endpoint& e)
+EndEndpointTesting(const Endpoint&)
 {
 	if (cgimode)
 	{
@@ -1327,7 +1327,7 @@ BeginTest(const Endpoint& e, const char *testname)
 }
 
 void
-EndTest(const Endpoint& e, const SOAPString& type, const SOAPString& msg)
+EndTest(const Endpoint&, const SOAPString& type, const SOAPString& msg)
 {
 	if (cgimode)
 	{
@@ -1637,7 +1637,7 @@ hexdecode(char *str)
 		if (*w == '%')
 		{
 			++w;
-			*s++ = (hexval(*w++) << 4) | hexval(*w++);
+			*s++ = char((hexval(*w++) << 4) | hexval(*w++));
 		}
 		else
 			*s++ = *w++;
@@ -1655,9 +1655,9 @@ ParseCGIQuery(SOAPHashMap<SOAPString,SOAPString>& jar, const char *str)
 	{
 		char *t = n;
 		char *v;
-		if ((n = sp_strchr(n, '&')))
+		if ((n = sp_strchr(n, '&')) != 0)
 			*n++ = 0;
-		if ((v = sp_strchr(t, '=')))
+		if ((v = sp_strchr(t, '=')) != 0)
 			*v++ = 0;
 		jar[hexdecode(t)] = hexdecode(v);
 	}

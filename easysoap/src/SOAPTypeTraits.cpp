@@ -195,8 +195,8 @@ SOAPTypeTraits<char>::Deserialize(const SOAPParameter& param, char& val)
     if (param.IsNull() || str.IsEmpty())
         throw SOAPException("Cannot convert null value to byte.");
 
-	int v;
-	val = v = sp_strtol(str);
+	int v = sp_strtol(str);
+	val = char(v);
 	if (v != val)
 		throw SOAPException("Value out of range for byte: %d", v);
 	return param;
@@ -229,8 +229,8 @@ SOAPTypeTraits<short>::Deserialize(const SOAPParameter& param, short& val)
     if (param.IsNull() || str.IsEmpty())
         throw SOAPException("Cannot convert null value to short.");
 
-	int v;
-	val = v = sp_strtol(str);
+	int v = sp_strtol(str);
+	val = short(v);
 	if (v != val)
 		throw SOAPException("Value out of range for short: %d", v);
 	return param;

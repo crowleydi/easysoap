@@ -25,7 +25,7 @@ public:
 	SOAPBuildersInteropHandler();
 	virtual ~SOAPBuildersInteropHandler();
 
-	SOAPBuildersInteropHandler* GetTarget(const SOAPEnvelope& request)
+	SOAPBuildersInteropHandler* GetTarget(const SOAPEnvelope& /*request*/)
 	{
 		return this;
 	}

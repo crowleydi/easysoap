@@ -26,7 +26,7 @@ SOAPBuildersHeaderHandler::~SOAPBuildersHeaderHandler()
 
 void
 SOAPBuildersHeaderHandler::echoHdrString(const SOAPParameter& header,
-										 SOAPEnvelope& request,
+										 SOAPEnvelope& /*request*/,
 										 SOAPEnvelope& response)
 {
 	SOAPString str;
@@ -40,7 +40,7 @@ SOAPBuildersHeaderHandler::echoHdrString(const SOAPParameter& header,
 
 void
 SOAPBuildersHeaderHandler::echoHdrStruct(const SOAPParameter& header,
-										 SOAPEnvelope& request,
+										 SOAPEnvelope& /*request*/,
 										 SOAPEnvelope& response)
 {
 	SOAPStruct str;

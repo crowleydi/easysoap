@@ -70,7 +70,7 @@ SOAPParser::Parse(SOAPEnvelope& env, SOAPTransport& trans)
 		throw SOAPException("Unexpected content type, only support text/xml: %s", contentType);
 
 	InitParser(trans.GetCharset());
-	while (1)
+	for (;;)
 	{
 		//
 		// create a buffer to read the HTTP payload into

@@ -58,6 +58,7 @@ BEGIN_EASYSOAP_NAMESPACE
 /**
 *
 */
+template<>
 class SOAPTypeTraits<std::string>
 {
 public:
@@ -91,6 +92,7 @@ class SOAPTypeTraits< std::vector<T> > : public SOAPArrayTypeTraits
 /**
 *
 */
+template<>
 class SOAPTypeTraits< std::vector<bool> > : public SOAPArrayTypeTraits
 {
 };
@@ -98,6 +100,7 @@ class SOAPTypeTraits< std::vector<bool> > : public SOAPArrayTypeTraits
 /**
 *
 */
+template<>
 class SOAPTypeTraits< std::vector<short> > : public SOAPArrayTypeTraits
 {
 };
@@ -105,6 +108,7 @@ class SOAPTypeTraits< std::vector<short> > : public SOAPArrayTypeTraits
 /**
 *
 */
+template<>
 class SOAPTypeTraits< std::vector<int> > : public SOAPArrayTypeTraits
 {
 };
@@ -112,6 +116,7 @@ class SOAPTypeTraits< std::vector<int> > : public SOAPArrayTypeTraits
 /**
 *
 */
+template<>
 class SOAPTypeTraits< std::vector<long> > : public SOAPArrayTypeTraits
 {
 };
@@ -119,6 +124,7 @@ class SOAPTypeTraits< std::vector<long> > : public SOAPArrayTypeTraits
 /**
 *
 */
+template<>
 class SOAPTypeTraits< std::vector<float> > : public SOAPArrayTypeTraits
 {
 };
@@ -126,6 +132,7 @@ class SOAPTypeTraits< std::vector<float> > : public SOAPArrayTypeTraits
 /**
 *
 */
+template<>
 class SOAPTypeTraits< std::vector<double> > : public SOAPArrayTypeTraits
 {
 };
@@ -133,6 +140,7 @@ class SOAPTypeTraits< std::vector<double> > : public SOAPArrayTypeTraits
 /**
 *
 */
+template<>
 class SOAPTypeTraits< std::vector<std::string> > : public SOAPArrayTypeTraits
 {
 };
@@ -168,6 +176,7 @@ private:
 /**
 *
 */
+template<>
 class SOAPTypeTraits< SOAPSTLBase64 > : public SOAPBase64Traits
 {
 };
@@ -200,6 +209,7 @@ private:
 /**
 *
 */
+template<>
 class SOAPTypeTraits< SOAPSTLHex > : public SOAPHexTraits
 {
 };

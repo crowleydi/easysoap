@@ -346,7 +346,7 @@ SOAPHTTPProtocol::GetReply()
 	if (vers)
 	{
 		respver += atoi(++vers) * 10;
-		if ((vers = sp_strchr(vers, '.')))
+		if ((vers = sp_strchr(vers, '.')) != 0)
 			respver += atoi(++vers);
 	}
 
@@ -361,7 +361,7 @@ SOAPHTTPProtocol::GetReply()
 	else
 		m_httpmsg = buff;
 
-	while (1)
+	for (;;)
 	{
 		if (ReadLine(buff, sizeof(buff)) == 0)
 			break;

@@ -40,7 +40,7 @@ public:
 		DispatchMethod("simpleStructReturnTest",&UserlandValidatorHandler::simpleStructReturnTest);
 	}
 
-	UserlandValidatorHandler* GetTarget(const SOAPEnvelope& request)
+	UserlandValidatorHandler* GetTarget(const SOAPEnvelope&)
 	{
 		return this;
 	}

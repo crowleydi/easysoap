@@ -29,7 +29,7 @@ public:
 		DispatchMethod("mult", ns, &DemoCalculatorHandler::mult);
 	}
 
-	DemoCalculatorHandler* GetTarget(const SOAPEnvelope& request)
+	DemoCalculatorHandler* GetTarget(const SOAPEnvelope&)
 	{
 		return this;
 	}

@@ -55,6 +55,8 @@ public:
 	}
 
 private:
+	SOAPResponse(const SOAPResponse&);
+	SOAPResponse& operator=(const SOAPResponse&);
 };
 
 END_EASYSOAP_NAMESPACE
