@@ -26,6 +26,9 @@
 #include <expat.h>
 #include <easysoap/XMLParser.h>
 
+#define EXPAT_VER(a,b,c) (((((a)*1000)+(b))*1000)+ (c))
+#define EXPAT_VERSION EXPAT_VER(XML_MAJOR_VERSION,XML_MINOR_VERSION,XML_MICRO_VERSION)
+
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -56,9 +59,7 @@ XMLParser::FreeParser()
 void
 XMLParser::InitParser(const char *encoding)
 {
-#if XML_MAJOR_VERSION > 1 || \
-	XML_MAJOR_VERSION == 1 && XML_MINOR_VERSION > 95 || \
-	XML_MAJOR_VERSION == 1 && XML_MINOR_VERSION == 95 && XML_MICRO_VERSION >= 3
+#if EXPAT_VERSION >= EXPAT_VER(1,95,3)
 	if (m_parser)
 	{
 		XML_ParserReset(m_parser, encoding);
