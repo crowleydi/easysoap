@@ -49,6 +49,8 @@ private:
 	bool		m_doclose;
 	bool		m_keepAlive;
 	bool		m_chunked;
+	SOAPString	m_keyfile;
+	SOAPString  m_password;
 
 	int		GetReply();
 	size_t	GetChunkLength();
@@ -66,6 +68,8 @@ public:
 		, m_doclose(false)
 		, m_keepAlive(true)
 		, m_chunked(false)
+		, m_keyfile(0)
+		, m_password(0)
 	{}
 
 	SOAPHTTPProtocol(const SOAPUrl& endpoint)
@@ -74,6 +78,8 @@ public:
 		, m_doclose(false)
 		, m_keepAlive(true)
 		, m_chunked(false)
+		, m_keyfile(0)
+		, m_password(0)
 	{
 		ConnectTo(endpoint);
 	}
@@ -84,6 +90,8 @@ public:
 		, m_doclose(false)
 		, m_keepAlive(true)
 		, m_chunked(false)
+		, m_keyfile(0)
+		, m_password(0)
 	{
 		ConnectTo(endpoint, proxy);
 	}
@@ -92,6 +100,7 @@ public:
 	{}
 
 	void	SetKeepAlive(bool keepAlive = true)	{m_keepAlive = keepAlive;}
+	void 	SetCertificateInfo(const char*keyfile, const char* password) {m_password = password; m_keyfile = keyfile; }
 	void	ConnectTo(const SOAPUrl& endpoint);
 	void	ConnectTo(const SOAPUrl& endpoint, const SOAPUrl& proxy);
 	int		Get(const char *path);
@@ -124,12 +133,15 @@ private:
 	SOAPHTTPProtocol	m_http;
 	SOAPString			m_userAgent;
 	SOAPUrl				m_endpoint;
+	SOAPString			m_keyfile;
+	SOAPString			m_password;
 
 public:
 	SOAPonHTTP() {}
 	SOAPonHTTP(const SOAPUrl& endpoint);
 	SOAPonHTTP(const SOAPUrl& endpoint, const SOAPUrl& proxy);
 
+	// for SSL Certificate support.
 	virtual ~SOAPonHTTP() {}
 
 	void ConnectTo(const SOAPUrl& endpoint);
@@ -138,6 +150,7 @@ public:
 	void SetUserAgent(const char *userAgent);
 	void SetTimeout(size_t secs) {m_http.SetTimeout(secs);}
 	void SetKeepAlive(bool keepAlive = false)	{m_http.SetKeepAlive(keepAlive);}
+	void SetCertificateInfo(const char*keyfile, const char* password) {m_password = password; m_keyfile = keyfile; }
 	//
 	//  Return charset if we know it
 	virtual const char *GetCharset() const;

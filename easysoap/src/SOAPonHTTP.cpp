@@ -48,6 +48,7 @@ SOAPonHTTP::SOAPonHTTP(const SOAPUrl& endpoint, const SOAPUrl& proxy)
 	ConnectTo(endpoint, proxy);
 }
 
+
 // read the payload into the buffer.
 // can be called multiple times.
 // returns 0 if entire payload has been read.
@@ -137,6 +138,8 @@ void
 SOAPonHTTP::ConnectTo(const SOAPUrl& endpoint)
 {
 	m_endpoint = endpoint;
+	if ((!m_keyfile.IsEmpty()) &&(!m_password.IsEmpty()))
+			m_http.SetCertificateInfo(m_keyfile, m_password);
 	m_http.ConnectTo(endpoint);
 }
 
@@ -144,6 +147,8 @@ void
 SOAPonHTTP::ConnectTo(const SOAPUrl& endpoint, const SOAPUrl& proxy)
 {
 	m_endpoint = endpoint;
+	if ((m_keyfile) &&(m_password))
+			m_http.SetCertificateInfo(m_keyfile, m_password);
 	m_http.ConnectTo(endpoint, proxy);
 }
 
@@ -336,7 +341,27 @@ SOAPHTTPProtocol::GetReply()
 	//
 	// Get charset/content-type info
 	//
-	ParseContentType(m_charset, m_contentType, GetHeader("Content-Type"));
+	// Per some RFC, encoding is us-ascii if it's not
+	// specifief in HTTP header.
+	m_charset = "US-ASCII";
+	const char *contype = GetHeader("Content-Type");
+	if (contype)
+	{
+		const char *charset = charset = sp_strstr(contype, "charset=");
+		if (charset)
+		{
+			charset += 8;
+			if (*charset == '\"')
+				++charset;
+			const char *end = charset;
+
+			while (*end && *end != '\"' && *end != ';' && *end != ' ')
+				++end;
+
+			m_charset = "";
+			m_charset.Append(charset, end - charset);
+		}
+	}
 
 	//
 	// Get some information so we can close the
@@ -512,6 +537,10 @@ SOAPHTTPProtocol::Connect()
 		case SOAPUrl::https_proto:
 			{
 				SOAPSecureSocketImp *socket = new SOAPSecureSocketImp();
+				// if we have information about the certificate to be used. 
+				if (!(m_password.IsEmpty()) && !(m_keyfile.IsEmpty()))
+						socket->SetCertificateInfo(m_keyfile.Str(), m_password.Str());
+				
 				socket->SOAPClientSocketImp::Connect(host, port);
 				SOAPProtocolBase::SetSocket(socket);
 				if (m_httpproxy)
