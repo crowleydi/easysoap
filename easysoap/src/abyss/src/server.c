@@ -829,6 +829,9 @@ int SessionLog(TSession *s)
 	char z[1024];
 	uint32 n;
 
+	if (s->requestline == NULL)
+		return TRUE;
+
 	if (strlen(s->requestline)>1024-26-50)
 		s->requestline[1024-26-50]='\0';
 
