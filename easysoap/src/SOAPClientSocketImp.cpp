@@ -187,7 +187,7 @@ SOAPClientSocketImp::Connect(const char *server, unsigned int port)
 	if (connect(m_socket, (struct sockaddr*)&sockAddr, sizeof(sockAddr)) == SOCKET_ERROR)
 	{
 		Close();
-		throw SOAPSocketException("Could not connect to host: %s", server);
+		throw SOAPSocketException("Connection refused to host: %s:%d", server, port);
 	}
 
 	int nodelay = 1;
