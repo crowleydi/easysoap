@@ -250,6 +250,9 @@
 				RelativePath="..\..\..\src\SOAPResponse.cpp">
 			</File>
 			<File
+				RelativePath="..\..\..\src\SOAPSSLContext.cpp">
+			</File>
+			<File
 				RelativePath="..\..\..\src\SOAPSecureSocketImp.cpp">
 			</File>
 			<File
@@ -392,6 +395,9 @@
 				RelativePath="..\..\..\include\easysoap\SOAPResponse.h">
 			</File>
 			<File
+				RelativePath="..\..\..\include\easysoap\SOAPSSLContext.h">
+			</File>
+			<File
 				RelativePath="..\..\..\include\easysoap\SOAPSTL.h">
 			</File>
 			<File
@@ -445,42 +451,8 @@
 			<File
 				RelativePath="..\..\..\include\easysoap\es_msvc.h">
 			</File>
-		</Filter>
-		<Filter
-			Name="abyss"
-			Filter="">
 			<File
-				RelativePath="..\..\..\src\abyss\src\abyss.h">
-			</File>
-			<File
-				RelativePath="..\..\..\src\abyss\src\conn.c">
-			</File>
-			<File
-				RelativePath="..\..\..\src\abyss\src\data.c">
-			</File>
-			<File
-				RelativePath="..\..\..\src\abyss\src\file.c">
-			</File>
-			<File
-				RelativePath="..\..\..\src\abyss\src\http.c">
-			</File>
-			<File
-				RelativePath="..\..\..\src\abyss\src\server.c">
-			</File>
-			<File
-				RelativePath="..\..\..\src\abyss\src\socket.c">
-			</File>
-			<File
-				RelativePath="..\..\..\src\abyss\src\thread.c">
-			</File>
-			<File
-				RelativePath="..\..\..\src\abyss\src\threadpool.cpp">
-			</File>
-			<File
-				RelativePath="..\..\..\src\abyss\src\threadpool.h">
-			</File>
-			<File
-				RelativePath="..\..\..\src\abyss\src\trace.c">
+				RelativePath="..\..\..\src\es_namespaces.h">
 			</File>
 		</Filter>
 		<Filter
