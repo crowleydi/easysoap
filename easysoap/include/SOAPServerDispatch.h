@@ -22,7 +22,7 @@
 #define AFX_SOAPSERVERDISPATCH_H__F7015C4A_8459_4090_ABD1_FB3EAB144B39__INCLUDED_
 
 
-#include "SOAP.h"
+#include <SOAP.h>
 
 class SOAPDispatchHandlerInterface;
 

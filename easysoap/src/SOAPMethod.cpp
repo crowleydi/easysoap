@@ -22,9 +22,9 @@
 #pragma warning (disable: 4786)
 #endif // _MSC_VER
 
-#include "SOAP.h"
-#include "SOAPMethod.h"
-#include "SOAPPacketWriter.h"
+#include <SOAP.h>
+#include <SOAPMethod.h>
+#include <SOAPPacketWriter.h>
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

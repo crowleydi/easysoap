@@ -25,7 +25,7 @@
 #include <io.h>
 #endif // _WIN32
 
-#include "SOAPCGIServer.h"
+#include <SOAPCGIServer.h>
 
 //
 //

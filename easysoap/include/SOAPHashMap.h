@@ -21,7 +21,7 @@
 #ifndef __SOAPHASHMAP_H__
 #define __SOAPHASHMAP_H__
 
-#include "SOAPUtil.h"
+#include <SOAPUtil.h>
 
 #ifdef _MSC_VER
 #pragma warning(disable: 4284)

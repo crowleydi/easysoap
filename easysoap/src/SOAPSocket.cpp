@@ -18,16 +18,12 @@
  */
 
 
-//
-//TODO:
-//  #define or make static const char *'s all the hard coded strings
-//
-
 #ifdef _MSC_VER
 #pragma warning (disable: 4786)
 #endif // _MSC_VER
 
-#include "SOAPSocket.h"
+#include <SOAPSocket.h>
+
 #include "SOAPClientSocketImp.h"
 #include "SOAPSecureSocketImp.h"
 

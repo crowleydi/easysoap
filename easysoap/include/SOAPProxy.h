@@ -21,14 +21,14 @@
 #if !defined(AFX_SOAPPROXY_H__D489F911_F39E_4C38_A5C0_95CD3D0A9459__INCLUDED_)
 #define AFX_SOAPPROXY_H__D489F911_F39E_4C38_A5C0_95CD3D0A9459__INCLUDED_
 
-#include "SOAP.h"
+#include <SOAP.h>
 
-#include "SOAPMethod.h"
-#include "SOAPEnvelope.h"
-#include "SOAPResponse.h"
-#include "SOAPPacketWriter.h"
-#include "SOAPParse.h"
-#include "SOAPUrl.h"
+#include <SOAPMethod.h>
+#include <SOAPEnvelope.h>
+#include <SOAPResponse.h>
+#include <SOAPPacketWriter.h>
+#include <SOAPParse.h>
+#include <SOAPUrl.h>
 
 class SOAPTransport;
 

@@ -22,7 +22,7 @@
 #endif // _MSC_VER
 
 #include <expat.h>
-#include "XMLParser.h"
+#include <XMLParser.h>
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

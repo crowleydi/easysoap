@@ -22,8 +22,9 @@
 #pragma warning (disable: 4786)
 #endif // _MSC_VER
 
+#include <SOAPNamespaces.h>
+
 #include "SOAPHeaderHandler.h"
-#include "SOAPNamespaces.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

@@ -21,9 +21,9 @@
 #if !defined(AFX_SOAPONHTTP_H__7D357522_E8B1_45A2_8CE1_A472A7D58C13__INCLUDED_)
 #define AFX_SOAPONHTTP_H__7D357522_E8B1_45A2_8CE1_A472A7D58C13__INCLUDED_
 
-#include "SOAPUrl.h"
-#include "SOAPSocket.h"
-#include "SOAPTransport.h"
+#include <SOAPUrl.h>
+#include <SOAPSocket.h>
+#include <SOAPTransport.h>
 
 
 class EASYSOAP_EXPORT SOAPHTTPProtocol : public SOAPProtocolBase

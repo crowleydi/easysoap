@@ -21,11 +21,12 @@
 #pragma warning (disable: 4786)
 #endif // _MSC_VER
 
-#include "SOAP.h"
-#include "SOAPonHTTP.h"
-#include "SOAPEnvelope.h"
+#include <SOAP.h>
+#include <SOAPonHTTP.h>
+#include <SOAPEnvelope.h>
+#include <SOAPDebugger.h>
+
 #include "SOAPSecureSocketImp.h"
-#include "SOAPDebugger.h"
 
 #ifndef SOAPUSER_AGENT
 #define SOAPUSER_AGENT EASYSOAP_STRING "/" EASYSOAP_VERSION_STRING

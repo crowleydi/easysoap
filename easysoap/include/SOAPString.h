@@ -23,8 +23,8 @@
 
 #include <wchar.h>
 
-#include "SOAP.h"
-#include "SOAPUtil.h"
+#include <SOAP.h>
+#include <SOAPUtil.h>
 
 class EASYSOAP_EXPORT SOAPString
 {

@@ -28,7 +28,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-#include "SOAPString.h"
+#include <SOAPString.h>
 
 class EASYSOAP_EXPORT SOAPException  
 {

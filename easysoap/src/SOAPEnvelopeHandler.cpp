@@ -22,8 +22,9 @@
 #endif // _MSC_VER
 
 #include "SOAPEnvelopeHandler.h"
-#include "SOAPEnvelope.h"
-#include "SOAPNamespaces.h"
+#include <SOAPEnvelope.h>
+#include <SOAPNamespaces.h>
+
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

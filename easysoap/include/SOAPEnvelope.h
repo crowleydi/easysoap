@@ -21,10 +21,10 @@
 #if !defined(AFX_SOAPENVELOPE_H__E0A24A39_4139_4A48_9C59_1DF34800189D__INCLUDED_)
 #define AFX_SOAPENVELOPE_H__E0A24A39_4139_4A48_9C59_1DF34800189D__INCLUDED_
 
-#include "SOAP.h"
+#include <SOAP.h>
 
-#include "SOAPBody.h"
-#include "SOAPHeader.h"
+#include <SOAPBody.h>
+#include <SOAPHeader.h>
 
 class EASYSOAP_EXPORT SOAPEnvelope
 {

@@ -21,8 +21,8 @@
 #pragma warning (disable: 4786)
 #endif // _MSC_VER
 
-#include "SOAPProxy.h"
-#include "SOAPonHTTP.h"
+#include <SOAPProxy.h>
+#include <SOAPonHTTP.h>
 
 const SOAPResponse&
 SOAPProxy::Execute(SOAPMethod& method)

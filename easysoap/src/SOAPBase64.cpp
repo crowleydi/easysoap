@@ -21,8 +21,8 @@
 #pragma warning (disable: 4786)
 #endif // _MSC_VER
 
-#include "SOAP.h"
-#include "SOAPBase64.h"
+#include <SOAP.h>
+#include <SOAPBase64.h>
 
 static char base64encode[64];
 static int  base64decode[256];

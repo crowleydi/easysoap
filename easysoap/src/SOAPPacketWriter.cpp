@@ -18,8 +18,8 @@
  */
 
 
-#include "SOAP.h"
-#include "SOAPPacketWriter.h"
+#include <SOAP.h>
+#include <SOAPPacketWriter.h>
 
 bool SOAPPacketWriter::g_makePretty = false;
 

@@ -21,8 +21,8 @@
 #if !defined(AFX_SOAPARRAYHANDLER_H__3A318691_8E69_43B1_9733_39FE84CA7565__INCLUDED_)
 #define AFX_SOAPARRAYHANDLER_H__3A318691_8E69_43B1_9733_39FE84CA7565__INCLUDED_
 
-#include "SOAP.h"
-#include "SOAPParseEventHandler.h"
+#include <SOAP.h>
+#include <SOAPParseEventHandler.h>
 
 class SOAPParameterHandler;
 class SOAPParameter;

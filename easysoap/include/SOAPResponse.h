@@ -21,9 +21,8 @@
 #if !defined(AFX_SOAPRESPONSE_H__B8BDA9D2_F6F6_4312_BFAD_B34A813A3B55__INCLUDED_)
 #define AFX_SOAPRESPONSE_H__B8BDA9D2_F6F6_4312_BFAD_B34A813A3B55__INCLUDED_
 
-#include "SOAP.h"
-
-#include "SOAPEnvelope.h"
+#include <SOAP.h>
+#include <SOAPEnvelope.h>
 
 class EASYSOAP_EXPORT SOAPResponse : public SOAPEnvelope
 {

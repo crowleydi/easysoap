@@ -21,8 +21,8 @@
 #if !defined(AFX_SOAPFAULT_H__290FC204_F572_4249_8E5E_D52E987FFAD0__INCLUDED_)
 #define AFX_SOAPFAULT_H__290FC204_F572_4249_8E5E_D52E987FFAD0__INCLUDED_
 
-#include "SOAP.h"
-#include "SOAPParameter.h"
+#include <SOAP.h>
+#include <SOAPParameter.h>
 
 class SOAPFaultHandler;
 

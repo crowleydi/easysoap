@@ -21,10 +21,10 @@
 #if !defined(AFX_SOAPBODY_H__2ED6E429_A5CB_4FEB_B1B1_19E83A2F8046__INCLUDED_)
 #define AFX_SOAPBODY_H__2ED6E429_A5CB_4FEB_B1B1_19E83A2F8046__INCLUDED_
 
-#include "SOAP.h"
+#include <SOAP.h>
 
-#include "SOAPMethod.h"
-#include "SOAPFault.h"
+#include <SOAPMethod.h>
+#include <SOAPFault.h>
 
 class EASYSOAP_EXPORT SOAPBody
 {

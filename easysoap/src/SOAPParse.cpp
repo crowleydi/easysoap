@@ -21,11 +21,11 @@
 #pragma warning (disable: 4786)
 #endif // _MSC_VER
 
-#include "SOAP.h"
-#include "SOAPParse.h"
-#include "SOAPEnvelopeHandler.h"
+#include <SOAP.h>
+#include <SOAPParse.h>
+#include <SOAPNamespaces.h>
 
-#include "SOAPNamespaces.h"
+#include "SOAPEnvelopeHandler.h"
 
 #define BUFF_SIZE 1024
 

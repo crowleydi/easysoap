@@ -22,8 +22,9 @@
 #pragma warning (disable: 4786)
 #endif // _MSC_VER
 
+#include <SOAPDebugger.h>
+
 #include "SOAPClientSocketImp.h"
-#include "SOAPDebugger.h"
 
 #if defined (_WIN32)
 #if !defined (__MWERKS__)

@@ -23,8 +23,9 @@
 #endif // _MSC_VER
 
 #include "SOAPBodyHandler.h"
-#include "SOAPBody.h"
-#include "SOAPNamespaces.h"
+#include <SOAPBody.h>
+#include <SOAPNamespaces.h>
+
 
 static const SOAPQName RootTag("root", SOAP_ENC);
 

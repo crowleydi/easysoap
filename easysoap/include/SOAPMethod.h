@@ -21,8 +21,8 @@
 #if !defined(AFX_SOAPMETHOD_H__B3726AD6_5844_4059_8ECD_36A553A918AD__INCLUDED_)
 #define AFX_SOAPMETHOD_H__B3726AD6_5844_4059_8ECD_36A553A918AD__INCLUDED_
 
-#include "SOAP.h"
-#include "SOAPParameter.h"
+#include <SOAP.h>
+#include <SOAPParameter.h>
 
 class EASYSOAP_EXPORT SOAPMethod : public SOAPParameter
 {

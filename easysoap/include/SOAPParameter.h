@@ -25,9 +25,9 @@
 #pragma warning (disable: 4786)
 #endif // _MSC_VER
 
-#include "SOAP.h"
-#include "SOAPBase64.h"
-#include "SOAPNamespaces.h"
+#include <SOAP.h>
+#include <SOAPBase64.h>
+#include <SOAPNamespaces.h>
 
 class SOAPParameterHandler;
 

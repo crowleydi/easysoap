@@ -21,8 +21,8 @@
 #if !defined(AFX_SOAPPACKETWRITER_H__DB61E902_B4A0_4AA3_A0F7_479D6295BD06__INCLUDED_)
 #define AFX_SOAPPACKETWRITER_H__DB61E902_B4A0_4AA3_A0F7_479D6295BD06__INCLUDED_
 
-#include "SOAPHashMap.h"
-#include "SOAPString.h"
+#include <SOAPHashMap.h>
+#include <SOAPString.h>
 
 class EASYSOAP_EXPORT SOAPPacketWriter  
 {

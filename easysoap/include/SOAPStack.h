@@ -21,7 +21,7 @@
 #ifndef __SOAPSTACK_H__
 #define __SOAPSTACK_H__
 
-#include "SOAPArray.h"
+#include <SOAPArray.h>
 
 template<typename T>
 class SOAPStack

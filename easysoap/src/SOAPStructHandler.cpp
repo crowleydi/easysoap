@@ -23,9 +23,9 @@
 #endif // _MSC_VER
 
 #include "SOAPStructHandler.h"
-
 #include "SOAPParameterHandler.h"
-#include "SOAPParameter.h"
+
+#include <SOAPParameter.h>
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

@@ -22,10 +22,10 @@
 #pragma warning (disable: 4786)
 #endif // _MSC_VER
 
-#include "SOAP.h"
-#include "SOAPEnvelope.h"
-#include "SOAPNamespaces.h"
-#include "SOAPPacketWriter.h"
+#include <SOAP.h>
+#include <SOAPEnvelope.h>
+#include <SOAPNamespaces.h>
+#include <SOAPPacketWriter.h>
 
 const SOAPQName EnvelopeTag("Envelope", SOAP_ENV);
 const SOAPQName EncodingAttr("encodingStyle", SOAP_ENV);

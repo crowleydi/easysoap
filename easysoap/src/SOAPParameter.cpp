@@ -22,10 +22,10 @@
 #pragma warning (disable: 4786)
 #endif // _MSC_VER
 
-#include "SOAP.h"
-#include "SOAPParameter.h"
-#include "SOAPNamespaces.h"
-#include "SOAPPacketWriter.h"
+#include <SOAP.h>
+#include <SOAPParameter.h>
+#include <SOAPNamespaces.h>
+#include <SOAPPacketWriter.h>
 
 #include <float.h>
 #include <stdlib.h>

@@ -22,9 +22,8 @@
 #pragma warning (disable: 4786)
 #endif // _MSC_VER
 
-#include "SOAPArrayHandler.h"
 #include "SOAPParameterHandler.h"
-#include "SOAPParameter.h"
+#include "SOAPArrayHandler.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

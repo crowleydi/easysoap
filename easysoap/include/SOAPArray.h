@@ -21,10 +21,10 @@
 #ifndef __SOAPARRAY_H__
 #define __SOAPARRAY_H__
 
-#include "SOAPUtil.h"
-#include "SOAPException.h"
-
 #include <new>
+
+#include <SOAPUtil.h>
+#include <SOAPException.h>
 
 template <typename T>
 class SOAPArray
