@@ -110,7 +110,7 @@ size_t
 SOAPHTTPServerTransport::Write(const SOAPMethod& method, const char *payload, size_t payloadsize)
 {
 	char lenstr[32];
-	sprintf(lenstr, "%u", payloadsize);
+	snprintf(lenstr, sizeof(lenstr), "%u", payloadsize);
 
 	ResponseStatus(m_session, m_error ? 500 : 200);
 	ResponseContentType(m_session, "text/xml; charset=\"UTF-8\"");
