@@ -207,42 +207,52 @@ SOAPServerDispatch::HandleRequest(SOAPEnvelope& request, SOAPResponse& response)
 void
 SOAPServerDispatch::HandleHeaders(SOAPEnvelope& request, SOAPResponse& response)
 {
-	const SOAPHeader::Headers& headers = request.GetHeader().GetHeaders();
+	const SOAPHeader::Headers& headers = request.GetHeader().GetAllHeaders();
 	for (SOAPHeader::Headers::ConstIterator h = headers.Begin(); h != headers.End(); ++h)
 	{
-		const SOAPParameter& header = *h;
+		const SOAPParameter& header = **h;
 		SOAPParameter::Attrs::Iterator actor = header.GetAttributes().Find(SOAPEnv::actor);
+		SOAPParameter::Attrs::Iterator mu = header.GetAttributes().Find(SOAPEnv::mustUnderstand);
 
-		//
-		// TODO: Be able to specify/check for a custom QName for this endpoint
-		if (!actor || (*actor == SOAP_ACTOR_NEXT))
+		if (!mu || (*mu == "0" || *mu == "1"))
 		{
-			bool handled = false;
 			//
-			// TODO:  This is an O(n) lookup... but n is (hopefully!) small
-			for (HeaderHandlers::Iterator i = m_headerHandlers.Begin(); i != m_headerHandlers.End(); ++i)
+			// TODO: Be able to specify/check for a custom QName for this endpoint
+			if (!actor || (*actor == SOAP_ACTOR_NEXT))
 			{
+				bool handled = false;
 				//
-				// We found a handler.  Now dispatch the method
-				if ((*i)->HandleHeader(header, request, response))
+				// TODO:  This is an O(n) lookup... but n is (hopefully!) small
+				for (HeaderHandlers::Iterator i = m_headerHandlers.Begin(); i != m_headerHandlers.End(); ++i)
 				{
-					handled = true;
-					break;
+					//
+					// We found a handler.  Now dispatch the method
+					if ((*i)->HandleHeader(header, request, response))
+					{
+						handled = true;
+						break;
+					}
+				}
+
+				if (!handled)
+				{
+					//
+					// check for mustUnderstand == 1
+					if (mu && *mu == "1")
+						// TODO:  Special MustUnderstand exception so the
+						// actor(?) in the SOAPFault can be set correctly.
+						throw SOAPMustUnderstandException("Failed to understand header \"{%s}:%s\"",
+							(const char *)header.GetName().GetNamespace(),
+							(const char *)header.GetName().GetName());
 				}
 			}
-
-			if (!handled)
-			{
-				//
-				// check for mustUnderstand == 1
-				SOAPParameter::Attrs::Iterator mu = header.GetAttributes().Find(SOAPEnv::mustUnderstand);
-				if (mu && *mu == "1")
-					// TODO:  Special MustUnderstand exception so the
-					// actor(?) in the SOAPFault can be set correctly.
-					throw SOAPMustUnderstandException("Failed to understand header \"{%s}:%s\"",
-						(const char *)header.GetName().GetNamespace(),
-						(const char *)header.GetName().GetName());
-			}
+		}
+		else
+		{
+			throw SOAPMustUnderstandException("Invalid value for mustUnderstand attribute on header {%s}:%s: %s",
+				(const char *)header.GetName().GetNamespace(),
+				(const char *)header.GetName().GetName(),
+				(const char *)mu->GetName());
 		}
 	}
 }
