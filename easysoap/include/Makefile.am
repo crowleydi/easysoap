@@ -1,15 +1,16 @@
 easysoapdir = $(prefix)/include/easysoap
 easysoap_HEADERS = \
+    SOAP.h \
     SOAPArray.h \
     SOAPBase64.h \
     SOAPBody.h \
     SOAPCGIServer.h \
+    SOAPCGITransport.h \
     SOAPDebugger.h \
     SOAPDispatchHandler.h \
     SOAPEnvelope.h \
     SOAPException.h \
     SOAPFault.h \
-    SOAP.h \
     SOAPHTTPServer.h \
     SOAPHashMap.h \
     SOAPHeader.h \
