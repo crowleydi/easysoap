@@ -233,7 +233,7 @@ SOAPSecureSocketImp::Write(const char *buff, size_t bufflen)
 		bool retry = false;
 		do
 		{
-			int bytes = SSL_write(m_ssl, buff, bufflen);
+			size_t bytes = SSL_write(m_ssl, buff, bufflen);
 			if (bytes > 0)
 			{
 				if (bytes != bufflen)

@@ -18,22 +18,22 @@ CPPFLAGS = -I../include -I$(EXPAT)/include \
 	 -DEASYSOAP_SSL # if you want https
 
 SRCS = SOAPArrayHandler.cpp SOAPBody.cpp SOAPBodyHandler.cpp \
-	SOAPDebugger.cpp SOAPPacketWriter.cpp \
+	SOAPDebugger.cpp SOAPPacketWriter.cpp SOAPBase64.cpp \
 	SOAPClientSocketImp.cpp SOAPEnvelope.cpp SOAPEnvelopeHandler.cpp \
 	SOAPFault.cpp SOAPFaultHandler.cpp SOAPHeader.cpp \
 	SOAPHeaderHandler.cpp SOAPMethod.cpp SOAPMethodHandler.cpp \
 	SOAPParameter.cpp SOAPParameterHandler.cpp SOAPParse.cpp \
-	SOAPProxy.cpp SOAPResponse.cpp SOAPResponseHandler.cpp \
+	SOAPProxy.cpp SOAPResponse.cpp SOAPQName.cpp \
 	SOAPSecureSocketImp.cpp SOAPSocket.cpp SOAPStructHandler.cpp \
 	SOAPUrl.cpp SOAPonHTTP.cpp XMLParser.cpp
 
 OBJS = SOAPArrayHandler.o SOAPBody.o SOAPBodyHandler.o \
-	SOAPDebugger.o SOAPPacketWriter.o \
+	SOAPDebugger.o SOAPPacketWriter.o SOAPBase64.o \
 	SOAPClientSocketImp.o SOAPEnvelope.o SOAPEnvelopeHandler.o \
 	SOAPFault.o SOAPFaultHandler.o SOAPHeader.o \
 	SOAPHeaderHandler.o SOAPMethod.o SOAPMethodHandler.o \
 	SOAPParameter.o SOAPParameterHandler.o SOAPParse.o \
-	SOAPProxy.o SOAPResponse.o SOAPResponseHandler.o \
+	SOAPProxy.o SOAPResponse.o SOAPQName.o \
 	SOAPSecureSocketImp.o SOAPSocket.o SOAPStructHandler.o \
 	SOAPUrl.o SOAPonHTTP.o XMLParser.o
 

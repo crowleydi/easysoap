@@ -387,10 +387,7 @@ const SOAPQName arrayType("arrayType", SOAP_ENC);
 bool
 SOAPParameter::WriteSOAPPacket(SOAPPacketWriter& packet) const
 {
-	const char *sym = 0;
-
 	packet.StartTag(m_name);
-
 
 	packet.AddAttr(xsitype, m_type);
 	if (IsNull())

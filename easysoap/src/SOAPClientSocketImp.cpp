@@ -57,7 +57,7 @@ public:
 #include <sys/unistd.h>
 #include <arpa/inet.h>
 #define INVALID_SOCKET 0xFFFFFFFF
-#define SOCKET_ERROR -1
+#define SOCKET_ERROR 0xFFFFFFFF
 #define closesocket close
 
 #else // not _WIN32
@@ -239,7 +239,7 @@ SOAPClientSocketImp::Write(const char *buff, size_t bufflen)
 		{
 			throw SOAPSocketException("Error writing to socket");
 		}
-		else if (bytes != bufflen)
+		else if (bytes != (int)bufflen)
 		{
 			throw SOAPSocketException("Error writing to socket, "
 					"tried to write %d bytes, wrote %d",

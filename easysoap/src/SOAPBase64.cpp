@@ -83,7 +83,7 @@ nextChar(const char*& str)
 
 	// only increment pointer if
 	// we're not at the end of string
-	if (c = *str)
+	if ((c = *str))
 		++str;
 
 	return c;
