@@ -105,7 +105,7 @@ SOAPBodyHandler::startElement(SOAPParser& parser, const XML_Char *name, const XM
 			p = &m_body->GetMethod().AddParameter(name);
 		}
 
-		m_paramHandler.SetParameter(*p);
+		m_paramHandler.SetParameter(p);
 		return m_paramHandler.start(parser, name, attrs);
 	}
 
