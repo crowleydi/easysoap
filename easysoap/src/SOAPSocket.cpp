@@ -58,6 +58,15 @@ SOAPProtocolBase::Close()
 	m_wend = 0;
 }
 
+void
+SOAPProtocolBase::SetSocket(SOAPSocketInterface *socket)
+{
+	Close();
+	m_socket = socket;
+	m_wpos = m_wbuff;
+	m_wend = m_wpos + sizeof(m_wbuff);
+}
+
 bool
 SOAPProtocolBase::Connect(const char *host, unsigned int port, bool secure)
 {

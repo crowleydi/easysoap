@@ -20,6 +20,8 @@
 
 #ifdef _WIN32
 #pragma warning (disable: 4786)
+#else // not _WIN32
+#include <sys/time.h>
 #endif // _WIN32
 
 #ifndef EASYSOAP_SSL
@@ -39,6 +41,7 @@ bool SOAPSecureSocketImp::Connect(const char *, unsigned int) {return false;}
 void SOAPSecureSocketImp::Close() { }
 int SOAPSecureSocketImp::Read(char *, int) {return 0;}
 int SOAPSecureSocketImp::Write(const char *, int) {return 0;}
+bool SOAPSecureSocketImp::WaitRead(int sec, int usec) {return false;}
 
 #else
 
@@ -88,22 +91,21 @@ SOAPSecureSocketImp::HandleError(const char *context, int retcode)
 	// we need to call SSL_get_error()
 	bool retry = false;
 	unsigned long err = SSL_get_error(m_ssl, retcode);
-	char msg[256];
 	switch (err)
 	{
 	case SSL_ERROR_NONE:
 		break;
 
 	case SSL_ERROR_ZERO_RETURN:
-		throw SOAPSocketException(context, "Socked closed unexpectedly");
+		Close();
 		break;
 
 	case SSL_ERROR_WANT_WRITE:
-		WaitWrite();
+		super::WaitWrite();
 		retry = true;
 		break;
 	case SSL_ERROR_WANT_READ:
-		WaitRead();
+		super::WaitRead();
 		retry = true;
 		break;
 	case SSL_ERROR_WANT_X509_LOOKUP:
@@ -113,19 +115,19 @@ SOAPSecureSocketImp::HandleError(const char *context, int retcode)
 	case SSL_ERROR_SYSCALL:
 	case SSL_ERROR_SSL:
 	default:
+		{
+		char msg[256];
 		ERR_error_string_n(err, msg, sizeof(msg) - 1);
 		msg[sizeof(msg) - 1] = 0;
 		throw SOAPSocketException(context, msg);
+		}
 	}
 	return retry;
 }
 
-bool
-SOAPSecureSocketImp::Connect(const char *host, unsigned int port)
+void
+SOAPSecureSocketImp::InitSSL()
 {
-	if (!super::Connect(host, port))
-		return false;
-
 	//
 	// set up SSL
 	//
@@ -145,7 +147,31 @@ SOAPSecureSocketImp::Connect(const char *host, unsigned int port)
 	if ((retcode = SSL_connect(m_ssl)) != 1)
 		HandleError("Error negotiating secure connection", retcode);
 
+}
+
+bool
+SOAPSecureSocketImp::Connect(const char *host, unsigned int port)
+{
+	if (!super::Connect(host, port))
+		return false;
+
+	InitSSL();
 	return true;
+}
+
+bool
+SOAPSecureSocketImp::WaitRead(int sec, int usec)
+{
+	if (SSL_pending(m_ssl) > 0)
+		return true;
+
+	// we have to wait...
+	struct timeval tv;
+	tv.tv_sec = sec;
+	tv.tv_usec = usec;
+	select(0, 0, 0, 0, sec == -1 ? 0 : &tv);
+
+	return SSL_pending(m_ssl) > 0;
 }
 
 int

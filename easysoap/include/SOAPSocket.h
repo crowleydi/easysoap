@@ -81,6 +81,8 @@ public:
 	SOAPProtocolBase();
 	virtual ~SOAPProtocolBase();
 
+	void SetSocket(SOAPSocketInterface *socket);
+
 	virtual bool CanRead() {return IsOpen() && (m_buff != m_buffend || m_socket->WaitRead(0));}
 	virtual bool IsOpen() {return m_socket && m_socket->IsOpen();}
 	virtual void Close();

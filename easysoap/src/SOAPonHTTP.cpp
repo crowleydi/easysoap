@@ -3,6 +3,7 @@
 #include "SOAP.h"
 #include "SOAPonHTTP.h"
 #include "SOAPEnvelope.h"
+#include "SOAPSecureSocketImp.h"
 
 
 #ifndef SOAPUSER_AGENT
@@ -99,34 +100,12 @@ SOAPHTTPProtocol::StartVerb(const char *verb, const char *path)
 	Write(" ");
 
 	if (m_proxy.Protocol() != SOAPUrl::no_proto)
-	{
-		// TODO: Get a string back from SOAPUrl
-		if (m_endpoint.Protocol() == SOAPUrl::http_proto)
-		{
-			Write("http://");
-			Write(m_endpoint.Hostname());
-		}
-		else if (m_endpoint.Protocol() == SOAPUrl::https_proto)
-		{
-			//
-			Write("https://");
-			Write(m_endpoint.Hostname());
-		}
-		else
-		{
-			// not true, some proxies can do FTP GETs
-			throw SOAPException("Proxy only handle HTTP destinations");
-		}
-	}
+		Write(m_endpoint.GetBaseString());
 
 	if (path && *path)
-	{
 		Write(path);
-	}
 	else
-	{
 		Write("/");
-	}
 
 	WriteLine(" HTTP/1.0");
 	WriteHostHeader(m_endpoint);
@@ -252,7 +231,25 @@ SOAPHTTPProtocol::Connect()
 			SOAPProtocolBase::Connect(host, port, false);
 			break;
 		case SOAPUrl::https_proto:
-			SOAPProtocolBase::Connect(host, port, true);
+			{
+				SOAPSecureSocketImp *socket = new SOAPSecureSocketImp();
+				socket->SOAPClientSocketImp::Connect(host, port);
+				SOAPProtocolBase::SetSocket(socket);
+				if (proxy)
+				{
+					char buffer[1024];
+					snprintf(buffer, 1024, "CONNECT %s:%d HTTP/1.0",
+							(const char *)m_endpoint.Hostname(),
+							m_endpoint.Port());
+					WriteLine(buffer);
+					WriteHostHeader(m_endpoint);
+					//
+					// TODO: Check return
+					//
+					GetReply();
+				}
+				socket->InitSSL();
+			}
 			break;
 		default:
 			throw SOAPSocketException("Can only handle HTTP protocols");

@@ -44,6 +44,9 @@ public:
 	virtual bool Connect(const char *host, unsigned int port);
 	virtual int Read(char *buffer, int len);
 	virtual int Write(const char *buffer, int len);
+	virtual bool WaitRead(int sec, int usec);
+
+	void InitSSL();
 };
 
 
