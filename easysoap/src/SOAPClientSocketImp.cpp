@@ -47,7 +47,6 @@ public:
 		WSACleanup();
 	}
 } __winsockinit;
-#define SOL_TCP IPPROTO_TCP
 
 #elif defined(__CYGWIN__)
 #include <sys/socket.h>
@@ -170,7 +169,7 @@ SOAPClientSocketImp::Connect(const char *server, unsigned int port)
 	sockAddr.sin_family = AF_INET;
 	sockAddr.sin_addr.s_addr = inet_addr(server);
 	sockAddr.sin_port = htons((u_short)port);
-	if (sockAddr.sin_addr.s_addr == INADDR_NONE)
+	if (sockAddr.sin_addr.s_addr == (unsigned int)-1)
 	{
 		struct hostent *lphost = gethostbyname(server);
 		if (lphost != NULL)
@@ -187,7 +186,13 @@ SOAPClientSocketImp::Connect(const char *server, unsigned int port)
 	}
 
 	int nodelay = 1;
-	if (setsockopt(m_socket, SOL_TCP, TCP_NODELAY, (const char *)&nodelay, sizeof(nodelay)) == -1)
+	struct protoent *tcpproto = getprotobyname("tcp");
+	if (!tcpproto)
+	{
+		throw SOAPSocketException("Could not get TCP proto struct.");
+	}
+
+	if (setsockopt(m_socket, tcpproto->p_proto, TCP_NODELAY, (const char *)&nodelay, sizeof(nodelay)) == -1)
 	{
 		throw SOAPSocketException("Could not set TCP_NODELAY");
 	}
