@@ -19,6 +19,7 @@ CFG=easysoap - Win32 Debug
 !MESSAGE 
 !MESSAGE "easysoap - Win32 Release" (based on "Win32 (x86) Dynamic-Link Library")
 !MESSAGE "easysoap - Win32 Debug" (based on "Win32 (x86) Dynamic-Link Library")
+!MESSAGE "easysoap - Win32 ReleaseSymbols" (based on "Win32 (x86) Dynamic-Link Library")
 !MESSAGE 
 
 # Begin Project
@@ -55,6 +56,7 @@ BSC32=bscmake.exe
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /machine:I386
 # ADD LINK32 ../win32/Release/expat.lib ws2_32.lib /nologo /dll /machine:I386
+# SUBTRACT LINK32 /debug
 
 !ELSEIF  "$(CFG)" == "easysoap - Win32 Debug"
 
@@ -83,12 +85,42 @@ LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /debug /machine:I386 /pdbtype:sept
 # ADD LINK32 ../win32/Debug/expat.lib ws2_32.lib /nologo /dll /debug /machine:I386 /pdbtype:sept
 
+!ELSEIF  "$(CFG)" == "easysoap - Win32 ReleaseSymbols"
+
+# PROP BASE Use_MFC 0
+# PROP BASE Use_Debug_Libraries 0
+# PROP BASE Output_Dir "easysoap___Win32_ReleaseSymbols"
+# PROP BASE Intermediate_Dir "easysoap___Win32_ReleaseSymbols"
+# PROP BASE Ignore_Export_Lib 0
+# PROP BASE Target_Dir ""
+# PROP Use_MFC 0
+# PROP Use_Debug_Libraries 0
+# PROP Output_Dir "../win32/ReleaseSymbols"
+# PROP Intermediate_Dir "../win32/ReleaseSymbols/obj"
+# PROP Ignore_Export_Lib 0
+# PROP Target_Dir ""
+# ADD BASE CPP /nologo /MD /W3 /GX /O2 /I "../include" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "EASYSOAP_DLL" /FD /c
+# SUBTRACT BASE CPP /YX
+# ADD CPP /nologo /MD /W3 /GX /Zi /O2 /I "../include" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "EASYSOAP_DLL" /FD /c
+# SUBTRACT CPP /YX
+# ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
+# ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
+# ADD BASE RSC /l 0x409 /d "NDEBUG"
+# ADD RSC /l 0x409 /d "NDEBUG"
+BSC32=bscmake.exe
+# ADD BASE BSC32 /nologo
+# ADD BSC32 /nologo
+LINK32=link.exe
+# ADD BASE LINK32 ../win32/Release/expat.lib ws2_32.lib /nologo /dll /machine:I386
+# ADD LINK32 ../win32/Release/expat.lib ws2_32.lib /nologo /dll /debug /machine:I386
+
 !ENDIF 
 
 # Begin Target
 
 # Name "easysoap - Win32 Release"
 # Name "easysoap - Win32 Debug"
+# Name "easysoap - Win32 ReleaseSymbols"
 # Begin Group "Source Files"
 
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
@@ -298,7 +330,7 @@ SOURCE=..\include\SOAPNamespaces.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\SOAPonHTTP.h
+SOURCE=..\include\SOAPonHTTP.h
 # End Source File
 # Begin Source File
 
