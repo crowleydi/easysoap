@@ -92,10 +92,22 @@ SOAPSSLContext::SOAPSSLContext()
 	throw SOAPMemoryException();
 }
 
-SOAPSSLContext::SOAPSSLContext(const char* certfile, const char* keyfile, const char* password)
+SOAPSSLContext::SOAPSSLContext(const char* cafile) 
+		: m_cafile(cafile)
+		, m_ctx(0)
+{
+	sslinit();
+	m_ctx = SSL_CTX_new(SSLv23_client_method());
+	if (!m_ctx)
+		throw SOAPMemoryException();
+	SetCAInfo(cafile);
+}
+
+SOAPSSLContext::SOAPSSLContext(const char* certfile, const char* keyfile, const char* password, const char* cafile)
 		: m_certfile(certfile)
 		, m_keyfile(keyfile)
 		, m_password(password)
+		, m_cafile(cafile)
 		, m_ctx(0)
 {
 	sslinit();
@@ -103,6 +115,8 @@ SOAPSSLContext::SOAPSSLContext(const char* certfile, const char* keyfile, const 
 	if (!m_ctx)
 		throw SOAPMemoryException();
 	SetCertInfo(certfile, keyfile, password);
+	if (cafile)
+		SetCAInfo(cafile);
 }
 
 void
@@ -122,6 +136,17 @@ SOAPSSLContext& SOAPSSLContext::operator=(const SOAPSSLContext& ctx)
 	return *this;	
 }
 */
+
+void SOAPSSLContext::SetCAInfo(const char* cafile)
+{
+	int retcode;
+
+	SSL_CTX_set_verify(m_ctx, SSL_VERIFY_PEER, NULL);
+
+	if ((retcode = SSL_CTX_load_verify_locations(m_ctx, m_cafile.Str(), 0)) != 1)
+			HandleError("Error loading the certificate authority file: %s\n", retcode);
+}
+
 void SOAPSSLContext::SetCertInfo(const char* certfile, const char* keyfile, const char* password)
 {
 	int retcode;

@@ -161,7 +161,25 @@ SOAPSecureSocketImp::InitSSL()
 
 	if ((retcode = SSL_connect(m_ssl)) != 1)
 		HandleError("Error negotiating secure connection : %s\n", retcode);
+}
 
+void
+SOAPSecureSocketImp::VerifyCert(const char* host)
+{
+	X509* server_cert = SSL_get_peer_certificate(m_ssl);
+	if (!server_cert)
+		throw SOAPException("Error getting server certificate.");
+
+	if (SSL_get_verify_result(m_ssl) != X509_V_OK)
+		throw SOAPException("Server certificate verification failed.");
+
+	char buf[128];
+	X509_NAME_get_text_by_NID(X509_get_subject_name(server_cert),
+							  NID_commonName, buf, sizeof(buf));
+	if (sp_strcasecmp(buf, host))
+		throw SOAPException("Server certificate hostname does not match (%s != %s).", buf, host);
+
+	X509_free(server_cert);
 }
 
 bool
@@ -171,6 +189,9 @@ SOAPSecureSocketImp::Connect(const char *host, unsigned int port)
 		return false;
 
 	InitSSL();
+
+	VerifyCert(host);
+
 	return true;
 }
 

@@ -54,6 +54,7 @@ public:
 	virtual bool WaitRead(int sec, int usec);
 
 	void InitSSL();
+	void VerifyCert(const char* host);
 };
 
 END_EASYSOAP_NAMESPACE

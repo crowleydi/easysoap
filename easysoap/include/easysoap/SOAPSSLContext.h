@@ -36,12 +36,17 @@ public:
 	SOAPSSLContext(){
 		throw SOAPException("HTTPS NOT SUPPORTED WITHOUT OpenSSL");
 	}
-	SOAPSSLContext(const char* certfile, const char* keyfile, const char* password) {
+	SOAPSSLContext(const char* cafile) {
+
+		throw SOAPException("HTTPS NOT SUPPORTED WITHOUT OpenSSL");
+	}
+	SOAPSSLContext(const char* certfile, const char* keyfile, const char* password, const char* cafile=0) {
 
 		throw SOAPException("HTTPS NOT SUPPORTED WITHOUT OpenSSL");
 	}
 
 	ssl_ctx_st*	GetContext() {return 0;}
+	void SetCAInfo(const char* cafile);
 	void SetCertInfo(const char* certfile, const char* keyfile, const char* password) {}
 	~SOAPSSLContext() {}
 };
@@ -53,12 +58,14 @@ class EASYSOAP_EXPORT SOAPSSLContext
 {
 public:
 	SOAPSSLContext();
-	SOAPSSLContext(const char* certfile, const char* keyfile, const char* password);
+	SOAPSSLContext(const char* cafile);
+	SOAPSSLContext(const char* certfile, const char* keyfile, const char* password, const char* cafile=0);
 	~SOAPSSLContext();
 	//SOAPSSLContext(const SOAPSSLContext& ctx);
 	//SOAPSSLContext& operator=(const SOAPSSLContext& ctx);
 
 	ssl_ctx_st*	GetContext();
+	void SetCAInfo(const char* cafile);
 	void SetCertInfo(const char* certfile, const char* keyfile, const char* password);
 
 	// callbacks required by openSSL
@@ -73,6 +80,7 @@ public:
 private:
 	static rsa_st*		m_tmpRSAKey;
 	ssl_ctx_st*			m_ctx;
+	SOAPString 			m_cafile;
 	SOAPString 			m_certfile;
 	SOAPString 			m_keyfile;
 	SOAPString 			m_password;
