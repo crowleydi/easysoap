@@ -228,7 +228,7 @@ operator>>(const SOAPParameter& param, Endpoint& e)
 }
 
 void
-GetAllEndpoints(SOAPArray<Endpoint>& ea)
+GetRound1Endpoints(SOAPArray<Endpoint>& ea)
 {
 	SOAPProxy proxy("http://www.xmethods.net/perl/soaplite.cgi", httpproxy);
 	SOAPMethod getAllEndpoints("getAllEndpoints",
@@ -245,6 +245,34 @@ GetAllEndpoints(SOAPArray<Endpoint>& ea)
 	{
 		Endpoint& e = ea.Add();
 		*(*i) >> e;
+	}
+}
+
+void
+GetRound2Endpoints(SOAPArray<Endpoint>& ea, const char *groupName)
+{
+	SOAPProxy proxy("http://www.whitemesa.net/interopInfo", httpproxy);
+	SOAPMethod getEndpointInfo("GetEndpointInfo",
+		"http://soapinterop.org/info/",
+		"http://soapinterop.org/info/#", true);
+
+	getEndpointInfo.AddParameter("groupName") << groupName;
+
+	const SOAPResponse& response = proxy.Execute(getEndpointInfo);
+	const SOAPParameter& p = response.GetReturnValue();
+
+	
+	SOAPString endpoint;
+	for (SOAPParameter::Array::ConstIterator i = p.GetArray().Begin();
+			i != p.GetArray().End();
+			++i)
+	{
+		Endpoint& e = ea.Add();
+		(*i)->GetParameter("endpointName") >> e.name;
+		(*i)->GetParameter("endpointURL") >> endpoint; e.endpoint = endpoint;
+		(*i)->GetParameter("wsdlURL") >> e.wsdl;
+		e.nspace = default_interop_namespace;
+		e.soapaction = round2_soapaction;
 	}
 }
 
@@ -1734,7 +1762,21 @@ main(int argc, char* argv[])
 
 		if (doall)
 		{
-			GetAllEndpoints(endpoints);
+			switch (test)
+			{
+			case round1:
+				GetRound1Endpoints(endpoints);
+				break;
+			case round2a:
+				GetRound2Endpoints(endpoints, "base");
+				break;
+			case round2b:
+				GetRound2Endpoints(endpoints, "Group B");
+				break;
+			case round2c:
+				GetRound2Endpoints(endpoints, "Group C");
+				break;
+			}
 		}
 
 		char buffer[256];
