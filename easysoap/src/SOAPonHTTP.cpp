@@ -134,10 +134,12 @@ SOAPHTTPProtocol::FlushInput()
 		size_t read = Read(buffer, sizeof(buffer));
 		if (read == 0)
 		{
-			SOAPDebugger::Print(2, "CLOSED\r\n");
 			Close();
 		}
 	}
+
+	if (m_doclose)
+		Close();
 }
 
 void
@@ -147,7 +149,7 @@ SOAPHTTPProtocol::StartVerb(const char *verb, const char *path)
 		throw SOAPException("Invalid NULL path");
 
 	FlushInput();
-	SOAPDebugger::Print(1, "\r\n\r\nREQUEST:\r\n");
+	SOAPDebugger::Print(1, "\n\nREQUEST:\n");
 
 	if (!Connect())
 		throw SOAPSocketException("Unable to make socket connection");
@@ -210,7 +212,7 @@ int
 SOAPHTTPProtocol::GetReply()
 {
 	Flush();
-	SOAPDebugger::Print(1, "\r\n\r\nRESPONSE:\r\n");
+	SOAPDebugger::Print(1, "\n\nRESPONSE:\n");
 	char buff[2048];
 	m_headers.Clear();
 
@@ -338,7 +340,9 @@ void
 SOAPHTTPProtocol::Close()
 {
 	m_canread = -1;
+	m_doclose = false;
 	super::Close();
+	SOAPDebugger::Print(2, "CLOSED\n");
 }
 
 bool
