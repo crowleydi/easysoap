@@ -194,3 +194,61 @@ SOAPBase64::Encode(const SOAPArray<char>& array, SOAPString& str)
 	*out = 0;
 }
 
+void
+SOAPHex::Encode(const SOAPArray<char>& bytes, SOAPString& str)
+{
+	static const char *hexchars = "0123456789ABCDEF";
+
+	str.Resize(bytes.Size() * 2 + 1);
+	char *s = str.Str();
+	const char *b = bytes.Begin();
+	while (b != bytes.End())
+	{
+		int c = *b++;
+		*s++ = hexchars[(c >> 4) & 0x0F];
+		*s++ = hexchars[c & 0x0F];
+	}
+	*s = 0;
+}
+
+inline
+int getHexValue(int c)
+{
+	switch (c)
+	{
+	case '0': return 0;
+	case '1': return 1;
+	case '2': return 2;
+	case '3': return 3;
+	case '4': return 4;
+	case '5': return 5;
+	case '6': return 6;
+	case '7': return 7;
+	case '8': return 8;
+	case '9': return 9;
+	case 'A': case 'a': return 10;
+	case 'B': case 'b': return 11;
+	case 'C': case 'c': return 12;
+	case 'D': case 'd': return 13;
+	case 'E': case 'e': return 14;
+	case 'F': case 'f': return 15;
+	default:
+		throw SOAPException("Invalid hex character: %c(%d)", c, c);
+	}
+}
+
+void
+SOAPHex::Decode(const SOAPString& str, SOAPArray<char>& bytes)
+{
+	const char *s = str.Str();
+	int ub;
+
+	bytes.Resize(0);
+	while ((ub = nextChar(s)))
+	{
+		int lb = nextChar(s);
+		if (!lb)
+			throw SOAPException("Reached unexpected end of hex string, not an even number of characters.");
+		bytes.Add((getHexValue(ub) << 4) + getHexValue(lb));
+	}
+}
