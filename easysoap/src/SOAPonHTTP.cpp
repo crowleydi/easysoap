@@ -127,7 +127,14 @@ SOAPHTTPProtocol::FlushInput()
 {
 	char buffer[256];
 	while (CanRead())
-		Read(buffer, sizeof(buffer));
+	{
+		size_t read = Read(buffer, sizeof(buffer));
+		if (read == 0)
+		{
+			SOAPDebugger::Print("CLOSED\r\n");
+			Close();
+		}
+	}
 }
 
 void
