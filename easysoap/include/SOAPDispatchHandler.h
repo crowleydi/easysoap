@@ -82,7 +82,7 @@ class EASYSOAP_EXPORT SOAPHeaderHandlerInterface
 {
 public:
 	virtual ~SOAPHeaderHandlerInterface() {}
-	virtual bool HandleHeader(const SOAPParameter& header, SOAPEnvelope& request) = 0;
+	virtual bool HandleHeader(const SOAPParameter& header, SOAPEnvelope& request, SOAPEnvelope& response) = 0;
 };
 
 
@@ -90,13 +90,13 @@ template <typename T>
 class EASYSOAP_EXPORT SOAPHeaderHandler : public SOAPHeaderHandlerInterface
 {
 private:
-	typedef bool (T::*HandlerFunction)(const SOAPParameter& header, SOAPEnvelope& request);
+	typedef bool (T::*HandlerFunction)(const SOAPParameter& header, SOAPEnvelope& request, SOAPEnvelope& response);
 	typedef SOAPHashMap<SOAPQName, HandlerFunction> DispatchMap;
 
 	SOAPHeaderHandler(const SOAPHeaderHandler&);
 	SOAPHeaderHandler& operator=(const SOAPHeaderHandler&);
 
-	bool HandleHeader(const SOAPParameter& header, SOAPEnvelope& request)
+	bool HandleHeader(const SOAPParameter& header, SOAPEnvelope& request, SOAPEnvelope& response)
 	{
 		const SOAPMethod& method = request.GetBody().GetMethod();
 		DispatchMap::Iterator i = m_dispatchMap.Find(method.GetName());
@@ -105,7 +105,7 @@ private:
 		if (i)
 		{
 			T *target= GetTarget(request);
-			handled = (target->*(*i))(method, response);
+			handled = (target->*(*i))(method, request, response);
 		}
 		return handled;
 	}
