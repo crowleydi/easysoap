@@ -246,6 +246,10 @@ SOURCE=..\include\SOAPDebugger.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\SOAPDispatchHandler.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\include\SOAPEnvelope.h
 # End Source File
 # Begin Source File

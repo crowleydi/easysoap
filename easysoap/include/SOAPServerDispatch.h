@@ -24,62 +24,7 @@
 
 #include "SOAP.h"
 
-
-class EASYSOAP_EXPORT SOAPDispatchHandlerInterface
-{
-public:
-	virtual ~SOAPDispatchHandlerInterface() {}
-	virtual void ExecuteMethod(const SOAPMethod& request, SOAPMethod& response) = 0;
-};
-
-
-
-template <typename T>
-class SOAPDispatchHandler : public SOAPDispatchHandlerInterface
-{
-private:
-	typedef void (T::*HandlerFunction)(const SOAPMethod& request, SOAPMethod& response);
-	typedef SOAPHashMap<SOAPString, HandlerFunction> DispatchMap;
-
-	SOAPDispatchHandler(const SOAPDispatchHandler&);
-	SOAPDispatchHandler& operator=(const SOAPDispatchHandler&);
-
-	void ExecuteMethod(const SOAPMethod& request, SOAPMethod& response)
-	{
-		DispatchMap::Iterator i = m_dispatchMap.Find(request.GetName().GetName());
-		if (i)
-		{
-			(m_target->*(*i))(request, response);
-		}
-		else
-		{
-			throw SOAPException("Unknown method request: [%s]::%s",
-				(const char *)request.GetName().GetNamespace(),
-				(const char *)request.GetName().GetName());
-		}
-	}
-
-	DispatchMap	m_dispatchMap;
-	T			*m_target;
-
-protected:
-	SOAPDispatchHandler(T* target = 0)
-		: m_target(target)
-	{
-	}
-
-	void DispatchTo(T *target)
-	{
-		m_target = target;
-	}
-
-	void DispatchMethod(const char *name, HandlerFunction func)
-	{
-		m_dispatchMap[name] = func;
-	}
-
-};
-
+class SOAPDispatchHandlerInterface;
 
 class EASYSOAP_EXPORT SOAPServerDispatch
 {
