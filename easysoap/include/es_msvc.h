@@ -27,6 +27,7 @@
 
 #define STDC_HEADERS
 #define HAVE_FLOAT_H
+#define HAVE_WCHART
 
 #define snprintf _snprintf
 #define vsnprintf _vsnprintf
