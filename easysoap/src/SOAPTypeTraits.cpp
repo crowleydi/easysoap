@@ -73,6 +73,32 @@ sp_strtol(const char *str)
 }
 
 
+static int
+sp_strtoul(const char *str)
+{
+	char *endptr = 0;
+	const char *startptr = str;
+	int ret;
+
+	errno = 0;
+	ret = strtoul(startptr, &endptr, 10);
+
+	if (endptr)
+	{
+		while (sp_isspace(*endptr))
+			++endptr;
+
+		if (startptr == endptr || *endptr != 0)
+			throw SOAPException("Could not convert string to unsigned integer: '%s'",
+					str);
+	}
+	if (errno == ERANGE)
+		throw SOAPException("Unsigned integer overflow: %s", str);
+
+	return ret;
+}
+
+
 //
 // TODO:  This is too tricky.  We need to find a
 // portable and nice way to return NAN.
@@ -312,7 +338,7 @@ SOAPTypeTraits<unsigned int>::Deserialize(const SOAPParameter& param, unsigned i
     if (param.IsNull() || str.IsEmpty())
         throw SOAPException("Cannot convert null value to unsigned integer.");
 
-	val = sp_strtol(str);
+	val = sp_strtoul(str);
 	return param;
 }
 
