@@ -121,6 +121,8 @@ TestEchoVoid(SOAPProxy& proxy,
 		std::cout << "Testing " << method.GetName() << ": ";
 
 		const SOAPResponse& response = proxy.Execute(method);
+		if (response.GetBody().GetMethod().GetNumParameters() != 0)
+			throw SOAPException("Received unexpected return values.");
 
 		std::cout << "SUCCESS" << std::endl;
 		return false;
