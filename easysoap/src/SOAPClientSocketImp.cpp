@@ -130,7 +130,7 @@ SOAPClientSocketImp::WaitWrite(int sec, int usec)
 
 	int ret = select(m_socket+1, 0, &fset, 0, sec == -1 ? 0 : &tv);
 	if (ret == SOCKET_ERROR)
-		throw SOAPException("WaitRead select error");
+		throw SOAPException("WaitWrite select error");
 
 	return ret == 1;
 }
