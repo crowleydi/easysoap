@@ -1,4 +1,11 @@
 
+0.2, aka Infomercial 17-Apr-2001
+	Major changes.
+	Extensible type system.
+	Lots of changes and bug fixes for interop testing.
+	Initial support to run as a CGI server.
+	Servers for SOAPBuilders interop and Userland validator.
+
 0.1.4, aka Foot and Mouth 23-Mar-2001
 	No real new features.  Added some stuff for configuring on
 	a per compiler basis.  I don't like it.  I really need to
