@@ -2,6 +2,8 @@
 0.6, 27-Mar-2002
 	Tons of stuff.  bug fixes, namespaces, bug fixes, changed header
 	file location.  Tons of stuff.  TONS of stuff.  Still no documentation.
+	Added Borland project files.  Moved MSVC project files to central
+	location.
 
 0.5
 	I forgot.  Too long ago.
