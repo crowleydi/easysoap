@@ -16,7 +16,7 @@
  * License along with this library; if not, write to the Free
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- * $Id$
+ * SOAPSecureSocketImp.cpp,v 1.27 2002/05/14 08:43:26 dcrowley Exp
  */
 
 
@@ -203,12 +203,18 @@ SOAPSecureSocketImp::VerifyCert(const char* host)
 }
 
 bool
-SOAPSecureSocketImp::Connect(const char *host, unsigned int port)
+SOAPSecureSocketImp::Connect(const char *host, unsigned int port, bool client)
 {
 	if (!super::Connect(host, port))
 		return false;
 
 	InitSSL();
+	
+	// set SSL to either be client or server...
+	if (client)
+		SSL_set_connect_state(m_ssl);
+	else
+		SSL_set_accept_state(m_ssl);
 
 	VerifyCert(host);
 
