@@ -23,6 +23,7 @@
 #endif // _MSC_VER
 
 #include "SOAPClientSocketImp.h"
+#include "SOAPDebugger.h"
 
 #if defined (_WIN32)
 #if !defined (__MWERKS__)
@@ -94,7 +95,9 @@ void
 SOAPClientSocketImp::Close()
 {
 	if (m_socket != INVALID_SOCKET)
+	{
 		closesocket(m_socket);
+	}
 
 	m_socket = INVALID_SOCKET;
 }
@@ -201,6 +204,7 @@ SOAPClientSocketImp::Connect(const char *server, unsigned int port)
 	{
 		throw SOAPSocketException("Could not set TCP_NODELAY");
 	}
+
 	return true;
 }
 
@@ -219,6 +223,7 @@ SOAPClientSocketImp::Read(char *buff, int bufflen)
 		{
 			throw SOAPSocketException("Error reading socket");
 		}
+		SOAPDebugger::Write(buff, bytes);
 	}
 	return bytes;
 }
@@ -240,6 +245,7 @@ SOAPClientSocketImp::Write(const char *buff, int bufflen)
 					"tried to write %d bytes, wrote %d",
 					bufflen, bytes);
 		}
+		SOAPDebugger::Write(buff, bytes);
 	}
 	return bytes;
 }
