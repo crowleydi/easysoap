@@ -82,6 +82,13 @@ SOAPPacketWriter::StartTag(const SOAPQName& tag, const char *prefix)
 	const char *nstag = 0;
 	bool addxmlns = false;
 	char buffer[64];
+
+	if (tag.GetNamespace() == "")
+	{
+		StartTag(tag.GetName());
+		return;
+	}
+
 	NamespaceMap::Iterator i = m_nsmap.Find(tag.GetNamespace());
 	if (!i)
 	{
@@ -266,6 +273,12 @@ SOAPPacketWriter::EndTag(const char *tag)
 void
 SOAPPacketWriter::EndTag(const SOAPQName& tag)
 {
+	if (tag.GetNamespace() == "")
+	{
+		EndTag(tag.GetName());
+		return;
+	}
+
 	if (m_instart)
 	{
 		Write("/>");
