@@ -35,6 +35,7 @@ SOAPProtocolBase::SOAPProtocolBase()
 	, m_buffend(0)
 	, m_wpos(0)
 	, m_wend(0)
+	, m_timeout(0)
 {
 }
 
