@@ -60,7 +60,7 @@ operator<<(std::ostream& os, const SOAPString& str)
 inline std::ostream&
 operator<<(std::ostream& os, const SOAPQName& name)
 {
-	return os << name.GetName() << "[" << name.GetNamespace() << "]";
+	return os << name.GetName();
 }
 
 void
@@ -105,6 +105,10 @@ operator>>(const SOAPParameter& param, Endpoint& e)
 	param.GetParameter("soapaction") >> e.soapaction;
 	e.needsappend = (param.GetParameter("soapactionNeedsMethod").GetInt() != 0);
 	param.GetParameter("methodNamespace") >> e.nspace;
+
+	// Try and fix wrong values.
+	if (e.nspace == "http://soapinterop.org")
+		e.nspace = "http://soapinterop.org/";
 
 	return param;
 }
@@ -666,8 +670,6 @@ void TestInterop(const Endpoint& e)
 	bool appendMethod = e.needsappend;
 	const char *uri = e.nspace;
 
-	std::cout << "Testing " << name << " interopability." << std::endl;
-
 	SOAPProxy proxy(endpoint, httpproxy);
 
 	SetTraceFile(name, "echoVoid");
@@ -701,6 +703,7 @@ void TestInterop(const Endpoint& e)
 	SetTraceFile(name, "echoStructArray_ZeroLen");
 	TestEchoStructArray(proxy, uri, soapAction, appendMethod, 0);
 
+#if 0
 	// Lets try echoing null values
 	SetTraceFile(name, "echoString_Null");
 	TestEchoString(proxy, uri, soapAction, appendMethod, 0);
@@ -714,6 +717,10 @@ void TestInterop(const Endpoint& e)
 	TestEchoIntegerInvalid(proxy, uri, soapAction, appendMethod, "2147483648");
 	SetTraceFile(name, "echoInteger_Underflow");
 	TestEchoIntegerInvalid(proxy, uri, soapAction, appendMethod, "-2147483649");
+	SetTraceFile(name, "echoInteger_BiggestInt");
+	TestEchoInteger(proxy, uri, soapAction, appendMethod, 2147483647);
+	SetTraceFile(name, "echoInteger_SmallestInt");
+	TestEchoInteger(proxy, uri, soapAction, appendMethod, -2147483648);
 
 	// Echo some of the uncommon float/double values
 	SetTraceFile(name, "echoFloat_NaN");
@@ -724,10 +731,13 @@ void TestInterop(const Endpoint& e)
 	TestEchoFloat(proxy, uri, soapAction, appendMethod, -HUGE_VAL);
 	SetTraceFile(name, "echoFloat_n0");
 	TestEchoFloat(proxy, uri, soapAction, appendMethod, "-0.0");
+	SetTraceFile(name, "echoFloat_Overflow");
+	TestEchoFloatInvalid(proxy, uri, soapAction, appendMethod, "1.65e555");
+	SetTraceFile(name, "echoFloat_Underflow");
+	TestEchoFloatInvalid(proxy, uri, soapAction, appendMethod, "1.65e-555");
+#endif
 
 	SOAPDebugger::Close();
-
-	std::cout << "Done." << std::endl << std::endl;
 }
 
 int
@@ -740,14 +750,21 @@ main(int argc, char* argv[])
 		const char *servicename = 0;
 		bool testlocal = true;
 		bool doall = false;
+		bool execute = true;
 
 		SOAPArray<Endpoint> endpoints;
+		SOAPPacketWriter::SetAddWhiteSpace(true);
 
 		for (int i = 1; i < argc; ++i)
 		{
 			if (sp_strcmp(argv[i], "-a") == 0)
 			{
 				doall = true;
+				testlocal = false;
+			}
+			else if (sp_strcmp(argv[i], "-e") == 0)
+			{
+				execute = false;
 			}
 			else if (sp_strcmp(argv[i], "-p") == 0)
 			{
@@ -774,6 +791,11 @@ main(int argc, char* argv[])
 			}
 		}
 
+		if (doall)
+		{
+			GetAllEndpoints(endpoints);
+		}
+
 		if (testlocal)
 		{
 			// Just test against localhost
@@ -785,13 +807,25 @@ main(int argc, char* argv[])
 			e.needsappend = false;
 		}
 
-		if (doall)
-		{
-			GetAllEndpoints(endpoints);
-		}
-
 		for (size_t j = 0; j < endpoints.Size(); ++j)
-			TestInterop(endpoints[j]);
+		{
+			Endpoint& e = endpoints[j];
+
+			std::cout	<< "      Name: " << e.name << std::endl
+						<< "  Endpoint: " << e.endpoint << std::endl
+						<< " Namespace: " << e.nspace << std::endl
+						<< "SOAPAction: " << e.soapaction
+						<< (e.needsappend ? "(method)" : "") <<	std::endl
+						<< std::endl;
+			if (execute)
+				TestInterop(endpoints[j]);
+
+			std::cout
+				<< std::endl
+				<< "----------------------------------------------------------------"
+				<< std::endl
+				<< std::endl;
+		}
 	}
 	catch (const SOAPMemoryException&)
 	{
