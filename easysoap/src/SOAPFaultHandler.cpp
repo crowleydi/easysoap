@@ -30,7 +30,7 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-const char *SOAPFaultHandler::start_tag = FULL_SOAP_ENV "|Fault";
+const char *SOAPFaultHandler::start_tag = FULL_SOAP_ENV PARSER_NS_SEP "Fault";
 
 SOAPFaultHandler::SOAPFaultHandler(SOAPFault& fault)
 {

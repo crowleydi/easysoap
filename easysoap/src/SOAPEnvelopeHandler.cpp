@@ -29,7 +29,7 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-const char *SOAPEnvelopeHandler::start_tag = FULL_SOAP_ENV "|Envelope";
+const char *SOAPEnvelopeHandler::start_tag = FULL_SOAP_ENV PARSER_NS_SEP "Envelope";
 
 SOAPEnvelopeHandler::SOAPEnvelopeHandler(SOAPEnvelope& envelope)
 : m_envelope(&envelope)
@@ -81,4 +81,5 @@ SOAPEnvelopeHandler::endElement(const XML_Char *name)
 	if (sp_strcmp(name, start_tag) == 0)
 		m_done = true;
 }
+
 

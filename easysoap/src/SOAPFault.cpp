@@ -29,10 +29,10 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-const char *SOAPFault::faultactor_attr = FULL_SOAP_ENV "|faultactor";
-const char *SOAPFault::faultcode_attr = FULL_SOAP_ENV "|faultcode";
-const char *SOAPFault::faultdetail_attr = FULL_SOAP_ENV "|detail";
-const char *SOAPFault::faultstring_attr = FULL_SOAP_ENV "|faultstring";
+const char *SOAPFault::faultactor_attr = FULL_SOAP_ENV PARSER_NS_SEP "faultactor";
+const char *SOAPFault::faultcode_attr = FULL_SOAP_ENV PARSER_NS_SEP "faultcode";
+const char *SOAPFault::faultdetail_attr = FULL_SOAP_ENV PARSER_NS_SEP "detail";
+const char *SOAPFault::faultstring_attr = FULL_SOAP_ENV PARSER_NS_SEP "faultstring";
 
 SOAPFault::SOAPFault()
 {

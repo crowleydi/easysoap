@@ -31,5 +31,7 @@
 #define TAG_SOAP_XSD "xsd"
 #define TAG_SOAP_XSI "xsi"
 
+#define PARSER_NS_SEP "#"
+
 #endif // __SOAPNamesSpaces_h__
 

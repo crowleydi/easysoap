@@ -60,7 +60,7 @@ SOAPMethodHandler::startElement(const XML_Char *name, const XML_Char **attrs)
 		const char *tag = *work++;
 		const char *val = *work++;
 
-		if (sp_strcmp(tag, FULL_SOAP_XSI "|type") == 0)
+		if (sp_strcmp(tag, FULL_SOAP_XSI PARSER_NS_SEP "type") == 0)
 		{
 			SOAPTypes::xsd_type type = SOAPTypes::GetXsdType(val);
 

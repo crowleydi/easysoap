@@ -28,6 +28,7 @@
 #include "SOAPParse.h"
 #include "SOAPResponseHandler.h"
 
+#include "SOAPNamespaces.h"
 
 #define BUFF_SIZE 1024
 
@@ -54,7 +55,7 @@ SOAPParser::Parse(SOAPResponse& resp, SOAPTransport& trans)
 		m_parser = 0;
 	}
 
-	m_parser = XML_ParserCreateNS(NULL, '|');
+	m_parser = XML_ParserCreateNS(NULL, PARSER_NS_SEP[0]);
 	XML_SetUserData(m_parser, this);
 	XML_SetElementHandler(m_parser, SOAPParser::startElement, SOAPParser::endElement);
 	XML_SetCharacterDataHandler(m_parser, SOAPParser::characterData);
