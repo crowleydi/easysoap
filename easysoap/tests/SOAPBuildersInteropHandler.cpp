@@ -162,7 +162,7 @@ SOAPBuildersInteropHandler::echoDate(const SOAPMethod& req, SOAPMethod& resp)
 	const SOAPParameter& inputDate = req.GetParameter("inputDate");
 	inputDate >> val;
 
-	(resp.AddParameter("return") << val).SetType(inputDate.GetType());
+	(resp.AddParameter("return") << val).SetType("dateTime");
 }
 
 
