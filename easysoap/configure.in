@@ -13,6 +13,7 @@ dnl Include other macros we need...
 sinclude(conftools/ac_cxx_namespaces.m4)
 sinclude(conftools/ac_cxx_template_keyword_qualifier.m4)
 sinclude(conftools/ac_cxx_partial_specialization.m4)
+sinclude(conftools/peti_with_dmalloc.m4)
 
 AC_CANONICAL_HOST
 AC_CYGWIN
@@ -74,6 +75,9 @@ AC_CHECK_HEADERS( \
 	sys/unistd.h \
 )
 
+dnl
+dnl Check if dmalloc is available and enabled
+PETI_WITH_DMALLOC
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
