@@ -354,6 +354,7 @@ void SOAPTypeTraits<const char *>::Serialize(SOAPParameter& param, const char *v
 }
 
 
+#ifdef HAVE_WCHART
 //
 //  Trait info for const wchar_t *
 void SOAPTypeTraits<const wchar_t *>::GetType(SOAPQName& type)
@@ -367,6 +368,7 @@ void SOAPTypeTraits<const wchar_t *>::Serialize(SOAPParameter& param, const wcha
 		param.AddAttribute(XMLSchemaInstance::nil) = "true";
 	param.GetStringRef() = val;
 }
+#endif // HAVE_WCHART
 
 
 //
