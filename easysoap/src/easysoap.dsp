@@ -203,10 +203,6 @@ SOURCE=.\SOAPonHTTP.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\SOAPPacketWriter.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=.\SOAPParameter.cpp
 # End Source File
 # Begin Source File
@@ -252,6 +248,10 @@ SOURCE=.\SOAPUrl.cpp
 # Begin Source File
 
 SOURCE=.\SOAPWinInetTransport.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\XMLComposer.cpp
 # End Source File
 # Begin Source File
 
@@ -363,10 +363,6 @@ SOURCE=..\include\easysoap\SOAPonHTTP.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\easysoap\SOAPPacketWriter.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\include\easysoap\SOAPParameter.h
 # End Source File
 # Begin Source File
@@ -448,6 +444,10 @@ SOURCE=..\include\easysoap\SOAPUtil.h
 # Begin Source File
 
 SOURCE=..\include\easysoap\SOAPWinInetTransport.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\easysoap\XMLComposer.h
 # End Source File
 # Begin Source File
 
