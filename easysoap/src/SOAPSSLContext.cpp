@@ -27,17 +27,7 @@
 
 USING_EASYSOAP_NAMESPACE
 
-#ifndef HAVE_LIBSSL
-
-SOAPSSLContext::SOAPSSLContext() {
-		throw SOAPSocketException("Secure sockets not supported.");
-}
-
-~SOAPSSLContext::SOAPSSLContext() {
-}
-
-
-#else
+#ifdef HAVE_LIBSSL
 
 extern "C" {
 #include <openssl/ssl.h>

@@ -29,6 +29,26 @@ struct rsa_st;
 
 BEGIN_EASYSOAP_NAMESPACE
 
+#ifndef HAVE_LIBSSL
+class EASYSOAP_EXPORT SOAPSSLContext
+{
+public:
+	SOAPSSLContext(){
+		throw SOAPException("HTTPS NOT SUPPORTED WITHOUT OpenSSL");
+	}
+	SOAPSSLContext(const char* certfile, const char* keyfile, const char* password) {
+
+		throw SOAPException("HTTPS NOT SUPPORTED WITHOUT OpenSSL");
+	}
+
+	ssl_ctx_st*	GetContext() {}
+	void SetCertInfo(const char* certfile, const char* keyfile, const char* password) {}
+	~SOAPSSLContext() {}
+};
+#else
+
+
+
 class EASYSOAP_EXPORT SOAPSSLContext
 {
 public:
@@ -62,7 +82,7 @@ private:
 	// handles error, returns true if they are recoverable, false if not.
 	void HandleError(const char* context, int retcode);
 };
-
+#endif
 END_EASYSOAP_NAMESPACE
 
 #endif // !defined(AFX_SOAPSSLCONTEXT_H__7D357522_E8B1_45A2_8CE1_A472A7D58C13__INCLUDED_)
