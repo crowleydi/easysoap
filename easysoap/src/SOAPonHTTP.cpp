@@ -385,17 +385,16 @@ SOAPHTTPProtocol::GetContentLength() const
 	return len;
 }
 
-int
+size_t
 SOAPHTTPProtocol::GetChunkLength()
 {
-	int  nbytes = 0;    // bytes read from socket
-	char hexStg[5];		// hex buffer
+	char hexStg[10];	// hex buffer
 	int  n = 0;         // position in string
 	int  m = 0;         // hex value of character (0-15)
-	int  intValue = 0;  // integer value of hex string
+	size_t intValue = 0;  // integer value of hex string
 
 	// skip blank lines
-	while ((nbytes = super::ReadLine(hexStg, sizeof(hexStg))) == 0)
+	while ((super::ReadLine(hexStg, sizeof(hexStg))) == 0)
 		;
 
 	while (n < 8)
@@ -435,9 +434,8 @@ SOAPHTTPProtocol::CanRead()
 }
 
 size_t
-SOAPHTTPProtocol::ReadChunk(char *buffer, int len)
+SOAPHTTPProtocol::ReadChunk(char *buffer, size_t len)
 {
-	size_t ret = 0;
 	if (m_canread == 0)
 	{
 		// get chunk size, abort on empty chunk
@@ -452,16 +450,13 @@ SOAPHTTPProtocol::ReadChunk(char *buffer, int len)
 	if (len > m_canread)
 		len = m_canread;
 
-	if (len < 0)
-		throw SOAPException("Invalid read chunk length < 0: %d", len);
-
-	ret = super::Read(buffer, len);
+	size_t ret = super::Read(buffer, len);
 	m_canread -= ret;
 	return ret;
 }
 
 size_t
-SOAPHTTPProtocol::ReadBytes(char *buffer, int len)
+SOAPHTTPProtocol::ReadBytes(char *buffer, size_t len)
 {
 	size_t ret = 0;
 	if (m_canread != 0)
@@ -480,7 +475,7 @@ SOAPHTTPProtocol::ReadBytes(char *buffer, int len)
 }
 
 size_t
-SOAPHTTPProtocol::Read(char *buffer, int len)
+SOAPHTTPProtocol::Read(char *buffer, size_t len)
 {
 	if (m_chunked)
 		return ReadChunk(buffer, len);
@@ -535,7 +530,6 @@ SOAPHTTPProtocol::Connect()
 			break;
 		default:
 			throw SOAPSocketException("Can only handle HTTP protocols");
-			break;
 		}
 		return IsOpen();
 	}

@@ -49,13 +49,13 @@ private:
 	bool		m_chunked;
 
 	int		GetReply();
-	int		GetChunkLength();
+	size_t	GetChunkLength();
 	bool	Connect();
 	void	WriteHostHeader(const SOAPUrl&);
 	void	FlushInput();
 	void	StartVerb(const char *verb, const char *path);
-	size_t  ReadChunk(char *buffer, int len);
-	size_t  ReadBytes(char *buffer, int len);
+	size_t  ReadChunk(char *buffer, size_t len);
+	size_t  ReadBytes(char *buffer, size_t len);
 
 public:
 	SOAPHTTPProtocol()
@@ -103,7 +103,7 @@ public:
 	int		GetContentLength() const;
 	bool	IsChunked() const {return m_chunked;}
 
-	virtual size_t Read(char *buffer, int len);
+	virtual size_t Read(char *buffer, size_t len);
 	virtual void Close();
 	virtual bool CanRead();
 	const SOAPString& GetRequestMessage()	{return m_httpmsg;}
