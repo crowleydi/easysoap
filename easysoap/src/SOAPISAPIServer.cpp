@@ -30,7 +30,7 @@ class SOAPISAPITransport : public SOAPServerTransport
 {
 public:
 	SOAPISAPITransport(EXTENSION_CONTROL_BLOCK* pECB)
-		: m_ecb(pECB), m_error(false), m_leftRead(0)
+		: m_ecb(pECB), m_error(false), m_leftRead(0), m_ecbData(0)
 	{
 		if (m_ecb)
 		{
@@ -91,11 +91,19 @@ public:
 
 		if (m_ecb->cbTotalBytes > m_ecb->cbAvailable)
 		{
-			m_ecb->ReadClient(m_ecb->ConnID, (void *)buffer, &dwSize);
+			if (!m_ecb->ReadClient(m_ecb->ConnID, (void *)buffer, &dwSize))
+				throw SOAPException("ReadClient() failed, err=0x%08x",
+						GetLastError());
+			if (dwSize == 0)
+				m_leftRead = 0;
 		}
 		else
 		{
-			memcpy(buffer, m_ecb->lpbData, dwSize);
+			if (!m_ecbData)
+				m_ecbData = m_ecb->lpbData;
+			const unsigned char *end = m_ecbData + dwSize;
+			while (m_ecbData != end)
+				*buffer++ = *m_ecbData++;
 		}
 
 		m_leftRead -= dwSize;
@@ -160,6 +168,7 @@ private:
 	SOAPISAPITransport& operator=(const SOAPISAPITransport&);
 
 	EXTENSION_CONTROL_BLOCK*	m_ecb;
+	const unsigned char *		m_ecbData;
 	bool						m_error;
 	size_t						m_leftRead;
 	SOAPString					m_charset;
