@@ -328,7 +328,8 @@ SOAPHTTPProtocol::Close()
 bool
 SOAPHTTPProtocol::CanRead()
 {
-	return super::CanRead() && m_canread != 0;
+	return m_canread > 0 || super::CanRead();
+	//return (m_canread == -1 && super::CanRead()) || m_canread > 0;
 }
 
 size_t
