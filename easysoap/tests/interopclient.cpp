@@ -32,6 +32,8 @@
 #endif // _WIN32
 
 #include <iostream>
+#include <algorithm>
+
 #include <math.h>
 #include <time.h>
 #ifdef _WIN32
@@ -74,7 +76,7 @@ SetTraceFile(const char *server, const char *test)
 {
 	char buffer[256];
 	snprintf(buffer, sizeof(buffer), "%s/%s.txt", server, test);
-	SOAPDebugger::SetFile(buffer);
+	//SOAPDebugger::SetFile(buffer);
 }
 
 double
@@ -163,6 +165,11 @@ struct Endpoint
 	SOAPString soapaction;
 	bool	   needsappend;
 	SOAPString nspace;
+
+	bool operator<(const Endpoint& p) const
+	{
+		return name < p.name;
+	}
 };
 
 const SOAPParameter&
@@ -259,16 +266,29 @@ TestEchoInteger(SOAPProxy& proxy, const Endpoint& e, int value)
 		throw SOAPException("Values are not equal");
 }
 
-void
-TestEchoInteger(SOAPProxy& proxy, const Endpoint& e, const char *value)
+const SOAPResponse&
+_TestEchoInteger(SOAPProxy& proxy, const Endpoint& e, const char *value)
 {
 	SOAPMethod method("echoInteger", e.nspace, e.soapaction, e.needsappend);
 	method.AddParameter("inputInteger").SetInt(value);
 
-	const SOAPResponse& response = proxy.Execute(method);
-	SOAPString outputValue = 0;
-	response.GetReturnValue() >> outputValue;
-	throw UnexpectedSuccessException("Returned value: %s", (const char *)outputValue);
+	return proxy.Execute(method);
+}
+
+void
+TestEchoIntegerForFail(SOAPProxy& proxy, const Endpoint& e, const char *value)
+{
+	const SOAPResponse& response = _TestEchoInteger(proxy, e, value);
+	throw UnexpectedSuccessException("Returned value: %s",
+			(const char *)response.GetReturnValue().GetString());
+}
+
+void
+TestEchoIntegerForPass(SOAPProxy& proxy, const Endpoint& e, const char *value)
+{
+	const SOAPResponse& response = _TestEchoInteger(proxy, e, value);
+	int returnValue;
+	response.GetReturnValue() >> returnValue;
 }
 
 void
@@ -304,16 +324,30 @@ TestEchoFloatStringValue(SOAPProxy& proxy, const Endpoint& e, const char *value)
 			(const char *)response.GetReturnValue().GetString());
 }
 
-void
-TestEchoFloatForFail(SOAPProxy& proxy, const Endpoint& e, const char *value)
+const SOAPResponse&
+_TestEchoFloat(SOAPProxy& proxy, const Endpoint& e, const char *value)
 {
 	SOAPMethod method("echoFloat", e.nspace, e.soapaction, e.needsappend);
 	SOAPParameter& inputParam = method.AddParameter("inputFloat");
 	inputParam.SetFloat(value);
 
-	const SOAPResponse& response = proxy.Execute(method);
+	return proxy.Execute(method);
+}
+
+void
+TestEchoFloatForFail(SOAPProxy& proxy, const Endpoint& e, const char *value)
+{
+	const SOAPResponse& response = _TestEchoFloat(proxy, e, value);
 	throw UnexpectedSuccessException("Returned value: %s",
 		(const char *)response.GetReturnValue().GetString());
+}
+
+void
+TestEchoFloatForPass(SOAPProxy& proxy, const Endpoint& e, const char *value)
+{
+	const SOAPResponse& response = _TestEchoFloat(proxy, e, value);
+	float result;
+	response.GetReturnValue() >> result;
 }
 
 void
@@ -466,27 +500,39 @@ TestEchoInteger(SOAPProxy& proxy, const Endpoint& e)
 }
 
 void
-TestEchoIntegerMostPositive(SOAPProxy& proxy, const Endpoint& e)
+TestEchoInteger_MostPositive(SOAPProxy& proxy, const Endpoint& e)
 {
 	TestEchoInteger(proxy, e, 2147483647);
 }
 
 void
-TestEchoIntegerMostNegative(SOAPProxy& proxy, const Endpoint& e)
+TestEchoInteger_MostNegative(SOAPProxy& proxy, const Endpoint& e)
 {
 	TestEchoInteger(proxy, e, -2147483648);
 }
 
 void
-TestEchoIntegerOverflow(SOAPProxy& proxy, const Endpoint& e)
+TestEchoInteger_Overflow(SOAPProxy& proxy, const Endpoint& e)
 {
-	TestEchoInteger(proxy, e, "2147483648");
+	TestEchoIntegerForFail(proxy, e, "2147483648");
 }
 
 void
-TestEchoIntegerUnderflow(SOAPProxy& proxy, const Endpoint& e)
+TestEchoInteger_Underflow(SOAPProxy& proxy, const Endpoint& e)
 {
-	TestEchoInteger(proxy, e, "-2147483649");
+	TestEchoIntegerForFail(proxy, e, "-2147483649");
+}
+
+void
+TestEchoInteger_Junk1(SOAPProxy& proxy, const Endpoint& e)
+{
+	TestEchoIntegerForFail(proxy, e, "1234junk");
+}
+
+void
+TestEchoInteger_Junk2(SOAPProxy& proxy, const Endpoint& e)
+{
+	TestEchoIntegerForPass(proxy, e, "\r\n\t 1234 \r\n\t");
 }
 
 void
@@ -535,6 +581,18 @@ void
 TestEchoFloat_SingleUnderflow(SOAPProxy& proxy, const Endpoint& e)
 {
 	TestEchoFloatForFail(proxy, e, "6.9e-46");
+}
+
+void
+TestEchoFloat_Junk1(SOAPProxy& proxy, const Endpoint& e)
+{
+	TestEchoFloatForFail(proxy, e, "1234junk");
+}
+
+void
+TestEchoFloat_Junk2(SOAPProxy& proxy, const Endpoint& e)
+{
+	TestEchoFloatForPass(proxy, e, "\r\n\t 1234 \r\n\t");
 }
 
 void
@@ -734,10 +792,12 @@ TestInterop(const Endpoint& e)
 	TestForFault(proxy, e, "BogusNamespace",			TestBogusNamespace);
 	TestForPass(proxy, e, "echoVoid",					TestEchoVoid);
 	TestForPass(proxy, e, "echoInteger",				TestEchoInteger);
-	TestForPass(proxy, e, "echoInteger_MostPositive",	TestEchoIntegerMostPositive);
-	TestForPass(proxy, e, "echoInteger_MostNegative",	TestEchoIntegerMostNegative);
-	TestForFault(proxy, e, "echoInteger_Overflow",		TestEchoIntegerOverflow);
-	TestForFault(proxy, e, "echoInteger_Underflow",		TestEchoIntegerUnderflow);
+	TestForPass(proxy, e, "echoInteger_MostPositive",	TestEchoInteger_MostPositive);
+	TestForPass(proxy, e, "echoInteger_MostNegative",	TestEchoInteger_MostNegative);
+	TestForFault(proxy, e, "echoInteger_Overflow",		TestEchoInteger_Overflow);
+	TestForFault(proxy, e, "echoInteger_Underflow",		TestEchoInteger_Underflow);
+	TestForFault(proxy, e, "echoInteger_Junk1"	,		TestEchoInteger_Junk1);
+	TestForPass(proxy, e, "echoInteger_Junk2"	,		TestEchoInteger_Junk2);
 	TestForPass(proxy, e, "echoFloat",					TestEchoFloat);
 	TestForPass(proxy, e, "echoFloat_NaN",				TestEchoFloat_NaN);
 	TestForPass(proxy, e, "echoFloat_INF",				TestEchoFloat_INF);
@@ -746,6 +806,8 @@ TestInterop(const Endpoint& e)
 	TestForFault(proxy, e, "echoFloat_SingleUnderflow",	TestEchoFloat_SingleUnderflow);
 	TestForFault(proxy, e, "echoFloat_DoubleOverflow",	TestEchoFloat_DoubleOverflow);
 	TestForFault(proxy, e, "echoFloat_DoubleUnderflow",	TestEchoFloat_DoubleUnderflow);
+	TestForFault(proxy, e, "echoFloat_Junk1",			TestEchoFloat_Junk1);
+	TestForPass(proxy, e, "echoFloat_Junk2",			TestEchoFloat_Junk2);
 	TestForPass(proxy, e, "echoString",					TestEchoString);
 	TestForPass(proxy, e, "echoStruct",					TestEchoStruct);
 	TestForPass(proxy, e, "echoIntegerArray",			TestEchoIntegerArray);
@@ -769,6 +831,9 @@ main(int argc, char* argv[])
 	const char *xmlname = 0;
 	try
 	{
+		SOAPDebugger::SetFile("foo.txt");
+		SOAPDebugger::SetMessageLevel(4);
+
 		const char *servicename = 0;
 		bool testlocal = true;
 		bool doall = false;
@@ -864,7 +929,18 @@ main(int argc, char* argv[])
 			e.needsappend = false;
 		}
 
+		char buffer[256];
+		time_t ltime = time(0);
+		struct tm *ltm = localtime(&ltime);
+		strftime(buffer, 256, "%d-%b-%Y %H:%M", ltm);
+
 		testresults.StartTag("InteropTests");
+		testresults.StartTag("Date");
+		testresults.WriteValue(buffer);
+		testresults.EndTag("Date");
+
+
+		std::sort(endpoints.Begin(), endpoints.End());
 
 		for (size_t j = 0; j < endpoints.Size(); ++j)
 		{
