@@ -79,11 +79,14 @@ private:
 
 	bool	Readbuff();
 
+	SOAPProtocolBase(const SOAPProtocolBase&);
+	SOAPProtocolBase& operator=(const SOAPProtocolBase&);
+
 protected:
+	SOAPProtocolBase();
 	void	Flush();
 
 public:
-	SOAPProtocolBase();
 	virtual ~SOAPProtocolBase();
 
 	void SetSocket(SOAPSocketInterface *socket);
