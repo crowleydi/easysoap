@@ -36,3 +36,18 @@ against it.
 
 SSLClient:
 ----------
+
+This is actually fairly straightforward. Generate an RSA key for your testing,
+with or without a passphrase, and call the client as such:
+
+./SSLClient <endpoint> [<certfile> <keyfile> <password>]
+
+where the endpoint is where you put the SSLServer
+
+What you should see is the SSL Environment Variables set by mod_ssl returned
+to you, so that you can make sure that everything is happening correctly.
+
+NOTE: 
+-----
+
+These test tools don't currently use Server Certificate Validation.
