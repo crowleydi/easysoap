@@ -52,7 +52,7 @@ SOAPParser::Parse(SOAPEnvelope& env, SOAPTransport& trans)
 	m_handlerstack.Clear();
 	m_hrefmap.Clear();
 
-	InitParser();
+	InitParser(trans.GetCharset());
 	while (1)
 	{
 		//
