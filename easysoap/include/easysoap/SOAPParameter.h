@@ -122,6 +122,7 @@ public:
 	bool IsStruct() const;
 
 	const Attrs& GetAttributes() const {return m_dataPtr->m_attrs;}
+	const Attrs& GetAccessorAttributes() const {return m_x_data.m_attrs;}
 	SOAPQName& AddAttribute(const SOAPQName& name);
 
 	//
