@@ -38,16 +38,11 @@
 #define SOAPUSER_AGENT EASYSOAP_STRING "/" EASYSOAP_VERSION_STRING
 #endif // SOAPUSER_AGENT
 
+USING_EASYSOAP_NAMESPACE
+
 // read the payload into the buffer.
 // can be called multiple times.
 // returns 0 if entire payload has been read.
-
-USING_EASYSOAP_NAMESPACE
-
-void
-SOAPonHTTP::SetError()
-{
-}
 
 size_t
 SOAPonHTTP::Read(char *buffer, size_t buffsize)
@@ -112,6 +107,11 @@ SOAPonHTTP::Write(const SOAPMethod& method, const char *payload, size_t payloads
 		throw SOAPException("Unexpected return Content-Type: %s", contype);
 
 	return ret;
+}
+
+void
+SOAPonHTTP::SetError()
+{
 }
 
 const char *
