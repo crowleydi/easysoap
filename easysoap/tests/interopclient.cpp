@@ -102,7 +102,7 @@ public:
 bool
 almostequal(float a, float b)
 {
-	if (fabs(a - b) <= fabs(a) * 0.0000005)
+	if (a != b && fabs(a - b) <= fabs(a) * 0.0000005)
 		throw FPLossException(a, b);
 	return false;
 }
@@ -226,7 +226,7 @@ TestMustUnderstand(SOAPProxy& proxy, const Endpoint& e, const char *mu)
 
 	header.SetName("Transaction", "uri:my-transaction");
 	header.SetValue("5");
-	header.AddAttribute(SOAPEnvelope::MustUnderstand, mu);
+	header.AddAttribute(SOAPEnv::mustUnderstand) = mu;
 
 	SOAPMethod& method = mustUnderstand.GetBody().GetMethod();
 	method.SetName("echoVoid", e.nspace);
@@ -398,6 +398,88 @@ TestEchoStruct(SOAPProxy& proxy, const Endpoint& e)
 		throw SOAPException("Values are not equal");
 }
 
+void
+TestEchoNestedStruct(SOAPProxy& proxy, const Endpoint& e)
+{
+	SOAPStructStruct inputValue;
+	
+	inputValue.varString = "This is a struct string.";
+	inputValue.varInt = 68;
+	inputValue.varFloat = (float)25.24345356;
+	inputValue.varStruct.varFloat = (float)12.5;
+	inputValue.varStruct.varInt = 86;
+	inputValue.varStruct.varString = "This is a nested struct.";
+
+	SOAPMethod method("echoNestedStruct", e.nspace, e.soapaction, e.needsappend);
+	method.AddParameter("inputStruct") << inputValue;
+
+	const SOAPResponse& response = proxy.Execute(method);
+	SOAPStructStruct outputValue;
+	response.GetReturnValue() >> outputValue;
+	if (inputValue != outputValue && !almostequal(inputValue.varFloat, outputValue.varFloat))
+		throw SOAPException("Values are not equal");
+}
+
+void
+TestEchoNestedArray(SOAPProxy& proxy, const Endpoint& e)
+{
+	SOAPArrayStruct inputValue;
+	
+	inputValue.varString = "This is a struct string.";
+	inputValue.varInt = 68;
+	inputValue.varFloat = 12.5;
+	inputValue.varArray.Add() = "This is string 1";
+	inputValue.varArray.Add() = "This is string 2";
+	inputValue.varArray.Add() = "This is string 3";
+	inputValue.varArray.Add() = "This is string 4";
+
+	SOAPMethod method("echoNestedArray", e.nspace, e.soapaction, e.needsappend);
+	method.AddParameter("inputStruct") << inputValue;
+
+	const SOAPResponse& response = proxy.Execute(method);
+	SOAPArrayStruct outputValue;
+	response.GetReturnValue() >> outputValue;
+	if (inputValue != outputValue && !almostequal(inputValue.varFloat, outputValue.varFloat))
+		throw SOAPException("Values are not equal");
+}
+
+void
+TestEchoBooleanJunk(SOAPProxy& proxy, const Endpoint& e)
+{
+	SOAPMethod method("echoBoolean", e.nspace, e.soapaction, e.needsappend);
+	(method.AddParameter("inputBoolean") << "junk").SetType("boolean", SOAP_XSI);
+
+	const SOAPResponse& response = proxy.Execute(method);
+
+	throw UnexpectedSuccessException("Returned value: %s",
+		(const char *)response.GetReturnValue().GetString());
+}
+
+void
+TestEchoBooleanTrue(SOAPProxy& proxy, const Endpoint& e)
+{
+	bool val = true;
+	SOAPMethod method("echoBoolean", e.nspace, e.soapaction, e.needsappend);
+	method.AddParameter("inputBoolean") << val;
+
+	const SOAPResponse& response = proxy.Execute(method);
+	response.GetReturnValue() >> val;
+	if (!val)
+		throw SOAPException("Values are not equal");
+}
+
+void
+TestEchoBooleanFalse(SOAPProxy& proxy, const Endpoint& e)
+{
+	bool val = false;
+	SOAPMethod method("echoBoolean", e.nspace, e.soapaction, e.needsappend);
+	method.AddParameter("inputBoolean") << val;
+
+	const SOAPResponse& response = proxy.Execute(method);
+	response.GetReturnValue() >> val;
+	if (val)
+		throw SOAPException("Values are not equal");
+}
 
 void
 TestEchoIntegerArray(SOAPProxy& proxy, const Endpoint& e, int numvals)
@@ -415,7 +497,6 @@ TestEchoIntegerArray(SOAPProxy& proxy, const Endpoint& e, int numvals)
 	// elements in the array!
 	SOAPParameter& param = method.AddParameter("inputIntegerArray");
 	param << inputValue;
-	param.SetArrayType("int");
 
 	const SOAPResponse& response = proxy.Execute(method);
 	response.GetReturnValue() >> outputValue;
@@ -438,7 +519,6 @@ TestEchoFloatArray(SOAPProxy& proxy, const Endpoint& e, int numvals)
 	// elements in the array!
 	SOAPParameter& param = method.AddParameter("inputFloatArray");
 	param << inputValue;
-	param.SetArrayType("float");
 
 	const SOAPResponse& response = proxy.Execute(method);
 
@@ -468,7 +548,6 @@ TestEchoStringArray(SOAPProxy& proxy, const Endpoint& e, int numvals)
 	// elements in the array!
 	SOAPParameter& param = method.AddParameter("inputStringArray");
 	param << inputValue;
-	param.SetArrayType("string");
 
 	const SOAPResponse& response = proxy.Execute(method);
 	SOAPArray<SOAPString> outputValue;
@@ -499,7 +578,6 @@ TestEchoStructArray(SOAPProxy& proxy, const Endpoint& e, int numvals)
 	// elements in the array!
 	SOAPParameter& param = method.AddParameter("inputStructArray");
 	param << inputValue;
-	param.SetArrayType(SOAPStruct::soap_name, SOAPStruct::soap_namespace);
 
 	const SOAPResponse& response = proxy.Execute(method);
 	SOAPArray<SOAPStruct> outputValue;
@@ -514,23 +592,16 @@ TestEcho2DStringArray(SOAPProxy& proxy, const Endpoint& e)
 	SOAPMethod method("echo2DStringArray", e.nspace,
 			e.soapaction, e.needsappend);
 
-	SOAPArray< SOAPArray<SOAPString> > twod;
-	SOAPArray< SOAPArray<SOAPString> > result;
+	SOAP2DArray<SOAPString> twod, result;
 
-	twod.Resize(3);
-	twod[0].Resize(3);
-	twod[1].Resize(3);
-	twod[2].Resize(3);
+	twod.Resize(3,2);
 
 	twod[0][0] = "0,0";
 	twod[0][1] = "0,1";
-	twod[0][2] = "0,2";
 	twod[1][0] = "1,0";
 	twod[1][1] = "1,1";
-	twod[1][2] = "1,2";
 	twod[2][0] = "2,0";
 	twod[2][1] = "2,1";
-	twod[2][2] = "2,2";
 
 	method.AddParameter("input2DStringArray") << twod;
 
@@ -550,7 +621,7 @@ TestEchoStructAsSimpleTypes(SOAPProxy& proxy, const Endpoint& e)
 	SOAPStruct s;
 	s.varString = "This is a test";
 	s.varInt = 1;
-	s.varFloat = 2.2;
+	s.varFloat = (float)2.2;
 
 	method.AddParameter("inputStruct") << s;
 
@@ -558,10 +629,35 @@ TestEchoStructAsSimpleTypes(SOAPProxy& proxy, const Endpoint& e)
 
 	if (response.GetReturnValue("outputString").GetString() != s.varString)
 		throw SOAPException("String values are not equal.");
+
 	if (response.GetReturnValue("outputInteger").GetInt() != s.varInt)
 		throw SOAPException("Int values are not equal.");
+
 	if (response.GetReturnValue("outputFloat").GetFloat() != s.varFloat)
 		throw SOAPException("Float values are not equal.");
+}
+
+void
+TestEchoSimpleTypesAsStruct(SOAPProxy& proxy, const Endpoint& e)
+{
+	SOAPMethod method("echoSimpleTypesAsStruct", e.nspace,
+			e.soapaction, e.needsappend);
+
+	SOAPStruct s;
+	s.varString = "This is a test";
+	s.varInt = 1;
+	s.varFloat = (float)2.2;
+
+	method.AddParameter("inputString") << s.varString;
+	method.AddParameter("inputInteger") << s.varInt;
+	method.AddParameter("inputFloat") << s.varFloat;
+
+	const SOAPResponse& response = proxy.Execute(method);
+	SOAPStruct out;
+	response.GetReturnValue() >> out;
+
+	if (s != out)
+		throw SOAPException("Values are not equal.");
 }
 
 void
@@ -575,9 +671,27 @@ TestEchoBase64(SOAPProxy& proxy, const Endpoint& e)
 		inputBinary[i] = rand();
 
 	SOAPMethod method("echoBase64", e.nspace, e.soapaction, e.needsappend);
-	method.AddParameter("inputBase64") << inputBinary;
+	method.AddParameter("inputBase64") << SOAPBase64(inputBinary);
 	const SOAPResponse& response = proxy.Execute(method);
-	response.GetReturnValue() >> outputBinary;
+	response.GetReturnValue() >> SOAPBase64(outputBinary);
+	if (inputBinary != outputBinary)
+		throw SOAPException("Values are not equal");
+}
+
+void
+TestEchoHexBinary(SOAPProxy& proxy, const Endpoint& e)
+{
+	SOAPArray<char> inputBinary, outputBinary;
+
+	int size = rand() % 501 + 500;
+	inputBinary.Resize(size);
+	for (int i = 0; i < size; ++i)
+		inputBinary[i] = rand();
+
+	SOAPMethod method("echoHexBinary", e.nspace, e.soapaction, e.needsappend);
+	method.AddParameter("inputHexBinary") << SOAPHex(inputBinary);
+	const SOAPResponse& response = proxy.Execute(method);
+	response.GetReturnValue() >> SOAPHex(outputBinary);
 	if (inputBinary != outputBinary)
 		throw SOAPException("Values are not equal");
 }
@@ -738,6 +852,29 @@ TestEchoStructArrayZeroLen(SOAPProxy& proxy, const Endpoint& e)
 	TestEchoStructArray(proxy, e, 0);
 }
 
+class SOAPTypeTraits< SOAPHashMap<SOAPString, int> > : public SOAPMapTypeTraits
+{
+};
+
+void
+TestEchoMap(SOAPProxy& proxy, const Endpoint& e)
+{
+    SOAPMethod method("echoMap", e.nspace,
+			e.soapaction, e.needsappend);
+
+    SOAPHashMap<SOAPString, int> map, outmap;
+    map["one"] = 1;
+    map["two"] = 2;
+    map["three"] = 3;
+
+    method.AddParameter("inputMap") << map;
+    const SOAPResponse& response = proxy.Execute(method);
+
+    response.GetReturnValue() >> outmap;
+    if (map.Size() != outmap.Size())
+        throw SOAPException("Maps have differing number of values.");
+}
+
 typedef void (*TestFunction)(SOAPProxy&, const Endpoint&);
 
 void
@@ -781,7 +918,7 @@ TestForPass(SOAPProxy& proxy, const Endpoint& e, const char *testname, TestFunct
 	}
 
 	std::cout << type;
-	if (msg)
+	if (msg != "PASS")
 		std::cout << ": " << msg;
 	std::cout << std::endl;
 
@@ -877,6 +1014,8 @@ TestInterop(const Endpoint& e)
 	testresults.WriteValue(e.nspace);
 	testresults.EndTag("NameSpace");
 
+	//
+	// Round 1
 	TestForFault(proxy, e, "BogusMethod",				TestBogusMethod);
 	TestForFault(proxy, e, "BogusNamespace",			TestBogusNamespace);
 	TestForFault(proxy, e, "MustUnderstand=1",			TestMustUnderstand_1);
@@ -909,9 +1048,27 @@ TestInterop(const Endpoint& e)
 	TestForPass(proxy, e, "echoFloatArray_ZeroLen",		TestEchoFloatArrayZeroLen);
 	TestForPass(proxy, e, "echoStringArray_ZeroLen",	TestEchoStringArrayZeroLen);
 	TestForPass(proxy, e, "echoStructArray_ZeroLen",	TestEchoStructArrayZeroLen);
+
+	//
+	// Additional Round 2 base methods
 	TestForPass(proxy, e, "echoBase64",					TestEchoBase64);
+	TestForPass(proxy, e, "echoBoolean_true",			TestEchoBooleanTrue);
+	TestForPass(proxy, e, "echoBoolean_false",			TestEchoBooleanFalse);
+	TestForFault(proxy, e, "echoBoolean_junk",			TestEchoBooleanJunk);
+	// echoDate
+	// echoDecimal
+
+	//
+	// Round 2/Group B methods
 	TestForPass(proxy, e, "echoStructAsSimpleTypes",	TestEchoStructAsSimpleTypes);
-	TestForPass(proxy, e, "echo2DStringArray",	TestEcho2DStringArray);
+	TestForPass(proxy, e, "echoSimpleTypesAsStruct",	TestEchoSimpleTypesAsStruct);
+	TestForPass(proxy, e, "echo2DStringArray",			TestEcho2DStringArray);
+	TestForPass(proxy, e, "echoNestedStruct",			TestEchoNestedStruct);
+	TestForPass(proxy, e, "echoNestedArray",			TestEchoNestedArray);
+
+	// Miscellaneous methods
+	TestForPass(proxy, e, "echoMap",					TestEchoMap);
+	TestForPass(proxy, e, "echoHexBinary",				TestEchoHexBinary);
 
 	testresults.EndTag("Server");
 }
