@@ -36,6 +36,7 @@ Download and untar source from:
 For Linux :
 	cd expat
 	./configure
+	(SEE NOTE BELOW FOR GCC USERS)
 	make
 	make install (must be root to install into /usr/local)
 
@@ -44,3 +45,14 @@ For Win32 :
 	Load .dsw and build.
 	Copy expat.lib to easysoap/win32/Debug
 	Copy expat.dll to easysoap/win32/Debug
+
+
+COMPLILING EXPAT WITH GCC
+=========================
+
+Because EasySoap++ uses exceptions, the Expat library must be compiled
+to handle exceptions correctly or crashes will occur when a C++ exception
+is thrown.  After you run the configure command you must edit lib/Makefile
+and add the flag "-fexceptions" to the CFLAGS proeprty.
+
+
