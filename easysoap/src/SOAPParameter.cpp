@@ -99,6 +99,8 @@ SOAPParameter::ClearValue()
 void
 SOAPParameter::Reset()
 {
+	if (m_parent)
+		m_parent->m_outtasync = true;
 	m_name.GetName().Empty();
 	m_name.GetNamespace().Empty();
 	ClearValue();
