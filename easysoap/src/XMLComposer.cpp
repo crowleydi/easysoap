@@ -79,6 +79,8 @@ XMLComposer::Reset(bool addDecl)
 const char *
 XMLComposer::GetBytes()
 {
+	if (m_buffptr == m_buffend)
+		Resize();
 	*m_buffptr = 0;
 	return m_buffer;
 }
