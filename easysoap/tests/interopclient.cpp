@@ -49,8 +49,6 @@
 
 #include "interopstruct.h"
 
-static const char *httpproxy = 0; // "http://localhost:8080";
-
 static const char *default_server = "http://easysoap.sourceforge.net/cgi-bin/interopserver";
 static const char *default_server_name = "EasySoap++ at Sourceforge";
 static const char *default_interop_namespace = "http://soapinterop.org/";
@@ -233,7 +231,7 @@ operator>>(const SOAPParameter& param, Endpoint& e)
 void
 GetRound1Endpoints(SOAPArray<Endpoint>& ea)
 {
-	SOAPProxy proxy("http://www.xmethods.net/perl/soaplite.cgi", httpproxy);
+	SOAPProxy proxy("http://www.xmethods.net/perl/soaplite.cgi");
 	SOAPMethod getAllEndpoints("getAllEndpoints",
 		"http://soapinterop.org/ilab",
 		"http://soapinterop.org/ilab#", true);
@@ -255,7 +253,7 @@ GetRound1Endpoints(SOAPArray<Endpoint>& ea)
 void
 GetRound2Endpoints(SOAPArray<Endpoint>& ea, const char *groupName)
 {
-	SOAPProxy proxy("http://www.whitemesa.net/interopInfo", httpproxy);
+	SOAPProxy proxy("http://www.whitemesa.net/interopInfo");
 	SOAPMethod getEndpointInfo("GetEndpointInfo",
 		"http://soapinterop.org/info/",
 		"http://soapinterop.org/info/", false);
@@ -1434,7 +1432,7 @@ TestForFault(SOAPProxy& proxy, const Endpoint& e, const SOAPString& testname, Te
 void
 TestInterop(const Endpoint& e, TestType test)
 {
-	SOAPonHTTP transport(e.endpoint, httpproxy);
+	SOAPonHTTP transport(e.endpoint);
 	transport.SetTimeout(30);
 	SOAPProxy proxy(&transport);
 
@@ -1730,10 +1728,6 @@ main(int argc, char* argv[])
 			else if (val == "-a-")
 			{
 				doappend = false;
-			}
-			else if (val == "-p")
-			{
-				httpproxy = argv[i++];
 			}
 			else if (val == "-n")
 			{

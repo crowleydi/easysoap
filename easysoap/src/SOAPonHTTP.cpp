@@ -140,7 +140,15 @@ SOAPonHTTP::ConnectTo(const SOAPUrl& endpoint)
 	m_endpoint = endpoint;
 	if (m_ctx)
 			m_http.SetContext(*m_ctx);
-	m_http.ConnectTo(endpoint);
+
+	const char *proxy_str = getenv("http_proxy");
+	if (proxy_str)
+	{
+		SOAPUrl proxy = proxy_str;
+		m_http.ConnectTo(endpoint, proxy);
+	}
+	else
+		m_http.ConnectTo(endpoint);
 }
 
 void
