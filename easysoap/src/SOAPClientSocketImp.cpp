@@ -208,8 +208,8 @@ SOAPClientSocketImp::Connect(const char *server, unsigned int port)
 	return true;
 }
 
-int
-SOAPClientSocketImp::Read(char *buff, int bufflen)
+size_t
+SOAPClientSocketImp::Read(char *buff, size_t bufflen)
 {
 	int bytes = 0;
 	if (bufflen > 0)
@@ -228,8 +228,8 @@ SOAPClientSocketImp::Read(char *buff, int bufflen)
 	return bytes;
 }
 
-int
-SOAPClientSocketImp::Write(const char *buff, int bufflen)
+size_t
+SOAPClientSocketImp::Write(const char *buff, size_t bufflen)
 {
 	int bytes = 0;
 	if (bufflen > 0)

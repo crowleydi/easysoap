@@ -37,8 +37,8 @@ public:
 	virtual bool IsOpen();
 	virtual void Close();
 	virtual bool Connect(const char *host, unsigned int port);
-	virtual int Read(char *buffer, int len);
-	virtual int Write(const char *buffer, int len);
+	virtual size_t Read(char *buffer, size_t len);
+	virtual size_t Write(const char *buffer, size_t len);
 };
 
 #endif // !defined(AFX_SOAPCLIENTSOCKETIMP_H__7D357522_E8B1_45A2_8CE1_A472A7D58C13__INCLUDED_)
