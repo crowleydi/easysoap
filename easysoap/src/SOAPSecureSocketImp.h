@@ -43,7 +43,7 @@ protected:
 	bool				m_delctx;
         void                            *m_cbdata;
 
-	bool HandleError(const char *context, int retcode);
+	bool HandleError(const char *context, int retcode, bool shouldWait = true);
 	void InitSSL();
 	void VerifyCert(const char* host);
 	const char* CheckForCertError(int rc);

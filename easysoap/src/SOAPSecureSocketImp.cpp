@@ -98,7 +98,7 @@ SOAPSecureSocketImp::~SOAPSecureSocketImp()
 }
 
 bool
-SOAPSecureSocketImp::HandleError(const char *context, int retcode)
+SOAPSecureSocketImp::HandleError(const char *context, int retcode, bool shouldWait)
 {
 	// we may have an error.
 	// we need to call SSL_get_error()
@@ -119,12 +119,16 @@ SOAPSecureSocketImp::HandleError(const char *context, int retcode)
 
 	case SSL_ERROR_WANT_WRITE:
 		SOAPDebugger::Print(2, "%s: SSL_ERROR_WANT_WRITE caught\r\n", context);
-		WaitWrite();
+                if (shouldWait) {
+		    WaitWrite();
+                }
 		retry = true;
 		break;
 	case SSL_ERROR_WANT_READ:
 		SOAPDebugger::Print(2, "%s: SSL_ERROR_WANT_READ caught\r\n", context);
-		WaitRead();
+                if (shouldWait) {
+		    WaitRead();
+                }
 		retry = true;
 		break;
 	case SSL_ERROR_WANT_X509_LOOKUP:
@@ -192,13 +196,19 @@ SOAPSecureSocketImp::InitSSL()
 	if (!m_ssl)
 		throw SOAPMemoryException();
 	
+        SSL_set_connect_state(m_ssl);
 	int retcode;
 
 	if ((retcode = SSL_set_fd(m_ssl, m_socket.GetRawSocketHandle())) != 1)
-		HandleError("Error attaching security layer to socket : %s\r\n", retcode);
+		HandleError("Error attaching security layer to socket : %s\r\n", retcode, false);
 
-	if ((retcode = SSL_connect(m_ssl)) != 1)
-		HandleError("Error negotiating secure connection : %s\r\n", retcode);
+        bool retry = false;
+        do 
+        {
+	    if ((retcode = SSL_connect(m_ssl)) != 1) {
+		retry = HandleError("Error negotiating secure connection : %s\r\n", retcode, true);
+            }
+        } while(retry); 
 }
 
 const char*  
@@ -379,7 +389,7 @@ SOAPSecureSocketImp::Read(char *buff, size_t bufflen)
 			{
 				// check for an error
 				SOAPDebugger::Print(2, "About to call HandleError...\r\n");
-				retry = HandleError("Error reading from secure socket", bytes);
+				retry = HandleError("Error reading from secure socket", bytes, false);
 				bytes = 0;
 			}
 		} while (retry);
@@ -417,7 +427,7 @@ SOAPSecureSocketImp::Write(const char *buff, size_t bufflen)
 			else 
 			{
 				// check for an error
-				retry = HandleError("Error writing to secure socket\r\n", bytes);
+				retry = HandleError("Error writing to secure socket\r\n", bytes, false);
 				bytes = 0;
 			}
 		} while (retry);
