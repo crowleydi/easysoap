@@ -5,7 +5,7 @@ dnl
 
 AC_INIT(Makefile.am)
 
-AM_INIT_AUTOMAKE(EasySoap++, 0.4)
+AM_INIT_AUTOMAKE(EasySoap++, 0.5)
 AM_CONFIG_HEADER(include/es_config.h)
 AC_CANONICAL_HOST
 
@@ -23,10 +23,12 @@ AM_PROG_LIBTOOL
 AC_PATH_PROG(MAKEDEPEND, makedepend, $TRUE)
 
 dnl Checks for libraries.
-AC_CHECK_LIB(expat, XML_Parse)
+AC_CHECK_LIB(nsl, gethostbyname)
+AC_CHECK_LIB(socket, send)
+AC_CHECK_LIB(wsock32, WSAStartup)
 AC_CHECK_LIB(crypto, ERR_put_error)
 AC_CHECK_LIB(ssl, SSL_connect)
-AC_CHECK_LIB(wsock32, WSAStartup)
+AC_CHECK_LIB(expat, XML_Parse)
 
 dnl Checks for header files.
 AC_HEADER_DIRENT
@@ -43,9 +45,11 @@ AC_CHECK_HEADERS( \
 	ieeefp.h \
 	malloc.h \
 	math.h \
+	memory.h \
 	netdb.h \
 	resolv.h \
 	stdlib.h \
+	string.h \
 	unistd.h \
 	arpa/inet.h \
 	netinet/in.h \
