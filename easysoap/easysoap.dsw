@@ -15,18 +15,6 @@ Package=<4>
 
 ###############################################################################
 
-Project: "expat"="..\Expat-1.95.2\Source\lib\expat.dsp" - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-}}}
-
-###############################################################################
-
 Project: "interopclient"=.\tests\interopclient.dsp - Package Owner=<4>
 
 Package=<5>
