@@ -330,18 +330,21 @@ public:
 	// clear all elements.
 	void Clear()
 	{
-		for (size_t i = 0; i < m_buckets; ++i)
+		if (m_table)
 		{
-			HashElement *he = m_table[i];
-			while (he)
+			for (size_t i = 0; i < m_buckets; ++i)
 			{
-				HashElement *next = he->m_next;
-				PutBackHashElement(he);
-				he = next;
+				HashElement *he = m_table[i];
+				while (he)
+				{
+					HashElement *next = he->m_next;
+					PutBackHashElement(he);
+					he = next;
+				}
+				m_table[i] = 0;
 			}
-			m_table[i] = 0;
+			m_numItems = 0;
 		}
-		m_numItems = 0;
 	}
 
 	size_t Size() const
