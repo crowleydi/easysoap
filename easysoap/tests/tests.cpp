@@ -259,6 +259,7 @@ TestInterop(SOAPProxy& proxy)
 {
 	try
 	{
+		SOAPMethod echoVoid				("echoVoid",			"urn:xmethodsInterop");
 		SOAPMethod echoString			("echoString",			"urn:xmethodsInterop");
 		SOAPMethod echoStringArray		("echoStringArray",		"urn:xmethodsInterop");
 		SOAPMethod echoInteger			("echoInteger",			"urn:xmethodsInterop");
@@ -268,19 +269,21 @@ TestInterop(SOAPProxy& proxy)
 		SOAPMethod echoStructure		("echoStructure",		"urn:xmethodsInterop");
 		SOAPMethod echoStructureArray	("echoStructureArray",	"urn:xmethodsInterop");
 
-		echoString.AddParameter().SetValue("This is a test string.");
+		WriteResponse(proxy.Execute(echoVoid));
+
+		echoString.AddParameter("inputString").SetValue("This is a test string.");
 		WriteResponse(proxy.Execute(echoString));
 
-		SOAPParameter& strarray = echoStringArray.AddParameter();
+		SOAPParameter& strarray = echoStringArray.AddParameter("inputStringArray");
 		strarray.AddParameter().SetValue("String 1");
 		strarray.AddParameter().SetValue("String 2");
 		strarray.AddParameter().SetValue("String 3");
 		WriteResponse(proxy.Execute(echoStringArray));
 
-		echoInteger.AddParameter().SetValue(1691);
+		echoInteger.AddParameter("inputInteger").SetValue(1691);
 		WriteResponse(proxy.Execute(echoInteger));
 
-		SOAPParameter& intarray = echoIntegerArray.AddParameter();
+		SOAPParameter& intarray = echoIntegerArray.AddParameter("inputIntegerArray");
 		intarray.AddParameter().SetValue(34);
 		intarray.AddParameter().SetValue(44);
 		intarray.AddParameter().SetValue(4);
@@ -288,10 +291,10 @@ TestInterop(SOAPProxy& proxy)
 		intarray.AddParameter().SetValue(315);
 		WriteResponse(proxy.Execute(echoIntegerArray));
 
-		echoFloat.AddParameter().SetValue((float)8.946);
+		echoFloat.AddParameter("inputFloat").SetValue((float)8.946);
 		WriteResponse(proxy.Execute(echoFloat));
 
-		SOAPParameter& floatarray = echoFloatArray.AddParameter();
+		SOAPParameter& floatarray = echoFloatArray.AddParameter("inputFloatArray");
 		floatarray.AddParameter().SetValue((float)34.26);
 		floatarray.AddParameter().SetValue((float)3.44);
 		floatarray.AddParameter().SetValue((float)124.5);
@@ -316,22 +319,12 @@ TestInterop(SOAPProxy& proxy)
 	}
 }
 
-void
-TestSOAPLiteInterop()
+void TestInterop(const char *name, const char *url)
 {
-	std::cout << "Testing SOAP::Lite interopability." << std::endl;
+	std::cout << "Testing " << name << " interopability." << std::endl;
 
-	SOAPProxy soaplite("http://services.xmethods.net:80/perl/soaplite.cgi");
-	TestInterop(soaplite);
-}
-
-void
-TestApacheInterop()
-{
-	std::cout << "Testing Apache interopability." << std::endl;
-
-	SOAPProxy apache("http://services.xmethods.net:80/soap/servlet/rpcrouter");
-	TestInterop(apache);
+	SOAPProxy proxy(url);
+	TestInterop(proxy);
 }
 
 int
@@ -339,17 +332,22 @@ main(int argc, char* argv[])
 {
 	try
 	{
-		TestSOAPUrlParsing();
-
-		TestApacheInterop();
-		TestSOAPLiteInterop();
+		// See: http://www.xmethods.net/ilab/ilab.html
+		TestInterop("Apache 2.1 RC",			"http://services.xmethods.net/soap/servlet/rpcrouter");
+		TestInterop("4s4c 1.3",					"http://services2.xmethods.net/ssss4c/ilab/soap.asp");
+		//TestInterop("MS SOAP 2.0 B1",			"http://services.xmethods.net/XMethodsInterop/XMethodsInterop.asp");
+		//TestInterop("MS .NET Beta 1",			"http://services2.xmethods.net/DotNet/XMInterop.asmx");
+		TestInterop("SOAP::Lite 0.46",			"http://services.xmethods.net/perl/soaplite.cgi");
+		//TestInterop("White Mesa SOAP RPC 1.4",	"http://delta/interop");
 
 		// Lets go over the internet and make some calls
 		// some methods from www.xmethods.com
+		/* Is lemurlabs.com gone?
 		GetInternetTime();
 		Fortune();
 		FortuneDictionaryList();
 		Fortune("linuxcookie");
+		*/
 
 
 		//Whois("scitegic.com");
