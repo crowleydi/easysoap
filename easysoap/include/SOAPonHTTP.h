@@ -40,6 +40,7 @@ private:
 	int			m_canread;
 	bool		m_httpproxy;
 	bool		m_doclose;
+	bool		m_keepAlive;
 
 	int		GetReply();
 	bool	Connect();
@@ -52,12 +53,14 @@ public:
 		: m_canread(-1)
 		, m_httpproxy(false)
 		, m_doclose(false)
+		, m_keepAlive(false)
 	{}
 
 	SOAPHTTPProtocol(const SOAPUrl& endpoint)
 		: m_canread(-1)
 		, m_httpproxy(false)
 		, m_doclose(false)
+		, m_keepAlive(false)
 	{
 		ConnectTo(endpoint);
 	}
@@ -66,6 +69,7 @@ public:
 		: m_canread(-1)
 		, m_httpproxy(false)
 		, m_doclose(false)
+		, m_keepAlive(false)
 	{
 		ConnectTo(endpoint, proxy);
 	}
@@ -73,6 +77,7 @@ public:
 	~SOAPHTTPProtocol()
 	{}
 
+	void	SetKeepAlive(bool keepAlive = false)	{m_keepAlive = keepAlive;}
 	void	ConnectTo(const SOAPUrl& endpoint);
 	void	ConnectTo(const SOAPUrl& endpoint, const SOAPUrl& proxy);
 	int		Get(const char *path);
@@ -113,6 +118,7 @@ public:
 
 	virtual ~SOAPonHTTP() {}
 
+	void	SetKeepAlive(bool keepAlive = false)	{m_http.SetKeepAlive(keepAlive);}
 	virtual void SetError();
 	//
 	//  Return charset if we know it

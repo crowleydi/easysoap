@@ -166,7 +166,9 @@ SOAPHTTPProtocol::StartVerb(const char *verb, const char *path)
 
 	WriteLine(" HTTP/1.1");
 	WriteHostHeader(m_endpoint);
-	WriteHeader("Connection", "Keep-Alive");
+
+	if (m_keepAlive)
+		WriteHeader("Connection", "Keep-Alive");
 }
 
 void
@@ -304,6 +306,9 @@ SOAPHTTPProtocol::GetReply()
 		if (!keepalive || sp_strcasecmp(keepalive, "Keep-Alive") != 0)
 			m_doclose = true;
 	}
+
+	if (!m_keepAlive)
+		m_doclose = true;
 
 	return httpreturn;
 }
