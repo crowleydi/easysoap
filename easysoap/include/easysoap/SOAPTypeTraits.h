@@ -259,7 +259,7 @@ public:
 		{
 			//
 			// parse position attribute if present
-			attr = (*i)->GetAttributes().Find(SOAPEnc::position);
+			attr = (*i)->GetAccessorAttributes().Find(SOAPEnc::position);
 			if (attr)
 			{
 				size_t newpos;
@@ -523,7 +523,7 @@ public:
 		{
 			//
 			// parse position attribute if present
-			attr = (*i)->GetAttributes().Find(SOAPEnc::position);
+			attr = (*i)->GetAccessorAttributes().Find(SOAPEnc::position);
 			if (attr)
 			{
 				size_t newrow, newcol;
