@@ -21,14 +21,14 @@
 #ifndef __SOAPNamesSpaces_h__
 #define __SOAPNamesSpaces_h__
 
-#define FULL_SOAP_ENV "http://schemas.xmlsoap.org/soap/envelope/"
-#define FULL_SOAP_ENC "http://schemas.xmlsoap.org/soap/encoding/"
-#define FULL_SOAP_XSI_1999 "http://www.w3.org/1999/XMLSchema-instance"
-#define FULL_SOAP_XSD_1999 "http://www.w3.org/1999/XMLSchema"
-#define FULL_SOAP_XSI_2001 "http://www.w3.org/2001/XMLSchema-instance"
-#define FULL_SOAP_XSD_2001 "http://www.w3.org/2001/XMLSchema"
-#define FULL_SOAP_XSI FULL_SOAP_XSI_1999
-#define FULL_SOAP_XSD FULL_SOAP_XSD_1999
+#define SOAP_ENV "http://schemas.xmlsoap.org/soap/envelope/"
+#define SOAP_ENC "http://schemas.xmlsoap.org/soap/encoding/"
+#define SOAP_XSI_1999 "http://www.w3.org/1999/XMLSchema-instance"
+#define SOAP_XSD_1999 "http://www.w3.org/1999/XMLSchema"
+#define SOAP_XSI_2001 "http://www.w3.org/2001/XMLSchema-instance"
+#define SOAP_XSD_2001 "http://www.w3.org/2001/XMLSchema"
+#define SOAP_XSI SOAP_XSI_1999
+#define SOAP_XSD SOAP_XSD_1999
 
 #define PARSER_NS_SEP "#"
 

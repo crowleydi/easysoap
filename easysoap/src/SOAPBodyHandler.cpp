@@ -30,7 +30,7 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-const char *SOAPBodyHandler::start_tag = FULL_SOAP_ENV PARSER_NS_SEP "Body";
+const char *SOAPBodyHandler::start_tag = SOAP_ENV PARSER_NS_SEP "Body";
 
 SOAPBodyHandler::SOAPBodyHandler(SOAPBody& body)
 : m_body(&body)

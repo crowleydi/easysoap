@@ -29,7 +29,7 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-const char *SOAPHeaderHandler::start_tag = FULL_SOAP_ENV ":Header";
+const char *SOAPHeaderHandler::start_tag = SOAP_ENV ":Header";
 
 SOAPHeaderHandler::SOAPHeaderHandler(SOAPHeader& header)
 : m_header(&header)

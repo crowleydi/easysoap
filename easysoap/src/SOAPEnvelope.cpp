@@ -45,20 +45,20 @@ bool
 SOAPEnvelope::WriteSOAPPacket(SOAPPacketWriter& packet) const
 {
 	packet.Reset();
-	packet.StartNSTag(FULL_SOAP_ENV, "Envelope", "V");
+	packet.StartNSTag(SOAP_ENV, "Envelope", "V");
 
 	// TODO: automagically add only the tags we need...
-	packet.AddXMLNS("C", FULL_SOAP_ENC);
-	packet.AddXMLNS("i", FULL_SOAP_XSI);
-	packet.AddXMLNS("d", FULL_SOAP_XSD);
+	packet.AddXMLNS("C", SOAP_ENC);
+	packet.AddXMLNS("i", SOAP_XSI);
+	packet.AddXMLNS("d", SOAP_XSD);
 
 	// TODO: allow user to set encoding style
-	packet.AddNSAttr(FULL_SOAP_ENV, "encodingStyle", FULL_SOAP_ENC);
+	packet.AddNSAttr(SOAP_ENV, "encodingStyle", SOAP_ENC);
 
 	m_header.WriteSOAPPacket(packet);
 	m_body.WriteSOAPPacket(packet);
 
-	packet.EndNSTag(FULL_SOAP_ENV, "Envelope");
+	packet.EndNSTag(SOAP_ENV, "Envelope");
 
 	return true;
 }

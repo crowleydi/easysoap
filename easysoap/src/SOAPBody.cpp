@@ -44,14 +44,14 @@ SOAPBody::~SOAPBody()
 bool
 SOAPBody::WriteSOAPPacket(SOAPPacketWriter& packet) const
 {
-	packet.StartNSTag(FULL_SOAP_ENV, "Body");
+	packet.StartNSTag(SOAP_ENV, "Body");
 
 	if (m_isfault)
 		m_fault.WriteSOAPPacket(packet);
 	else
 		m_method.WriteSOAPPacket(packet);
 
-	packet.EndNSTag(FULL_SOAP_ENV, "Body");
+	packet.EndNSTag(SOAP_ENV, "Body");
 
 	return true;
 }

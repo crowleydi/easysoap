@@ -29,7 +29,7 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-const char *SOAPEnvelopeHandler::start_tag = FULL_SOAP_ENV PARSER_NS_SEP "Envelope";
+const char *SOAPEnvelopeHandler::start_tag = SOAP_ENV PARSER_NS_SEP "Envelope";
 
 SOAPEnvelopeHandler::SOAPEnvelopeHandler(SOAPEnvelope& envelope)
 : m_done(false)

@@ -108,7 +108,7 @@ void
 SOAPParameter::SetType(const char *type, const char *ns)
 {
 	if (!ns)
-		ns = FULL_SOAP_XSD;
+		ns = SOAP_XSD;
 
 	m_type = type;
 	m_typens = ns;
@@ -160,7 +160,7 @@ void
 SOAPParameter::SetIsArray()
 {
 	m_flags = ARRAY_FLAG;
-	SetType("Array", FULL_SOAP_ENC);
+	SetType("Array", SOAP_ENC);
 }
 
 void
@@ -391,10 +391,10 @@ SOAPParameter::WriteSOAPPacket(SOAPPacketWriter& packet) const
 
 	packet.StartTag(sym);
 
-	packet.AddNSAttr(FULL_SOAP_XSI, "type", m_typens, m_type);
+	packet.AddNSAttr(SOAP_XSI, "type", m_typens, m_type);
 	if (IsNull())
 	{
-		packet.AddNSAttr(FULL_SOAP_XSI, "null", "1");
+		packet.AddNSAttr(SOAP_XSI, "null", "1");
 	}
 	else if (IsArray())
 	{
@@ -404,14 +404,14 @@ SOAPParameter::WriteSOAPPacket(SOAPPacketWriter& packet) const
 			// TODO:  This is bogus.  We need to go through all params
 			// and check their type.  If they're not all the same, use 'ur-type'
 			snprintf(typebuff, sizeof(typebuff), "%s[%d]", (const char *)GetArray()[0].GetType(), GetArray().Size());
-			packet.AddNSAttr(FULL_SOAP_ENC, "arrayType", (const char *)GetArray()[0].GetTypeNamespace(), typebuff);
+			packet.AddNSAttr(SOAP_ENC, "arrayType", (const char *)GetArray()[0].GetTypeNamespace(), typebuff);
 		}
 		else
 		{
 			// TODO: With no elements, we obviously can't discern the
 			// type so... we probably should have a way for the user to
 			// set the type to use...
-			packet.AddNSAttr(FULL_SOAP_ENC, "arrayType", FULL_SOAP_XSD, "ur-type[0]");
+			packet.AddNSAttr(SOAP_ENC, "arrayType", SOAP_XSD, "ur-type[0]");
 		}
 
 		for (size_t i = 0; i < GetArray().Size(); ++i)

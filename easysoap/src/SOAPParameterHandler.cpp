@@ -86,11 +86,12 @@ SOAPParameterHandler::start(SOAPParser& parser, const XML_Char *name, const XML_
 			}
 			return 0;
 		}
-		else if (sp_strcmp(tag, FULL_SOAP_ENC PARSER_NS_SEP "arrayType") == 0)
+		else if (sp_strcmp(tag, SOAP_ENC PARSER_NS_SEP "arrayType") == 0)
 		{
 			haveArrayType = true;
 		}
-		else if (sp_strcmp(tag, FULL_SOAP_XSI PARSER_NS_SEP "type") == 0)
+		else if (sp_strcmp(tag, SOAP_XSI_1999 PARSER_NS_SEP "type") == 0
+				|| sp_strcmp(tag, SOAP_XSI_2001 PARSER_NS_SEP "type") == 0)
 		{
 			char *sep = sp_strchr(val, ':');
 			if (sep)
@@ -112,7 +113,8 @@ SOAPParameterHandler::start(SOAPParser& parser, const XML_Char *name, const XML_
 				throw SOAPException("xsi:type is not namespace qualified: %s", val);
 			}
 		}
-		else if (sp_strcmp(tag, FULL_SOAP_XSI PARSER_NS_SEP "null") == 0)
+		else if (sp_strcmp(tag, SOAP_XSI_1999 PARSER_NS_SEP "null") == 0
+				|| sp_strcmp(tag, SOAP_XSI_2001 PARSER_NS_SEP "null") == 0)
 		{
 			if (sp_strcmp(val, "1") == 0 || sp_strcasecmp(val, "true") == 0)
 			{
