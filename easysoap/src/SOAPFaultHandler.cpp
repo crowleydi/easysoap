@@ -51,18 +51,7 @@ SOAPFaultHandler::start(const XML_Char *name, const XML_Char **attrs)
 SOAPParseEventHandler *
 SOAPFaultHandler::startElement(const XML_Char *name, const XML_Char **attrs)
 {
-	// Check for unscopted fault names
-	if (sp_strcmp(name, "faultcode") == 0)
-		m_paramHandler.SetParameter(m_fault->AddParameter(SOAPFault::faultcode_attr));
-	else if (sp_strcmp(name, "faultactor") == 0)
-		m_paramHandler.SetParameter(m_fault->AddParameter(SOAPFault::faultactor_attr));
-	else if (sp_strcmp(name, "detail") == 0)
-		m_paramHandler.SetParameter(m_fault->AddParameter(SOAPFault::faultdetail_attr));
-	else if (sp_strcmp(name, "faultstring") == 0)
-		m_paramHandler.SetParameter(m_fault->AddParameter(SOAPFault::faultstring_attr));
-	else
-		m_paramHandler.SetParameter(m_fault->AddParameter(name));
-
+	m_paramHandler.SetParameter(m_fault->AddParameter(name));
 	return m_paramHandler.start(name, attrs);
 }
 

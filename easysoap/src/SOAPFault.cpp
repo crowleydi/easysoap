@@ -29,10 +29,10 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-const char *SOAPFault::faultactor_attr = FULL_SOAP_ENV PARSER_NS_SEP "faultactor";
-const char *SOAPFault::faultcode_attr = FULL_SOAP_ENV PARSER_NS_SEP "faultcode";
-const char *SOAPFault::faultdetail_attr = FULL_SOAP_ENV PARSER_NS_SEP "detail";
-const char *SOAPFault::faultstring_attr = FULL_SOAP_ENV PARSER_NS_SEP "faultstring";
+const char *SOAPFault::faultactor_attr = "faultactor";
+const char *SOAPFault::faultcode_attr = "faultcode";
+const char *SOAPFault::faultdetail_attr = "detail";
+const char *SOAPFault::faultstring_attr = "faultstring";
 
 SOAPFault::SOAPFault()
 {
@@ -53,34 +53,23 @@ SOAPFault::WriteSOAPPacket(SOAPPacketWriter& packet) const
 const SOAPParameter*
 SOAPFault::GetFaultCode() const
 {
-	Struct::Iterator i = m_params.Find(faultcode_attr);
-	if (i)
-		return *i;
-	return 0;
+	return GetParameter(faultcode_attr);
 }
 
 const SOAPParameter*
 SOAPFault::GetFaultString() const
-{	Struct::Iterator i = m_params.Find(faultstring_attr);
-	if (i)
-		return *i;
-	return 0;
+{
+	return GetParameter(faultstring_attr);
 }
 
 const SOAPParameter*
 SOAPFault::GetFaultActor() const
 {
-	Struct::Iterator i = m_params.Find(faultactor_attr);
-	if (i)
-		return *i;
-	return 0;
+	return GetParameter(faultactor_attr);
 }
 
 const SOAPParameter*
 SOAPFault::GetDetail() const
 {
-	Struct::Iterator i = m_params.Find(faultdetail_attr);
-	if (i)
-		return *i;
-	return 0;
+	return GetParameter(faultdetail_attr);
 }

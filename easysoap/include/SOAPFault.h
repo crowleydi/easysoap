@@ -74,8 +74,6 @@ private:
 	static const char *faultstring_attr;
 	static const char *faultactor_attr;
 	static const char *faultdetail_attr;
-
-	SOAPParameter::Struct	m_params;
 };
 
 #endif // !defined(AFX_SOAPFAULT_H__290FC204_F572_4249_8E5E_D52E987FFAD0__INCLUDED_)
