@@ -42,12 +42,7 @@ public:
 
 	bool WriteSOAPPacket(SOAPPacketWriter& packet) const;
 
-	static const SOAPQName MustUnderstand;
-	static const SOAPQName Actor;
-
 private:
-
-	static const char *parse_tag;
 
 	SOAPHeader	m_header;
 	SOAPBody	m_body;
