@@ -85,6 +85,13 @@ public:
 		Assign(str.m_str);
 	}
 
+#ifdef HAVE_WCHART
+	SOAPString(const wchar_t *str) : m_str(0), m_alloc(32)
+	{
+		Assign(str);
+	}
+#endif // HAVE_WCHART
+
 	// Destructor
 	~SOAPString()
 	{
