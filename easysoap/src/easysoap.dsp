@@ -407,6 +407,10 @@ SOURCE=..\include\SOAPSocket.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\include\SOAPSTL.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\include\SOAPString.h
 # End Source File
 # Begin Source File
