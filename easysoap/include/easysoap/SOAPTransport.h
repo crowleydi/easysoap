@@ -31,14 +31,15 @@ class SOAPMethod;
 
 class EASYSOAP_EXPORT SOAPTransport
 {
+private:
+	SOAPTransport(const SOAPTransport&);
+	SOAPTransport& operator=(const SOAPTransport&);
+
 protected:
 	SOAPTransport() {}
-	static void ParseContentType(SOAPString& charset, const char *contenttype);
 
 public:
 	virtual ~SOAPTransport() {}
-
-	virtual void SetError() = 0;
 	//
 	//  Return charset if known otherwise null
 	virtual const char *GetCharset() const = 0;
@@ -51,11 +52,23 @@ public:
 	// send the payload.  can only be called ONCE per
 	// payload. 
 	virtual size_t Write(const SOAPMethod& method, const char *payload, size_t payloadsize) = 0;
+};
 
-	virtual const char *GetSoapAction() const
-	{
-		return 0;
-	}
+class EASYSOAP_EXPORT SOAPServerTransport : public SOAPTransport
+{
+private:
+	SOAPServerTransport(const SOAPServerTransport&);
+	SOAPServerTransport& operator=(const SOAPServerTransport&);
+
+protected:
+	SOAPServerTransport() {}
+
+public:
+	virtual ~SOAPServerTransport() {}
+
+	virtual const char *GetSoapAction() const = 0;
+
+	virtual void SetError() = 0;
 };
 
 END_EASYSOAP_NAMESPACE
