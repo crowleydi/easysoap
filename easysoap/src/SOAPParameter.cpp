@@ -29,6 +29,7 @@
 
 #include <float.h>
 #include <math.h>
+#include <errno.h>
 
 #define NULL_FLAG   1
 #define ARRAY_FLAG  2
@@ -348,7 +349,7 @@ typedef union
 	{
 		int i1;
 		int i2;
-	};
+	} s;
 } fptricks;
 
 double
@@ -364,8 +365,8 @@ SOAPParameter::GetDouble() const
 	else if (sp_strcasecmp(m_strval, "NaN") == 0)
 	{
 		fptricks t;
-		t.i1 = 0xFFFFFFFF;
-		t.i2 = 0xFFFFFFFF;
+		t.s.i1 = 0xFFFFFFFF;
+		t.s.i2 = 0xFFFFFFFF;
 		return t.d;
 	}
 
