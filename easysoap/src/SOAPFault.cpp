@@ -84,6 +84,44 @@ SOAPFault::GetDetail() const
 	return 0;
 }
 
+bool
+SOAPFault::WriteSOAPPacket(XMLComposer& packet) const
+{
+	const SOAPParameter *p = 0;
+
+	packet.StartTag(GetName());
+
+	//
+	// Enforce element order
+	if ((p = GetFaultCode()))
+		p->WriteSOAPPacket(packet);
+	if ((p = GetFaultString()))
+		p->WriteSOAPPacket(packet);
+	if ((p = GetFaultActor()))
+		p->WriteSOAPPacket(packet);
+	if ((p = GetDetail()))
+		p->WriteSOAPPacket(packet);
+
+	SOAPParameter::Struct::Iterator i = GetStruct().Begin();
+	while (i != GetStruct().End())
+	{
+		p = *i++;
+		//
+		// skip elements which have already been output
+		const SOAPQName& name = p->GetName();
+		if (name == faultcode_attr ||
+			name == faultstring_attr ||
+			name == faultactor_attr ||
+			name == faultdetail_attr)
+			continue;
+		p->WriteSOAPPacket(packet);
+	}
+
+	packet.EndTag(GetName());
+
+	return true;
+}
+
 SOAPFaultException::SOAPFaultException(const SOAPFault& fault)
 : m_fault(fault)
 {

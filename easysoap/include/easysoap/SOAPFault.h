@@ -81,6 +81,8 @@ public:
 	const SOAPParameter* GetFaultCode() const;
 	const SOAPParameter* GetDetail() const;
 
+	bool WriteSOAPPacket(XMLComposer& packet) const;
+
 private:
 	static const SOAPString faultcode_attr;
 	static const SOAPString faultstring_attr;
