@@ -12,7 +12,6 @@ THESOURCES = \
 	SOAPEnvelope.cpp \
 	SOAPEnvelopeHandler.cpp \
 	SOAPFault.cpp \
-	SOAPFaultHandler.cpp \
 	SOAPHTTPServer.cpp \
 	SOAPHeader.cpp \
 	SOAPHeaderHandler.cpp \
@@ -40,7 +39,6 @@ noinst_HEADERS = \
 	SOAPBodyHandler.h \
 	SOAPClientSocketImp.h \
 	SOAPEnvelopeHandler.h \
-	SOAPFaultHandler.h \
 	SOAPHeaderHandler.h \
 	SOAPMethodHandler.h \
 	SOAPParameterHandler.h \
