@@ -48,46 +48,46 @@ HTTPReasonByStatus(int code)
 {
 	static struct _HTTPReasons {
 		int status;
-		char *reason;
+		const char *reason;
 	} *r,reasons[] = 
 	{
-		{ 100,"Continue" }, 
-		{ 101,"Switching Protocols" }, 
-		{ 200,"OK" }, 
-		{ 201,"Created" }, 
-		{ 202,"Accepted" }, 
-		{ 203,"Non-Authoritative Information" }, 
-		{ 204,"No Content" }, 
-		{ 205,"Reset Content" }, 
-		{ 206,"Partial Content" }, 
-		{ 300,"Multiple Choices" }, 
-		{ 301,"Moved Permanently" }, 
-		{ 302,"Moved Temporarily" }, 
-		{ 303,"See Other" }, 
-		{ 304,"Not Modified" }, 
-		{ 305,"Use Proxy" }, 
-		{ 400,"Bad Request" }, 
-		{ 401,"Unauthorized" }, 
-		{ 402,"Payment Required" }, 
-		{ 403,"Forbidden" }, 
-		{ 404,"Not Found" }, 
-		{ 405,"Method Not Allowed" }, 
-		{ 406,"Not Acceptable" }, 
-		{ 407,"Proxy Authentication Required" }, 
-		{ 408,"Request Timeout" }, 
-		{ 409,"Conflict" }, 
-		{ 410,"Gone" }, 
-		{ 411,"Length Required" }, 
-		{ 412,"Precondition Failed" }, 
-		{ 413,"Request Entity Too Large" }, 
-		{ 414,"Request-URI Too Long" }, 
-		{ 415,"Unsupported Media Type" }, 
-		{ 500,"Internal Server Error" }, 
-		{ 501,"Not Implemented" }, 
-		{ 502,"Bad Gateway" }, 
-		{ 503,"Service Unavailable" }, 
-		{ 504,"Gateway Timeout" }, 
-		{ 505,"HTTP Version Not Supported" },
+		{ 100, "Continue" }, 
+		{ 101, "Switching Protocols" },
+		{ 200, "OK" },
+		{ 201, "Created" }, 
+		{ 202, "Accepted" }, 
+		{ 203, "Non-Authoritative Information" }, 
+		{ 204, "No Content" }, 
+		{ 205, "Reset Content" }, 
+		{ 206, "Partial Content" }, 
+		{ 300, "Multiple Choices" }, 
+		{ 301, "Moved Permanently" }, 
+		{ 302, "Moved Temporarily" }, 
+		{ 303, "See Other" }, 
+		{ 304, "Not Modified" }, 
+		{ 305, "Use Proxy" }, 
+		{ 400, "Bad Request" }, 
+		{ 401, "Unauthorized" }, 
+		{ 402, "Payment Required" }, 
+		{ 403, "Forbidden" }, 
+		{ 404, "Not Found" }, 
+		{ 405, "Method Not Allowed" }, 
+		{ 406, "Not Acceptable" }, 
+		{ 407, "Proxy Authentication Required" }, 
+		{ 408, "Request Timeout" }, 
+		{ 409, "Conflict" }, 
+		{ 410, "Gone" }, 
+		{ 411, "Length Required" }, 
+		{ 412, "Precondition Failed" }, 
+		{ 413, "Request Entity Too Large" }, 
+		{ 414, "Request-URI Too Long" }, 
+		{ 415, "Unsupported Media Type" }, 
+		{ 500, "Internal Server Error" }, 
+		{ 501, "Not Implemented" }, 
+		{ 502, "Bad Gateway" }, 
+		{ 503, "Service Unavailable" }, 
+		{ 504, "Gateway Timeout" }, 
+		{ 505, "HTTP Version Not Supported" },
 		{ 000, NULL }
 	};
 
@@ -110,15 +110,15 @@ WriteErrorMessage(EXTENSION_CONTROL_BLOCK *pECB, int error, const char *szBuffer
 	char szStatus[128];
 	char szHeader[] = "Content-Type: text/html\r\n\r\n";
 
-	wsprintf(szStatus, "%d %s", error, HTTPReasonByStatus(error));
+	int statlen = wsprintfA(szStatus, "%d %s", error, HTTPReasonByStatus(error));
 
 	header.pszStatus = szStatus;
-	header.cchStatus = lstrlen(szStatus);
+	header.cchStatus = statlen;
 	header.pszHeader = szHeader;
 	header.cchHeader = sizeof(szHeader);
 	header.fKeepConn = 0;
 
-	dwBufLen = lstrlen(szBuffer);
+	dwBufLen = lstrlenA(szBuffer);
 
 	pECB->ServerSupportFunction(pECB->ConnID, HSE_REQ_SEND_RESPONSE_HEADER_EX,
 		&header, 0, 0);
@@ -149,7 +149,7 @@ GetExtensionVersion( HSE_VERSION_INFO* pVer )
 	if (pVer)
 	{
 		pVer->dwExtensionVersion = HSE_VERSION;
-		lstrcpyn(pVer->lpszExtensionDesc, extensionDesc, HSE_MAX_EXT_DLL_NAME_LEN);
+		lstrcpynA(pVer->lpszExtensionDesc, extensionDesc, HSE_MAX_EXT_DLL_NAME_LEN);
 	}
 
 	gIoPort = CreateIoCompletionPort((HANDLE)INVALID_HANDLE_VALUE, NULL, 0, 0);
@@ -174,7 +174,7 @@ HttpExtensionProc( EXTENSION_CONTROL_BLOCK *pECB )
 	if (!pECB)
 		return HSE_STATUS_ERROR;
 
-	if (lstrcmp(pECB->lpszMethod, "POST"))
+	if (lstrcmpA(pECB->lpszMethod, "POST"))
 	{
 		WriteErrorMessage(pECB, 405, "<H1>Invalid method, only POST is supported.</H1>");
 		return HSE_STATUS_ERROR;
@@ -184,7 +184,7 @@ HttpExtensionProc( EXTENSION_CONTROL_BLOCK *pECB )
 	{
 		char	szBuffer[128];
 
-		wsprintf(szBuffer, "<H1>Error posting to completion port! Win32 Error = %i</H1>", GetLastError());
+		wsprintfA(szBuffer, "<H1>Error posting to completion port! Win32 Error = %i</H1>", GetLastError());
 		WriteErrorMessage(pECB, 500, szBuffer);
 		return HSE_STATUS_ERROR;
 	}
