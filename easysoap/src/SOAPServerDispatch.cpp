@@ -164,6 +164,8 @@ SOAPServerDispatch::Handle(SOAPTransport& trans)
 		// create SOAPFault
 		//
 		retval = -1;
+
+		HandleException(mux);
 		WriteFault("SOAP-ENV:MustUnderstand", mux.What());
 	}
 	catch(SOAPException& sex)
@@ -172,6 +174,8 @@ SOAPServerDispatch::Handle(SOAPTransport& trans)
 		// create SOAPFault
 		//
 		retval = -1;
+
+		HandleException(sex);
 		WriteFault(faultcode, sex.What());
 	}
 	catch (...)
@@ -180,8 +184,11 @@ SOAPServerDispatch::Handle(SOAPTransport& trans)
 		// create SOAPFault
 		//
 		faultcode = serverfault;
-		WriteFault(faultcode, "Serious error occurred.");
 		retval = -1;
+
+		SOAPException e("Serious error occured.");
+		HandleException(e);
+		WriteFault(faultcode, e.What());
 	}
 
 	return retval;
