@@ -157,11 +157,30 @@ GetExtensionVersion( HSE_VERSION_INFO* pVer )
 
 	gIoPort = CreateIoCompletionPort((HANDLE)INVALID_HANDLE_VALUE, NULL, 0, 0);
 
+	//
+	// Before creating the worker threads
+	// we need to RevertToSelf() so the threads
+	// get proper permissions.
+	//
+	// First, keep track of who we are.
+	HANDLE htok = NULL;
+	OpenThreadToken(GetCurrentThread(), TOKEN_IMPERSONATE, TRUE, &htok);
+
+	//
+	// RevertToSelf()
+	SetThreadToken(NULL, NULL);
+
 	for (n = 0; n < numWorkerThreads; ++n)
 	{
 		DWORD id;
 		gWorkerThreads[n] = CreateThread(NULL, 0, ThreadProc, gIoPort, 0, &id);
 	}
+
+	//
+	// Switch back to who we were
+	SetThreadToken(NULL, htok);
+	CloseHandle(htok);
+
 	return TRUE;
 }
 
