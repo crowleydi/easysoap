@@ -34,8 +34,10 @@ struct SOAPInteropStruct
 	int			varInt;
 	float		varFloat;
 
+	static const char *soap_name;
 	static const char *soap_namespace;
 };
+const char *SOAPInteropStruct::soap_name = "SOAPStruct";
 const char *SOAPInteropStruct::soap_namespace = "http://soapinterop.org/xsd";
 
 
@@ -44,7 +46,7 @@ const char *SOAPInteropStruct::soap_namespace = "http://soapinterop.org/xsd";
 SOAPParameter&
 operator<<(SOAPParameter& param, const SOAPInteropStruct& val)
 {
-	param.SetType("SOAPStruct", SOAPInteropStruct::soap_namespace);
+	param.SetType(val.soap_name, val.soap_namespace);
 	param.SetIsStruct();
 
 	param.AddParameter("varString") << val.varString;

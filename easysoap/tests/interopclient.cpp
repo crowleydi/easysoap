@@ -34,12 +34,15 @@
 
 #include <iostream>
 #include <math.h>
+#include <time.h>
+
 #include <SOAP.h>
 #include <SOAPDebugger.h>
 
 #include "interopstruct.h"
 
 const char *httpproxy = 0; // "http://localhost:8080";
+
 const char *default_interop_namespace = "http://soapinterop.org/";
 const char *default_interop_soapaction = "urn:soapinterop";
 
@@ -66,6 +69,17 @@ SetTraceFile(const char *server, const char *test)
 	char buffer[256];
 	snprintf(buffer, sizeof(buffer), "%s/%s.txt", server, test);
 	SOAPDebugger::SetFile(buffer);
+}
+
+float
+randdouble()
+{
+	double f1 = rand();
+	double f2 = rand();
+	double f3 = (rand() % 40) - 20;
+	if (f2 == 0.0)
+		return 0.0;
+	return f1/f2*pow(10.0, f3);
 }
 
 //
@@ -96,8 +110,11 @@ operator>>(const SOAPParameter& param, Endpoint& e)
 }
 
 void
-GetAllEndpoints(SOAPArray<Endpoint>& e)
+GetAllEndpoints(SOAPArray<Endpoint>& ea)
 {
+	//
+	// TODO: Change this to just add values to the
+	// array instead of replacing the array values.
 	SOAPProxy proxy("http://www.xmethods.net/perl/soaplite.cgi", httpproxy);
 	SOAPMethod getAllEndpoints("getAllEndpoints",
 		"http://soapinterop.org/ilab",
@@ -106,7 +123,12 @@ GetAllEndpoints(SOAPArray<Endpoint>& e)
 	const SOAPResponse& response = proxy.Execute(getAllEndpoints);
 	const SOAPParameter& p = response.GetReturnValue();
 
-	p >> e;
+	SOAPParameter::Array::ConstIterator i = p.GetArray().Begin();
+	while (i != p.GetArray().End())
+	{
+		Endpoint& e = ea.Add();
+		*(i++) >> e;
+	}
 }
 
 bool
@@ -448,22 +470,24 @@ bool
 TestEchoIntegerArray(SOAPProxy& proxy,
 			const char *uri,
 			const char *soapAction,
-			bool appendMethod)
+			bool appendMethod, int numvals)
 {
 	try
 	{
 		SOAPArray<int> inputValue;
 		SOAPArray<int> outputValue;
 
-		inputValue.Add(1);
-		inputValue.Add(66);
-		inputValue.Add(-73);
-		inputValue.Add(927353);
-		inputValue.Add(16);
-		inputValue.Add(0);
+		for (int i = 0; i < numvals; ++i)
+			inputValue.Add(rand());
 
 		SOAPMethod method("echoIntegerArray", uri, soapAction, appendMethod);
-		method.AddParameter("inputIntegerArray") << inputValue;
+		// Here I call SetArrayType() to make sure that for zero-length
+		// arrays the array type is correct.  We have to set it manually
+		// for zero length arrays because we can't determine the type from
+		// elements in the array!
+		SOAPParameter& param = method.AddParameter("inputIntegerArray");
+		param << inputValue;
+		param.SetArrayType("int");
 
 		std::cout << "Testing " << method.GetName() << ": ";
 
@@ -491,25 +515,22 @@ bool
 TestEchoFloatArray(SOAPProxy& proxy,
 			const char *uri,
 			const char *soapAction,
-			bool appendMethod)
+			bool appendMethod, int numvals)
 {
 	try
 	{
 		SOAPArray<float> inputValue;
-
-		inputValue.Add(1.34523452345346754753453);
-		inputValue.Add(6.65334598983465754583455);
-		inputValue.Add(73.233453452324523453455);
-		inputValue.Add(927324985793245335.235423e2);
-		inputValue.Add(1.63245234532453452345e10);
-		inputValue.Add(1.62345234523452345e-10);
-		inputValue.Add(-1.5324523423453246e10);
-		inputValue.Add(-1.6234523452345345e-10);
-		inputValue.Add(-0.1);
-		inputValue.Add(0.1);
+		for (int i = 0; i < numvals; ++i)
+			inputValue.Add(randdouble());
 
 		SOAPMethod method("echoFloatArray", uri, soapAction, appendMethod);
-		method.AddParameter("inputFloatArray") << inputValue;
+		// Here I call SetArrayType() to make sure that for zero-length
+		// arrays the array type is correct.  We have to set it manually
+		// for zero length arrays because we can't determine the type from
+		// elements in the array!
+		SOAPParameter& param = method.AddParameter("inputFloatArray");
+		param << inputValue;
+		param.SetArrayType("float");
 
 		std::cout << "Testing " << method.GetName() << ": ";
 
@@ -542,19 +563,26 @@ bool
 TestEchoStringArray(SOAPProxy& proxy,
 			const char *uri,
 			const char *soapAction,
-			bool appendMethod)
+			bool appendMethod, int numvals)
 {
 	try
 	{
 		SOAPArray<SOAPString> inputValue;
-
-		inputValue.Add("String 1");
-		inputValue.Add("String 2");
-		inputValue.Add("Third String");
-		inputValue.Add("A Fourth and last string.");
+		for (int i = 0; i < numvals; ++i)
+		{
+			char buffer[256];
+			sprintf(buffer, "This is test string #%d, rn=%d", i, rand());
+			inputValue.Add(buffer);
+		}
 
 		SOAPMethod method("echoStringArray", uri, soapAction, appendMethod);
-		method.AddParameter("inputStringArray") << inputValue;
+		// Here I call SetArrayType() to make sure that for zero-length
+		// arrays the array type is correct.  We have to set it manually
+		// for zero length arrays because we can't determine the type from
+		// elements in the array!
+		SOAPParameter& param = method.AddParameter("inputStringArray");
+		param << inputValue;
+		param.SetArrayType("string");
 
 		std::cout << "Testing " << method.GetName() << ": ";
 
@@ -580,67 +608,32 @@ TestEchoStringArray(SOAPProxy& proxy,
 
 
 bool
-TestEchoZeroLenStringArray(SOAPProxy& proxy,
-			const char *uri,
-			const char *soapAction,
-			bool appendMethod)
-{
-	try
-	{
-		SOAPMethod method("echoStringArray", uri, soapAction, appendMethod);
-		method.AddParameter("inputStringArray").SetArrayType("string");
-
-		std::cout << "Testing " << method.GetName() << ": ";
-
-		const SOAPResponse& response = proxy.Execute(method);
-		SOAPArray<SOAPString> outputValue;
-		response.GetReturnValue() >> outputValue;
-		if (outputValue.Size() != 0)
-			throw SOAPException("Values are not equal");
-
-		std::cout << "PASS" << std::endl;
-		return false;
-	}
-	catch (SOAPException& sex)
-	{
-		std::cout << "FAILED: " << sex.What() << std::endl;
-	}
-	catch (...)
-	{
-		std::cout << "FAILED (badly)" << std::endl;
-	}
-	return true;
-}
-
-
-bool
 TestEchoStructArray(SOAPProxy& proxy,
 			const char *uri,
 			const char *soapAction,
-			bool appendMethod)
+			bool appendMethod, int numvals)
 {
 	try
 	{
 		SOAPArray<SOAPInteropStruct> inputValue;
-
-		SOAPInteropStruct& val1 = inputValue.Add();
-		SOAPInteropStruct& val2 = inputValue.Add();
-		SOAPInteropStruct& val3 = inputValue.Add();
-
-		val1.varFloat = (float)46.346;
-		val1.varInt = -2352;
-		val1.varString = "Array struct string 1.";
-
-		val2.varFloat = (float)2.2;
-		val2.varInt = -233752;
-		val2.varString = "Array struct string 2.";
-
-		val3.varFloat = (float)26.345e+20;
-		val3.varInt = 523552;
-		val3.varString = "Array struct string 3.";
+		for (int i = 0; i < numvals; ++i)
+		{
+			SOAPInteropStruct& val = inputValue.Add();
+			char buffer[256];
+			sprintf(buffer, "This is struct string #%d, rn=%d", i, rand());
+			val.varString = buffer;
+			val.varFloat = randdouble();
+			val.varInt = rand();
+		}
 
 		SOAPMethod method("echoStructArray", uri, soapAction, appendMethod);
-		method.AddParameter("inputStructArray") << inputValue;
+		// Here I call SetArrayType() to make sure that for zero-length
+		// arrays the array type is correct.  We have to set it manually
+		// for zero length arrays because we can't determine the type from
+		// elements in the array!
+		SOAPParameter& param = method.AddParameter("inputStructArray");
+		param << inputValue;
+		param.SetArrayType(SOAPInteropStruct::soap_name, SOAPInteropStruct::soap_namespace);
 
 		std::cout << "Testing " << method.GetName() << ": ";
 
@@ -677,30 +670,38 @@ void TestInterop(const Endpoint& e)
 
 	SOAPProxy proxy(endpoint, httpproxy);
 
-#if 0
 	SetTraceFile(name, "echoVoid");
 	TestEchoVoid(proxy, uri, soapAction, appendMethod);
 
 	SetTraceFile(name, "echoInteger");
-	TestEchoInteger(proxy, uri, soapAction, appendMethod, 464);
+	TestEchoInteger(proxy, uri, soapAction, appendMethod, rand());
 	SetTraceFile(name, "echoFloat");
-	TestEchoFloat(proxy, uri, soapAction, appendMethod, (float)1.34523452345346754753453);
+	TestEchoFloat(proxy, uri, soapAction, appendMethod, randdouble());
 	SetTraceFile(name, "echoString");
 	TestEchoString(proxy, uri, soapAction, appendMethod, "This is a test string from EasySOAP++");
 	SetTraceFile(name, "echoStruct");
 	TestEchoStruct(proxy, uri, soapAction, appendMethod);
 
 	SetTraceFile(name, "echoIntegerArray");
-	TestEchoIntegerArray(proxy, uri, soapAction, appendMethod);
+	TestEchoIntegerArray(proxy, uri, soapAction, appendMethod, 5);
 	SetTraceFile(name, "echoFloatArray");
-	TestEchoFloatArray(proxy, uri, soapAction, appendMethod);
+	TestEchoFloatArray(proxy, uri, soapAction, appendMethod, 5);
 	SetTraceFile(name, "echoStringArray");
-	TestEchoStringArray(proxy, uri, soapAction, appendMethod);
+	TestEchoStringArray(proxy, uri, soapAction, appendMethod, 5);
 	SetTraceFile(name, "echoStructArray");
-	TestEchoStructArray(proxy, uri, soapAction, appendMethod);
+	TestEchoStructArray(proxy, uri, soapAction, appendMethod, 5);
 
-#else
-	// Lets test some boundry cases...
+	// Echo zero length arrays
+	SetTraceFile(name, "echoIntegerArray_ZeroLen");
+	TestEchoIntegerArray(proxy, uri, soapAction, appendMethod, 0);
+	SetTraceFile(name, "echoFloatArray_ZeroLen");
+	TestEchoFloatArray(proxy, uri, soapAction, appendMethod, 0);
+	SetTraceFile(name, "echoStringArray_ZeroLen");
+	TestEchoStringArray(proxy, uri, soapAction, appendMethod, 0);
+	SetTraceFile(name, "echoStructArray_ZeroLen");
+	TestEchoStructArray(proxy, uri, soapAction, appendMethod, 0);
+
+	// Lets try echoing null values
 	SetTraceFile(name, "echoString_Null");
 	TestEchoString(proxy, uri, soapAction, appendMethod, 0);
 	SetTraceFile(name, "echoInteger_Null");
@@ -708,26 +709,22 @@ void TestInterop(const Endpoint& e)
 	SetTraceFile(name, "echoFloat_Null");
 	TestEchoFloat(proxy, uri, soapAction, appendMethod, (const char *)0);
 
+	// Lets try echoing integers that are too big
 	SetTraceFile(name, "echoInteger_Overflow");
 	TestEchoIntegerInvalid(proxy, uri, soapAction, appendMethod, "2147483648");
 	SetTraceFile(name, "echoInteger_Underflow");
 	TestEchoIntegerInvalid(proxy, uri, soapAction, appendMethod, "-2147483649");
 
+	// Echo some of the uncommon float/double values
 	SetTraceFile(name, "echoFloat_NaN");
 	TestEchoFloat(proxy, uri, soapAction, appendMethod, "NaN");
 	SetTraceFile(name, "echoFloat_INF");
 	TestEchoFloat(proxy, uri, soapAction, appendMethod, HUGE_VAL);
 	SetTraceFile(name, "echoFloat_nINF");
 	TestEchoFloat(proxy, uri, soapAction, appendMethod, -HUGE_VAL);
-	SetTraceFile(name, "echoFloat_pINF");
-	TestEchoFloat(proxy, uri, soapAction, appendMethod, "+INF");
-
 	SetTraceFile(name, "echoFloat_n0");
 	TestEchoFloat(proxy, uri, soapAction, appendMethod, "-0.0");
 
-	SetTraceFile(name, "echoStringArray_ZeroLen");
-	TestEchoZeroLenStringArray(proxy, uri, soapAction, appendMethod);
-#endif
 	SOAPDebugger::Close();
 
 	std::cout << "Done." << std::endl << std::endl;
@@ -737,19 +734,28 @@ int
 main(int argc, char* argv[])
 {
 	int ret = 0;
-	bool testlocal = true;
-
+	srand(time(0));
 	try
 	{
+		const char *servicename = 0;
+		bool testlocal = true;
+		bool doall = false;
+
+		SOAPArray<Endpoint> endpoints;
+
 		for (int i = 1; i < argc; ++i)
 		{
 			if (sp_strcmp(argv[i], "-a") == 0)
 			{
-				SOAPArray<Endpoint> endpoints;
-				GetAllEndpoints(endpoints);
-
-				for (size_t i = 0; i < endpoints.Size(); ++i)
-					TestInterop(endpoints[i]);
+				doall = true;
+			}
+			else if (sp_strcmp(argv[i], "-p") == 0)
+			{
+				httpproxy = argv[++i];
+			}
+			else if (sp_strcmp(argv[i], "-n") == 0)
+			{
+				servicename = argv[++i];
 			}
 			else if (argv[i][0] == '-')
 			{
@@ -758,27 +764,34 @@ main(int argc, char* argv[])
 			else
 			{
 				testlocal = false;
-				Endpoint e;
-				e.name = argv[i];
+				Endpoint& e = endpoints.Add();
+				e.name = servicename ? servicename : argv[i];
 				e.endpoint = argv[i];
 				e.nspace = default_interop_namespace;
 				e.soapaction = default_interop_soapaction;
 				e.needsappend = false;
-				TestInterop(e);
+				servicename = 0;
 			}
 		}
 
 		if (testlocal)
 		{
 			// Just test against localhost
-			Endpoint e;
+			Endpoint& e = endpoints.Add();
 			e.name = "localhost";
 			e.endpoint = "http://localhost:80/cgi-bin/interopserver";
 			e.nspace = default_interop_namespace;
 			e.soapaction = default_interop_soapaction;
 			e.needsappend = false;
-			TestInterop(e);
 		}
+
+		if (doall)
+		{
+			GetAllEndpoints(endpoints);
+		}
+
+		for (size_t j = 0; j < endpoints.Size(); ++j)
+			TestInterop(endpoints[j]);
 	}
 	catch (const SOAPMemoryException&)
 	{
