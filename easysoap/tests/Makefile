@@ -8,9 +8,13 @@ EXPAT = /usr/local
 CXXFLAGS = -g -Wall
 LDFLAGS = -L$(EXPAT)/lib -L../lib -leasysoap -lexpat -lssl
 #
+# SunOS Flags
+#CXXFLAGS = -g -Wall
+#LDFLAGS = -L$(EXPAT)/lib -L../lib -leasysoap -lexpat -lsocket -lnsl
+#
 # Cygwin Flags
 #CXXFLAGS = -g -Wall
-#LDFLAGS = -L$(EXPAT)/lib -L../lib -leasysoap -lexpat -lssl -lcrypto -lwsock32
+#LDFLAGS = -L$(EXPAT)/lib -L../lib -leasysoap -lexpat -lwsock32 -lssl -lcrypto
 
 EASYDIR = ../lib
 EASYSOAPLIB = $(EASYDIR)/libeasysoap.a
