@@ -532,7 +532,7 @@ TestEchoInteger_Junk1(SOAPProxy& proxy, const Endpoint& e)
 void
 TestEchoInteger_Junk2(SOAPProxy& proxy, const Endpoint& e)
 {
-	TestEchoIntegerForPass(proxy, e, "\n\t 1234 \n\t");
+	TestEchoIntegerForPass(proxy, e, "\r\n\t 1234 \r\n\t");
 }
 
 void
@@ -592,7 +592,7 @@ TestEchoFloat_Junk1(SOAPProxy& proxy, const Endpoint& e)
 void
 TestEchoFloat_Junk2(SOAPProxy& proxy, const Endpoint& e)
 {
-	TestEchoFloatForPass(proxy, e, "\n\t 1234 \n\t");
+	TestEchoFloatForPass(proxy, e, "\r\n\t 1234 \r\n\t");
 }
 
 void
