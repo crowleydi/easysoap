@@ -28,11 +28,13 @@
 #include <stdlib.h>
 #include "SOAP.h"
 
+class SOAPParameterHandler;
+
 class EASYSOAP_EXPORT SOAPParameter
 {
 public:
 
-	typedef SOAPArray<SOAPParameter>				Array;
+	typedef SOAPArray<SOAPParameter *>				Array;
 	typedef SOAPHashMap<SOAPString, SOAPParameter*>	Struct;
 	typedef SOAPHashMap<SOAPString, SOAPString>		Attrs;
 
@@ -67,13 +69,13 @@ public:
 	void SetValue(const char *val);
 	void SetNull();
 
-	int GetInt() const						{return atoi(m_strval);}
+	int GetInt() const;
 	operator int() const					{return GetInt();}
 
-	float GetFloat() const					{return atof(m_strval);}
+	float GetFloat() const;
 	operator float() const					{return GetFloat();}
 
-	double GetDouble() const				{return atof(m_strval);}
+	double GetDouble() const;
 	operator double() const					{return GetDouble();}
 
 	//SOAPString& GetString()					{return m_strval;}
@@ -100,21 +102,17 @@ public:
 		return m_struct;
 	}
 
-	SOAPParameter& AddParameter(const char *name = "item")
-	{
-		size_t size = GetArray().Size();
-		GetArray().Resize(size + 1);
-		SOAPParameter& ret = GetArray()[size];
-		ret.SetParent(this);
-		ret.SetName(name);
-		return ret;
-	}
-
+	SOAPParameter& AddParameter(const char *name = "item");
 	const SOAPParameter *GetParameter(const char *name) const;
 
 	void SetBaseType(SOAPTypes::xsd_type type)
 	{
 		m_basetype = type;
+	}
+
+	void SetAttribute(const char *tag, const char *val)
+	{
+		m_attrs[tag] = val;
 	}
 
 	Attrs& GetAttributes() {return m_attrs;}
@@ -126,6 +124,8 @@ private:
 	void SetParent(SOAPParameter *parent) {m_parent = parent;}
 	void Assign(const SOAPParameter&);
 
+	friend class SOAPParameterHandler;
+
 	SOAPParameter	*m_parent;
 	Attrs			m_attrs;
 	SOAPString		m_name;
@@ -133,6 +133,7 @@ private:
 	SOAPString		m_strval;
 	Array			m_array;
 	Struct			m_struct;
+	bool			m_isnull;
 	SOAPTypes::xsd_type m_basetype;
 
 	static unsigned int		m_gensym;
@@ -209,10 +210,10 @@ inline const SOAPParameter&
 operator>>(const SOAPParameter& param, SOAPArray<T>& val)
 {
 	val.Resize(0);
-	for (SOAPArray<SOAPParameter>::ConstIterator i = param.GetArray().Begin();
+	for (SOAPArray<SOAPParameter*>::ConstIterator i = param.GetArray().Begin();
 		i != param.GetArray().End();
 		++i)
-		*i >> val.Add();
+		**i >> val.Add();
 	return param;
 }
 

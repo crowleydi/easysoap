@@ -60,29 +60,26 @@ public:
 		return m_params.Size();
 	}
 
-	SOAPParameter& AddParameter()
+	SOAPParameter& AddParameter(const char *name = 0)
 	{
-		size_t size = m_params.Size();
-		m_params.Resize(size + 1);
-		return m_params[size];
-	}
-
-	SOAPParameter& AddParameter(const char *name)
-	{
-		size_t size = m_params.Size();
-		m_params.Resize(size + 1);
-		m_params[size].SetName(name);
-		return m_params[size];
+		SOAPParameter * p = new SOAPParameter();
+		m_params.Add(p);
+		if (name)
+			p->SetName(name);
+		return *p;
 	}
 
 	SOAPParameter& AddParameter(const SOAPParameter& param)
 	{
-		return m_params.Add(param);
+		SOAPParameter * p = new SOAPParameter();
+		m_params.Add(p);
+		*p = param;
+		return *p;
 	}
 
 	const SOAPParameter& GetParameter(size_t i) const
 	{
-		return m_params[i];
+		return *m_params[i];
 	}
 
 	void SetSoapAction(const char *sa, bool appendName = true);

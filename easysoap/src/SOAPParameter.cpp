@@ -27,6 +27,9 @@
 #include "SOAPNamespaces.h"
 #include "SOAPPacketWriter.h"
 
+#include <float.h>
+#include <math.h>
+
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -37,31 +40,40 @@ static const char *SOAP_xsi_type = TAG_SOAP_XSI ":type";
 SOAPParameter::SOAPParameter()
 : m_parent(0)
 , m_basetype(SOAPTypes::xsd_none)
+, m_isnull(true)
 {
 	Reset();
 }
 
+SOAPParameter::SOAPParameter(const SOAPParameter& param)
+: m_parent(0)
+, m_basetype(SOAPTypes::xsd_none)
+, m_isnull(true)
+{
+	Assign(param);
+}
+
 SOAPParameter::~SOAPParameter()
 {
+	Reset();
 }
 
 void
 SOAPParameter::Assign(const SOAPParameter& param)
 {
+	Reset();
 	m_basetype = param.m_basetype;
-	m_name = param.m_name;
+	SetName(param.m_name);
 	m_attrs = param.m_attrs;
 	m_strval = param.m_strval;
 
 	const Array& params = param.GetArray();
 	for (size_t i = 0; i < params.Size(); ++i)
-		AddParameter(params[i].GetName()) = params[i];
-}
-
-SOAPParameter::SOAPParameter(const SOAPParameter& param)
-: m_parent(0)
-{
-	Assign(param);
+	{
+		SOAPParameter * p = new SOAPParameter();
+		p->SetParent(this);
+		*p = *params[i];
+	}
 }
 
 SOAPParameter&
@@ -75,10 +87,13 @@ SOAPParameter::operator=(const SOAPParameter& param)
 void
 SOAPParameter::Reset()
 {
+	for (Array::Iterator i = m_array.Begin(); i != m_array.End(); ++i)
+		delete *i;
 	m_array.Resize(0);
 	m_struct.Clear();
 	m_attrs.Clear();
 	SetType(SOAPTypes::xsd_none);
+	SetNull();
 }
 
 void
@@ -146,7 +161,8 @@ SOAPParameter::GetTypeString() const
 void
 SOAPParameter::SetNull()
 {
-	//SetType(SOAPTypes::xsd_null);
+	m_isnull = true;
+	m_strval = "";
 }
 
 void
@@ -154,6 +170,7 @@ SOAPParameter::SetInteger(const char *val)
 {
 	SetType(SOAPTypes::xsd_int);
 	m_strval = val;
+	m_isnull = false;
 }
 
 void
@@ -161,6 +178,23 @@ SOAPParameter::SetValue(const char *val)
 {
 	SetType(SOAPTypes::xsd_string);
 	m_strval = val;
+	m_isnull = false;
+}
+
+void
+SOAPParameter::SetFloat(const char *val)
+{
+	SetType(SOAPTypes::xsd_float);
+	m_strval = val;
+	m_isnull = false;
+}
+
+void
+SOAPParameter::SetDouble(const char *val)
+{
+	SetType(SOAPTypes::xsd_double);
+	m_strval = val;
+	m_isnull = false;
 }
 
 void
@@ -172,33 +206,70 @@ SOAPParameter::SetValue(int val)
 }
 
 void
-SOAPParameter::SetFloat(const char *val)
+SOAPParameter::SetValue(float fval)
 {
-	SetType(SOAPTypes::xsd_float);
-	m_strval = val;
-}
-
-void
-SOAPParameter::SetValue(float val)
-{
-	char buffer[64];
-	snprintf(buffer, sizeof(buffer), "%f", val);
-	SetFloat(buffer);
-}
-
-void
-SOAPParameter::SetDouble(const char *val)
-{
-	SetType(SOAPTypes::xsd_double);
-	m_strval = val;
+	double val = fval;
+	if (_finite(val))
+	{
+		char buffer[64];
+		snprintf(buffer, sizeof(buffer), "%g", val);
+		SetFloat(buffer);
+	}
+	else
+	{
+		if (_isnan(val))
+		{
+			SetFloat("NaN");
+		}
+		else if (val > 0)
+		{
+			SetFloat("INF");
+		}
+		else
+		{
+			SetFloat("-INF");
+		}
+	}
 }
 
 void
 SOAPParameter::SetValue(double val)
 {
-	char buffer[64];
-	snprintf(buffer, sizeof(buffer), "%f", val);
-	SetDouble(buffer);
+	if (_finite(val))
+	{
+		char buffer[64];
+		snprintf(buffer, sizeof(buffer), "%g", val);
+		SetDouble(buffer);
+	}
+	else
+	{
+		if (val > 0)
+			SetDouble("+INF");
+		else
+			SetDouble("-INF");
+	}
+}
+
+int
+SOAPParameter::GetInt() const
+{
+	return atoi(m_strval);
+}
+
+float
+SOAPParameter::GetFloat() const
+{
+	return GetDouble();
+}
+
+double
+SOAPParameter::GetDouble() const
+{
+	if (m_strval == "INF")
+		return HUGE_VAL;
+	else if (m_strval == "-INF")
+		return -HUGE_VAL;
+	return atof(m_strval);
 }
 
 const SOAPParameter *
@@ -210,6 +281,18 @@ SOAPParameter::GetParameter(const char *name) const
 	return 0;
 }
 
+
+SOAPParameter&
+SOAPParameter::AddParameter(const char *name)
+{
+
+	SOAPParameter *ret = new SOAPParameter();
+	m_array.Add(ret);
+	ret->SetParent(this);
+	ret->SetName(name);
+
+	return *ret;
+}
 
 bool
 SOAPParameter::WriteSOAPPacket(SOAPPacketWriter& packet) const
@@ -254,7 +337,7 @@ SOAPParameter::WriteSOAPPacket(SOAPPacketWriter& packet) const
 			char typebuff[128];
 			if (GetArray().Size() > 0)
 			{
-				snprintf(typebuff, sizeof(typebuff), "%s[%d]", GetArray()[0].GetTypeString(), GetArray().Size());
+				snprintf(typebuff, sizeof(typebuff), "%s[%d]", GetArray()[0]->GetTypeString(), GetArray().Size());
 				packet.AddAttr(TAG_SOAP_ENC ":arrayType", typebuff);
 			}
 			else
@@ -263,7 +346,7 @@ SOAPParameter::WriteSOAPPacket(SOAPPacketWriter& packet) const
 			}
 
 			for (size_t i = 0; i < GetArray().Size(); ++i)
-				GetArray()[i].WriteSOAPPacket(packet);
+				GetArray()[i]->WriteSOAPPacket(packet);
 
 		}
 		break;
