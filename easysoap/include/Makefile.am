@@ -36,4 +36,4 @@ easysoap_HEADERS = \
     es_msvc.h \
     es_mwerks.h 
 EXTRA_DIST = \
-    config/MetrowerksPrecomp.pch config/MetrowerksPrecompTest.pch es_config.h
+    config/MetrowerksPrecomp.pch config/MetrowerksPrecompTest.pch
