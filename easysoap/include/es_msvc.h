@@ -31,6 +31,7 @@
 #define HAVE_STDLIB_H
 #define HAVE_FLOAT_H
 #define HAVE_WCHART
+#define HAVE_STRERROR
 
 #define snprintf _snprintf
 #define vsnprintf _vsnprintf

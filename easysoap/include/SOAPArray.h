@@ -36,16 +36,16 @@ private:
 	size_t	m_allocated;
 	size_t	m_size;
 
-	void _realloc(size_t size)
+	void _realloc(size_t s)
 	{
-		if (size > m_allocated)
+		if (s > m_allocated)
 		{
 			const size_t minalloc = sp_maximum<size_t>(8, 128/sizeof(T));
 			size_t toalloc = m_allocated;
 			if (toalloc < minalloc)
 				toalloc = minalloc;
 
-			while (toalloc < size)
+			while (toalloc < s)
 				toalloc *= 2;
 
 			T* newarray = sp_alloc<T>(toalloc);
@@ -61,9 +61,9 @@ private:
 			for (i = m_size; i < toalloc; ++i)
 				new (newarray + i) T();
 
-			size = m_size;
+			s = m_size;
 			Empty();
-			m_size = size;
+			m_size = s;
 			m_array = newarray;
 			m_allocated = toalloc;
 		}
@@ -73,12 +73,12 @@ public:
 	typedef T* Iterator;
 	typedef const T* ConstIterator;
 
-	SOAPArray(size_t size = 0)
+	SOAPArray(size_t s = 0)
 		: m_array(0)
 		, m_allocated(0)
 		, m_size(0)
 	{
-		Resize(size);
+		Resize(s);
 	}
 
 	SOAPArray(const SOAPArray& x)
@@ -236,12 +236,12 @@ public:
 		return m_size;
 	}
 
-	void Resize(size_t size)
+	void Resize(size_t s)
 	{
 
-		if (size > Size())
-			_realloc(size);
-		m_size = size;
+		if (s > Size())
+			_realloc(s);
+		m_size = s;
 	}
 
 	T& GetAt(size_t index)
@@ -302,7 +302,7 @@ public:
 	iterator begin()				{return Begin();}
 	iterator end()					{return End();}
 	size_t size() const				{return Size();}
-	void resize(size_t size)		{Resize(size);}
+	void resize(size_t s)			{Resize(s);}
 };
 
 template <typename T>

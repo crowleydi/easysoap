@@ -292,7 +292,7 @@ public:
 	}
 
 	SOAPBase64(SOAPArray<char>& arr)
-		: m_arr(&arr), m_carr(0)
+		: m_carr(0), m_arr(&arr)
 	{
 	}
 private:
@@ -319,11 +319,13 @@ public:
 	const SOAPArray<char>*	m_carr;
 	SOAPArray<char>*		m_arr;
 
-	SOAPHex(const SOAPArray<char>& carr) : m_carr(&carr), m_arr(0)
+	SOAPHex(const SOAPArray<char>& carr)
+		: m_carr(&carr), m_arr(0)
 	{
 	}
 
-	SOAPHex(SOAPArray<char>& arr) : m_arr(&arr), m_carr(0)
+	SOAPHex(SOAPArray<char>& arr)
+		: m_carr(0), m_arr(&arr)
 	{
 	}
 private:

@@ -40,8 +40,8 @@ public:
 
 	virtual SOAPParseEventHandler* start(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs) = 0;
 	virtual SOAPParseEventHandler* startElement(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs) = 0;
-	virtual void endElement(const XML_Char *name) {};
-	virtual void characterData(const XML_Char *str, int len) {};
+	virtual void endElement(const XML_Char * /*name*/) {};
+	virtual void characterData(const XML_Char * /*str*/, int /*len*/) {};
 };
 
 #endif // !defined(AFX_SOAPPARSEEVENTHANDLER_H__144ECE87_83A1_49B0_B48B_5112E1FFDA99__INCLUDED_)
