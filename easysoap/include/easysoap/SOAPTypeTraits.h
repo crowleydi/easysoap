@@ -311,9 +311,12 @@ public:
 	Deserialize(const SOAPParameter& param, T& val)
 	{
 		size_t size = val.EstimateSize(param.GetStringRef());
-		val.m_arr->resize(size);
-		val.Decode(param.GetStringRef(), val.m_arr->begin(), size);
-		val.m_arr->resize(size);
+		if (size > 0)
+		{
+			val.m_arr->resize(size);
+			val.Decode(param.GetStringRef(), &(*val.m_arr)[0], size);
+			val.m_arr->resize(size);
+		}
 		return param;
 	}
 };
