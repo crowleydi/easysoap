@@ -128,7 +128,7 @@ SOAPClientSocketImp::WaitRead(int sec, int usec)
 	FD_SET(m_socket, &eset);
 
 	tv.tv_sec = sec;
-	tv.tv_usec = 40;
+	tv.tv_usec = usec;
 
 	int ret = select(m_socket+1, &rset, 0, &eset, sec == -1 ? 0 : &tv);
 	int rsetresult = FD_ISSET(m_socket, &rset);
@@ -154,7 +154,7 @@ SOAPClientSocketImp::WaitWrite(int sec, int usec)
 	FD_SET(m_socket, &wset);
 
 	tv.tv_sec = sec;
-	tv.tv_usec = 40;
+	tv.tv_usec = usec;
 
 	int ret = select(m_socket+1, 0, &wset, &eset, sec == -1 ? 0 : &tv);
 	int wsetresult = FD_ISSET(m_socket, &wset);
