@@ -20,6 +20,7 @@
 
 #ifdef _WIN32
 #pragma warning (disable: 4786)
+#include <winsock2.h>
 #else // not _WIN32
 #include <sys/time.h>
 #endif // _WIN32
@@ -163,6 +164,9 @@ SOAPSecureSocketImp::Connect(const char *host, unsigned int port)
 bool
 SOAPSecureSocketImp::WaitRead(int sec, int usec)
 {
+	if (!m_ssl)
+		return super::WaitRead(sec, usec);
+
 	if (SSL_pending(m_ssl) > 0)
 		return true;
 
@@ -178,6 +182,9 @@ SOAPSecureSocketImp::WaitRead(int sec, int usec)
 int
 SOAPSecureSocketImp::Read(char *buff, int bufflen)
 {
+	if (!m_ssl)
+		return super::Read(buff, bufflen);
+
 	int bytes = 0;
 	if (bufflen > 0)
 	{
@@ -204,6 +211,9 @@ SOAPSecureSocketImp::Read(char *buff, int bufflen)
 int
 SOAPSecureSocketImp::Write(const char *buff, int bufflen)
 {
+	if (!m_ssl)
+		return super::Write(buff, bufflen);
+
 	if (bufflen > 0)
 	{
 		bool retry = false;
