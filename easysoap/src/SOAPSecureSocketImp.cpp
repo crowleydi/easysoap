@@ -376,12 +376,9 @@ SOAPSecureSocketImp::Read(char *buff, size_t bufflen)
 		bool retry = false;
 		do
 		{
-			try {
-				bytes = SSL_read(m_ssl, buff, bufflen);
-				SOAPDebugger::Print(2, "SRECV: %d bytes\r\n", bytes);
-			} catch (...) {
-				throw SOAPSSLException("Error caught while attempting to read");
-			}
+			bytes = SSL_read(m_ssl, buff, bufflen);
+			SOAPDebugger::Print(2, "SRECV: %d bytes\r\n", bytes);
+
 			if (bytes > 0)
 			{
 				// good, we read some bytes.
@@ -408,16 +405,13 @@ SOAPSecureSocketImp::Write(const char *buff, size_t bufflen)
 
 	if (bufflen > 0)
 	{
+		int bytes = 0;
 		bool retry = false;
 		do
 		{
-			int bytes = 0;
-			try {
-				bytes = SSL_write(m_ssl, buff, bufflen);
-				SOAPDebugger::Print(2, "SSEND: %d bytes\n", bytes);
-			} catch (...) {
-				throw SOAPSSLException("Exception caught while attempting to write.");
-			}
+			bytes = SSL_write(m_ssl, buff, bufflen);
+			SOAPDebugger::Print(2, "SSEND: %d bytes\n", bytes);
+
 			if (bytes > 0)
 			{
 				if ((unsigned int)bytes != bufflen)
@@ -433,7 +427,9 @@ SOAPSecureSocketImp::Write(const char *buff, size_t bufflen)
 				bytes = 0;
 			}
 		} while (retry);
+
 		SOAPDebugger::Write(1, buff, bufflen);
+		return bytes;
 	}
 	return 0;
 }
