@@ -23,6 +23,10 @@
 
 #include "SOAPUtil.h"
 
+#ifdef _MSC_VER
+#pragma warning(disable: 4284)
+#endif // _MSC_VER
+
 // pre-decalure some functors
 template<typename T>
 struct SOAPHashCodeFunctor;
@@ -68,7 +72,7 @@ private:
 		const SOAPHashMap	*m_map;
 		size_t				m_index;
 		
-		friend class SOAPHashMap;
+		friend class SOAPHashMap<K,I,H,E>;
 
 		// private constuctor that can only be called by SOAPHashMap
 		ForwardHashMapIterator(const SOAPHashMap *map, HashElement *he, size_t index)
@@ -492,7 +496,7 @@ private:
 		return he->m_item;
 	}
 
-	friend class Iterator;
+	friend class ForwardHashMapIterator;
 
 	HashElement **m_table;
 	size_t	m_buckets;
