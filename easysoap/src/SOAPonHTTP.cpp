@@ -48,7 +48,7 @@ SOAPonHTTP::Write(const SOAPMethod& method, const char *payload, int payloadsize
 {
 	m_http.BeginPost(m_path);
 	m_http.WriteHeader("User-Agent", SOAPUSER_AGENT);
-	m_http.WriteHeader("Content-Type", "text/xml");
+	m_http.WriteHeader("Content-Type", "text/xml; charset=utf-8");
 
 	m_http.Write("SOAPAction: \"");
 	m_http.Write(method.GetSoapAction());
