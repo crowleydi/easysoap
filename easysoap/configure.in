@@ -44,6 +44,10 @@ AC_CHECK_LIB(socket, send)
 AC_CHECK_LIB(wsock32, WSAStartup)
 AC_CHECK_LIB(crypto, ERR_put_error)
 AC_CHECK_LIB(ssl, SSL_connect)
+AC_CHECK_LIB(z, gzread,,
+	AC_MSG_ERROR("Could not find the library 'zlib'.  Download and install from http://www.zlib.org/"))
+AC_CHECK_HEADER(zlib.h,,
+	AC_MSG_ERROR("Could not find zlib.h"))
 AC_CHECK_LIB(expat, XML_Parse,,
 	AC_MSG_ERROR("Could not find the XML parsing library 'expat'.  Download and install from http://expat.sourceforge.net/"))
 AC_CHECK_HEADER(expat.h,,
