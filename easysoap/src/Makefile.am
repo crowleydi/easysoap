@@ -50,6 +50,10 @@ INCLUDES=-I@top_srcdir@/include
 libeasysoap_la_LDFLAGS = -no-undefined
 
 
+AM_CFLAGS=-Wall
+AM_CXXFLAGS=-Wall
+
+
 EXTRA_DIST = \
 	SOAPWinInetTransport.cpp \
 	SOAPISAPIServer.cpp \

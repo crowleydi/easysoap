@@ -106,10 +106,10 @@ SOAPSSLContext::SOAPSSLContext(const char* cafile)
 }
 
 SOAPSSLContext::SOAPSSLContext(const char* certfile, const char* keyfile, const char* password, const char* cafile)
-		: m_certfile(certfile)
+		: m_cafile(cafile)
+		, m_certfile(certfile)
 		, m_keyfile(keyfile)
 		, m_password(password)
-		, m_cafile(cafile)
 		, m_ctx(0)
 	, m_verifyserver(true)
 {
@@ -186,7 +186,7 @@ void SOAPSSLContext::SetCertInfo(const char* certfile, const char* keyfile, cons
 int SOAPSSLContext::password_cb(char* buf, int size, int rwflag, void *userdata) 
 {
 		SOAPString password = ((SOAPSSLContext*)userdata)->m_password;
-		if (size < password.Length())
+		if ((unsigned int)size < password.Length())
 				throw SOAPMemoryException();
 		
 		sp_strcpy(buf, password.Str());
@@ -223,6 +223,38 @@ SOAPSSLContext::~SOAPSSLContext()
 		}
 			
 }
+bool
+SOAPSSLContext::IgnoreCertError(int rc) 
+{
+	for (SOAPArray<int>::const_iterator i = m_certerrors.begin();
+			i != m_certerrors.end(); 
+			i++) {
+		if (*i == rc)
+			return true;
+	}
+	return false;
+}
+
+void 
+SOAPSSLContext::AddCertErrorToIgnoreList(int rc)
+{
+	m_certerrors.Add(rc);
+}
+
+bool SOAPSSLContext::RemoveCertErrorFromIgnoreList(int rc)
+{
+	int index = 0;
+	for (SOAPArray<int>::const_iterator i = m_certerrors.begin();
+			i != m_certerrors.end(); 
+			i++) {
+		index++;
+		if (*i == rc) {
+			m_certerrors.RemoveAt(index);
+			return true;
+		}
+	} 
+	return false;
 
 
+}
 #endif // EASYSOAP_SSLCONTEXT

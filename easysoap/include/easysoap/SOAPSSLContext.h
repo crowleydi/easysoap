@@ -51,6 +51,12 @@ public:
 	ssl_ctx_st*	GetContext() {return 0;}
 	void SetCAInfo(const char* cafile);
 	void SetCertInfo(const char* certfile, const char* keyfile, const char* password) {}
+	bool VerifyServerCert() { return false; };
+	void SetVerifyServerCert (bool v) { } ;
+
+	bool IgnoreCertError(int rc ) { return false; } ;
+	void AddCertErrorToIgnoreList(int rc) { };
+	bool RemoveCertErrorFromIgnoreList(int rc) { return false; };
 	~SOAPSSLContext() {}
 };
 #else
@@ -79,6 +85,9 @@ public:
 	bool VerifyServerCert() { return m_verifyserver; } ;
 	void SetVerifyServerCert(bool v) { m_verifyserver = v; } ;
 
+	bool IgnoreCertError(int rc );
+	void AddCertErrorToIgnoreList(int rc) ;
+	bool RemoveCertErrorFromIgnoreList(int rc) ;
 
 private:
 	typedef enum {
@@ -87,14 +96,15 @@ private:
 	} CertType;
 
 	static rsa_st*		m_tmpRSAKey;
-	ssl_ctx_st*			m_ctx;
 	SOAPString 			m_cafile;
 	SOAPString 			m_certfile;
 	SOAPString 			m_keyfile;
 	SOAPString 			m_password;
+	ssl_ctx_st*			m_ctx;
 	CertType 			type;
 
 	bool				m_verifyserver;
+	SOAPArray<int> 		m_certerrors;
 
 
 	void sslinit();

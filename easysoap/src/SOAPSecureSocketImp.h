@@ -44,6 +44,7 @@ protected:
 	bool HandleError(const char *context, int retcode);
 	void InitSSL();
 	void VerifyCert(const char* host);
+	const char* CheckForCertError(int rc);
 public:
 	SOAPSecureSocketImp();
 	SOAPSecureSocketImp(SOAPSSLContext& ctx);
@@ -54,7 +55,7 @@ public:
 	virtual bool IsOpen();
 	virtual void Close();
 	virtual bool Connect(const char *host, unsigned int port) {
-		Connect(host, port, true);
+		return Connect(host, port, true);
 	}
 	virtual bool Connect(const char *host, unsigned int port, bool client );
 	virtual size_t Read(char *buffer, size_t len);

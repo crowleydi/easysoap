@@ -9,3 +9,6 @@ EXTRA_DIST = \
 	conftools/missing \
 	conftools/mkinstalldirs \
 	conftools/ltmain.sh
+
+AM_CFLAGS=-Wall
+AM_CXXFLAGS=-Wall

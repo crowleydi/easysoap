@@ -51,12 +51,12 @@ SOAPSecureSocketImp::~SOAPSecureSocketImp()
 bool SOAPSecureSocketImp::WaitRead(int, int) {return false;}
 bool SOAPSecureSocketImp::WaitWrite(int, int) { return false; }
 void SOAPSecureSocketImp::Close() { }
-void SOAPSecureSocketImp::IsOpen() { }
-bool SOAPSecureSocketImp::Connect(const char *, unsigned int) {return false;}
+bool SOAPSecureSocketImp::IsOpen() { return false; }
+bool SOAPSecureSocketImp::Connect(const char *, unsigned int, bool client) {return false;}
 size_t SOAPSecureSocketImp::Read(char *, size_t) {return 0;}
 size_t SOAPSecureSocketImp::Write(const char *, size_t) {return 0;}
 void SOAPSecureSocketImp::InitSSL() {}
-void SOAPSecureSocketImp::VerifyCert(const char*) { }
+void SOAPSecureSocketImp::VerifyCert(const char*) {  }
 
 #else // HAVE_LIBSSL
 
@@ -101,6 +101,8 @@ SOAPSecureSocketImp::HandleError(const char *context, int retcode)
 	// we may have an error.
 	// we need to call SSL_get_error()
 	bool retry = false;
+	char tmp[2048];
+	memset(&tmp, 0, sizeof(tmp));
 	unsigned long err = SSL_get_error(m_ssl, retcode);
 	switch (err)
 	{
@@ -130,50 +132,55 @@ SOAPSecureSocketImp::HandleError(const char *context, int retcode)
 
 	case SSL_ERROR_SYSCALL:
 		SOAPDebugger::Print(2, "%s: SSL_ERROR_SYSCALL caught\r\n", context);
+		if (retcode == 0)
 		{
-			if (ERR_get_error() == 0)
-			{
-				if (retcode == 0)
-				{
-					// premature EOF, but not necessarily an error
-					SOAPDebugger::Print(2, "%s: premature close on socket\r\n", context);
-					break;
-				}
-
-				if (retcode == -1)
-				{
-					char msg[256];
-#ifdef HAVE_STRERROR
-					sp_strncpy(msg, strerror(errno), sizeof(msg));
-#else // dont HAVE_STRERROR
-					snprintf(msg, sizeof(msg), "socket error, errno=%d\r\n", errno);
-#endif // HAVE_STRERROR
-					msg[sizeof(msg) - 1] = 0;
-					throw SOAPSocketException(context, msg);
-				}
-			}
+			// premature EOF, but not necessarily an error
+			SOAPDebugger::Print(2, "%s: premature close on socket\r\n", context);
+			// shouldn't we retry here?
+			retry = true;
+			break;
 		}
-		// okay to fall through.
+		if (retcode == -1)
+		{
+#ifdef HAVE_STRERROR
+			sp_strncpy(tmp, strerror(errno), sizeof(tmp));
+#else // dont HAVE_STRERROR
+			snprintf(tmp, sizeof(tmp), "socket error, errno=%d\r\n", errno);
+			tmp[sizeof(tmp) - 1] = 0;
+#endif // HAVE_STRERROR
+			throw SOAPSocketException(context, tmp);
+		}
+		break;
 	case SSL_ERROR_SSL:
 	default:
-		{
-		char msg[2048];
-
+		SOAPString msg;
+		if (ERR_peek_error()) {
+			unsigned long sslerror = ERR_get_error();
+			msg = "An SSL error occured. Here are the contents of the SSL error queue";
+			for (  ; sslerror != 0 ; sslerror = ERR_get_error()) 
+			{
+				
 #if OPENSSL_VERSION_NUMBER >= 0x00906000L
-		ERR_error_string_n(err, msg, sizeof(msg) - 1);
+				ERR_error_string_n(sslerror, tmp, sizeof(tmp) - 1);
 #else
-		// dangerous
-		ERR_error_string(err, msg);
+				// dangerous
+				ERR_error_string(sslerror, tmp);
+				tmp[sizeof(tmp) - 1] = \0;
 #endif // OPENSSL_VERSION_NUMBER
-
-		msg[sizeof(msg) - 1] = 0;
-		SOAPDebugger::Print(2, "Error handled.\r\ncontext: %s\r\nMsg: %s\r\n", context, msg);
-		throw SOAPSocketException(context, msg);
+				SOAPDebugger::Print(2, "Error handled.\r\ncontext: %s\r\nMsg: %s\r\n", context, tmp);
+				msg += tmp;
+				msg += ".     "; // create some space to make it readable
+			}
+		} else {
+			msg = "Unkown error";
 		}
+		throw SOAPSocketException(context, msg.Str());
 	}
 	return retry;
+	
 }
 
+	
 void
 SOAPSecureSocketImp::InitSSL()
 {
@@ -193,22 +200,91 @@ SOAPSecureSocketImp::InitSSL()
 		HandleError("Error negotiating secure connection : %s\r\n", retcode);
 }
 
+const char*  
+SOAPSecureSocketImp::CheckForCertError(int rc) {
+	SOAPString msg = "";
+	if (!m_context->IgnoreCertError(rc)) {
+		switch(rc) {
+			case X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT:
+				msg = "the issuer certificate could not be found";
+				break;
+			case X509_V_ERR_UNABLE_TO_DECRYPT_CERT_SIGNATURE:
+				msg = "the certificate signature could not be decrypted.";
+				break;
+			case X509_V_ERR_UNABLE_TO_DECODE_ISSUER_PUBLIC_KEY:
+				msg = "the public key in the certificate SubjectPublicKeyInfo could not be read.";
+				break;
+			case X509_V_ERR_CERT_SIGNATURE_FAILURE:
+				msg = "the signature of the certificate is invalid.";
+				break;
+			case X509_V_ERR_CERT_NOT_YET_VALID:
+				msg = " the certificate is not yet valid. ";
+				break;
+			case X509_V_ERR_CERT_HAS_EXPIRED:
+				msg = " the certificate has expired.";
+				break;
+			case X509_V_ERR_ERROR_IN_CERT_NOT_BEFORE_FIELD:
+				msg = "the certificate notBefore field contains an invalid time.";
+				break;
+			case X509_V_ERR_ERROR_IN_CERT_NOT_AFTER_FIELD:
+				msg = " the certificate notAfter field contains an invalid time.";
+				break;
+			case X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT:
+				msg = "the passed certificate is self signed and the same certificate cannot be found in the list of trusted certificates.";
+				break;
+			case X509_V_ERR_SELF_SIGNED_CERT_IN_CHAIN:
+				msg = "self signed certificate in certificate chain.";
+				break;
+			case X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY:
+				msg = "unable to get local issuer certificate. ";
+				break;
+			case X509_V_ERR_UNABLE_TO_VERIFY_LEAF_SIGNATURE:
+				msg = " unable to verify the first certificate.";
+				break;
+			case X509_V_ERR_INVALID_CA:
+				msg = "Invalid CA certificate.";
+				break;
+			case X509_V_ERR_PATH_LENGTH_EXCEEDED:
+				msg = "Certificate chain too long.";
+				break;
+			case X509_V_ERR_INVALID_PURPOSE:
+				msg = "Unsupported certificate purpose.";
+				break;
+			case X509_V_ERR_CERT_UNTRUSTED:
+				msg = "the root CA is not marked as trusted for the specified purpose.";
+				break;
+			case X509_V_ERR_CERT_REJECTED:
+				msg = "the root CA is marked to reject the specified purpose.";
+				break;
+			case X509_V_ERR_KEYUSAGE_NO_CERTSIGN:
+				msg = "key usage does not include certificate signing.";
+				break;
+			default:
+				msg = "Server certificate verification failed due to an unknown error";
+				break;
+		}
+	}
+	return msg.Str();
+}
+
 void
 SOAPSecureSocketImp::VerifyCert(const char* host)
 {
 	X509* server_cert = SSL_get_peer_certificate(m_ssl);
 	if (!server_cert)
-		throw SOAPException("Error getting server certificate.\r\n");
+		throw SOAPException("Error getting server certificate.");
 
 	int rc = SSL_get_verify_result(m_ssl);
-	if (rc != X509_V_OK)
-		throw SOAPException("Server certificate verification failed\r\n", rc);
+	
+	SOAPString msg = CheckForCertError(rc);
+	if (msg == "")
+		throw SOAPException("Error verifying peer certificate: %s", msg.Str());
 
-	char buf[128];
+	char buf[256];
 	X509_NAME_get_text_by_NID(X509_get_subject_name(server_cert),
 							  NID_commonName, buf, sizeof(buf));
 	if (sp_strcasecmp(buf, host))
-		throw SOAPException("Server certificate hostname does not match (%s != %s)\r\n", buf, host);
+		throw SOAPException("Server certificate hostname does not match (%s != %s)", buf, host);
 
 	X509_free(server_cert);
 }
@@ -304,9 +380,9 @@ SOAPSecureSocketImp::Write(const char *buff, size_t bufflen)
 			SOAPDebugger::Print(2, "SSEND: %d bytes\n", bytes);
 			if (bytes > 0)
 			{
-				if (bytes != bufflen)
+				if ((unsigned int)bytes != bufflen)
 					throw SOAPSocketException("Error writing to secure socket, "
-						   "expected to write %d bytes, wrote %d bytes\r\n",
+						   "expected to write %d bytes, wrote %d bytes",
 						   bufflen, bytes);
 				retry = false;
 			}

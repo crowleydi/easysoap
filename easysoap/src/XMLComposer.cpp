@@ -207,7 +207,7 @@ XMLComposer::AddAttr(const SOAPQName& tag, const char *value)
 void
 XMLComposer::AddAttr(const SOAPQName& tag, const SOAPQName& value)
 {
-	const char *tnsprefix;
+	const char *tnsprefix = 0;
 	const char *vnsprefix = 0;
 	bool addtns = false;
 	bool addvns = false;
