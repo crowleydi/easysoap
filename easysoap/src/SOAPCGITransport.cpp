@@ -18,10 +18,10 @@
  */
 
 
-#ifdef _WIN32
+#ifdef _MSVC
 #include <fcntl.h>
 #include <io.h>
-#endif // _WIN32
+#endif // _MSVC
 
 #include "SOAPCGIHandler.h"
 
@@ -34,10 +34,10 @@ SOAPCGITransport::SOAPCGITransport()
 	if (contentlen)
 		m_canread = atoi(contentlen);
 
-#ifdef _WIN32
+#ifdef _MSVC
 	_setmode(_fileno(stdin), _O_BINARY);
 	_setmode(_fileno(stdout), _O_BINARY);
-#endif // _WIN32
+#endif // _MSVC
 }
 
 SOAPCGITransport::~SOAPCGITransport()
