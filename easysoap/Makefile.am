@@ -10,5 +10,10 @@ EXTRA_DIST = \
 	conftools/mkinstalldirs \
 	conftools/ltmain.sh
 
+tests: src
+validator: src
+simpleserver: src
+google: src
+
 AM_CFLAGS=-Wall
 AM_CXXFLAGS=-Wall
