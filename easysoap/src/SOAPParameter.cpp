@@ -39,16 +39,16 @@ static const char *SOAP_xsi_type = TAG_SOAP_XSI ":type";
 
 SOAPParameter::SOAPParameter()
 : m_parent(0)
-, m_basetype(SOAPTypes::xsd_none)
 , m_isnull(true)
+, m_basetype(SOAPTypes::xsd_none)
 {
 	Reset();
 }
 
 SOAPParameter::SOAPParameter(const SOAPParameter& param)
 : m_parent(0)
-, m_basetype(SOAPTypes::xsd_none)
 , m_isnull(true)
+, m_basetype(SOAPTypes::xsd_none)
 {
 	Assign(param);
 }
@@ -209,7 +209,7 @@ void
 SOAPParameter::SetValue(float fval)
 {
 	double val = fval;
-	if (_finite(val))
+	if (finite(val))
 	{
 		char buffer[64];
 		snprintf(buffer, sizeof(buffer), "%g", val);
@@ -217,25 +217,19 @@ SOAPParameter::SetValue(float fval)
 	}
 	else
 	{
-		if (_isnan(val))
-		{
+		if (isnan(val))
 			SetFloat("NaN");
-		}
-		else if (val > 0)
-		{
+		else if (val > 0.0)
 			SetFloat("INF");
-		}
 		else
-		{
 			SetFloat("-INF");
-		}
 	}
 }
 
 void
 SOAPParameter::SetValue(double val)
 {
-	if (_finite(val))
+	if (finite(val))
 	{
 		char buffer[64];
 		snprintf(buffer, sizeof(buffer), "%g", val);
@@ -243,7 +237,9 @@ SOAPParameter::SetValue(double val)
 	}
 	else
 	{
-		if (val > 0)
+		if (isnan(val))
+			SetDouble("NaN");
+		else if (val > 0.0)
 			SetDouble("+INF");
 		else
 			SetDouble("-INF");
