@@ -234,12 +234,12 @@ GetRound1Endpoints(SOAPArray<Endpoint>& ea)
 	SOAPProxy proxy("http://www.xmethods.net/perl/soaplite.cgi");
 	SOAPMethod getAllEndpoints("getAllEndpoints",
 		"http://soapinterop.org/ilab",
-		"http://soapinterop.org/ilab#", true);
+		"http://soapinterop.org/ilab#getAllEndpoints");
 
+	//SOAPDebugger::SetFile("r1.log");
 	const SOAPResponse& response = proxy.Execute(getAllEndpoints);
 	const SOAPParameter& p = response.GetReturnValue();
 
-	
 	for (SOAPParameter::Array::ConstIterator i = p.GetArray().Begin();
 			i != p.GetArray().End();
 			++i)
@@ -256,8 +256,9 @@ GetRound2Endpoints(SOAPArray<Endpoint>& ea, const char *groupName)
 	SOAPProxy proxy("http://www.whitemesa.net/interopInfo");
 	SOAPMethod getEndpointInfo("GetEndpointInfo",
 		"http://soapinterop.org/info/",
-		"http://soapinterop.org/info/", false);
+		"http://soapinterop.org/info/");
 
+	//SOAPDebugger::SetFile("r2.log");
 	getEndpointInfo.AddParameter("groupName") << groupName;
 
 	const SOAPResponse& response = proxy.Execute(getEndpointInfo);
@@ -294,6 +295,16 @@ typedef enum
 } TestType;
 
 
+void
+SetupMethod(SOAPMethod& method, const char *name, const Endpoint& e)
+{
+	SOAPString sa = e.soapaction;
+	if (e.needsappend)
+		sa.Append(name);
+	method.SetName(name, e.nspace);
+	method.SetSoapAction(sa);
+}
+
 /////////////////////////////////////////////////////////////////////////////////
 //
 // Round 1 + Round 2 base methods
@@ -303,7 +314,8 @@ typedef enum
 void
 TestEchoVoid(SOAPProxy& proxy, const Endpoint& e)
 {
-	SOAPMethod method("echoVoid", e.nspace, e.soapaction, e.needsappend);
+	SOAPMethod method;
+	SetupMethod(method, "echoVoid", e);
 
 	const SOAPResponse& response = proxy.Execute(method);
 	if (response.GetBody().GetMethod().GetNumParameters() != 0)
@@ -315,7 +327,8 @@ TestEchoString(SOAPProxy& proxy, const Endpoint& e, const char *value)
 {
 	SOAPString inputValue = value;
 
-	SOAPMethod method("echoString", e.nspace, e.soapaction, e.needsappend);
+	SOAPMethod method;
+	SetupMethod(method, "echoString", e);
 	method.AddParameter("inputString") << inputValue;
 
 	const SOAPResponse& response = proxy.Execute(method);
@@ -330,7 +343,8 @@ TestEchoInteger(SOAPProxy& proxy, const Endpoint& e, int value)
 {
 	int inputValue = value;
 
-	SOAPMethod method("echoInteger", e.nspace, e.soapaction, e.needsappend);
+	SOAPMethod method;
+	SetupMethod(method, "echoInteger", e);
 	method.AddParameter("inputInteger") << inputValue;
 
 	const SOAPResponse& response = proxy.Execute(method);
@@ -343,7 +357,8 @@ TestEchoInteger(SOAPProxy& proxy, const Endpoint& e, int value)
 const SOAPResponse&
 TestEchoInteger(SOAPProxy& proxy, const Endpoint& e, const char *value)
 {
-	SOAPMethod method("echoInteger", e.nspace, e.soapaction, e.needsappend);
+	SOAPMethod method;
+	SetupMethod(method, "echoInteger", e);
 	method.AddParameter("inputInteger").SetInt(value);
 
 	return proxy.Execute(method);
@@ -370,7 +385,8 @@ TestEchoFloat(SOAPProxy& proxy, const Endpoint& e, float value)
 {
 	float inputValue = value;
 
-	SOAPMethod method("echoFloat", e.nspace, e.soapaction, e.needsappend);
+	SOAPMethod method;
+	SetupMethod(method, "echoFloat", e);
 	SOAPParameter& inputParam = method.AddParameter("inputFloat");
 	inputParam << inputValue;
 
@@ -390,7 +406,8 @@ TestEchoDouble(SOAPProxy& proxy, const Endpoint& e, double value)
 {
 	double inputValue = value;
 
-	SOAPMethod method("echoDouble", e.nspace, e.soapaction, e.needsappend);
+	SOAPMethod method;
+	SetupMethod(method, "echoDouble", e);
 	SOAPParameter& inputParam = method.AddParameter("inputDouble");
 	inputParam << inputValue;
 
@@ -414,7 +431,8 @@ TestEchoDouble(SOAPProxy& proxy, const Endpoint& e)
 void
 TestEchoFloatStringValue(SOAPProxy& proxy, const Endpoint& e, const char *value)
 {
-	SOAPMethod method("echoFloat", e.nspace, e.soapaction, e.needsappend);
+	SOAPMethod method;
+	SetupMethod(method, "echoFloat", e);
 	SOAPParameter& inputParam = method.AddParameter("inputFloat");
 	inputParam.SetFloat(value);
 
@@ -427,7 +445,8 @@ TestEchoFloatStringValue(SOAPProxy& proxy, const Endpoint& e, const char *value)
 const SOAPResponse&
 TestEchoFloat(SOAPProxy& proxy, const Endpoint& e, const char *value)
 {
-	SOAPMethod method("echoFloat", e.nspace, e.soapaction, e.needsappend);
+	SOAPMethod method;
+	SetupMethod(method, "echoFloat", e);
 	SOAPParameter& inputParam = method.AddParameter("inputFloat");
 	inputParam.SetFloat(value);
 
@@ -459,7 +478,8 @@ TestEchoStruct(SOAPProxy& proxy, const Endpoint& e)
 	inputValue.varInt = 68;
 	inputValue.varFloat = (float)25.24345356;
 
-	SOAPMethod method("echoStruct", e.nspace, e.soapaction, e.needsappend);
+	SOAPMethod method;
+	SetupMethod(method, "echoStruct", e);
 	method.AddParameter("inputStruct") << inputValue;
 
 	const SOAPResponse& response = proxy.Execute(method);
@@ -478,7 +498,8 @@ TestEchoIntegerArray(SOAPProxy& proxy, const Endpoint& e, int numvals)
 	for (int i = 0; i < numvals; ++i)
 		inputValue.Add(rand());
 
-	SOAPMethod method("echoIntegerArray", e.nspace, e.soapaction, e.needsappend);
+	SOAPMethod method;
+	SetupMethod(method, "echoIntegerArray", e);
 	// Here I call SetArrayType() to make sure that for zero-length
 	// arrays the array type is correct.  We have to set it manually
 	// for zero length arrays because we can't determine the type from
@@ -500,7 +521,8 @@ TestEchoFloatArray(SOAPProxy& proxy, const Endpoint& e, int numvals)
 	for (int i = 0; i < numvals; ++i)
 		inputValue.Add((float)randdouble());
 
-	SOAPMethod method("echoFloatArray", e.nspace, e.soapaction, e.needsappend);
+	SOAPMethod method;
+	SetupMethod(method, "echoFloatArray", e);
 	// Here I call SetArrayType() to make sure that for zero-length
 	// arrays the array type is correct.  We have to set it manually
 	// for zero length arrays because we can't determine the type from
@@ -525,7 +547,8 @@ TestEchoDoubleArray(SOAPProxy& proxy, const Endpoint& e, int numvals)
 	for (int i = 0; i < numvals; ++i)
 		inputValue.Add(randdouble());
 
-	SOAPMethod method("echoDoubleArray", e.nspace, e.soapaction, e.needsappend);
+	SOAPMethod method;
+	SetupMethod(method, "echoDoubleArray", e);
 	// Here I call SetArrayType() to make sure that for zero-length
 	// arrays the array type is correct.  We have to set it manually
 	// for zero length arrays because we can't determine the type from
@@ -554,7 +577,8 @@ TestEchoStringArray(SOAPProxy& proxy, const Endpoint& e, int numvals)
 		inputValue.Add(buffer);
 	}
 
-	SOAPMethod method("echoStringArray", e.nspace, e.soapaction, e.needsappend);
+	SOAPMethod method;
+	SetupMethod(method, "echoStringArray", e);
 	// Here I call SetArrayType() to make sure that for zero-length
 	// arrays the array type is correct.  We have to set it manually
 	// for zero length arrays because we can't determine the type from
@@ -584,7 +608,8 @@ TestEchoStructArray(SOAPProxy& proxy, const Endpoint& e, int numvals)
 		val.varInt = rand();
 	}
 
-	SOAPMethod method("echoStructArray", e.nspace, e.soapaction, e.needsappend);
+	SOAPMethod method;
+	SetupMethod(method, "echoStructArray", e);
 	// Here I call SetArrayType() to make sure that for zero-length
 	// arrays the array type is correct.  We have to set it manually
 	// for zero length arrays because we can't determine the type from
@@ -782,7 +807,8 @@ TestEchoDoubleArrayZeroLen(SOAPProxy& proxy, const Endpoint& e)
 void
 TestEchoBooleanJunk(SOAPProxy& proxy, const Endpoint& e)
 {
-	SOAPMethod method("echoBoolean", e.nspace, e.soapaction, e.needsappend);
+	SOAPMethod method;
+	SetupMethod(method, "echoBoolean", e);
 	(method.AddParameter("inputBoolean") << "junk").SetType("boolean", XMLSchema2001::xsd);
 
 	const SOAPResponse& response = proxy.Execute(method);
@@ -795,7 +821,8 @@ void
 TestEchoBooleanTrue(SOAPProxy& proxy, const Endpoint& e)
 {
 	bool val = true;
-	SOAPMethod method("echoBoolean", e.nspace, e.soapaction, e.needsappend);
+	SOAPMethod method;
+	SetupMethod(method, "echoBoolean", e);
 	method.AddParameter("inputBoolean") << val;
 
 	const SOAPResponse& response = proxy.Execute(method);
@@ -808,7 +835,8 @@ void
 TestEchoBooleanFalse(SOAPProxy& proxy, const Endpoint& e)
 {
 	bool val = false;
-	SOAPMethod method("echoBoolean", e.nspace, e.soapaction, e.needsappend);
+	SOAPMethod method;
+	SetupMethod(method, "echoBoolean", e);
 	method.AddParameter("inputBoolean") << val;
 
 	const SOAPResponse& response = proxy.Execute(method);
@@ -837,7 +865,8 @@ TestEchoNestedStruct(SOAPProxy& proxy, const Endpoint& e)
 	inputValue.varStruct.varInt = 86;
 	inputValue.varStruct.varString = "This is a nested struct.";
 
-	SOAPMethod method("echoNestedStruct", e.nspace, e.soapaction, e.needsappend);
+	SOAPMethod method;
+	SetupMethod(method, "echoNestedStruct", e);
 	method.AddParameter("inputStruct") << inputValue;
 
 	const SOAPResponse& response = proxy.Execute(method);
@@ -860,7 +889,8 @@ TestEchoNestedArray(SOAPProxy& proxy, const Endpoint& e)
 	inputValue.varArray.Add() = "This is string 3";
 	inputValue.varArray.Add() = "This is string 4";
 
-	SOAPMethod method("echoNestedArray", e.nspace, e.soapaction, e.needsappend);
+	SOAPMethod method;
+	SetupMethod(method, "echoNestedArray", e);
 	method.AddParameter("inputStruct") << inputValue;
 
 	const SOAPResponse& response = proxy.Execute(method);
@@ -873,8 +903,8 @@ TestEchoNestedArray(SOAPProxy& proxy, const Endpoint& e)
 void
 TestEcho2DStringArray(SOAPProxy& proxy, const Endpoint& e)
 {
-	SOAPMethod method("echo2DStringArray", e.nspace,
-			e.soapaction, e.needsappend);
+	SOAPMethod method;
+	SetupMethod(method, "echo2DStringArray", e);
 
 	SOAP2DArray<SOAPString> twod, result;
 
@@ -903,8 +933,8 @@ TestEcho2DStringArray(SOAPProxy& proxy, const Endpoint& e)
 void
 TestEchoStructAsSimpleTypes(SOAPProxy& proxy, const Endpoint& e)
 {
-	SOAPMethod method("echoStructAsSimpleTypes", e.nspace,
-			e.soapaction, e.needsappend);
+	SOAPMethod method;
+	SetupMethod(method, "echoStructAsSimpleTypes", e);
 
 	SOAPStruct s;
 	s.varString = "This is a test";
@@ -928,8 +958,8 @@ TestEchoStructAsSimpleTypes(SOAPProxy& proxy, const Endpoint& e)
 void
 TestEchoSimpleTypesAsStruct(SOAPProxy& proxy, const Endpoint& e)
 {
-	SOAPMethod method("echoSimpleTypesAsStruct", e.nspace,
-			e.soapaction, e.needsappend);
+	SOAPMethod method;
+	SetupMethod(method, "echoSimpleTypesAsStruct", e);
 
 	SOAPStruct s;
 	s.varString = "This is a test";
@@ -958,7 +988,8 @@ TestEchoBase64(SOAPProxy& proxy, const Endpoint& e)
 	for (int i = 0; i < size; ++i)
 		inputBinary[i] = rand();
 
-	SOAPMethod method("echoBase64", e.nspace, e.soapaction, e.needsappend);
+	SOAPMethod method;
+	SetupMethod(method, "echoBase64", e);
 	method.AddParameter("inputBase64") << SOAPBase64(inputBinary);
 	const SOAPResponse& response = proxy.Execute(method);
 
@@ -1000,7 +1031,7 @@ TestEchoHdrString(SOAPProxy& proxy, const Endpoint& e,
 	SOAPMethod& method = env.GetBody().GetMethod();
 
 	method.SetName("echoVoid", e.nspace);
-	method.SetSoapAction(e.soapaction, e.needsappend);
+	method.SetSoapAction(e.soapaction);
 
 	SOAPString str = "This is a string in the header";
 	header << str;
@@ -1045,7 +1076,7 @@ TestEchoHdrStruct(SOAPProxy& proxy, const Endpoint& e,
 	SOAPMethod& method = env.GetBody().GetMethod();
 
 	method.SetName("echoVoid", e.nspace);
-	method.SetSoapAction(e.soapaction, e.needsappend);
+	method.SetSoapAction(e.soapaction);
 
 	SOAPStruct str;
 
@@ -1101,14 +1132,15 @@ TestEchoHdrStruct(SOAPProxy& proxy, const Endpoint& e)
 void
 TestBogusMethod(SOAPProxy& proxy, const Endpoint& e)
 {
-	SOAPMethod method("BogusMethod", e.nspace, e.soapaction, e.needsappend);
+	SOAPMethod method;
+	SetupMethod(method, "BogusMethod", e);
 	proxy.Execute(method);
 }
 
 void
 TestBogusNamespace(SOAPProxy& proxy, const Endpoint& e)
 {
-	SOAPMethod method("echoVoid", "http://bogusns.com/", e.soapaction, e.needsappend);
+	SOAPMethod method("echoVoid", "http://bogusns.com/", "http://bogusns.com/");
 	proxy.Execute(method);
 	throw UnexpectedSuccessException("Method executed with bogus namespace.");
 }
@@ -1125,7 +1157,7 @@ TestMustUnderstand(SOAPProxy& proxy, const Endpoint& e, const char *mu)
 
 	SOAPMethod& method = mustUnderstand.GetBody().GetMethod();
 	method.SetName("echoVoid", e.nspace);
-	method.SetSoapAction(e.soapaction, e.needsappend);
+	method.SetSoapAction(e.soapaction);
 
 	proxy.Execute(mustUnderstand);
 }
@@ -1157,8 +1189,8 @@ END_EASYSOAP_NAMESPACE
 void
 TestEchoMap(SOAPProxy& proxy, const Endpoint& e)
 {
-    SOAPMethod method("echoMap", e.nspace,
-			e.soapaction, e.needsappend);
+    SOAPMethod method;
+	SetupMethod(method, "echoMap", e);
 
     SOAPHashMap<SOAPString, int> map, outmap;
     map["one"] = 1;
@@ -1183,7 +1215,8 @@ TestEchoHexBinary(SOAPProxy& proxy, const Endpoint& e)
 	for (int i = 0; i < size; ++i)
 		inputBinary[i] = rand();
 
-	SOAPMethod method("echoHexBinary", e.nspace, e.soapaction, e.needsappend);
+	SOAPMethod method;
+	SetupMethod(method, "echoHexBinary", e);
 	method.AddParameter("inputHexBinary") << SOAPHex(inputBinary);
 	const SOAPResponse& response = proxy.Execute(method);
 

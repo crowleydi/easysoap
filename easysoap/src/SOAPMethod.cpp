@@ -34,37 +34,25 @@
 
 USING_EASYSOAP_NAMESPACE
 
-SOAPMethod::SOAPMethod(const char *name, const char *ns, const char *sa, bool appendName)
+SOAPMethod::SOAPMethod(const char *name, const char *ns)
 {
 	SetName(name, ns);
-	if (sa)
-	{
-		SetSoapAction(sa, appendName);
-	}
-	else
-	{
-		m_action = ns;
-		m_action.Append("#");
-		m_action.Append(name);
-	}
+}
+
+SOAPMethod::SOAPMethod(const char *name, const char *ns, const char *sa)
+{
+	SetName(name, ns);
+	SetSoapAction(sa);
 }
 
 SOAPMethod::~SOAPMethod()
 {
-
 }
 
 void
-SOAPMethod::SetSoapAction(const char *sa, bool appendName)
+SOAPMethod::SetSoapAction(const char *sa)
 {
-	if (sa)
-	{
-		m_action = sa;
-		if (appendName)
-			m_action.Append(GetName().GetName());
-	}
-	else
-		m_action = "";
+	m_action = sa;
 }
 
 bool

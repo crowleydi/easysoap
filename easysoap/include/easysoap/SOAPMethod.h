@@ -32,7 +32,8 @@ class EASYSOAP_EXPORT SOAPMethod : public SOAPParameter
 {
 public:
 	SOAPMethod() {}
-	SOAPMethod(const char *name, const char *ns, const char *soapAction = 0, bool appendName = true);
+	SOAPMethod(const char *name, const char *ns);
+	SOAPMethod(const char *name, const char *ns, const char *soapAction);
 	virtual ~SOAPMethod();
 
 	size_t GetNumParameters() const
@@ -45,7 +46,7 @@ public:
 		return GetName().GetNamespace();
 	}
 
-	void SetSoapAction(const char *sa, bool appendName = true);
+	void SetSoapAction(const char *sa);
 	const SOAPString& GetSoapAction() const
 	{
 		return m_action;
