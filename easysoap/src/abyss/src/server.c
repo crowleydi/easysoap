@@ -546,10 +546,10 @@ int ServerDefaultHandlerFunc(TSession *r)
 int ServerCreate(TServer *srv,char *name,uint16 port,char *filespath,
 				  char *logfilename)
 {
-	srv->name=strdup(name);
+	srv->name = (name ? strdup(name) : 0);
 	srv->port=port;
 	srv->defaulthandler=ServerDefaultHandlerFunc;
-	srv->filespath=strdup(filespath);
+	srv->filespath = (filespath ? strdup(filespath) : 0);
 	srv->keepalivetimeout=15;
 	srv->keepalivemaxconn=30;
 	srv->timeout=15;
