@@ -314,7 +314,6 @@ uint32 SocketWait(TSocket *s,int rd,int wr,uint32 timems);
 int SocketBlocking(TSocket *s, int b);
 uint32 SocketAvailableReadBytes(TSocket *s);
 
-
 /*********************************************************************
 ** File
 *********************************************************************/
@@ -413,6 +412,7 @@ typedef struct _TServer
 	void *defaulthandler;
 	int advertise;
 	void *userdata;
+	int stopped;
 #ifdef _UNIX
 	uid_t uid;
 	gid_t gid;
@@ -601,6 +601,10 @@ void ServerDefaultHandler(TServer *srv,URIHandler handler);
 int LogOpen(TServer *srv, char *filename);
 void LogWrite(TServer *srv,char *c);
 void LogClose(TServer *srv);
+
+void ResetServerStopFlag(TServer *srv);
+void StopServer(TServer *srv);
+int IsServerStopped(TServer *srv);
 
 
 /*********************************************************************

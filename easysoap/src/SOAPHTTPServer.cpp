@@ -165,3 +165,18 @@ SOAPHTTPServer::_RequestHandler(struct _TSession *session)
 	}
 }
 
+void SOAPHTTPServer::Stop()
+{
+	StopServer(m_server);
+}
+
+void SOAPHTTPServer::ResetFlag()
+{
+	ResetServerStopFlag(m_server);
+}
+
+int SOAPHTTPServer::IsStopped()
+{
+	return IsServerStopped(m_server);
+}
+

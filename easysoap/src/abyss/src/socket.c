@@ -136,12 +136,25 @@ int SocketListen(TSocket *s, uint32 backlog)
 	RET(listen(*s,backlog));
 }
 
+BOOL WaitForConnect( TSocket *s, uint32 msec)
+{
+	if (SocketWait( s, 1, 0, msec))
+		return TRUE;
+	return FALSE;
+}
+
 int SocketAccept(TSocket *s, TSocket *ns,TIPAddr *ip)
 {
 	struct sockaddr_in sa;
 	uint32 size=sizeof(sa);
 
-	for (;;)
+	for (;;) {
+		
+		if (!WaitForConnect( s, 1000)) {
+			*ns = -1;
+			break;
+		}
+
 		if ((*ns=accept(*s,(struct sockaddr *)&sa,&size))!=(-1))
 		{
 			*ip=sa.sin_addr;
@@ -150,6 +163,7 @@ int SocketAccept(TSocket *s, TSocket *ns,TIPAddr *ip)
 		else
 			if (SocketError()!=EINTR)
 				break;
+	}
 	
 	RET(*ns);
 }

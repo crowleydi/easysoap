@@ -555,6 +555,7 @@ int ServerCreate(TServer *srv,char *name,uint16 port,char *filespath,
 	srv->timeout=15;
 	srv->advertise=TRUE;
 	srv->userdata=0;
+	srv->stopped = 0;
 #ifdef _UNIX
 	srv->pidfile=srv->uid=srv->gid=(-1);
 #endif	/* _UNIX */
@@ -599,10 +600,14 @@ void ServerFunc(TConn *c)
 
 	ka=c->server->keepalivemaxconn;
 
+//GWK: change to resolve memory leak
 	RequestInit(&r,c);
+//GWK: end change
 	while (ka--)
 	{
+//GWK: change to resolve memory leak
 		RequestFree(&r);
+//GWK: end change
 		RequestInit(&r,c);
 
 		/* Wait to read until timeout */
@@ -708,6 +713,8 @@ void ServerRun(TServer *srv)
 			};
 			SocketClose(&ns);
 		}
+		else if (srv->stopped)
+			break;
 		else
 			TraceMsg("Socket Error=%d\n", SocketError());
 	};
@@ -750,9 +757,12 @@ void ServerRun(TServer *srv)
 			}
 			else
 				SocketClose(&ns);
-		}
-		else
+		} else {
+			if (srv->stopped)
+				break;
 			TraceMsg("Socket Error=%d\n", SocketError());
+
+		}
 	};
 }
 #endif	/* _FORK */
@@ -836,4 +846,19 @@ int SessionLog(TSession *s)
 
 	LogWrite(s->server,z);
 	return TRUE;
+}
+
+void ResetServerStopFlag(TServer *srv)
+{
+	srv->stopped=0;
+}
+
+void StopServer(TServer *srv)
+{
+	srv->stopped=1;
+}
+
+int IsServerStopped(TServer *srv)
+{
+	return srv->stopped;
 }

@@ -15,26 +15,33 @@
  * You should have received a copy of the GNU Library General Public
  * License along with this library; if not, write to the Free
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *
- * $Id$
  */
 
 
 #if !defined(AFX_SOAPHTTPSERVERTRANSPORT_H__0A80D352_B75C_411D_9096_7F1CACB82BD1__INCLUDED_)
 #define AFX_SOAPHTTPSERVERTRANSPORT_H__0A80D352_B75C_411D_9096_7F1CACB82BD1__INCLUDED_
 
-#include <SOAPServer.h>
+#include <SOAP.h>
+#include <SOAPServerDispatch.h>
+#include <SOAPDispatchHandler.h>
 
 struct _TServer;
 struct _TSession;
 
-class EASYSOAP_EXPORT SOAPHTTPServer : public SOAPServer<SOAPHTTPServer>
+class EASYSOAP_EXPORT SOAPHTTPServer
 {
 public:
 	SOAPHTTPServer(int port=80);
 	~SOAPHTTPServer();
 
+	SOAPHTTPServer& DispatchTo(SOAPDispatchHandlerInterface *disp)
+	{
+		m_dispatch.DispatchTo(disp);
+		return *this;
+	}
+
 	int Handle();
+
 private:
 
 	static int _RequestHandler(struct _TSession *);
@@ -42,6 +49,11 @@ private:
 
 	struct _TServer		*m_server;
 	SOAPServerDispatch	m_dispatch;
+
+public:
+	void Stop();
+	void ResetFlag();
+	int IsStopped();
 };
 
 #endif // !defined(AFX_SOAPHTTPSERVERTRANSPORT_H__0A80D352_B75C_411D_9096_7F1CACB82BD1__INCLUDED_)
