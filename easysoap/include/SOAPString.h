@@ -62,12 +62,11 @@ private:
 						return;
 				}
 				// we didn't have enough room to copy..
+				*m_str = 0;
 			}
 
 			// we need to alloc some space
 			size_t req = sp_strlen(str) + 1;
-			if (m_str)
-				*m_str = 0;
 			Ensure(req);
 			sp_strcpy(m_str, str);
 		}
