@@ -64,8 +64,11 @@ GetExtensionVersion( HSE_VERSION_INFO* pVer )
 {
 	long n;
 
-	pVer->dwExtensionVersion = MAKEWORD(HSE_VERSION_MAJOR, HSE_VERSION_MINOR);
-	lstrcpyn(pVer->lpszExtensionDesc, extensionDesc, HSE_MAX_EXT_DLL_NAME_LEN);
+	if (pVer)
+	{
+		pVer->dwExtensionVersion = MAKEWORD(HSE_VERSION_MAJOR, HSE_VERSION_MINOR);
+		lstrcpyn(pVer->lpszExtensionDesc, extensionDesc, HSE_MAX_EXT_DLL_NAME_LEN);
+	}
 
 	gIoPort = CreateIoCompletionPort((HANDLE)INVALID_HANDLE_VALUE, NULL, 0, 0);
 
@@ -86,6 +89,9 @@ GetExtensionVersion( HSE_VERSION_INFO* pVer )
 DWORD WINAPI
 HttpExtensionProc( EXTENSION_CONTROL_BLOCK *pECB )
 {
+	if (!pECB)
+		return HSE_STATUS_ERROR;
+
 	if (!PostQueuedCompletionStatus(gIoPort, (DWORD)pECB, 0, NULL))
 	{
 		DWORD	dwBufLen;
