@@ -597,8 +597,8 @@ SOAPParameter::WriteSOAPPacket(SOAPPacketWriter& packet, bool writetype) const
 	}
 	else if (IsStruct())
 	{
-		for (Struct::Iterator i = GetStruct().Begin(); i != GetStruct().End(); ++i)
-			(*i)->WriteSOAPPacket(packet);
+		for (size_t i = 0; i < GetArray().Size(); ++i)
+			GetArray()[i]->WriteSOAPPacket(packet);
 	}
 	else
 	{
