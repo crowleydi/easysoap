@@ -25,8 +25,9 @@
 #pragma warning (disable: 4786)
 #endif // _MSC_VER
 
-#include <stdlib.h>
 #include "SOAP.h"
+#include "SOAPBase64.h"
+#include "SOAPNamespaces.h"
 
 class SOAPParameterHandler;
 
@@ -78,6 +79,7 @@ public:
 	double GetDouble() const;
 	operator double() const					{return GetDouble();}
 
+	SOAPString& GetString()					{return m_strval;}
 	const SOAPString& GetString() const		{return m_strval;}
 	operator const SOAPString&() const		{return GetString();}
 
@@ -216,6 +218,71 @@ operator>>(const SOAPParameter& param, SOAPArray<T>& val)
 	for (SOAPParameter::Array::ConstIterator i = param.GetArray().Begin();
 		i != param.GetArray().End(); ++i)
 		*i >> val.Add();
+	return param;
+}
+
+
+inline SOAPParameter&
+operator<<(SOAPParameter& param, short val)
+{
+	param.SetValue((int)val);
+	param.SetType("short");
+	return param;
+}
+
+inline const SOAPParameter&
+operator>>(const SOAPParameter& param, short& val)
+{
+	val = param.GetInt();
+	return param;
+}
+
+inline SOAPParameter&
+operator<<(SOAPParameter& param, char val)
+{
+	param.SetValue((int)val);
+	param.SetType("byte");
+	return param;
+}
+
+inline const SOAPParameter&
+operator>>(const SOAPParameter& param, char& val)
+{
+	val = param.GetInt();
+	return param;
+}
+
+//
+// Specialize to automatically use base64 encoding
+inline const SOAPParameter&
+operator<<(SOAPParameter& param, const SOAPArray<char>& val)
+{
+	param.SetValue(""); // coerce it to a string
+	SOAPBase64::Encode(val, param.GetString());
+	param.SetType("base64", SOAP_ENC);
+	// Or, you could use this
+	// param.SetType("base64Binary", SOAP_XSD_2001);
+	return param;
+}
+
+//
+// Specialize to automatically convert base64 encoding
+inline const SOAPParameter&
+operator>>(const SOAPParameter& param, SOAPArray<char>& val)
+{
+	val.Resize(0);
+	if (param.IsArray())
+	{
+		for (SOAPParameter::Array::ConstIterator i = param.GetArray().Begin();
+			i != param.GetArray().End(); ++i)
+			*i >> val.Add();
+	}
+	else
+	{
+		//
+		// Could also check for Hex encoding.
+		SOAPBase64::Decode(param.GetString(), val);
+	}
 	return param;
 }
 
