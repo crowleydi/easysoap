@@ -93,6 +93,11 @@ public:
 
 	void Clear();
 
+	bool IsUndefined()
+	{
+		return m_name.IsEmpty() && m_namespace.IsEmpty();
+	}
+
 private:
 	SOAPString	m_name;
 	SOAPString	m_namespace;
