@@ -25,6 +25,8 @@
 
 #define snprintf _snprintf
 #define vsnprintf _vsnprintf
+#define isnan _isnan
+#define finite _finite
 
 #ifdef EASYSOAP_STATIC
 #define EASYSOAP_EXPORT
