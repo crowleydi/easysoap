@@ -85,16 +85,18 @@ rsa_st* OpenSSLinit::m_tmpRSAKey = 0;
 
 SOAPSSLContext::SOAPSSLContext() 
 	:	m_ctx(0)
+	, m_verifyserver(true)
 {
 	sslinit();
 	m_ctx = SSL_CTX_new(SSLv23_client_method());
 	if (!m_ctx)
-	throw SOAPMemoryException();
+		throw SOAPMemoryException();
 }
 
 SOAPSSLContext::SOAPSSLContext(const char* cafile) 
 		: m_cafile(cafile)
 		, m_ctx(0)
+	, m_verifyserver(true)
 {
 	sslinit();
 	m_ctx = SSL_CTX_new(SSLv23_client_method());
@@ -109,6 +111,7 @@ SOAPSSLContext::SOAPSSLContext(const char* certfile, const char* keyfile, const 
 		, m_password(password)
 		, m_cafile(cafile)
 		, m_ctx(0)
+	, m_verifyserver(true)
 {
 	sslinit();
 	m_ctx = SSL_CTX_new(SSLv23_client_method());

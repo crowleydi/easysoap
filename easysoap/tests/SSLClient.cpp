@@ -98,6 +98,7 @@ const char* SSLEnvVars[] = {
 } ;
 int main(int argc, char* argv[]) 
 {
+
 	// set this to be whatever you'd like. Earthshattering is my domain  -- blsl
 	const char *ns="http://www.earthshattering.org/test";
 
@@ -127,9 +128,12 @@ int main(int argc, char* argv[])
 		SOAPSSLContext *ctx=0;
 		if (argc > 2) 
 			ctx = new SOAPSSLContext(certfile.Str(), keyfile.Str(), password.Str());
+		else
+			ctx = new SOAPSSLContext();
+		ctx->SetVerifyServerCert(false);
 		SOAPonHTTP http;
-		if (ctx)
-			http.SetContext(*ctx);
+		http.SetContext(*ctx);
+		
 		SOAPProxy proxy(&http);
 
 		http.ConnectTo(SOAPUrl(endpoint));
@@ -150,6 +154,7 @@ int main(int argc, char* argv[])
 	} catch(SOAPException &e) {
 		fprintf(stderr, "SOAPFault: %s", e.What().Str());
 	}
+	SOAPDebugger::Close();
 }
 
 

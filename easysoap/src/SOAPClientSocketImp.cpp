@@ -147,6 +147,7 @@ SOAPClientSocketImp::~SOAPClientSocketImp()
 void
 SOAPClientSocketImp::Close()
 {
+	SOAPDebugger::Print(5, "SOAPClientSocketImp::Close()\r\n");
 	if (m_socket != INVALID_SOCKET)
 	{
 		closesocket(m_socket);
@@ -227,6 +228,7 @@ SOAPClientSocketImp::IsOpen()
 bool
 SOAPClientSocketImp::Connect(const char *server, unsigned int port)
 {
+	SOAPDebugger::Print(5, "SOAPClientSocketImp::Connect()\r\n");
 	Close();
 
 	//
@@ -305,7 +307,7 @@ SOAPClientSocketImp::Connect(const char *server, unsigned int port)
 		throw SOAPSocketException("Error setting TCP_NODELAY");
 #endif
 	}
-
+	SOAPDebugger::Print(5, "SOAPClientSocketImp::Connect() successful\r\n");
 	return true;
 }
 

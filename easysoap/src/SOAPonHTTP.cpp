@@ -465,6 +465,7 @@ SOAPHTTPProtocol::GetChunkLength()
 void
 SOAPHTTPProtocol::Close()
 {
+	SOAPDebugger::Print(5, "SOAPHTTPProtocol::Close()");
 	m_canread = 0;
 	m_doclose = false;
 	super::Close();
@@ -528,6 +529,7 @@ SOAPHTTPProtocol::Read(char *buffer, size_t len)
 bool
 SOAPHTTPProtocol::Connect()
 {
+	SOAPDebugger::Print(5, "SOAPHTTPProtocol::Connect()\r\n");
 	if (!IsOpen())
 	{
 		// See if we have to talk through an HTTP proxy
@@ -540,7 +542,7 @@ SOAPHTTPProtocol::Connect()
 		switch (proto)
 		{
 		case SOAPUrl::http_proto:
-			SOAPProtocolBase::Connect(host, port, false);
+			SOAPProtocolBase::Connect(host, port);
 			break;
 		case SOAPUrl::https_proto:
 			{
@@ -550,7 +552,11 @@ SOAPHTTPProtocol::Connect()
 				else
 					socket = new SOAPSecureSocketImp();
 
-				socket->SOAPClientSocketImp::Connect(host, port);
+				if (!socket)
+					throw SOAPMemoryException();
+
+				socket->Connect(host, port);
+
 				SOAPProtocolBase::SetSocket(socket);
 				if (m_httpproxy)
 				{
@@ -572,7 +578,6 @@ SOAPHTTPProtocol::Connect()
 					// fancy with the GET/POST commands.
 					m_httpproxy = false;
 				}
-				socket->InitSSL();
 			}
 			break;
 		default:

@@ -48,12 +48,15 @@ SOAPSecureSocketImp::~SOAPSecureSocketImp()
 {
 }
 
-bool SOAPSecureSocketImp::Connect(const char *, unsigned int) {return false;}
+bool SOAPSecureSocketImp::WaitRead(int, int) {return false;}
+bool SOAPSecureSocketImp::WaitWrite(int, int) { return false; }
 void SOAPSecureSocketImp::Close() { }
+void SOAPSecureSocketImp::IsOpen() { }
+bool SOAPSecureSocketImp::Connect(const char *, unsigned int) {return false;}
 size_t SOAPSecureSocketImp::Read(char *, size_t) {return 0;}
 size_t SOAPSecureSocketImp::Write(const char *, size_t) {return 0;}
-bool SOAPSecureSocketImp::WaitRead(int, int) {return false;}
 void SOAPSecureSocketImp::InitSSL() {}
+void SOAPSecureSocketImp::VerifyCert(const char*) { }
 
 #else // HAVE_LIBSSL
 
@@ -102,32 +105,38 @@ SOAPSecureSocketImp::HandleError(const char *context, int retcode)
 	switch (err)
 	{
 	case SSL_ERROR_NONE:
+		SOAPDebugger::Print(2, "%s: SSL_ERROR_NONE caught. retcode = %d\r\n", context, retcode);
 		break;
 
 	case SSL_ERROR_ZERO_RETURN:
+		SOAPDebugger::Print(2, "%s: SSL_ERROR_ZERO_RETURN caught\r\n", context);
 		Close();
 		break;
 
 	case SSL_ERROR_WANT_WRITE:
-		super::WaitWrite();
+		SOAPDebugger::Print(2, "%s: SSL_ERROR_WANT_WRITE caught\r\n", context);
+		WaitWrite();
 		retry = true;
 		break;
 	case SSL_ERROR_WANT_READ:
-		super::WaitRead();
+		SOAPDebugger::Print(2, "%s: SSL_ERROR_WANT_READ caught\r\n", context);
+		WaitRead();
 		retry = true;
 		break;
 	case SSL_ERROR_WANT_X509_LOOKUP:
+		SOAPDebugger::Print(2, "%s: SSL_ERROR_WANT_X509_LOOKUP caught\r\n", context);
 		retry = true;
 		break;
 
 	case SSL_ERROR_SYSCALL:
+		SOAPDebugger::Print(2, "%s: SSL_ERROR_SYSCALL caught\r\n", context);
 		{
 			if (ERR_get_error() == 0)
 			{
 				if (retcode == 0)
 				{
 					// premature EOF, but not necessarily an error
-					SOAPDebugger::Print(2, "%s: premature close on socket", context);
+					SOAPDebugger::Print(2, "%s: premature close on socket\r\n", context);
 					break;
 				}
 
@@ -137,7 +146,7 @@ SOAPSecureSocketImp::HandleError(const char *context, int retcode)
 #ifdef HAVE_STRERROR
 					sp_strncpy(msg, strerror(errno), sizeof(msg));
 #else // dont HAVE_STRERROR
-					snprintf(msg, sizeof(msg), "socket error, errno=%d", errno);
+					snprintf(msg, sizeof(msg), "socket error, errno=%d\r\n", errno);
 #endif // HAVE_STRERROR
 					msg[sizeof(msg) - 1] = 0;
 					throw SOAPSocketException(context, msg);
@@ -158,6 +167,7 @@ SOAPSecureSocketImp::HandleError(const char *context, int retcode)
 #endif // OPENSSL_VERSION_NUMBER
 
 		msg[sizeof(msg) - 1] = 0;
+		SOAPDebugger::Print(2, "Error handled.\r\ncontext: %s\r\nMsg: %s\r\n", context, msg);
 		throw SOAPSocketException(context, msg);
 		}
 	}
@@ -176,11 +186,11 @@ SOAPSecureSocketImp::InitSSL()
 	
 	int retcode;
 
-	if ((retcode = SSL_set_fd(m_ssl, m_socket)) != 1)
-		HandleError("Error attaching security layer to socket : %s\n", retcode);
+	if ((retcode = SSL_set_fd(m_ssl, m_socket.m_socket)) != 1)
+		HandleError("Error attaching security layer to socket : %s\r\n", retcode);
 
 	if ((retcode = SSL_connect(m_ssl)) != 1)
-		HandleError("Error negotiating secure connection : %s\n", retcode);
+		HandleError("Error negotiating secure connection : %s\r\n", retcode);
 }
 
 void
@@ -188,58 +198,71 @@ SOAPSecureSocketImp::VerifyCert(const char* host)
 {
 	X509* server_cert = SSL_get_peer_certificate(m_ssl);
 	if (!server_cert)
-		throw SOAPException("Error getting server certificate.");
+		throw SOAPException("Error getting server certificate.\r\n");
 
-	if (SSL_get_verify_result(m_ssl) != X509_V_OK)
-		throw SOAPException("Server certificate verification failed.");
+	int rc = SSL_get_verify_result(m_ssl);
+	if (rc != X509_V_OK)
+		throw SOAPException("Server certificate verification failed\r\n", rc);
 
 	char buf[128];
 	X509_NAME_get_text_by_NID(X509_get_subject_name(server_cert),
 							  NID_commonName, buf, sizeof(buf));
 	if (sp_strcasecmp(buf, host))
-		throw SOAPException("Server certificate hostname does not match (%s != %s).", buf, host);
+		throw SOAPException("Server certificate hostname does not match (%s != %s)\r\n", buf, host);
 
 	X509_free(server_cert);
-}
-
-bool
-SOAPSecureSocketImp::Connect(const char *host, unsigned int port, bool client)
-{
-	if (!super::Connect(host, port))
-		return false;
-
-	InitSSL();
-	
-	// set SSL to either be client or server...
-	if (client)
-		SSL_set_connect_state(m_ssl);
-	else
-		SSL_set_accept_state(m_ssl);
-
-	VerifyCert(host);
-
-	return true;
 }
 
 bool
 SOAPSecureSocketImp::WaitRead(int sec, int usec)
 {
 	if (!m_ssl)
-		return super::WaitRead(sec, usec);
+		return m_socket.WaitRead(sec, usec);
 
 	if (SSL_pending(m_ssl) > 0)
 		return true;
 
 	// we have to wait...
-	Wait(sec, usec);
+	m_socket.Wait(sec, usec);
 	return SSL_pending(m_ssl) > 0;
 }
+
+bool
+SOAPSecureSocketImp::WaitWrite(int sec, int usec)
+{
+	// not sure if this is correct or not
+	return m_socket.WaitWrite(sec, usec);
+
+}
+bool
+SOAPSecureSocketImp::IsOpen()
+{
+	SOAPDebugger::Print(5, "SOAPSecureSocketImp::IsOpen()");
+	// more to be done?
+	return m_socket.IsOpen();
+}
+
+bool
+SOAPSecureSocketImp::Connect(const char *host, unsigned int port, bool client)
+{
+	SOAPDebugger::Print(5, "SOAPSecureSocketImp::Connect()\r\n");
+	if (!m_socket.Connect(host, port))
+		return false;
+
+	InitSSL();
+	if (m_context->VerifyServerCert())
+		VerifyCert(host);
+
+	SOAPDebugger::Print(5, "Connected to %s:%d \r\n", host, port);
+	return true;
+}
+
 
 size_t
 SOAPSecureSocketImp::Read(char *buff, size_t bufflen)
 {
 	if (!m_ssl)
-		return super::Read(buff, bufflen);
+		return m_socket.Read(buff, bufflen);
 
 	int bytes = 0;
 	if (bufflen > 0)
@@ -248,7 +271,7 @@ SOAPSecureSocketImp::Read(char *buff, size_t bufflen)
 		do
 		{
 			bytes = SSL_read(m_ssl, buff, bufflen);
-			SOAPDebugger::Print(2, "SRECV: %d bytes\n", bytes);
+			SOAPDebugger::Print(2, "SRECV: %d bytes\r\n", bytes);
 			if (bytes > 0)
 			{
 				// good, we read some bytes.
@@ -270,27 +293,27 @@ size_t
 SOAPSecureSocketImp::Write(const char *buff, size_t bufflen)
 {
 	if (!m_ssl)
-		return super::Write(buff, bufflen);
+		return m_socket.Write(buff, bufflen);
 
 	if (bufflen > 0)
 	{
 		bool retry = false;
 		do
 		{
-			size_t bytes = SSL_write(m_ssl, buff, bufflen);
+			int bytes = SSL_write(m_ssl, buff, bufflen);
 			SOAPDebugger::Print(2, "SSEND: %d bytes\n", bytes);
 			if (bytes > 0)
 			{
 				if (bytes != bufflen)
 					throw SOAPSocketException("Error writing to secure socket, "
-						   "expected to write %d bytes, wrote %d bytes",
+						   "expected to write %d bytes, wrote %d bytes\r\n",
 						   bufflen, bytes);
 				retry = false;
 			}
 			else 
 			{
 				// check for an error
-				retry = HandleError("Error writing to secure socket", bytes);
+				retry = HandleError("Error writing to secure socket\r\n", bytes);
 				bytes = 0;
 			}
 		} while (retry);
@@ -302,10 +325,11 @@ SOAPSecureSocketImp::Write(const char *buff, size_t bufflen)
 void
 SOAPSecureSocketImp::Close()
 {
+	SOAPDebugger::Print(5, "SOAPSecureSocketImp::Close()\r\n");
 	if (m_ssl)
 		SSL_shutdown(m_ssl);
 
-	super::Close();
+	m_socket.Close();
 
 	if (m_ssl)
 	{

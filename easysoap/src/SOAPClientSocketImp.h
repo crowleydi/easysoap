@@ -30,6 +30,7 @@ BEGIN_EASYSOAP_NAMESPACE
 class SOAPClientSocketImp : public SOAPSocketInterface
 {
 protected:
+	friend class SOAPSecureSocketImp;
 	unsigned int	m_socket;
 	void			Wait(int sec, int usec);
 
@@ -44,6 +45,7 @@ public:
 	virtual bool Connect(const char *host, unsigned int port);
 	virtual size_t Read(char *buffer, size_t len);
 	virtual size_t Write(const char *buffer, size_t len);
+
 };
 
 END_EASYSOAP_NAMESPACE

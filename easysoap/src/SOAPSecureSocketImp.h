@@ -23,7 +23,7 @@
 #if !defined(AFX_SOAPSECURESOCKETIMP_H__7481DF95_30AD_4892_B5E4_44463F2F6D42__INCLUDED_)
 #define AFX_SOAPSECURESOCKETIMP_H__7481DF95_30AD_4892_B5E4_44463F2F6D42__INCLUDED_
 
-
+#include <easysoap/SOAPSocket.h>
 #include "SOAPClientSocketImp.h"
 
 struct ssl_st;
@@ -32,29 +32,34 @@ BEGIN_EASYSOAP_NAMESPACE
 
 class SOAPSSLContext;
 
-class SOAPSecureSocketImp : public SOAPClientSocketImp
+class SOAPSecureSocketImp : public SOAPSocketInterface
 {
 private:
-	typedef SOAPClientSocketImp super;
+	SOAPClientSocketImp m_socket;
 
 protected:
 	ssl_st				*m_ssl;
 	SOAPSSLContext		*m_context;
 	bool				m_delctx;
 	bool HandleError(const char *context, int retcode);
+	void InitSSL();
+	void VerifyCert(const char* host);
 public:
 	SOAPSecureSocketImp();
 	SOAPSecureSocketImp(SOAPSSLContext& ctx);
 	virtual ~SOAPSecureSocketImp();
 
+	virtual bool WaitRead(int sec = -1, int usec = 0);
+	virtual bool WaitWrite(int sec = -1, int usec = 0);
+	virtual bool IsOpen();
 	virtual void Close();
-	virtual bool Connect(const char *host, unsigned int port, bool client = true);
+	virtual bool Connect(const char *host, unsigned int port) {
+		Connect(host, port, true);
+	}
+	virtual bool Connect(const char *host, unsigned int port, bool client );
 	virtual size_t Read(char *buffer, size_t len);
 	virtual size_t Write(const char *buffer, size_t len);
-	virtual bool WaitRead(int sec, int usec);
 
-	void InitSSL();
-	void VerifyCert(const char* host);
 };
 
 END_EASYSOAP_NAMESPACE

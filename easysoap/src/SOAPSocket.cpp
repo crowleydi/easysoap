@@ -25,7 +25,7 @@
 #endif // _MSC_VER
 
 #include <easysoap/SOAPSocket.h>
-
+#include <easysoap/SOAPDebugger.h>
 #include "SOAPClientSocketImp.h"
 #include "SOAPSecureSocketImp.h"
 
@@ -49,6 +49,7 @@ SOAPProtocolBase::~SOAPProtocolBase()
 void
 SOAPProtocolBase::Close()
 {
+	SOAPDebugger::Print(5, "SOAPProtocolBase::Close()\r\n");
 	delete m_socket;
 	m_socket = 0;
 	m_buff = 0;
@@ -60,21 +61,18 @@ SOAPProtocolBase::Close()
 void
 SOAPProtocolBase::SetSocket(SOAPSocketInterface *socket)
 {
-	Close();
+	//Close();
 	m_socket = socket;
 	m_wpos = m_wbuff;
 	m_wend = m_wpos + sizeof(m_wbuff);
 }
 
 bool
-SOAPProtocolBase::Connect(const char *host, unsigned int port, bool secure)
+SOAPProtocolBase::Connect(const char *host, unsigned int port)
 {
 	Close();
 
-	if (secure)
-		m_socket = new SOAPSecureSocketImp();
-	else
-		m_socket = new SOAPClientSocketImp();
+	m_socket = new SOAPClientSocketImp();
 
 	if (!m_socket)
 		throw SOAPMemoryException();
