@@ -39,11 +39,13 @@
 USING_EASYSOAP_NAMESPACE
 
 SOAPonHTTP::SOAPonHTTP(const SOAPUrl& endpoint)
+: m_ctx(0)
 {
 	ConnectTo(endpoint);
 }
 
 SOAPonHTTP::SOAPonHTTP(const SOAPUrl& endpoint, const SOAPUrl& proxy)
+: m_ctx(0)
 {
 	ConnectTo(endpoint, proxy);
 }
