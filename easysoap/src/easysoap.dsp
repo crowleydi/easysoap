@@ -110,6 +110,10 @@ SOURCE=.\SOAPBodyHandler.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\SOAPCGITransport.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\SOAPClientSocketImp.cpp
 # End Source File
 # Begin Source File
