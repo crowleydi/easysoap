@@ -10,4 +10,4 @@ validator_SOURCES = \
 LDADD = ../src/libeasysoap.la
 INCLUDES = -I@top_srcdir@/include
 
-EXTRA_DIST = README.TXT validator.dsp
+EXTRA_DIST = README.TXT

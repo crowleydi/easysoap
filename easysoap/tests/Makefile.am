@@ -23,4 +23,4 @@ SSLServer_SOURCES = \
 LDADD = ../src/libeasysoap.la
 INCLUDES = -I@top_srcdir@/include
 
-EXTRA_DIST = README.TXT interopclient.dsp interopserver.dsp README.SSL
+EXTRA_DIST = README.TXT README.SSL
