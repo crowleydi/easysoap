@@ -23,6 +23,8 @@
 #include <easysoap/SOAP.h>
 #include <easysoap/SOAPDispatchHandler.h>
 
+USING_EASYSOAP_NAMESPACE
+
 class WhichToolkitHandler :
 	public SOAPDispatchHandler<WhichToolkitHandler>
 {

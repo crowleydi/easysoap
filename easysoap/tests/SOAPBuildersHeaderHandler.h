@@ -7,6 +7,8 @@
 
 #include <easysoap/SOAPDispatchHandler.h>
 
+USING_EASYSOAP_NAMESPACE
+
 //
 // See http://www.whitemesa.com/interop.htm
 //

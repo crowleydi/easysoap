@@ -19,6 +19,8 @@
 
 #include <easysoap/SOAP.h>
 
+USING_EASYSOAP_NAMESPACE
+
 //
 //  The namespace for the methods we're calling.  This
 //  is the same namespace defined in calchandler.h.

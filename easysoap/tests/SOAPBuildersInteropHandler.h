@@ -6,6 +6,7 @@
 #define AFX_SOAPBUILDERSINTEROPHANDLER_H__C0C1D23F_D31D_4118_BB27_C85AB1FA7645__INCLUDED_
 
 #include <easysoap/SOAPDispatchHandler.h>
+USING_EASYSOAP_NAMESPACE
 
 //
 // See http://www.whitemesa.com/interop.htm

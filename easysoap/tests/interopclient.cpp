@@ -1107,11 +1107,15 @@ TestMustUnderstand_0(SOAPProxy& proxy, const Endpoint& e)
 }
 
 
+BEGIN_EASYSOAP_NAMESPACE
+
 //
 // We have to declare the type traits for our map
 class SOAPTypeTraits< SOAPHashMap<SOAPString, int> > : public SOAPMapTypeTraits
 {
 };
+
+END_EASYSOAP_NAMESPACE
 
 void
 TestEchoMap(SOAPProxy& proxy, const Endpoint& e)
