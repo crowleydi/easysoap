@@ -17,37 +17,29 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-//
-//
-//
-//   CGI Program for the Userland SOAP 1.1 Validator Web App
-//   http://validator.soapware.org/
-//
-//
-//
+#if !defined(AFX_WHICHTOOLKITHANDLER_H__54C64ECA_7D60_4DD8_B8B4_EEE5EAF4118A__INCLUDED_)
+#define AFX_WHICHTOOLKITHANDLER_H__54C64ECA_7D60_4DD8_B8B4_EEE5EAF4118A__INCLUDED_
 
-#include <SOAP.h>
-#include <SOAPCGIHandler.h>
+#include "SOAP.h"
+#include "SOAPDispatchHandler.h"
 
-#include "UserlandValidatorHandler.h"
-#include "WhichToolkitHandler.h"
-
-//
-//
-// main for the CGI handler;
-//
-int
-main(int argc, char* argv[], char *env[])
+class WhichToolkitHandler :
+	public SOAPDispatchHandler<WhichToolkitHandler>
 {
-	SOAPCGIDispatch cgi;
-	WhichToolkitHandler whichToolkitHandler;
-	UserlandValidatorHandler validatorHandler;
+public:
+	WhichToolkitHandler()
+	{
+		DispatchTo(this);
+		DispatchMethod("whichToolkit", &WhichToolkitHandler::whichToolkit);
+	}
 
-	//SOAPPacketWriter::SetAddWhiteSpace();
+	virtual ~WhichToolkitHandler()
+	{
+	}
 
-	return cgi.
-		Dispatch("", &validatorHandler).
-		Dispatch("http://www.soapware.org/", &whichToolkitHandler).
-		Handle();
-}
+	void whichToolkit(const SOAPMethod& request, SOAPMethod& response);
+};
+
+#endif // !defined(AFX_WHICHTOOLKITHANDLER_H__54C64ECA_7D60_4DD8_B8B4_EEE5EAF4118A__INCLUDED_)
+
 
