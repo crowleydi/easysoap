@@ -21,8 +21,6 @@
 #ifndef __SOAPHASHMAP_H__
 #define __SOAPHASHMAP_H__
 
-#include <SOAPUtil.h>
-
 #ifdef _MSC_VER
 #pragma warning(disable: 4284)
 #endif // _MSC_VER
@@ -30,6 +28,10 @@
 // pre-decalure some functors
 template<typename T>
 struct SOAPHashCodeFunctor;
+template<typename T>
+struct SOAPHashCodeFunctorNoCase;
+template<typename T>
+struct SOAPEqualsFunctorNoCase;
 
 template<typename T>
 struct SOAPEqualsFunctor
@@ -40,74 +42,72 @@ struct SOAPEqualsFunctor
 	}
 };
 
+
+#include <SOAPUtil.h>
+#include <SOAPArray.h>
+
+
 template <typename K, typename I,
 	typename H = SOAPHashCodeFunctor<K>,
 	typename E = SOAPEqualsFunctor<K> >
 class EASYSOAP_EXPORT SOAPHashMap
 {
 private:
-	H hashcode;
-	E equals;
-
 	// structure for keeping a linked-list of elements
 	struct HashElement {
-		HashElement(size_t hash, HashElement* next, const K& key)
-			: m_hash(hash), m_next(next), m_key(key) {}
-
-		HashElement(size_t hash, HashElement* next, const K& key, const I& item)
-			: m_hash(hash), m_next(next), m_key(key), m_item(item) {}
-
+		HashElement() : m_hash(0), m_used(false) {}
 		size_t	m_hash;
-		HashElement *m_next;
+		bool	m_used;
 		K		m_key;
 		I		m_item;
 	};
 
-	// structure for keeping memory pools
-	struct HashElementPool {
-		HashElement *m_elements;
-		size_t		m_size;
-	};
+	H hashcode;
+	E equals;
+
+	typedef SOAPArray<HashElement>	Elements;
+	Elements	m_elements;
+	size_t		m_numElements;
+	float		m_fillfactor;
+	size_t		m_resizeThreshold;
 
 	// our Iterator class
 	class ForwardHashMapIterator
 	{
 	private:
-		HashElement			*m_he;
-		const SOAPHashMap	*m_map;
-		size_t				m_index;
+		const SOAPHashMap		*m_map;
+		Elements::Iterator		m_index;
 		
 		friend class SOAPHashMap<K,I,H,E>;
 
 		// private constuctor that can only be called by SOAPHashMap
-		ForwardHashMapIterator(const SOAPHashMap *map, HashElement *he, size_t index)
-			: m_he(he), m_map(map), m_index(index)
+		ForwardHashMapIterator(const SOAPHashMap *map, Elements::Iterator index)
+			: m_map(map), m_index(index)
 		{
 			if (m_map)
 			{
 				// Find first bucket with an element
-				while (!m_he && m_index != m_map->m_buckets)
-						m_he = m_map->m_table[m_index++];
+				while (m_index != m_map->m_elements.End() && !m_index->m_used)
+						++m_index;
 			}
 		}
 
 	public:
 		// default constructor
 		ForwardHashMapIterator()
-			: m_he(0), m_map(0), m_index(0)
+			: m_map(0), m_index(0)
 		{
 		}
 
 		//copy constructor
 		ForwardHashMapIterator(const ForwardHashMapIterator& r)
-			: m_he(r.m_he), m_map(r.m_map), m_index(r.m_index)
+			: m_map(r.m_map), m_index(r.m_index)
 		{
 		}
 
 		// assignment operator
 		ForwardHashMapIterator& operator=(const ForwardHashMapIterator& r)
 		{
-			m_he = r.m_he;
 			m_map = r.m_map;
 			m_index = r.m_index;
 			return *this;
@@ -117,26 +117,21 @@ private:
 		bool operator==(const ForwardHashMapIterator& r) const
 		{
 			// make sure we're pointing to the exact same element
-			return m_he == r.m_he;
+			return m_map == r.m_map && m_index == r.m_index;
 		}
 
 		// not equals operator
 		bool operator!=(const ForwardHashMapIterator& r) const
 		{
 			// can't be pointing to the same element...
-			return m_he != r.m_he;
+			return m_map != r.m_map || m_index != r.m_index;
 		}
 
 		// Move to next element
 		ForwardHashMapIterator& Next()
 		{
-			if (m_he)
-			{
-				m_he = m_he->m_next;
-				while (!m_he && m_index != m_map->m_buckets)
-						m_he = m_map->m_table[m_index++];
-
-			}
+			while (++m_index != m_map->m_elements.End() && !m_index->m_used)
+					;
 			return *this;
 		}
 
@@ -160,50 +155,50 @@ private:
 		// some boolean operators
 		operator bool()
 		{
-			return m_he != 0;
+			return m_index != m_map->m_elements.End();
 		}
 
 		bool operator!()
 		{
-			return m_he == 0;
+			return m_index == m_map->m_elements.End();
 		}
 
 		// access the hash key.  can't modify it!
 		const K& Key() const
 		{
-			return m_he->m_key;
+			return m_index->m_key;
 		}
 
 		// access the data item.
 		I& operator*()
 		{
-			return m_he->m_item;
+			return m_index->m_item;
 		}
 
 		const I& operator*() const
 		{
-			return m_he->m_item;
+			return m_index->m_item;
 		}
 
 		I* operator->()
 		{
-			return &m_he->m_item;
+			return &m_index->m_item;
 		}
 
 		const I* operator->() const
 		{
-			return &m_he->m_item;
+			return &m_index->m_item;
 		}
 
 		// maybe get rid of these since we can use *
 		const I& Item() const
 		{
-			return m_he->m_item;
+			return m_index->m_item;
 		}
 
 		I& Item()
 		{
-			return m_he->m_item;
+			return m_index->m_item;
 		}
 	};
 
@@ -213,28 +208,24 @@ public:
 	~SOAPHashMap()
 	{
 		Clear();
-		sp_free(m_table);
 	}
 	
 	SOAPHashMap(size_t size = 31, float fillfactor = 0.75) :
-		m_table(0), m_buckets(0), m_numItems(0),
-		m_fillfactor(fillfactor), m_resizeThreshold(0)
+		m_numElements(0), m_fillfactor(fillfactor), m_resizeThreshold(0)
 	{
 		Resize(size); // this sets m_resizeThreshold
 	}
 
 	template<typename A, typename B, typename C, typename D>
 	SOAPHashMap(const SOAPHashMap<A,B,C,D>& r) :
-		m_table(0), m_buckets(0), m_numItems(0),
-		m_fillfactor(r.GetFillFactor()), m_resizeThreshold(0)
+		m_numElements(0), m_fillfactor(r.GetFillFactor()), m_resizeThreshold(0)
 	{
 		Resize(r.GetNumBuckets()); // this sets m_resizeThreshold
 		*this = r;
 	}
 
 	SOAPHashMap(const SOAPHashMap& r) :
-		m_table(0), m_buckets(0), m_numItems(0),
-		m_fillfactor(r.GetFillFactor()), m_resizeThreshold(0)
+		m_numElements(0), m_fillfactor(r.GetFillFactor()), m_resizeThreshold(0)
 	{
 		Resize(r.GetNumBuckets()); // this sets m_resizeThreshold
 		*this = r;
@@ -269,12 +260,12 @@ public:
 
 	Iterator Begin() const
 	{
-		return Iterator(this, 0, 0);
+		return Iterator(this, (Elements::Iterator)m_elements.Begin());
 	}
 
 	Iterator End() const
 	{
-		return Iterator(0, 0, 0);
+		return Iterator(this, (Elements::Iterator)m_elements.End());
 	}
 
 
@@ -304,52 +295,24 @@ public:
 	// returns true if we found the key and removed it.
 	bool Remove(const K& key)
 	{
-		if (m_buckets > 0)
-		{
-			size_t hash = hashcode(key);
-			// we use ** here so we can treat the first element the
-			// same was as the other elements in the linked list
-			HashElement **he = &m_table[hash % m_buckets];
-			while (*he)
-			{
-				if ((*he)->m_hash == hash && equals((*he)->m_key, key))
-				{
-					HashElement *temp = (*he)->m_next;
-					PutBackHashElement(*he);
-					*he = temp;
-
-					--m_numItems;
-					return true;
-				}
-				he = &((*he)->m_next);
-			}
-		}
-		return false;
+		Iterator found = Find(key);
+		if (!found)
+			return false;
+		found.m_index->m_used = false;
+		return true;
 	}
 
 	// clear all elements.
 	void Clear()
 	{
-		if (m_table)
-		{
-			for (size_t i = 0; i < m_buckets; ++i)
-			{
-				HashElement *he = m_table[i];
-				while (he)
-				{
-					HashElement *next = he->m_next;
-					PutBackHashElement(he);
-					he = next;
-				}
-				m_table[i] = 0;
-			}
-			m_numItems = 0;
-		}
+		for (Elements::Iterator i = m_elements.Begin(); i != m_elements.End(); ++i)
+			i->m_used = false;
+		m_numElements = 0;
 	}
 
 	size_t Size() const
 	{
-		return m_numItems;
+		return m_numElements;
 	}
 
 	// find the item associated with the given key.
@@ -361,7 +324,7 @@ public:
 		return Find(key, hash);
 	}
 
-	size_t GetNumBuckets() const {return m_buckets;}
+	size_t GetNumBuckets() const {return m_elements.Size();}
 	float GetFillFactor() const {return m_fillfactor;}
 
 private:
@@ -370,15 +333,21 @@ private:
 	template<typename X>
 	Iterator Find(const X& key, size_t hash) const
 	{
-		if (m_buckets > 0)
+		if (m_elements.Size() > 0)
 		{
-			size_t index = hash % m_buckets;
-			HashElement *he = m_table[index];
-			while (he)
+			size_t index = hash % m_elements.Size();
+			size_t sindex = index;
+			while (index < m_elements.Size())
 			{
-				if (he->m_hash == hash && equals(he->m_key, key))
-					return Iterator(this, he, ++index);
-				he = he->m_next;
+				if (m_elements[index].m_hash == hash &&
+					m_elements[index].m_key == key)
+					return Iterator(this, (Elements::Iterator)m_elements.Begin() + index);
+
+				// now it sux.  linear lookup...
+				if (++index == m_elements.Size())
+					index = 0;
+				else if (index == sindex)
+					break;
 			}
 		}
 		return End();
@@ -387,115 +356,74 @@ private:
 	// resize only if it makes the table bigger
 	void Resize(size_t newsize)
 	{
-		if (newsize <= m_buckets)
+		if (newsize <= m_elements.Size())
 			return;
 
-		// get a new array to copy the elements into
-		HashElement **newtable =
-			sp_alloc<HashElement*>(newsize);
-		size_t i = 0;
+		Elements newelements;
+		newelements.Resize(newsize);
 
-		// clear out the new array;
-		for (i = 0; i < newsize; ++i)
-			newtable[i] = 0;
-
-		// move elements into the new array.
-		for (i = 0; i < m_buckets; ++i)
+		for (Elements::Iterator i = m_elements.Begin(); i != m_elements.End(); ++i)
 		{
-			HashElement *he = m_table[i];
-			while (he)
+			if (i->m_used)
 			{
-				HashElement *next = he->m_next;
-				size_t newindex = he->m_hash % newsize;
-				he->m_next = newtable[newindex];
-				newtable[newindex] = he;
-				he = next;
+				size_t newindex = i->m_hash % newsize;
+				while (newelements[newindex].m_used)
+					if (++newindex == newsize)
+						newindex = 0;
+				newelements[newindex] = *i;
 			}
 		}
 
-		// blow away the old array and set the pointer
-		// to the new array
-		sp_free(m_table);
-		m_table = newtable;
-		m_buckets = newsize;
-		// precompute the threshold so we don't have to
-		// recompute for every Put()
-		m_resizeThreshold = (size_t) (m_buckets * m_fillfactor);
+		m_resizeThreshold = m_fillfactor * newsize;
+		m_elements.AttachTo(newelements);
 	}
 
-
-	void PutBackHashElement(HashElement *he)
-	{
-		delete he;
-	}
-
-	HashElement *GetNextHashElement(
-			size_t hash,
-			HashElement* next,
-			const K& key,
-			const I& item)
-	{
-		return new HashElement(hash, next, key, item);
-	}
-
-	HashElement *GetNextHashElement(
-			size_t hash,
-			HashElement* next,
-			const K& key)
-	{
-		return new HashElement(hash, next, key);
-	}
 
 	// This method actually puts an object into the hashtable.
 	I& Put(size_t hash, const K& key, const I& item)
 	{
 		// check for resize
-		if (m_numItems >= m_resizeThreshold)
-			Resize(m_buckets * 2 + 1);
+		if (m_numElements >= m_resizeThreshold)
+			Resize(m_elements.Size() * 2 + 1);
 
-		size_t index = hash % m_buckets;
-		HashElement *he = GetNextHashElement(hash, m_table[index], key, item);
-		m_table[index] = he;
-		++m_numItems;
+		size_t index = hash % m_elements.Size();
+		while (m_elements[index].m_used)
+			if (++index = m_elements.Size())
+				index = 0;
 
-		return he->m_item;
+		++m_numElements;
+		m_elements[index].m_used = true;
+		m_elements[index].m_key = key;
+		m_elements[index].m_hash = hash;
+		return m_elements[index].m_item = item;
 	}
 
 	// This method actually puts an object into the hashtable.
 	I& Put(size_t hash, const K& key)
 	{
 		// check for resize
-		if (m_numItems >= m_resizeThreshold)
-			Resize(m_buckets * 2 + 1);
+		if (m_numElements >= m_resizeThreshold)
+			Resize(m_elements.Size() * 2 + 1);
 
-		size_t index = hash % m_buckets;
-		HashElement *he = GetNextHashElement(hash, m_table[index], key);
-		m_table[index] = he;
-		++m_numItems;
+		size_t index = hash % m_elements.Size();
+		while (m_elements[index].m_used)
+			if (++index = m_elements.Size())
+				index = 0;
 
-		return he->m_item;
+		++m_numElements;
+		m_elements[index].m_used = true;
+		m_elements[index].m_key = key;
+		m_elements[index].m_hash = hash;
+		return m_elements[index].m_item;
 	}
 
 	friend class ForwardHashMapIterator;
-
-	HashElement **m_table;
-	size_t	m_buckets;
-	size_t	m_numItems;
-	float	m_fillfactor;
-	size_t	m_resizeThreshold;
 };
 
 
 ////////////////////////////////
 ///  Make it easier to use no case
 ////////////////////////////////
-template<typename T>
-struct SOAPHashCodeFunctorNoCase;
-
-template<typename T>
-struct SOAPEqualsFunctorNoCase;
-
-
 template<typename K, typename I>
 class SOAPHashMapNoCase : public SOAPHashMap<K, I,
 				SOAPHashCodeFunctorNoCase<K>,
