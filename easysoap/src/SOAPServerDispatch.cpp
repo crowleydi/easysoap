@@ -112,6 +112,9 @@ SOAPServerDispatch::Handle(SOAPTransport& trans)
 
 	try
 	{
+		m_request.Reset();
+		m_response.Reset();
+
 		// Parse the SOAP packet
 		faultcode = clientfault;
 		m_parser.Parse(m_request, trans);
