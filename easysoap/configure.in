@@ -32,6 +32,7 @@ AC_CXX_PARTIAL_SPECIALIZATION
 AC_CXX_TEMPLATE_KEYWORD_QUALIFIER
 
 dnl Checks for libraries.
+AC_CHECK_LIB(stdc++, __builtin_new)
 AC_CHECK_LIB(nsl, gethostbyname)
 AC_CHECK_LIB(socket, send)
 AC_CHECK_LIB(wsock32, WSAStartup)
