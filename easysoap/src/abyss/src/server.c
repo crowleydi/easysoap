@@ -808,15 +808,25 @@ void LogClose(TServer *srv)
 
 int SessionLog(TSession *s)
 {
+	/***
+	 * FIX ME:  We can overwrite array bounds in here...
+	 * sprintf() is BAD
+	 ***/
+
 	char z[1024];
 	uint32 n;
 
 	if (strlen(s->requestline)>1024-26-50)
 		s->requestline[1024-26-50]='\0';
 
+#ifdef _WIN32
 	n=sprintf(z,"%d.%d.%d.%d - %s - [",s->conn->peerip.S_un.S_un_b.s_b1,
 		s->conn->peerip.S_un.S_un_b.s_b2,s->conn->peerip.S_un.S_un_b.s_b3,
 		s->conn->peerip.S_un.S_un_b.s_b4,(s->user?s->user:""));
+#else // not _WIN32
+	n=sprintf(z,"%s - [", (s->user ? s->user : ""));
+#endif // _WIN32
+
 
 	DateToLogString(&s->date,z+n);
 

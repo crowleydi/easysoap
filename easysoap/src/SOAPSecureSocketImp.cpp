@@ -30,7 +30,7 @@
 #include <sys/time.h>
 #endif // _WIN32
 
-#ifndef EASYSOAP_SSL
+#if (defined(HAVE_LIBSSL) && (HAVE_LIBSSL == 1))
 
 #include "SOAPSecureSocketImp.h"
 

@@ -16,7 +16,7 @@ SHELL = /bin/sh
 
 srcdir = .
 top_srcdir = ..
-prefix = /usr/tmp/asdf
+prefix = /usr/local
 exec_prefix = ${prefix}
 
 bindir = ${exec_prefix}/bin
@@ -72,26 +72,23 @@ LIBTOOL = $(SHELL) $(top_builddir)/libtool
 LN_S = ln -s
 MAKEDEPEND = /usr/X11R6/bin/makedepend
 MAKEINFO = makeinfo
-NETWORK_LIBS = 
 OBJDUMP = @OBJDUMP@
 PACKAGE = EasySoap++
 RANLIB = ranlib
-SSL_DEFINES = -DEASYSOAP_SSL
-SSL_LIBS = -lcrypto -lssl
 STATIC_EASYSOAP_LIBS = $(top_builddir)/src/libeasysoap.a
-VERSION = 0.2
+VERSION = 0.3.1
 
 noinst_PROGRAMS = interopclient interopserver
 noinst_LIBRARIES = libSOAPBuildersInteropHandler.a
 
 interopclient_SOURCES = interopclient.cpp
-interopclient_LDADD =      libSOAPBuildersInteropHandler.a $(STATIC_EASYSOAP_LIBS) $(SSL_LIBS)
+interopclient_LDADD =      libSOAPBuildersInteropHandler.a $(STATIC_EASYSOAP_LIBS)
 
 interopclient_DEPENDENCIES =      libSOAPBuildersInteropHandler.a $(STATIC_EASYSOAP_LIBS)
 
 
 interopserver_SOURCES = interopserver.cpp
-interopserver_LDADD =      libSOAPBuildersInteropHandler.a $(STATIC_EASYSOAP_LIBS) $(SSL_LIBS)
+interopserver_LDADD =      libSOAPBuildersInteropHandler.a $(STATIC_EASYSOAP_LIBS)
 
 interopserver_DEPENDENCIES =      libSOAPBuildersInteropHandler.a $(STATIC_EASYSOAP_LIBS)
 
@@ -107,10 +104,10 @@ CONFIG_CLEAN_FILES =
 LIBRARIES =  $(noinst_LIBRARIES)
 
 
-DEFS =  -DPACKAGE=\"EasySoap++\" -DVERSION=\"0.2\" -DHAVE_LIBEXPAT=1 -DSTDC_HEADERS=1  -I. -I$(srcdir) 
+DEFS =  -DPACKAGE=\"EasySoap++\" -DVERSION=\"0.3.1\" -DHAVE_LIBEXPAT=1 -DHAVE_LIBSSL=1 -DHAVE_LIBCRYPTO=1 -DHAVE_LIBNSL=1 -DSTDC_HEADERS=1  -I. -I$(srcdir) 
 CPPFLAGS = 
 LDFLAGS = 
-LIBS = -lexpat 
+LIBS = -lnsl -lcrypto -lssl -lexpat 
 libSOAPBuildersInteropHandler_a_LIBADD = 
 libSOAPBuildersInteropHandler_a_OBJECTS =  SOAPBuildersInteropHandler.o
 AR = ar

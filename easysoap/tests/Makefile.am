@@ -3,13 +3,13 @@ noinst_LIBRARIES = libSOAPBuildersInteropHandler.a
 
 interopclient_SOURCES = interopclient.cpp
 interopclient_LDADD = \
-    libSOAPBuildersInteropHandler.a $(STATIC_EASYSOAP_LIBS) $(SSL_LIBS)
+    libSOAPBuildersInteropHandler.a $(STATIC_EASYSOAP_LIBS)
 interopclient_DEPENDENCIES = \
     libSOAPBuildersInteropHandler.a $(STATIC_EASYSOAP_LIBS)
 
 interopserver_SOURCES = interopserver.cpp
 interopserver_LDADD = \
-    libSOAPBuildersInteropHandler.a $(STATIC_EASYSOAP_LIBS) $(SSL_LIBS)
+    libSOAPBuildersInteropHandler.a $(STATIC_EASYSOAP_LIBS)
 interopserver_DEPENDENCIES = \
     libSOAPBuildersInteropHandler.a $(STATIC_EASYSOAP_LIBS)
 

@@ -22,7 +22,7 @@
 
 
 extern "C" {
-#include "abyss/src/abyss.h"
+#include "abyss.h"
 }
 
 //

@@ -1,8 +1,12 @@
-noinst_PROGRAMS = simplecgi
+noinst_PROGRAMS = simpleserver simpleclient
 
-simplecgi_SOURCES = simplecgi.cpp
-simplecgi_LDADD = $(STATIC_EASYSOAP_LIBS)
-simplecgi_DEPENDENCIES = $(STATIC_EASYSOAP_LIBS)
+simpleserver_SOURCES = simpleserver.cpp
+simpleserver_DEPENDENCIES = $(STATIC_EASYSOAP_LIBS)
+simpleserver_LDADD = $(STATIC_EASYSOAP_LIBS)
+
+simpleclient_SOURCES = simpleclient.cpp
+simpleclient_DEPENDENCIES = $(STATIC_EASYSOAP_LIBS)
+simpleclient_LDADD = $(STATIC_EASYSOAP_LIBS)
 
 INCLUDES = $(EASYSOAP_INCLUDES)
 

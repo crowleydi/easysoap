@@ -1,9 +1,9 @@
 dnl Process this file with autoconf to produce a configure script.
 AC_INIT(include/SOAP.h)
-AM_INIT_AUTOMAKE(EasySoap++, 0.2)
+AM_INIT_AUTOMAKE(EasySoap++, 0.3.1)
 
 dnl Checks for programs.
-AC_CHECK_TOOL(RANLIB, ranlib, :)
+AC_PROG_RANLIB
 AM_PROG_LIBTOOL
 AC_PROG_CC
 AC_PROG_CXX
@@ -14,6 +14,9 @@ AC_PATH_PROG(MAKEDEPEND, makedepend, $TRUE)
 dnl Checks for libraries.
 AC_CHECK_LIB(expat, XML_Parse)
 AC_CHECK_LIB(ssl, SSL_connect)
+AC_CHECK_LIB(crypto, des_crypt)
+AC_CHECK_LIB(nsl, SSL_connect)
+AC_CHECK_LIB(wsock32, WSAStartup)
 
 dnl Checks for header files.
 AC_HEADER_STDC
@@ -39,45 +42,4 @@ EXPAT_INCLUDES=""
 AC_SUBST(EXPAT_LIBS)
 AC_SUBST(EXPAT_INCLUDES)
 
-dnl Platform Specifics
-case "$host_os" in
-  linux*)
-    SSL_LIBS="-lcrypto -lssl"
-	NETWORK_LIBS=""
-	;;
-
-  solaris2*)
-    SSL_LIBS=""
-	NETWORK_LIBS="-lsocket -lnsl"
-	;;
-
-  # REV: ??
-  cygwin*)
-    SSL_LIBS="-lssl -lcrypto"
-	NETWORK_LIBS="-lwsock32"
-	;;
-esac
-
-dnl Optional crud
-AC_ARG_WITH(ssl,
-[  --with-ssl[=ARG]        Compile SSL Support [ARG=yes]],
-[case "${withval}" in
-   yes)
-     SSL_DEFINES="-DEASYSOAP_SSL"
-	 ;;
-   no)
-     SSL_DEFINES=""
-	 SSL_LIBS=""
-	 ;;
-   *)
-     echo "${withval} is not a valid option for --with-ssl."
-	 exit 1;
-	 ;;
-esac],
-[SSL_DEFINES="-DEASYSOAP_SSL"])
-    
-AC_SUBST(SSL_DEFINES)
-AC_SUBST(SSL_LIBS)
-AC_SUBST(NETWORK_LIBS)
-
-AC_OUTPUT(Makefile simpleserver/Makefile validator/Makefile tests/Makefile src/Makefile include/Makefile)
+AC_OUTPUT(Makefile simpleserver/Makefile validator/Makefile tests/Makefile src/Makefile src/abyss/Makefile src/abyss/src/Makefile include/Makefile)
