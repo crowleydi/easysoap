@@ -25,7 +25,7 @@ SOAPBuildersInteropHandler::RegisterMiscellaneous()
 		&SOAPBuildersInteropHandler::echoNestedStruct);
 
 	DispatchMethod("echoHexBinary",	interop_namespace,
-		&SOAPBuildersInteropHandler::echoBase64);
+		&SOAPBuildersInteropHandler::echoHexBinary);
 
 	DispatchMethod("echoMap",	interop_namespace,
 		&SOAPBuildersInteropHandler::echoMap);
