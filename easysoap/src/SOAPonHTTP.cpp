@@ -37,21 +37,7 @@
 int
 SOAPonHTTP::Read(char *buffer, int buffsize)
 {
-	int ret = 0;
-	if (m_canread == -1)
-		ret = m_http.Read(buffer, buffsize);
-	else if (m_canread > 0)
-	{
-		ret = m_http.Read(buffer, buffsize);
-		m_canread -= ret;
-		if (m_canread == 0)
-		{
-			const char *conn = m_http.GetHeader("Connection");
-			if (sp_strcasecmp(conn, "Close") == 0)
-				m_http.Close();
-		}
-	}
-	return ret;
+	return m_http.Read(buffer, buffsize);
 }
 
 // send the payload.  can only be called ONCE per
@@ -68,11 +54,7 @@ SOAPonHTTP::Write(const SOAPMethod& method, const char *payload, int payloadsize
 	m_http.Write(method.GetSoapAction());
 	m_http.WriteLine("\"");
 
-	int ret = m_http.PostData(payload, payloadsize);
-
-	m_canread = m_http.GetContentLength();
-
-	return ret;
+	return m_http.PostData(payload, payloadsize);
 }
 
 void
@@ -187,12 +169,21 @@ SOAPHTTPProtocol::GetReply()
 	m_headers.Clear();
 
 	int httpreturn = 500;
+	int respver = 0;
 
 	// This should read a line that is something like:
 	// HTTP/1.1 200 OK
 	if (ReadLine(buff, sizeof(buff)) == 0)
 	{
 		throw SOAPException("Couldn't read response.");
+	}
+
+	char *vers = sp_strchr(buff, '/');
+	if (vers)
+	{
+		respver += atoi(++vers) * 10;
+		if (vers = sp_strchr(vers, '.'))
+			respver += atoi(++vers);
 	}
 
 	char *httpretcode = sp_strchr(buff, ' ');
@@ -227,6 +218,27 @@ SOAPHTTPProtocol::GetReply()
 		}
 	}
 
+	//
+	// Get some information so we can close the
+	// the connection gracefully if we need to..
+	//
+	m_canread = GetContentLength();
+	m_doclose = false;
+	const char *keepalive = GetHeader("Connection");
+	if (respver > 10)
+	{
+		if (!keepalive
+			|| sp_strcasecmp(keepalive, "Close") == 0
+			|| sp_strcasecmp(keepalive, "Keep-Alive") != 0)
+			m_doclose = true;
+	}
+	else
+	{
+		if (!keepalive
+			|| sp_strcasecmp(keepalive, "Keep-Alive") != 0)
+			m_doclose = true;
+	}
+
 	return httpreturn;
 }
 
@@ -249,6 +261,38 @@ SOAPHTTPProtocol::GetContentLength()
 	if (header)
 		len = atoi(header);
 	return len;
+}
+
+void
+SOAPHTTPProtocol::Close()
+{
+	m_canread = -1;
+	super::Close();
+}
+
+bool
+SOAPHTTPProtocol::CanRead()
+{
+	return super::CanRead() && m_canread != 0;
+}
+
+int
+SOAPHTTPProtocol::Read(char *buffer, int len)
+{
+	int ret = 0;
+	if (m_canread != 0)
+	{
+		ret = super::Read(buffer, len);
+		if (m_canread > 0)
+		{
+			m_canread -= ret;
+			if (m_canread == 0 && m_doclose)
+			{
+				Close();
+			}
+		}
+	}
+	return ret;
 }
 
 bool

@@ -35,8 +35,10 @@ private:
 	HeaderMap	m_headers;
 	SOAPUrl		m_endpoint;
 	SOAPUrl		m_proxy;
-	bool		m_httpproxy;
 	SOAPString	m_httpmsg;
+	int			m_canread;
+	bool		m_httpproxy;
+	bool		m_doclose;
 
 	int		GetReply();
 	bool	Connect();
@@ -46,14 +48,23 @@ private:
 
 public:
 	SOAPHTTPProtocol()
+		: m_canread(-1)
+		, m_doclose(false)
+		, m_httpproxy(false)
 	{}
 
 	SOAPHTTPProtocol(const SOAPUrl& endpoint)
+		: m_canread(-1)
+		, m_doclose(false)
+		, m_httpproxy(false)
 	{
 		ConnectTo(endpoint);
 	}
 
 	SOAPHTTPProtocol(const SOAPUrl& endpoint, const SOAPUrl& proxy)
+		: m_canread(-1)
+		, m_doclose(false)
+		, m_httpproxy(false)
 	{
 		ConnectTo(endpoint, proxy);
 	}
@@ -71,6 +82,10 @@ public:
 
 	const char *GetHeader(const char *header);
 	int		GetContentLength();
+
+	virtual int Read(char *buffer, int len);
+	virtual void Close();
+	virtual bool CanRead();
 };
 
 
@@ -79,21 +94,18 @@ class EASYSOAP_EXPORT SOAPonHTTP : public SOAPTransport
 private:
 	SOAPHTTPProtocol	m_http;
 	SOAPString			m_path;
-	int					m_canread;
 
 public:
-	SOAPonHTTP() : m_canread() {}
+	SOAPonHTTP() {}
 
 	SOAPonHTTP(const SOAPUrl& endpoint)
 		: m_http(endpoint)
 		, m_path(endpoint.Path())
-		, m_canread(-1)
 	{}
 
 	SOAPonHTTP(const SOAPUrl& endpoint, const SOAPUrl& proxy)
 		: m_http(endpoint, proxy)
 		, m_path(endpoint.Path())
-		, m_canread(-1)
 	{}
 
 	virtual ~SOAPonHTTP() {}
