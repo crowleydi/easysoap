@@ -27,6 +27,7 @@
 #include <SOAPHashMap.h>
 #include <SOAPArray.h>
 #include <SOAPString.h>
+#include <SOAPQName.h>
 #include <SOAPException.h>
 
 class SOAPPacketWriter;
