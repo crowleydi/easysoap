@@ -22,9 +22,26 @@
 #include <SOAPServerDispatch.h>
 #include <SOAPDispatchHandler.h>
 
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
+
+
+//
+// Special exception for mustUnderstand faults
+// so we can return the correct faultstring
+class SOAPMustUnderstandException : public SOAPException
+{
+public:
+	SOAPMustUnderstandException(const SOAPString& what)
+		: SOAPException(what) {}
+	SOAPMustUnderstandException(const char *fmt, ...)
+	{
+		va_list args;
+		va_start(args, fmt);
+		FormattedMessage(fmt, args);
+		va_end(args);
+	}
+	~SOAPMustUnderstandException() {}
+};
+
 
 SOAPServerDispatch::SOAPServerDispatch()
 	: m_transport(0)
@@ -122,7 +139,7 @@ SOAPServerDispatch::Handle(SOAPTransport& trans)
 		if (!HandleRequest(m_request, m_response))
 		{
 			faultcode = clientfault;
-			throw SOAPException("Could not find handler for method \"{%s}:%s\"",
+			throw SOAPException("Unknown method \"{%s}:%s\"",
 				(const char *)requestMethod.GetName().GetNamespace(),
 				(const char *)requestMethod.GetName().GetName());
 		}
@@ -137,6 +154,14 @@ SOAPServerDispatch::Handle(SOAPTransport& trans)
 		m_transport->Write(m_response.GetBody().GetMethod(),
 			m_writer.GetBytes(),
 			m_writer.GetLength());
+	}
+	catch(SOAPMustUnderstandException& mux)
+	{
+		//
+		// create SOAPFault
+		//
+		retval = -1;
+		WriteFault("SOAP-ENV:MustUnderstand", mux.What());
 	}
 	catch(SOAPException& sex)
 	{
@@ -214,7 +239,7 @@ SOAPServerDispatch::HandleHeaders(SOAPEnvelope& request, SOAPResponse& response)
 				if (mu && *mu == "1")
 					// TODO:  Special MustUnderstand exception so the
 					// actor(?) in the SOAPFault can be set correctly.
-					throw SOAPException("Failed to understand header \"{%s}:%s\"",
+					throw SOAPMustUnderstandException("Failed to understand header \"{%s}:%s\"",
 						(const char *)header.GetName().GetNamespace(),
 						(const char *)header.GetName().GetName());
 			}
