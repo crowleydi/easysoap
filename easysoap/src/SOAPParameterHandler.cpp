@@ -90,7 +90,10 @@ SOAPParameterHandler::start(SOAPParser& parser, const XML_Char *name, const XML_
 				if (vsep)
 				{
 					const char *vns = parser.ExpandNamespace(val, vsep);
-					attr.Set(++vsep, vns);
+					if (vns)
+						attr.Set(++vsep, vns);
+					else
+						attr = val;
 				}
 				else
 				{
