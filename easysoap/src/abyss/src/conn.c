@@ -50,7 +50,15 @@ void ConnFree(TConn *c)
 	free(c);
 }
 
+#ifdef _WIN32
+//WINAPI is needed to set the correct calling condition.
+//If the threadpool is used, not using WINAPI will give an error like:
+//  The ESP value was not saved correctly across function calls using different
+//  calling conditions
+uint32 WINAPI ConnJob(TConn *c)
+#else
 uint32 ConnJob(TConn *c)
+#endif
 {
 	c->connected=TRUE;
 	(c->job)(c);

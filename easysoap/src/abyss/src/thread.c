@@ -34,6 +34,15 @@
 
 #include "abyss.h"
 
+#define THREADPOOL
+
+#ifdef _WIN32
+#ifdef THREADPOOL
+#define INTERFACE_ONLY
+#include "threadpool.h"
+#endif
+#endif
+
 /*********************************************************************
 ** Thread
 *********************************************************************/
@@ -43,7 +52,11 @@ int ThreadCreate(TThread *t,uint32 (*func)(void *),void *arg)
 #ifdef _WIN32
 	DWORD z;
 
+#ifdef THREADPOOL
+	*t=PoolCreateThread(NULL,4096,(LPTHREAD_START_ROUTINE)func,(LPVOID)arg,CREATE_SUSPENDED,&z);
+#else
 	*t=CreateThread(NULL,4096,(LPTHREAD_START_ROUTINE)func,(LPVOID)arg,CREATE_SUSPENDED,&z);
+#endif
 
 	return (*t!=NULL);
 #else
@@ -97,7 +110,11 @@ int ThreadStop(TThread *t)
 int ThreadKill(TThread *t)
 {
 #ifdef _WIN32
+#ifdef THREADPOOL
+	return (PoolTerminateThread(*t,0)!=0);
+#else
 	return (TerminateThread(*t,0)!=0);
+#endif
 #else
 	/*return (pthread_kill(*t)==0);*/
 	return TRUE;
