@@ -26,6 +26,7 @@ easysoap_HEADERS = \
     SOAPSocket.h \
     SOAPStack.h \
     SOAPString.h \
+    SOAPTypeTraits.h \
     SOAPTransport.h \
     SOAPUrl.h \
     SOAPUtil.h \
