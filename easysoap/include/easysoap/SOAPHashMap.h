@@ -533,7 +533,7 @@ public:
 			while (he)
 			{
 				HashElement *next = he->m_next;
-				delete he;
+				m_pool.Return(he);
 				he = next;
 			}
 		}
