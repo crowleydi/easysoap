@@ -68,13 +68,11 @@ public:
 	static const SOAPParameter& Deserialize(const SOAPParameter&, int& val);
 };
 
+//
+// assume long and int are the same, 32 bit integers
 template <>
-class EASYSOAP_EXPORT SOAPTypeTraits<long>
+class EASYSOAP_EXPORT SOAPTypeTraits<long> : public SOAPTypeTraits<int>
 {
-public:
-	static void GetType(SOAPQName& type);
-	static SOAPParameter& Serialize(SOAPParameter& param, long val);
-	static const SOAPParameter& Deserialize(const SOAPParameter&, long& val);
 };
 
 template <>

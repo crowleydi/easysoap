@@ -271,35 +271,6 @@ SOAPTypeTraits<int>::Deserialize(const SOAPParameter& param, int& val)
 }
 
 
-void SOAPTypeTraits<long>::GetType(SOAPQName& type)
-{
-	type = XMLSchema2001::long_;
-}
-
-SOAPParameter&
-SOAPTypeTraits<long>::Serialize(SOAPParameter& param, long val)
-{
-	char buffer[64];
-	sp_itoa(val, buffer);
-	param.GetStringRef() = buffer;
-	return param;
-}
-
-const SOAPParameter&
-SOAPTypeTraits<long>::Deserialize(const SOAPParameter& param, long& val)
-{
-	const SOAPString& str = param.GetString();
-    if (param.IsStruct())
-        throw SOAPException("Cannot convert a struct to an integer.");
-
-    if (param.IsNull() || str.IsEmpty())
-        throw SOAPException("Cannot convert null value to integer.");
-
-	val = sp_strtol(str);
-	return param;
-}
-
-
 //
 //  Trait info for float
 void SOAPTypeTraits<float>::GetType(SOAPQName& type)
