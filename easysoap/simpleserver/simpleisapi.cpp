@@ -34,10 +34,21 @@
 DWORD WINAPI
 ThreadProc(void* p)
 {
-	DemoCalculatorHandler	handler;
-	SOAPISAPIServer	server((HANDLE)p);
+	try
+	{
+		DemoCalculatorHandler	handler;
+		SOAPISAPIServer	server((HANDLE)p);
 
-	return server.DispatchTo(&handler).Handle();
+		return server.DispatchTo(&handler).Handle();
+	}
+	catch (SOAPException&)
+	{
+	}
+	catch (...)
+	{
+	}
+
+	return 1;
 }
 
 
