@@ -65,10 +65,11 @@ SOAPParameterHandler::start(SOAPParser& parser, const XML_Char *name, const XML_
 	const XML_Char *elementType = 0;
 	const XML_Char *arrayType = 0;
 
-	while (*attrs)
+	const XML_Char **cattrs = attrs;
+	while (*cattrs)
 	{
-		const XML_Char *tag = *attrs++;
-		const XML_Char *val = *attrs++;
+		const XML_Char *tag = *cattrs++;
+		const XML_Char *val = *cattrs++;
 
 		if (AttrArrayType == tag)
 		{
@@ -97,7 +98,7 @@ SOAPParameterHandler::start(SOAPParser& parser, const XML_Char *name, const XML_
 				throw SOAPException("Typename is not namespace qualified for element %s: %s", name, val);
 			}
 		}
-		else if (AttrXsiNull1999 == tag || AttrXsiNull1999 == tag)
+		else if (AttrXsiNull1999 == tag || AttrXsiNull2001 == tag)
 		{
 			if (sp_strcmp(val, "1") == 0 || sp_strcasecmp(val, "true") == 0)
 			{
@@ -151,7 +152,6 @@ SOAPParameterHandler::start(SOAPParser& parser, const XML_Char *name, const XML_
 		if (b)
 			*b = 0;
 		m_arrayHandler->SetArrayType(sep, typens);
-		m_param->SetArrayType(sep, typens);
 		if (b)
 			*b = '[';
 

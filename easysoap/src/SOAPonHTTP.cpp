@@ -284,7 +284,7 @@ SOAPHTTPProtocol::GetReply()
 			while (*end && *end != '\"' && *end != ';' && *end != ' ')
 				++end;
 
-			m_charset = 0;
+			m_charset = "";
 			m_charset.Append(charset, end - charset);
 		}
 	}

@@ -44,7 +44,6 @@ SOAPArrayHandler::~SOAPArrayHandler()
 SOAPParseEventHandler *
 SOAPArrayHandler::start(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs)
 {
-	m_param->SetIsArray();
 	m_param->GetArray().Resize(0);
 	return this;
 }
@@ -110,5 +109,7 @@ SOAPArrayHandler::startElement(SOAPParser& parser, const XML_Char *name, const X
 void
 SOAPArrayHandler::SetArrayType(const XML_Char *type, const XML_Char *typens)
 {
+	m_param->SetIsArray();
+	m_param->SetArrayType(type, typens);
 	m_paramHandler->SetParameterType(type, typens);
 }
