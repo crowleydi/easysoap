@@ -125,6 +125,7 @@ AC_CHECK_FUNCS( \
 	socket \
 	strdup \
 	strtol \
+	strtoul \
 	snprintf \
 	strerror \
 	stricmp \
@@ -138,6 +139,7 @@ AC_OUTPUT( \
 	proj/win32/BCB5/Makefile \
 	proj/win32/MSVC6/Makefile \
 	proj/win32/MSVC7/Makefile \
+	proj/win32/MSVC7.1/Makefile \
 	include/Makefile \
 	include/easysoap/Makefile \
 	src/Makefile \
