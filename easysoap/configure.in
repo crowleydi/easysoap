@@ -44,14 +44,32 @@ AC_CHECK_LIB(socket, send)
 AC_CHECK_LIB(wsock32, WSAStartup)
 AC_CHECK_LIB(crypto, ERR_put_error)
 AC_CHECK_LIB(ssl, SSL_connect)
-AC_CHECK_LIB(z, gzread,,
-	AC_MSG_ERROR("Could not find the library 'zlib'.  Download and install from http://www.zlib.org/"))
-AC_CHECK_HEADER(zlib.h,,
-	AC_MSG_ERROR("Could not find zlib.h"))
 AC_CHECK_LIB(expat, XML_Parse,,
 	AC_MSG_ERROR("Could not find the XML parsing library 'expat'.  Download and install from http://expat.sourceforge.net/"))
 AC_CHECK_HEADER(expat.h,,
 	AC_MSG_ERROR("Could not find expat.h"))
+
+dnl Check for zlib
+AC_ARG_WITH(zlib,[
+AC_HELP_STRING([--with-zlib=PATH], [search for zlib in PATH])
+AC_HELP_STRING([--without-zlib], [disable use of zlib])],[
+  case "$withval" in
+  no)
+    AC_MSG_WARN([zlib disabled]) ;;
+  *)
+    if test -d "$withval"; then
+      CPPFLAGS="$CPPFLAGS -I$withval/include"
+      LDFLAGS="$LDFLAGS -L$withval/lib"
+    fi
+
+    AC_CHECK_HEADER(zlib.h,[
+      AC_CHECK_LIB(z, gzread,[
+        AC_DEFINE(HAVE_LIBZ, 1, [If zlib is available])
+      ],),
+    ])
+    ;;
+  esac
+])
 
 dnl Checks for header files.
 AC_HEADER_DIRENT
