@@ -25,6 +25,7 @@
 #include "SOAPonHTTP.h"
 #include "SOAPEnvelope.h"
 #include "SOAPSecureSocketImp.h"
+#include "SOAPDebugger.h"
 
 #ifndef SOAPUSER_AGENT
 #define SOAPUSER_AGENT "EasySoap++/0.2"
@@ -135,6 +136,8 @@ SOAPHTTPProtocol::StartVerb(const char *verb, const char *path)
 		throw SOAPException("Invalid NULL path");
 
 	FlushInput();
+	SOAPDebugger::Print("\r\n\r\nREQUEST:\r\n");
+
 	if (!Connect())
 		throw SOAPSocketException("Unable to make socket connection");
 	Write(verb);
@@ -158,6 +161,7 @@ SOAPHTTPProtocol::StartVerb(const char *verb, const char *path)
 void
 SOAPHTTPProtocol::BeginPost(const char *path)
 {
+
 	StartVerb("POST", path);
 }
 
@@ -189,6 +193,8 @@ SOAPHTTPProtocol::WriteHeader(const char *header, int value)
 int
 SOAPHTTPProtocol::GetReply()
 {
+	Flush();
+	SOAPDebugger::Print("\r\n\r\nRESPONSE:\r\n");
 	char buff[2048];
 	m_headers.Clear();
 
