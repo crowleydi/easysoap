@@ -580,6 +580,40 @@ TestEchoStringArray(SOAPProxy& proxy,
 
 
 bool
+TestEchoZeroLenStringArray(SOAPProxy& proxy,
+			const char *uri,
+			const char *soapAction,
+			bool appendMethod)
+{
+	try
+	{
+		SOAPMethod method("echoStringArray", uri, soapAction, appendMethod);
+		method.AddParameter("inputStringArray").SetArrayType("string");
+
+		std::cout << "Testing " << method.GetName() << ": ";
+
+		const SOAPResponse& response = proxy.Execute(method);
+		SOAPArray<SOAPString> outputValue;
+		response.GetReturnValue() >> outputValue;
+		if (outputValue.Size() != 0)
+			throw SOAPException("Values are not equal");
+
+		std::cout << "PASS" << std::endl;
+		return false;
+	}
+	catch (SOAPException& sex)
+	{
+		std::cout << "FAILED: " << sex.What() << std::endl;
+	}
+	catch (...)
+	{
+		std::cout << "FAILED (badly)" << std::endl;
+	}
+	return true;
+}
+
+
+bool
 TestEchoStructArray(SOAPProxy& proxy,
 			const char *uri,
 			const char *soapAction,
@@ -643,7 +677,7 @@ void TestInterop(const Endpoint& e)
 
 	SOAPProxy proxy(endpoint, httpproxy);
 
-#if 1
+#if 0
 	SetTraceFile(name, "echoVoid");
 	TestEchoVoid(proxy, uri, soapAction, appendMethod);
 
@@ -690,6 +724,9 @@ void TestInterop(const Endpoint& e)
 
 	SetTraceFile(name, "echoFloat_n0");
 	TestEchoFloat(proxy, uri, soapAction, appendMethod, "-0.0");
+
+	SetTraceFile(name, "echoStringArray_ZeroLen");
+	TestEchoZeroLenStringArray(proxy, uri, soapAction, appendMethod);
 #endif
 	SOAPDebugger::Close();
 
