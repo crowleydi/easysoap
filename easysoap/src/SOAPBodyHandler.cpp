@@ -37,7 +37,8 @@ SOAPBodyHandler::SOAPBodyHandler(SOAPBody& body)
 , m_methodHandler(body.GetMethod())
 , m_faultHandler(body.GetFault())
 {
-
+	m_paramHandler.SetIgnoreId();
+	m_paramHandler.SetIgnoreName();
 }
 
 SOAPBodyHandler::~SOAPBodyHandler()
@@ -46,22 +47,38 @@ SOAPBodyHandler::~SOAPBodyHandler()
 }
 
 SOAPParseEventHandler *
-SOAPBodyHandler::start(const XML_Char *name, const XML_Char **attrs)
+SOAPBodyHandler::start(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs)
 {
 	return this;
 }
 
 SOAPParseEventHandler *
-SOAPBodyHandler::startElement(const XML_Char *name, const XML_Char **attrs)
+SOAPBodyHandler::startElement(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs)
 {
 	if (sp_strcmp(name, SOAPFaultHandler::start_tag) == 0)
 	{
 		m_body->SetIsFault(true);
-		return m_faultHandler.start(name, attrs);
+		return m_faultHandler.start(parser, name, attrs);
+	}
+
+	const XML_Char **cattrs = attrs;
+	while (*cattrs)
+	{
+		const char *tag = *cattrs++;
+		const char *val = *cattrs++;
+		if (sp_strcmp(tag, "id") == 0)
+		{
+			SOAPParameter *p = parser.GetHRefParam(val);
+			if (!p)
+				throw SOAPException("Sorry, currently don't support pre-declared href/id parameters.");
+
+			m_paramHandler.SetParameter(*p);
+			return m_paramHandler.start(parser, name, attrs);
+		}
 	}
 
 	m_body->SetIsFault(false);
-	return m_methodHandler.start(name, attrs);
+	return m_methodHandler.start(parser, name, attrs);
 }
 
 void

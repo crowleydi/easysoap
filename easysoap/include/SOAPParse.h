@@ -28,7 +28,7 @@
 class SOAPResponse;
 class SOAPResponseHandler;
 
-class EASYSOAP_EXPORT SOAPParser : private SOAPParseEventHandler
+class EASYSOAP_EXPORT SOAPParser
 {
 public:
 
@@ -36,10 +36,16 @@ public:
 	virtual ~SOAPParser();
 
 	SOAPResponse& Parse(SOAPResponse& resp, SOAPTransport& trans);
+
+	// Used by subscribers/handlers to resolve something like "xsi:integer" into
+	// a fully qualified name (or whatever) "http://www.w3.org/1999/XMLSchema-instance#integer"
+	void ResolveName(const char *name, SOAPString& result);
+	SOAPParameter *GetHRefParam(const SOAPString& name);
+	void SetHRefParam(const SOAPString&, SOAPParameter *);
+
 private:
 
-	SOAPParseEventHandler* start(const XML_Char *name, const XML_Char **attrs);
-	SOAPParseEventHandler* startElement(const XML_Char *name, const XML_Char **attrs);
+	void startElement(const XML_Char *name, const XML_Char **attrs);
 	void endElement(const XML_Char *name);
 	void characterData(const XML_Char *str, int len);
 	void startNamespace(const XML_Char *prefix, const XML_Char *uri);
@@ -57,19 +63,15 @@ private:
 
 	XML_Parser							m_parser;
 
-	//
-	// the class that handles parsing events
-	//
-	SOAPResponseHandler					*m_response;
+	typedef SOAPStack<SOAPParseEventHandler *>	HandlerStack;
+	typedef SOAPHashMap<SOAPString, SOAPString> NamespaceMap;
+	typedef SOAPHashMap<SOAPString, SOAPParameter*> HRefMap;
 
-	//
-	// our parsing stack
-	//
-	SOAPStack<SOAPParseEventHandler *>	m_handlerstack;
-	typedef SOAPHashMap<SOAPString,SOAPString> NamespaceMap;
-	NamespaceMap	m_nsmap;
-	SOAPString		m_work;
-
+	HandlerStack			m_handlerstack;
+	SOAPString				m_work;
+	SOAPResponseHandler		*m_response;
+	NamespaceMap			m_nsmap;
+	HRefMap					m_hrefmap;
 };
 
 #endif // !defined(AFX_SOAPPARSE_H__751545FF_EF84_42BC_9622_A6CE624F1F14__INCLUDED_)

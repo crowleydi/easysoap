@@ -36,6 +36,8 @@ SOAPParameterHandler::SOAPParameterHandler()
 , m_structHandler(0)
 , m_arrayHandler(0)
 , m_setvalue(false)
+, m_ignoreId(false)
+, m_ignoreName(false)
 {
 }
 
@@ -46,83 +48,96 @@ SOAPParameterHandler::~SOAPParameterHandler()
 }
 
 SOAPParseEventHandler *
-SOAPParameterHandler::start(const XML_Char *name, const XML_Char **attrs)
+SOAPParameterHandler::start(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs)
 {
-	m_param->SetName(name);
+	if (!m_ignoreName)
+		m_param->SetName(name);
 	m_param->Reset();
-	m_type = SOAPTypes::xsd_none;
 	m_setvalue = true;
 	m_str = "";
 
 	bool haveArrayType = false;
-	bool haveType = false;
 	while (*attrs)
 	{
 		const XML_Char *tag = *attrs++;
 		const XML_Char *val = *attrs++;
 
-		if (sp_strcmp(tag, FULL_SOAP_XSI PARSER_NS_SEP "type") == 0)
+		if (m_ignoreId && sp_strcmp(tag, "id") == 0)
 		{
-			m_type = SOAPTypes::GetXsdType(val);
-			haveType = true;
+			continue;
+		}
+		else if (sp_strcmp(tag, "href") == 0)
+		{
+			// I need to detect circular references because
+			// No way I can handle that at this point...
+			// I'm not real sure how this all needs to work...
+			// Pure guess work here!
+			if (*val != '#')
+				throw SOAPException("Unable to resolve complex href: %s", val);
+			++val;
+			SOAPParameter *p = parser.GetHRefParam(val);
+			if (p)
+			{
+				*m_param = *p;
+			}
+			else
+			{
+				parser.SetHRefParam(val, m_param);
+			}
+			return 0;
 		}
 		else if (sp_strcmp(tag, FULL_SOAP_ENC PARSER_NS_SEP "arrayType") == 0)
 		{
 			haveArrayType = true;
 		}
+		else if (sp_strcmp(tag, FULL_SOAP_XSI PARSER_NS_SEP "type") == 0)
+		{
+			parser.ResolveName(val, m_typestr);
+			val = m_typestr;
+		}
 		else if (sp_strcmp(tag, FULL_SOAP_XSI PARSER_NS_SEP "null") == 0)
 		{
-			if (sp_strcmp(val, "1") == 0 || sp_strcmp(val, "true") == 0)
+			if (sp_strcmp(val, "1") == 0 || sp_strcasecmp(val, "true") == 0)
 			{
 				m_param->SetNull();
 				m_setvalue = false;
 			}
 		}
+
+		m_param->SetAttribute(tag, val);
 	}
 
-	if (haveArrayType && m_type == SOAPTypes::xsd_none)
-		m_type = SOAPTypes::soap_array;
-
-	if (m_type == SOAPTypes::soap_array)
+	if (haveArrayType)
 	{
+		m_setvalue = false;
 		if (!m_arrayHandler)
 			m_arrayHandler = new SOAPArrayHandler();
 		m_arrayHandler->SetParameter(m_param);
-		return m_arrayHandler->start(name, attrs);
-	}
-	else if (m_type == SOAPTypes::soap_struct)
-	{
-		if (!m_structHandler)
-			m_structHandler = new SOAPStructHandler();
-		m_structHandler->SetParameter(m_param);
-		return m_structHandler->start(name, attrs);
-	}
-	else if (m_type == SOAPTypes::xsd_none)
-	{
-		return this;
+		return m_arrayHandler->start(parser, name, attrs);
 	}
 
 	return this;
 }
 
 SOAPParseEventHandler *
-SOAPParameterHandler::startElement(const XML_Char *name, const XML_Char **attrs)
+SOAPParameterHandler::startElement(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs)
 {
 	//
 	// If a parameter has an element, then it must
 	// be a struct!
+	m_setvalue = false;
 	if (!m_structHandler)
 		m_structHandler = new SOAPStructHandler();
-	m_type  = SOAPTypes::soap_struct;
 	m_structHandler->SetParameter(m_param);
 	m_param->SetType(SOAPTypes::soap_struct);
-	return m_structHandler->startElement(name, attrs);
+	return m_structHandler->startElement(parser, name, attrs);
 }
 
 void
 SOAPParameterHandler::characterData(const XML_Char *str, int len)
 {
-	m_str.Append(str, len);
+	if (m_setvalue)
+		m_str.Append(str, len);
 }
 
 void
@@ -130,24 +145,6 @@ SOAPParameterHandler::endElement(const XML_Char *name)
 {
 	if (m_setvalue)
 	{
-		switch (m_type)
-		{
-		case SOAPTypes::xsd_int:
-		case SOAPTypes::xsd_integer:
-			m_param->SetInteger(m_str);
-			break;
-		case SOAPTypes::xsd_float:
-			m_param->SetFloat(m_str);
-			break;
-		case SOAPTypes::xsd_double:
-			m_param->SetDouble(m_str);
-			break;
-		case SOAPTypes::xsd_string:
-		case SOAPTypes::xsd_none:// What to do here.. I guess assume we got a string back?
-			m_param->SetValue(m_str);
-			break;
-		default:
-			break;
-		}
+		m_param->m_strval = m_str;
 	}
 }

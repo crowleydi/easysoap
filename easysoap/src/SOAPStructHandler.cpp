@@ -42,17 +42,17 @@ SOAPStructHandler::~SOAPStructHandler()
 }
 
 SOAPParseEventHandler *
-SOAPStructHandler::start(const XML_Char *name, const XML_Char **attrs)
+SOAPStructHandler::start(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs)
 {
 	m_param->SetType(SOAPTypes::soap_struct);
 	return this;
 }
 
 SOAPParseEventHandler *
-SOAPStructHandler::startElement(const XML_Char *name, const XML_Char **attrs)
+SOAPStructHandler::startElement(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs)
 {
 	m_paramHandler->SetParameter(m_param->AddParameter(name));
-	return m_paramHandler->start(name, attrs);
+	return m_paramHandler->start(parser, name, attrs);
 }
 
 void

@@ -43,16 +43,16 @@ SOAPFaultHandler::~SOAPFaultHandler()
 }
 
 SOAPParseEventHandler *
-SOAPFaultHandler::start(const XML_Char *name, const XML_Char **attrs)
+SOAPFaultHandler::start(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs)
 {
 	return this;
 }
 
 SOAPParseEventHandler *
-SOAPFaultHandler::startElement(const XML_Char *name, const XML_Char **attrs)
+SOAPFaultHandler::startElement(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs)
 {
 	m_paramHandler.SetParameter(m_fault->AddParameter(name));
-	return m_paramHandler.start(name, attrs);
+	return m_paramHandler.start(parser, name, attrs);
 }
 
 void

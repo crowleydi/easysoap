@@ -29,6 +29,7 @@
 typedef void *XML_Parser;
 typedef char XML_Char;
 
+class SOAPParser;
 class SOAPParseEventHandler
 {
 public:
@@ -36,8 +37,8 @@ public:
 	SOAPParseEventHandler() {}
 	virtual ~SOAPParseEventHandler() {}
 
-	virtual SOAPParseEventHandler* start(const XML_Char *name, const XML_Char **attrs) = 0;
-	virtual SOAPParseEventHandler* startElement(const XML_Char *name, const XML_Char **attrs) = 0;
+	virtual SOAPParseEventHandler* start(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs) = 0;
+	virtual SOAPParseEventHandler* startElement(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs) = 0;
 	virtual void endElement(const XML_Char *name) = 0;
 	virtual void characterData(const XML_Char *str, int len) = 0;
 };

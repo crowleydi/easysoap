@@ -76,6 +76,8 @@ SOAPParser::Parse(SOAPResponse& resp, SOAPTransport& trans)
 
 	// make sure our stack is empty
 	m_handlerstack.Clear();
+	m_hrefmap.Clear();
+
 	while (1)
 	{
 		//
@@ -113,21 +115,7 @@ SOAPParser::Parse(SOAPResponse& resp, SOAPTransport& trans)
 	return resp;
 }
 
-//
-// SOAPParseEventHandler methods
-//
-
-SOAPParseEventHandler *
-SOAPParser::start(const XML_Char *name, const XML_Char **attrs)
-{
-	//
-	// this method should never be called
-	//
-
-	return 0;
-}
-
-SOAPParseEventHandler *
+void
 SOAPParser::startElement(const XML_Char *name, const XML_Char **attrs)
 {
 	SOAPParseEventHandler* handler = 0;
@@ -155,48 +143,12 @@ SOAPParser::startElement(const XML_Char *name, const XML_Char **attrs)
 
 	if (handler)
 	{
-		const XML_Char **cattrs = attrs;
-		while (*cattrs)
-		{
-			const char *tag = *cattrs++;
-			const char *val = *cattrs;
-			if (sp_strcmp(tag, FULL_SOAP_XSI PARSER_NS_SEP "type") == 0)
-			{
-				NamespaceMap::Iterator i = m_nsmap.Find(val);
-				if (i)
-				{
-					// we already mapped it!
-					*cattrs = *i;
-				}
-				else
-				{
-					char *colon = sp_strchr(val, ':');
-					if (colon)
-					{
-						*colon++ = 0;
-						NamespaceMap::Iterator i = m_nsmap.Find(val);
-						if (i)
-						{
-							m_work = *i;
-							m_work.Append(PARSER_NS_SEP);
-							m_work.Append(colon);
-							*--colon = ':';
-							*cattrs = m_nsmap[val] = m_work;
-						}
-						else
-						{
-							// TODO:
-							// this is probably an error...
-						}
-					}
-				}
-			}
-			++cattrs;
-		}
-		return m_handlerstack.Push(handler->startElement(name, attrs));
+		m_handlerstack.Push(handler->startElement(*this, name, attrs));
 	}
-
-	return m_handlerstack.Push(0);
+	else
+	{
+		m_handlerstack.Push(0);
+	}
 }
 
 void
@@ -232,6 +184,44 @@ SOAPParser::endNamespace(const XML_Char *prefix)
 		m_nsmap.Remove(prefix);
 	else
 		m_nsmap.Remove("");
+}
+
+SOAPParameter *
+SOAPParser::GetHRefParam(const SOAPString& name)
+{
+	HRefMap::Iterator i = m_hrefmap.Find(name);
+	if (i)
+		return *i;
+	return 0;
+}
+
+void
+SOAPParser::SetHRefParam(const SOAPString& name, SOAPParameter *param)
+{
+	m_hrefmap[name] = param;
+}
+
+void
+SOAPParser::ResolveName(const char *name, SOAPString& result)
+{
+	char *colon = sp_strchr(name, ':');
+	if (colon)
+	{
+		*colon = 0;
+		NamespaceMap::Iterator i = m_nsmap.Find(name);
+		if (i)
+		{
+			result = *i;
+			result.Append(PARSER_NS_SEP);
+			result.Append(++colon);
+			*--colon = ':';
+		}
+		else
+		{
+			// TODO:
+			// this is probably an error...
+		}
+	}
 }
 
 //

@@ -42,17 +42,17 @@ SOAPMethodHandler::~SOAPMethodHandler()
 }
 
 SOAPParseEventHandler *
-SOAPMethodHandler::start(const XML_Char *name, const XML_Char **attrs)
+SOAPMethodHandler::start(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs)
 {
 	m_method->Reset();
 	return this;
 }
 
 SOAPParseEventHandler *
-SOAPMethodHandler::startElement(const XML_Char *name, const XML_Char **attrs)
+SOAPMethodHandler::startElement(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs)
 {
 	m_paramHandler.SetParameter(m_method->AddParameter());
-	return m_paramHandler.start(name, attrs);
+	return m_paramHandler.start(parser, name, attrs);
 }
 
 void

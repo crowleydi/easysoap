@@ -46,23 +46,23 @@ SOAPEnvelopeHandler::~SOAPEnvelopeHandler()
 }
 
 SOAPParseEventHandler *
-SOAPEnvelopeHandler::start(const XML_Char *name, const XML_Char **attrs)
+SOAPEnvelopeHandler::start(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs)
 {
 	m_done = false;
 	return this;
 }
 
 SOAPParseEventHandler *
-SOAPEnvelopeHandler::startElement(const XML_Char *name, const XML_Char **attrs)
+SOAPEnvelopeHandler::startElement(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs)
 {
 	m_done = false;
 	if (sp_strcmp(name, SOAPBodyHandler::start_tag) == 0)
 	{
-		return m_bodyHandler.start(name, attrs);
+		return m_bodyHandler.start(parser, name, attrs);
 	}
 	else if (sp_strcmp(name, SOAPHeaderHandler::start_tag) == 0)
 	{
-		return m_headerHandler.start(name, attrs);
+		return m_headerHandler.start(parser, name, attrs);
 	}
 	else if (sp_strcmp(name, SOAPEnvelopeHandler::start_tag) == 0)
 	{

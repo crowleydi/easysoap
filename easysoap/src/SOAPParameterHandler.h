@@ -37,18 +37,22 @@ public:
 
 	void SetParameter(SOAPParameter& param)	{m_param = &param;}
 
-	virtual SOAPParseEventHandler* start(const XML_Char *name, const XML_Char **attrs);
-	virtual SOAPParseEventHandler* startElement(const XML_Char *name, const XML_Char **attrs);
+	virtual SOAPParseEventHandler* start(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs);
+	virtual SOAPParseEventHandler* startElement(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs);
 	virtual void endElement(const XML_Char *name);
 	virtual void characterData(const XML_Char *str, int len);
 
+	void SetIgnoreName(bool val = true)	{m_ignoreName = val;}
+	void SetIgnoreId(bool val = true)	{m_ignoreId = val;}
 private:
 	SOAPParameter			*m_param;
-	SOAPTypes::xsd_type		m_type;
 	SOAPString				m_str;
+	SOAPString				m_typestr;
 	SOAPStructHandler		*m_structHandler;
 	SOAPArrayHandler		*m_arrayHandler;
 	bool					m_setvalue;
+	bool					m_ignoreId;
+	bool					m_ignoreName;
 };
 
 #endif // !defined(AFX_SOAPPARAMETERHANDLER_H__124ED3B5_721D_4AB5_8B65_32D5C4F86420__INCLUDED_)

@@ -23,6 +23,7 @@
 
 #include "SOAPMethodHandler.h"
 #include "SOAPFaultHandler.h"
+#include "SOAPParameterHandler.h"
 
 class SOAPBody;
 
@@ -32,8 +33,8 @@ public:
 	SOAPBodyHandler(SOAPBody&);
 	virtual ~SOAPBodyHandler();
 
-	virtual SOAPParseEventHandler* start(const XML_Char *name, const XML_Char **attrs);
-	virtual SOAPParseEventHandler* startElement(const XML_Char *name, const XML_Char **attrs);
+	virtual SOAPParseEventHandler* start(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs);
+	virtual SOAPParseEventHandler* startElement(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs);
 	virtual void endElement(const XML_Char *name);
 	virtual void characterData(const XML_Char *str, int len);
 
@@ -44,7 +45,7 @@ private:
 	SOAPBody			*m_body;
 	SOAPMethodHandler	m_methodHandler;
 	SOAPFaultHandler	m_faultHandler;
-
+	SOAPParameterHandler	m_paramHandler;
 };
 
 #endif // !defined(AFX_SOAPBODYHANDLER_H__F011566F_10D2_4391_B8C2_C19BA6AFA822__INCLUDED_)

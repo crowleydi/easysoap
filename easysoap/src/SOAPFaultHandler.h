@@ -31,8 +31,8 @@ public:
 	SOAPFaultHandler(SOAPFault& fault);
 	virtual ~SOAPFaultHandler();
 
-	virtual SOAPParseEventHandler* start(const XML_Char *name, const XML_Char **attrs);
-	virtual SOAPParseEventHandler* startElement(const XML_Char *name, const XML_Char **attrs);
+	virtual SOAPParseEventHandler* start(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs);
+	virtual SOAPParseEventHandler* startElement(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs);
 	virtual void endElement(const XML_Char *name);
 	virtual void characterData(const XML_Char *str, int len);
 

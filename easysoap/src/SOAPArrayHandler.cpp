@@ -42,17 +42,17 @@ SOAPArrayHandler::~SOAPArrayHandler()
 }
 
 SOAPParseEventHandler *
-SOAPArrayHandler::start(const XML_Char *name, const XML_Char **attrs)
+SOAPArrayHandler::start(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs)
 {
 	m_param->SetType(SOAPTypes::soap_array);
 	return this;
 }
 
 SOAPParseEventHandler *
-SOAPArrayHandler::startElement(const XML_Char *name, const XML_Char **attrs)
+SOAPArrayHandler::startElement(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs)
 {
 	m_paramHandler->SetParameter(m_param->AddParameter());
-	return m_paramHandler->start(name, attrs);
+	return m_paramHandler->start(parser, name, attrs);
 }
 
 void
