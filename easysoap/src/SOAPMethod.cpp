@@ -66,8 +66,6 @@ SOAPMethod::SetSoapAction(const char *sa, bool appendName)
 void
 SOAPMethod::Reset()
 {
-	for (size_t i = 0; i < m_params.Size(); ++i)
-		delete m_params[i];
 	m_params.Resize(0);
 }
 
@@ -82,7 +80,7 @@ SOAPMethod::WriteSOAPPacket(SOAPPacketWriter& packet) const
 	packet.AddAttr("xmlns:m", m_namespace);
 
 	for (size_t i = 0; i < m_params.Size(); ++i)
-		m_params[i]->WriteSOAPPacket(packet);
+		m_params[i].WriteSOAPPacket(packet);
 
 	packet.EndTag("m", m_name);
 
