@@ -45,6 +45,7 @@ public:
 	typedef SOAPArray<SOAPParameter*>				Array;
 	typedef SOAPHashMap<SOAPString, SOAPParameter*>	Struct;
 	typedef SOAPHashMap<SOAPQName, SOAPQName>		Attrs;
+	typedef SOAPPool<SOAPParameter> 				Pool;
 
 	SOAPParameter();
 	SOAPParameter(const SOAPParameter& param);
@@ -146,7 +147,6 @@ private:
 	void Assign(const SOAPParameter&);
 	void CheckStructSync() const;
 
-	typedef SOAPPool<SOAPParameter> Pool;
 	class Data
 	{
 	public:
