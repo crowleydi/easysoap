@@ -51,6 +51,7 @@ SOAPParser::Parse(SOAPEnvelope& env, SOAPTransport& trans)
 	// make sure our stack is empty
 	m_handlerstack.Clear();
 	m_hrefmap.Clear();
+	m_nsmap.Clear();
 
 	InitParser(trans.GetCharset());
 	while (1)
@@ -140,18 +141,22 @@ void
 SOAPParser::startNamespace(const XML_Char *prefix, const XML_Char *uri)
 {
 	if (prefix)
-		m_nsmap[prefix] = uri;
+		m_work = prefix;
 	else
-		m_nsmap[""] = uri;
+		m_work = "";
+
+	m_nsmap[m_work] = uri;
 }
 
 void
 SOAPParser::endNamespace(const XML_Char *prefix)
 {
 	if (prefix)
-		m_nsmap.Remove(prefix);
+		m_work = prefix;
 	else
-		m_nsmap.Remove("");
+		m_work = "";
+
+	m_nsmap.Remove(m_work);
 }
 
 SOAPParameter *
