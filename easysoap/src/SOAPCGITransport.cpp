@@ -45,7 +45,7 @@ SOAPCGITransport::SOAPCGITransport()
 	if (contentlen)
 		m_canread = atoi(contentlen);
 
-	SOAPHTTPProtocol::ParseContentType(m_charset, getenv("CONTENT_TYPE"));
+	SOAPHTTPProtocol::ParseContentType(m_contentType, m_charset, getenv("CONTENT_TYPE"));
 
 	const char *sa = getenv("HTTP_SOAPACTION");
 
@@ -103,6 +103,12 @@ const char *
 SOAPCGITransport::GetCharset() const
 {
 	return m_charset;
+}
+
+const char *
+SOAPCGITransport::GetContentType() const
+{
+	return m_contentType;
 }
 
 const char *

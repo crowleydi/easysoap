@@ -44,6 +44,10 @@ public:
 	//  Return charset if known otherwise null
 	virtual const char *GetCharset() const = 0;
 
+	//
+	//  Return charset if known otherwise null
+	virtual const char *GetContentType() const = 0;
+
 	// read the payload into the buffer.
 	// can be called multiple times.
 	// returns 0 if entire payload has been read.

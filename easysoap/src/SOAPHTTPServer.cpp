@@ -27,8 +27,6 @@ extern "C" {
 #include <abyss.h>
 }
 
-USING_EASYSOAP_NAMESPACE
-
 //
 // Little static class to init the Abyss web server.
 // Not sure if it's needed...
@@ -43,6 +41,8 @@ public:
 } _abyssinit;
 
 
+BEGIN_EASYSOAP_NAMESPACE
+
 //
 // Class for reading the socket/session the web server
 // hands to us.
@@ -55,6 +55,7 @@ public:
 
 	void SetError();
 	const char *GetCharset() const;
+	const char *GetContentType() const;
 	const char *GetSoapAction() const;
 	size_t Read(char *buffer, size_t buffsize);
 	size_t Write(const SOAPMethod& method, const char *payload, size_t payloadsize);
@@ -63,8 +64,13 @@ private:
 	struct _TSession	*m_session;
 	size_t				m_bytestoread;
 	SOAPString			m_charset;
+	SOAPString			m_contentType;
 	bool				m_error;
 };
+
+END_EASYSOAP_NAMESPACE
+
+USING_EASYSOAP_NAMESPACE
 
 SOAPHTTPServerTransport::SOAPHTTPServerTransport(struct _TSession *session)
 : m_session(session), m_bytestoread(0), m_error(false)
@@ -75,7 +81,7 @@ SOAPHTTPServerTransport::SOAPHTTPServerTransport(struct _TSession *session)
 	if (contlen)
 		m_bytestoread = atoi(contlen);
 
-	SOAPHTTPProtocol::ParseContentType(m_charset, contype);
+	SOAPHTTPProtocol::ParseContentType(m_contentType, m_charset, contype);
 }
 
 SOAPHTTPServerTransport::~SOAPHTTPServerTransport()
@@ -86,6 +92,12 @@ void
 SOAPHTTPServerTransport::SetError()
 {
 	m_error = true;
+}
+
+const char *
+SOAPHTTPServerTransport::GetContentType() const
+{
+	return m_contentType;
 }
 
 const char *

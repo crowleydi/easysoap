@@ -65,6 +65,10 @@ SOAPParser::Parse(SOAPEnvelope& env, SOAPTransport& trans)
 	m_idmap.Clear();
 	m_hrefs.Resize(0);
 
+	const char *contentType = trans.GetContentType();
+	if (contentType && sp_strcmp(contentType, "text/xml"))
+		throw SOAPException("Unexpected content type, only support text/xml: %s", contentType);
+
 	InitParser(trans.GetCharset());
 	while (1)
 	{

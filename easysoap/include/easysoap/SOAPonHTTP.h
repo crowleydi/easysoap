@@ -109,7 +109,7 @@ public:
 	virtual bool CanRead();
 	const SOAPString& GetRequestMessage()	{return m_httpmsg;}
 
-	static void ParseContentType(SOAPString& charset, const char *contenttype);
+	static void ParseContentType(SOAPString& contentType, SOAPString& charset, const char *contenttype);
 };
 
 

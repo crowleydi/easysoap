@@ -121,6 +121,12 @@ SOAPWinInetTransport::ConnectTo(const SOAPUrl& endpoint, const SOAPUrl& proxy)
 }
 
 const char *
+SOAPWinInetTransport::GetContentType() const
+{
+	return m_contentType;
+}
+
+const char *
 SOAPWinInetTransport::GetCharset() const
 {
 	return m_charset;
@@ -198,7 +204,7 @@ SOAPWinInetTransport::Write(const SOAPMethod& method, const char *packet, size_t
 	qsize = sizeof(contenttype);
 	if (!HttpQueryInfoA(m_hRequest, HTTP_QUERY_CONTENT_TYPE, contenttype, &qsize, &index))
 		contenttype[0] = 0;
-	SOAPHTTPProtocol::ParseContentType(m_charset, contenttype);
+	SOAPHTTPProtocol::ParseContentType(m_contentType, m_charset, contenttype);
 
 	return packetlen;
 }

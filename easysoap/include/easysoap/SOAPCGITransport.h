@@ -39,6 +39,7 @@ public:
 
 	void SetError();
 	const char *GetCharset() const;
+	const char *GetContentType() const;
 	const char *GetSoapAction() const;
 	size_t Read(char *buffer, size_t buffsize);
 	size_t Write(const SOAPMethod& method, const char *payload, size_t payloadsize);
@@ -59,6 +60,7 @@ private:
 	FILE		*m_infile;
 	int			m_canread;
 	SOAPString	m_charset;
+	SOAPString	m_contentType;
 	SOAPString	m_soapaction;
 };
 

@@ -561,24 +561,39 @@ SOAPHTTPProtocol::Connect()
 }
 
 void
-SOAPHTTPProtocol::ParseContentType(SOAPString& str, const char *contenttype)
+SOAPHTTPProtocol::ParseContentType(SOAPString& contentType, SOAPString& charset, const char *ctype)
 {
-	str = "US-ASCII";
-	if (contenttype)
+	charset = "US-ASCII";
+	contentType = "text/xml";
+
+	if (ctype)
 	{
-		const char *charset = sp_strstr(contenttype, "charset=");
-		if (charset)
+		const char *ct = ctype;
+		while (*ct)
 		{
-			charset += 8;
-			if (*charset == '\"')
-				++charset;
-			const char *end = charset;
+			int c = *ct++;
+			if (c == ' ' || c == ';' || c == 0)
+			{
+				contentType = "";
+				contentType.Append(ctype, ct - ctype - 1);
+				break;
+			}
+		}
+
+
+		const char *cs = sp_strstr(ctype, "charset=");
+		if (cs)
+		{
+			cs += 8;
+			if (*cs == '\"')
+				++cs;
+			const char *end = cs;
 
 			while (*end && *end != '\"' && *end != ';' && *end != ' ')
 				++end;
 
-			str = "";
-			str.Append(charset, end - charset);
+			charset = "";
+			charset.Append(cs, end - cs);
 		}
 	}
 }

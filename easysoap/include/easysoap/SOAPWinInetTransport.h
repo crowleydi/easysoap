@@ -37,6 +37,7 @@ private:
 	SOAPWinInetTransport& operator=(const SOAPWinInetTransport&);
 
 	SOAPString		m_charset;
+	SOAPString		m_contentType;
 	SOAPString		m_errorString;
 	SOAPString		m_userAgent;
 	size_t			m_canRead;
@@ -62,6 +63,7 @@ public:
 	void SetKeepAlive(bool keepAlive = true);
 
 	const char *GetCharset() const;
+	const char *GetContentType() const;
 	size_t Read(char *buffer, size_t bufflen);
 	size_t Write(const SOAPMethod& method, const char *packet, size_t len);
 };
