@@ -53,14 +53,14 @@ public:
 		: m_canread(-1)
 		, m_httpproxy(false)
 		, m_doclose(false)
-		, m_keepAlive(false)
+		, m_keepAlive(true)
 	{}
 
 	SOAPHTTPProtocol(const SOAPUrl& endpoint)
 		: m_canread(-1)
 		, m_httpproxy(false)
 		, m_doclose(false)
-		, m_keepAlive(false)
+		, m_keepAlive(true)
 	{
 		ConnectTo(endpoint);
 	}
@@ -69,7 +69,7 @@ public:
 		: m_canread(-1)
 		, m_httpproxy(false)
 		, m_doclose(false)
-		, m_keepAlive(false)
+		, m_keepAlive(true)
 	{
 		ConnectTo(endpoint, proxy);
 	}
@@ -77,7 +77,7 @@ public:
 	~SOAPHTTPProtocol()
 	{}
 
-	void	SetKeepAlive(bool keepAlive = false)	{m_keepAlive = keepAlive;}
+	void	SetKeepAlive(bool keepAlive = true)	{m_keepAlive = keepAlive;}
 	void	ConnectTo(const SOAPUrl& endpoint);
 	void	ConnectTo(const SOAPUrl& endpoint, const SOAPUrl& proxy);
 	int		Get(const char *path);
