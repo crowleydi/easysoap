@@ -292,6 +292,68 @@ public:
 	}
 };
 
+template <typename T>
+class SOAP2DArray
+{
+private:
+	SOAPArray<T>	m_array;
+	size_t			m_rows;
+	size_t			m_cols;
+
+	//
+	// It might be nice to
+	// implement these...
+	SOAP2DArray(const SOAP2DArray&);
+	SOAP2DArray& operator=(const SOAP2DArray&);
+
+public:
+
+	SOAP2DArray()
+	{
+	}
+
+	SOAP2DArray(size_t rows, size_t cols)
+	{
+		Resize(rows, cols);
+	}
+
+	//
+	// This does a resize, but contents
+	// will get all scrambled around.
+	// use at your own peril...
+	void Resize(size_t rows, size_t cols)
+	{
+		m_rows = rows;
+		m_cols = cols;
+		m_array.Resize(m_rows * m_cols);
+	}
+
+	size_t GetNumRows() const {return m_rows;}
+	size_t GetNumCols() const {return m_cols;}
+
+	T* operator[](size_t row)
+	{
+		return m_array.Ptr() + (row * m_cols);
+	}
+
+	const T* operator[](size_t row) const
+	{
+		return m_array.Ptr() + (row * m_cols);
+	}
+
+	bool operator==(const SOAP2DArray& other)
+	{
+		return GetNumRows() == other.GetNumRows() &&
+			GetNumCols() == other.GetNumCols() &&
+			m_array == other.m_array;
+	}
+
+	bool operator!=(const SOAP2DArray& other)
+	{
+		return !(*this == other);
+	}
+};
+
 #endif // __SOAPARRAY_H__
 
 
