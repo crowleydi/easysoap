@@ -140,10 +140,14 @@ SOAPServerDispatch::Handle(SOAPServerTransport& trans)
 		// Now handle the request
 		if (!HandleRequest(m_request, m_response))
 		{
+			const char *methns = requestMethod.GetName().GetNamespace();
+			const char *methname = requestMethod.GetName().GetName();
 			faultcode = clientfault;
-			throw SOAPException("Unknown method \"{%s}:%s\"",
-				(const char *)requestMethod.GetName().GetNamespace(),
-				(const char *)requestMethod.GetName().GetName());
+			if (!methns)
+				methns ="Unspecified";
+			if (!methname)
+				methname ="Unspecified";
+			throw SOAPException("Unknown method \"{%s}:%s\"", methns, methname);
 		}
 
 		//
