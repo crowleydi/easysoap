@@ -35,7 +35,7 @@ class EASYSOAP_EXPORT SOAPParameter
 {
 public:
 
-	typedef SOAPArray<SOAPParameter>				Array;
+	typedef SOAPArray<SOAPParameter*>				Array;
 	typedef SOAPHashMap<SOAPString, SOAPParameter*>	Struct;
 	typedef SOAPHashMap<SOAPQName, SOAPString>		Attrs;
 
@@ -102,7 +102,7 @@ public:
 	{
 		if (m_array.Size() < i)
 			throw SOAPException("Array index out of bounds.");
-		return m_array[i];
+		return *m_array[i];
 	}
 
 	const SOAPQName& GetArrayType() const {return m_arrayType;}
@@ -229,7 +229,7 @@ operator>>(const SOAPParameter& param, SOAPArray<T>& val)
 	val.Resize(0);
 	for (SOAPParameter::Array::ConstIterator i = param.GetArray().Begin();
 		i != param.GetArray().End(); ++i)
-		*i >> val.Add();
+		**i >> val.Add();
 	return param;
 }
 
@@ -287,7 +287,7 @@ operator>>(const SOAPParameter& param, SOAPArray<char>& val)
 	{
 		for (SOAPParameter::Array::ConstIterator i = param.GetArray().Begin();
 			i != param.GetArray().End(); ++i)
-			*i >> val.Add();
+			**i >> val.Add();
 	}
 	else
 	{

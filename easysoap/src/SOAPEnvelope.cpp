@@ -48,13 +48,13 @@ bool
 SOAPEnvelope::WriteSOAPPacket(SOAPPacketWriter& packet) const
 {
 	packet.Reset();
-	packet.StartTag(EnvelopeTag, "V");
+	packet.StartTag(EnvelopeTag, "E");
 
 	// TODO: automagically add only the tags we need...
-	packet.AddXMLNS("C", SOAP_ENC);
-	packet.AddXMLNS("i", SOAP_XSI);
-	packet.AddXMLNS("d", SOAP_XSD);
-	packet.SetNamespace("___easysoap_default_ns", "d");
+	packet.AddXMLNS("A", SOAP_ENC);
+	packet.AddXMLNS("s", SOAP_XSI);
+	packet.AddXMLNS("y", SOAP_XSD);
+	packet.SetNamespace("___easysoap_default_ns", "y");
 
 	// TODO: allow user to set encoding style
 	packet.AddAttr(EncodingAttr, SOAP_ENC);

@@ -69,7 +69,7 @@ SOAPMethod::WriteSOAPPacket(SOAPPacketWriter& packet) const
 	packet.StartTag(GetName(), "m");
 
 	for (size_t i = 0; i < GetArray().Size(); ++i)
-		GetArray()[i].WriteSOAPPacket(packet);
+		GetArray()[i]->WriteSOAPPacket(packet);
 
 	packet.EndTag(GetName());
 

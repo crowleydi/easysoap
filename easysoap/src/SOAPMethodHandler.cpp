@@ -52,7 +52,58 @@ SOAPMethodHandler::start(SOAPParser& parser, const XML_Char *name, const XML_Cha
 SOAPParseEventHandler *
 SOAPMethodHandler::startElement(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs)
 {
-	m_paramHandler.SetParameter(m_method->AddParameter());
+	const char *id = 0;
+	const char *href = 0;
+
+	const char **cattrs = attrs;
+	while (*cattrs)
+	{
+		const char *tag = *cattrs++;
+		const char *val = *cattrs++;
+
+		if (sp_strcmp(tag, "id") == 0)
+		{
+			id = val;
+			break;
+		}
+		else if (sp_strcmp(tag, "href") == 0)
+		{
+			href = val;
+			break;
+		}
+	}
+
+	SOAPParameter *param = 0;
+
+	if (id)
+	{
+		if (!(param = parser.GetHRefParam(id)))
+		{
+			param = &m_method->AddParameter();
+			parser.SetHRefParam(id, param);
+		}
+		else
+		{
+		}
+	}
+	else if (href)
+	{
+		++href;
+		if (!(param = parser.GetHRefParam(href)))
+		{
+			param = &m_method->AddParameter();
+			parser.SetHRefParam(href, param);
+		}
+		else
+		{
+		}
+	}
+	else
+	{
+		param = &m_method->AddParameter();
+	}
+
+	m_paramHandler.SetParameter(*param);
 	return m_paramHandler.start(parser, name, attrs);
 }
 

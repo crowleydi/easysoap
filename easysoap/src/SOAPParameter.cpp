@@ -73,9 +73,8 @@ SOAPParameter::Assign(const SOAPParameter& param)
 	m_array.Resize(params.Size());
 	for (size_t i = 0; i < params.Size(); ++i)
 	{
-		SOAPParameter& p = m_array[i];
-		p.SetParent(this);
-		p = params[i];
+		m_array[i] = new SOAPParameter(*params[i]);
+		m_array[i]->SetParent(this);
 	}
 }
 
@@ -91,7 +90,10 @@ void
 SOAPParameter::Reset()
 {
 	for (Array::Iterator i = m_array.Begin(); i != m_array.End(); ++i)
-		i->Reset();
+	{
+		delete *i;
+		*i = 0;
+	}
 
 	m_array.Resize(0);
 	m_struct.Clear();
@@ -447,23 +449,24 @@ SOAPParameter::GetParameter(const char *name) const
 SOAPParameter&
 SOAPParameter::AddParameter(const char *name)
 {
-	SOAPParameter& ret = m_array.Add();
-	ret.Reset();
-	ret.SetParent(this);
-	ret.SetName(name);
+	SOAPParameter *ret = new SOAPParameter();
+	ret->SetParent(this);
+	ret->SetName(name);
+	m_array.Add(ret);
 	m_outtasync = true;
 
-	return ret;
+	return *ret;
 }
 
 SOAPParameter&
 SOAPParameter::AddParameter(const SOAPParameter& p)
 {
-	SOAPParameter& ret = m_array.Add(p);
-	ret.SetParent(this);
+	SOAPParameter *ret = new SOAPParameter(p);
+	m_array.Add(ret);
+	ret->SetParent(this);
 	m_outtasync = true;
 
-	return ret;
+	return *ret;
 }
 
 SOAPParameter::Struct&
@@ -488,7 +491,7 @@ SOAPParameter::CheckStructSync() const
 		m_struct.Clear();
 		for (Array::ConstIterator i = m_array.Begin(); i != m_array.End(); ++i)
 		{
-			m_struct[i->GetName().GetName()] = (SOAPParameter *)i;
+			m_struct[(*i)->GetName().GetName()] = (SOAPParameter *)*i;
 		}
 		m_outtasync = false;
 	}
@@ -506,6 +509,9 @@ SOAPParameter::WriteSOAPPacket(SOAPPacketWriter& packet, bool writetype) const
 	if (writetype)
 		packet.AddAttr(xsitype, m_type);
 
+	for (Attrs::Iterator i = m_attrs.Begin(); i != m_attrs.End(); ++i)
+		packet.AddAttr(i.Key(), i.Item());
+
 	if (IsNull())
 	{
 		packet.AddAttr(xsinull, "1");
@@ -521,12 +527,12 @@ SOAPParameter::WriteSOAPPacket(SOAPPacketWriter& packet, bool writetype) const
 			if (GetArray().Size() > 0)
 			{
 				gottype = true;
-				atype = GetArray()[0].GetType();
+				atype = GetArray()[0]->GetType();
 				writetype = false;
 
 				for (size_t i = 1; i < GetArray().Size(); ++i)
 				{
-					if (atype != GetArray()[i].GetType())
+					if (atype != GetArray()[i]->GetType())
 					{
 						writetype = true;
 						gottype = false;
@@ -546,7 +552,7 @@ SOAPParameter::WriteSOAPPacket(SOAPPacketWriter& packet, bool writetype) const
 		packet.AddAttr(arrayType, atype);
 
 		for (size_t i = 0; i < GetArray().Size(); ++i)
-			GetArray()[i].WriteSOAPPacket(packet, writetype);
+			GetArray()[i]->WriteSOAPPacket(packet, writetype);
 	}
 	else if (IsStruct())
 	{

@@ -51,7 +51,58 @@ SOAPStructHandler::start(SOAPParser& parser, const XML_Char *name, const XML_Cha
 SOAPParseEventHandler *
 SOAPStructHandler::startElement(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs)
 {
-	m_paramHandler->SetParameter(m_param->AddParameter(name));
+	const char *id = 0;
+	const char *href = 0;
+
+	const char **cattrs = attrs;
+	while (*cattrs)
+	{
+		const char *tag = *cattrs++;
+		const char *val = *cattrs++;
+
+		if (sp_strcmp(tag, "id") == 0)
+		{
+			id = val;
+			break;
+		}
+		else if (sp_strcmp(tag, "href") == 0)
+		{
+			href = val;
+			break;
+		}
+	}
+
+	SOAPParameter *param = 0;
+
+	if (id)
+	{
+		if (!(param = parser.GetHRefParam(id)))
+		{
+			param = &m_param->AddParameter(name);
+			parser.SetHRefParam(id, param);
+		}
+		else
+		{
+		}
+	}
+	else if (href)
+	{
+		++href;
+		if (!(param = parser.GetHRefParam(href)))
+		{
+			param = &m_param->AddParameter(name);
+			parser.SetHRefParam(href, param);
+		}
+		else
+		{
+		}
+	}
+	else
+	{
+		param = &m_param->AddParameter(name);
+	}
+
+	m_paramHandler->SetParameter(*param);
 	return m_paramHandler->start(parser, name, attrs);
 }
 

@@ -79,8 +79,8 @@ int
 SOAPServerDispatch::Handle()
 {
 	int retval = 0;
-	const char *serverfault = "SOAP-ENV::Sever";
-	const char *clientfault = "SOAP-ENV::Client";
+	const char *serverfault = "SOAP-ENV:Server";
+	const char *clientfault = "SOAP-ENV:Client";
 	const char *faultcode = serverfault;
 	try
 	{

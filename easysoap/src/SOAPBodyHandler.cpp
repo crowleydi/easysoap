@@ -26,6 +26,8 @@
 #include "SOAPBody.h"
 #include "SOAPNamespaces.h"
 
+static const SOAPQName RootTag("root", SOAP_ENC);
+
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -55,24 +57,48 @@ SOAPBodyHandler::start(SOAPParser& parser, const XML_Char *name, const XML_Char 
 SOAPParseEventHandler *
 SOAPBodyHandler::startElement(SOAPParser& parser, const XML_Char *name, const XML_Char **attrs)
 {
-	if (m_gotMethod)
+	const char *id = 0;
+	const char *href = 0;
+	const char *root = 0;
+
+	const XML_Char **cattrs = attrs;
+	while (*cattrs)
+	{
+		const char *tag = *cattrs++;
+		const char *val = *cattrs++;
+		if (sp_strcmp(tag, "id") == 0)
+		{
+			id = val;
+		}
+		else if (sp_strcmp(tag, "href") == 0)
+		{
+			href = val;
+		}
+		else if (RootTag == tag)
+		{
+			root = val;
+		}
+	}
+
+	if (m_gotMethod || root && sp_strcmp(root, "0"))
 	{
 		SOAPParameter *p = 0;
-		const XML_Char **cattrs = attrs;
-		while (*cattrs)
+		if (id)
 		{
-			const char *tag = *cattrs++;
-			const char *val = *cattrs++;
-			if (sp_strcmp(tag, "id") == 0)
-			{
-				p = parser.GetHRefParam(val);
-				break;
-			}
+			p = parser.GetHRefParam(id);
+			if (!p)
+				throw SOAPException("Body handler: unknown element, id=%s", id);
 		}
-
-		if (!p)
-			//throw SOAPException("Unknown element: %s");
-			return 0;
+		else if (href)
+		{
+			p = parser.GetHRefParam(++href);
+			if (!p)
+				throw SOAPException("Body handler: unknown element, href=%s", href);
+		}
+		else if (root)
+		{
+			p = &m_body->GetMethod().AddParameter(name);
+		}
 
 		m_paramHandler.SetParameter(*p);
 		return m_paramHandler.start(parser, name, attrs);

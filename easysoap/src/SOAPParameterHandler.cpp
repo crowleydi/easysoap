@@ -50,7 +50,7 @@ SOAPParameterHandler::~SOAPParameterHandler()
 const SOAPQName AttrXsiType1999("type", SOAP_XSI_1999);
 const SOAPQName AttrXsiType2001("type", SOAP_XSI_2001);
 const SOAPQName AttrXsiNull1999("null", SOAP_XSI_1999);
-const SOAPQName AttrXsiNull2001("null", SOAP_XSI_2001);
+const SOAPQName AttrXsiNull2001("nil", SOAP_XSI_2001);
 const SOAPQName AttrArrayType("arrayType", SOAP_ENC);
 
 SOAPParseEventHandler *
@@ -70,31 +70,7 @@ SOAPParameterHandler::start(SOAPParser& parser, const XML_Char *name, const XML_
 		const XML_Char *tag = *attrs++;
 		const XML_Char *val = *attrs++;
 
-		if (m_ignoreId && sp_strcmp(tag, "id") == 0)
-		{
-			continue;
-		}
-		else if (sp_strcmp(tag, "href") == 0)
-		{
-			// I need to detect circular references because
-			// No way I can handle that at this point...
-			// I'm not real sure how this all needs to work...
-			// Pure guess work here!
-			if (*val != '#')
-				throw SOAPException("Unable to resolve complex href: %s", val);
-			++val;
-			SOAPParameter *p = parser.GetHRefParam(val);
-			if (p)
-			{
-				*m_param = *p;
-			}
-			else
-			{
-				parser.SetHRefParam(val, m_param);
-			}
-			return 0;
-		}
-		else if (AttrArrayType == tag)
+		if (AttrArrayType == tag)
 		{
 			arrayType = val;
 		}
@@ -129,6 +105,10 @@ SOAPParameterHandler::start(SOAPParser& parser, const XML_Char *name, const XML_
 				m_setvalue = false;
 			}
 		}
+		else
+		{
+			m_param->AddAttribute(tag, val);
+		}
 	}
 
 	if (!elementType)
@@ -143,31 +123,37 @@ SOAPParameterHandler::start(SOAPParser& parser, const XML_Char *name, const XML_
 		m_arrayHandler->SetParameter(m_param);
 		m_setvalue = false;
 
-		char *sep = sp_strchr(arrayType, ':');
+		const char *sep = sp_strchr(arrayType, ':');
+		const char *typens = 0;
 		if (sep)
 		{
-			*sep = 0;
-			const char *typens = parser.ExpandNamespace(arrayType);
-			*sep++ = ':';
-			if (typens)
-			{
-				char *b = sp_strchr(sep, '[');
-				if (b)
-					*b = 0;
-				m_arrayHandler->SetArrayType(sep, typens);
-				m_param->SetArrayType(sep, typens);
-				if (b)
-					*b = '[';
-			}
-			else
-			{
+			char *z = (char *)sep;
+			*z = 0;
+			typens = parser.ExpandNamespace(arrayType);
+
+			if (!typens)
 				throw SOAPException("Could not resolve arrayType for element %s: %s", name, arrayType);
-			}
+
+			*z = ':';
+			++sep;
 		}
 		else
 		{
-			throw SOAPException("Array typename is not namespace qualified for element %s: %s", name, arrayType);
+			typens = parser.ExpandNamespace("");
+
+			if (!typens)
+				throw SOAPException("Array typename is not namespace qualified for element %s: %s", name, arrayType);
+
+			sep = arrayType;
 		}
+
+		char *b = sp_strchr(sep, '[');
+		if (b)
+			*b = 0;
+		m_arrayHandler->SetArrayType(sep, typens);
+		m_param->SetArrayType(sep, typens);
+		if (b)
+			*b = '[';
 
 		return m_arrayHandler->start(parser, name, attrs);
 	}
