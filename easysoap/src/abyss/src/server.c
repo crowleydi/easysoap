@@ -589,6 +589,7 @@ void ServerFree(TServer *srv)
 	ListFree(&srv->handlers);
 	ListInitAutoFree(&srv->defaultfilenames);
 	LogClose(srv);
+	SocketClose(&srv->listensock);
 }
 
 void ServerFunc(TConn *c)
@@ -713,10 +714,11 @@ void ServerRun(TServer *srv)
 			};
 			SocketClose(&ns);
 		}
-		else if (srv->stopped)
-			break;
-		else
-			TraceMsg("Socket Error=%d\n", SocketError());
+		else {
+			if (srv->stopped)
+				break;
+			/*TraceMsg("Socket Error=%d\n", SocketError());*/
+		}
 	};
 }
 #else
@@ -760,8 +762,7 @@ void ServerRun(TServer *srv)
 		} else {
 			if (srv->stopped)
 				break;
-			TraceMsg("Socket Error=%d\n", SocketError());
-
+			/*TraceMsg("Socket Error=%d\n", SocketError());*/
 		}
 	};
 }
