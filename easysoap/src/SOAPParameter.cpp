@@ -236,7 +236,7 @@ SOAPParameter::SetValue(float fval)
 	if (finite(val))
 	{
 		char buffer[64];
-		snprintf(buffer, sizeof(buffer), "%G", val);
+		snprintf(buffer, sizeof(buffer), "%.9G", val);
 		SetFloat(buffer);
 	}
 	else
@@ -256,7 +256,7 @@ SOAPParameter::SetValue(double val)
 	if (finite(val))
 	{
 		char buffer[64];
-		snprintf(buffer, sizeof(buffer), "%G", val);
+		snprintf(buffer, sizeof(buffer), "%.18G", val);
 		SetDouble(buffer);
 	}
 	else
@@ -325,7 +325,7 @@ SOAPParameter::GetDouble() const
 		return HUGE_VAL;
 	else if (m_strval == "-INF")
 		return -HUGE_VAL;
-	return atof(m_strval);
+	return strtod(m_strval, 0);
 }
 
 const SOAPParameter *
