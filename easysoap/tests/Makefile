@@ -36,6 +36,9 @@ interopserver : $(SERVEROBJS) $(EASYSOAPLIB)
 $(EASYSOAPLIB) :
 	cd ../src; make
 
+interop.html: interop.xsl interop.xml
+	sabcmd interop.xsl interop.xml interop.html
+
 clean:
-	rm -f core *.o interopclient interopserver
+	rm -f core *.o interopclient interopserver interop.html
 

@@ -1,4 +1,3 @@
-
 /* 
  * EasySoap++ - A C++ library for SOAP (Simple Object Access Protocol)
  * Copyright (C) 2001 David Crowley; SciTegic, Inc.
@@ -35,7 +34,7 @@
 #include <iostream>
 #include <math.h>
 #include <time.h>
-#include <direct.h>
+#include <sys/stat.h>
 
 #include <SOAP.h>
 #include <SOAPDebugger.h>
@@ -492,15 +491,27 @@ TestEchoFloat_negINF(SOAPProxy& proxy, const Endpoint& e)
 }
 
 void
-TestEchoFloat_Overflow(SOAPProxy& proxy, const Endpoint& e)
+TestEchoFloat_DoubleOverflow(SOAPProxy& proxy, const Endpoint& e)
 {
-	TestEchoFloatForFail(proxy, e, "1.6e555");
+	TestEchoFloatForFail(proxy, e, "1.8e308");
 }
 
 void
-TestEchoFloat_Underflow(SOAPProxy& proxy, const Endpoint& e)
+TestEchoFloat_DoubleUnderflow(SOAPProxy& proxy, const Endpoint& e)
 {
-	TestEchoFloatForFail(proxy, e, "1.6e-555");
+	TestEchoFloatForFail(proxy, e, "2.4e-324");
+}
+
+void
+TestEchoFloat_SingleOverflow(SOAPProxy& proxy, const Endpoint& e)
+{
+	TestEchoFloatForFail(proxy, e, "3.5e38");
+}
+
+void
+TestEchoFloat_SingleUnderflow(SOAPProxy& proxy, const Endpoint& e)
+{
+	TestEchoFloatForFail(proxy, e, "6.9e-46");
 }
 
 void
@@ -708,8 +719,10 @@ TestInterop(const Endpoint& e)
 	TestForPass(proxy, e, "echoFloat_NaN",				TestEchoFloat_NaN);
 	TestForPass(proxy, e, "echoFloat_INF",				TestEchoFloat_INF);
 	TestForPass(proxy, e, "echoFloat_negINF",			TestEchoFloat_negINF);
-	TestForFault(proxy, e, "echoFloat_Overflow",		TestEchoFloat_Overflow);
-	TestForFault(proxy, e, "echoFloat_Underflow",		TestEchoFloat_Underflow);
+	TestForFault(proxy, e, "echoFloat_SingleOverflow",	TestEchoFloat_SingleOverflow);
+	TestForFault(proxy, e, "echoFloat_SingleUnderflow",	TestEchoFloat_SingleUnderflow);
+	TestForFault(proxy, e, "echoFloat_DoubleOverflow",	TestEchoFloat_DoubleOverflow);
+	TestForFault(proxy, e, "echoFloat_DoubleUnderflow",	TestEchoFloat_DoubleUnderflow);
 	TestForPass(proxy, e, "echoString",					TestEchoString);
 	TestForPass(proxy, e, "echoStruct",					TestEchoStruct);
 	TestForPass(proxy, e, "echoIntegerArray",			TestEchoIntegerArray);
@@ -842,7 +855,7 @@ main(int argc, char* argv[])
 						<< std::endl;
 
 			if (makedirs)
-				_mkdir(e.name);
+				mkdir(e.name, 0755);
 
 			if (execute && !skips.Find(e.name))
 				TestInterop(e);
