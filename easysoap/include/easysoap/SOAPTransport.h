@@ -29,6 +29,9 @@ BEGIN_EASYSOAP_NAMESPACE
 
 class SOAPMethod;
 
+/**
+*
+*/
 class EASYSOAP_EXPORT SOAPTransport
 {
 private:
@@ -58,6 +61,9 @@ public:
 	virtual size_t Write(const SOAPMethod& method, const char *payload, size_t payloadsize) = 0;
 };
 
+/**
+*
+*/
 class EASYSOAP_EXPORT SOAPServerTransport : public SOAPTransport
 {
 private:

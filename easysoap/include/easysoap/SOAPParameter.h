@@ -35,6 +35,9 @@ BEGIN_EASYSOAP_NAMESPACE
 
 class SOAPParameterHandler;
 
+/**
+*
+*/
 class EASYSOAP_EXPORT SOAPParameter
 {
 public:

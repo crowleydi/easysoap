@@ -28,6 +28,9 @@
 
 BEGIN_EASYSOAP_NAMESPACE
 
+/**
+*
+*/
 class EASYSOAP_EXPORT SOAPResponse : public SOAPEnvelope
 {
 public:

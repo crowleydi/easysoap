@@ -30,6 +30,9 @@ BEGIN_EASYSOAP_NAMESPACE
 template<typename T>
 class SOAPTypeTraits;
 
+/**
+*
+*/
 template <>
 class EASYSOAP_EXPORT SOAPTypeTraits<bool>
 {
@@ -40,6 +43,9 @@ public:
 	static const SOAPParameter& Deserialize(const SOAPParameter&, bool& val);
 };
 
+/**
+*
+*/
 template <>
 class EASYSOAP_EXPORT SOAPTypeTraits<char>
 {
@@ -49,6 +55,9 @@ public:
 	static const SOAPParameter& Deserialize(const SOAPParameter&, char& val);
 };
 
+/**
+*
+*/
 template <>
 class EASYSOAP_EXPORT SOAPTypeTraits<short>
 {
@@ -58,6 +67,9 @@ public:
 	static const SOAPParameter& Deserialize(const SOAPParameter&, short& val);
 };
 
+/**
+*
+*/
 template <>
 class EASYSOAP_EXPORT SOAPTypeTraits<int>
 {
@@ -77,11 +89,17 @@ public:
 
 //
 // assume long and int are the same, 32 bit integers
+/**
+*
+*/
 template <>
 class EASYSOAP_EXPORT SOAPTypeTraits<long> : public SOAPTypeTraits<int>
 {
 };
 
+/**
+*
+*/
 template <>
 class EASYSOAP_EXPORT SOAPTypeTraits<float>
 {
@@ -92,6 +110,9 @@ public:
 	static const SOAPParameter& Deserialize(const SOAPParameter&, float& val);
 };
 
+/**
+*
+*/
 template <>
 class EASYSOAP_EXPORT SOAPTypeTraits<double>
 {
@@ -102,6 +123,9 @@ public:
 	static const SOAPParameter& Deserialize(const SOAPParameter&, double& val);
 };
 
+/**
+*
+*/
 template <>
 class EASYSOAP_EXPORT SOAPTypeTraits<SOAPString>
 {
@@ -111,6 +135,9 @@ public:
 	static const SOAPParameter& Deserialize(const SOAPParameter&, SOAPString& val);
 };
 
+/**
+*
+*/
 template <>
 class EASYSOAP_EXPORT SOAPTypeTraits<const char *>
 {
@@ -122,6 +149,9 @@ public:
 };
 
 #ifdef HAVE_WCHART
+/**
+*
+*/
 template <>
 class EASYSOAP_EXPORT SOAPTypeTraits<const wchar_t *>
 {
@@ -133,6 +163,9 @@ public:
 };
 #endif
 
+/**
+*
+*/
 class SOAPMapTypeTraits
 {
 public:
@@ -170,12 +203,18 @@ public:
 };
 
 #ifdef HAVE_PARTIAL_SPECIALIZATION
+/**
+*
+*/
 template <typename K, typename V>
 class SOAPTypeTraits< SOAPHashMap<K, V> > : public SOAPMapTypeTraits
 {
 };
 #endif // HAVE_PARTIAL_SPECIALIZATION
 
+/**
+*
+*/
 class SOAPArrayTypeTraits
 {
 private:
@@ -293,6 +332,9 @@ public:
 //
 // Base class for Encoding and
 // Decoding hex and base64 strings.
+/**
+*
+*/
 class SOAPByteArrayEncodingTraits
 {
 public:
@@ -323,6 +365,9 @@ public:
 
 //
 // Traits for base64 encoded byte arrays
+/**
+*
+*/
 class SOAPBase64 : public SOAPBase64Base
 {
 public:
@@ -344,7 +389,9 @@ private:
 	SOAPBase64& operator=(const SOAPBase64&);
 };
 
-
+/**
+*
+*/
 class SOAPBase64Traits : public SOAPByteArrayEncodingTraits
 {
 public:
@@ -356,6 +403,9 @@ public:
 
 //
 // Traits for hex encoded byte arrays
+/**
+*
+*/
 class SOAPHex : public SOAPHexBase
 {
 public:
@@ -377,7 +427,9 @@ private:
 	SOAPHex& operator=(const SOAPHex&);
 };
 
-
+/**
+*
+*/
 class SOAPHexTraits : public SOAPByteArrayEncodingTraits
 {
 public:
@@ -387,58 +439,91 @@ public:
 	}
 };
 
+/**
+*
+*/
 template <>
 class SOAPTypeTraits< SOAPBase64 > : public SOAPBase64Traits
 {
 };
 
+/**
+*
+*/
 template <>
 class SOAPTypeTraits< SOAPHex > : public SOAPHexTraits
 {
 };
 
 #ifdef HAVE_PARTIAL_SPECIALIZATION
+/**
+*
+*/
 template <typename T>
 class SOAPTypeTraits< SOAPArray<T> > : public SOAPArrayTypeTraits
 {
 };
 #else // DONT HAVE_PARTIAL_SPECIALIZATION
+/**
+*
+*/
 template <>
 class SOAPTypeTraits< SOAPArray<bool> > : public SOAPArrayTypeTraits
 {
 };
 
+/**
+*
+*/
 template <>
 class SOAPTypeTraits< SOAPArray<short> > : public SOAPArrayTypeTraits
 {
 };
 
+/**
+*
+*/
 template <>
 class SOAPTypeTraits< SOAPArray<int> > : public SOAPArrayTypeTraits
 {
 };
 
+/**
+*
+*/
 template <>
 class SOAPTypeTraits< SOAPArray<long> > : public SOAPArrayTypeTraits
 {
 };
 
+/**
+*
+*/
 template <>
 class SOAPTypeTraits< SOAPArray<float> > : public SOAPArrayTypeTraits
 {
 };
 
+/**
+*
+*/
 template <>
 class SOAPTypeTraits< SOAPArray<double> > : public SOAPArrayTypeTraits
 {
 };
 
+/**
+*
+*/
 template <>
 class SOAPTypeTraits< SOAPArray<SOAPString> > : public SOAPArrayTypeTraits
 {
 };
 #endif // HAVE_PARTIAL_SPECIALIZATION
 
+/**
+*
+*/
 class SOAP2DArrayTypeTraits
 {
 private:
@@ -564,41 +649,65 @@ public:
 };
 
 #ifdef HAVE_PARTIAL_SPECIALIZATION
+/**
+*
+*/
 template <typename T>
 class SOAPTypeTraits< SOAP2DArray<T> > : public SOAP2DArrayTypeTraits
 {
 };
 #else // DONT HAVE_PARTIAL_SPECIALIZATION
+/**
+*
+*/
 template <>
 class SOAPTypeTraits< SOAP2DArray<bool> > : public SOAP2DArrayTypeTraits
 {
 };
 
+/**
+*
+*/
 template <>
 class SOAPTypeTraits< SOAP2DArray<char> > : public SOAP2DArrayTypeTraits
 {
 };
 
+/**
+*
+*/
 template <>
 class SOAPTypeTraits< SOAP2DArray<int> > : public SOAP2DArrayTypeTraits
 {
 };
 
+/**
+*
+*/
 template <>
 class SOAPTypeTraits< SOAP2DArray<long> > : public SOAP2DArrayTypeTraits
 {
 };
 
+/**
+*
+*/
 template <>
 class SOAPTypeTraits< SOAP2DArray<float> > : public SOAP2DArrayTypeTraits
 {
 };
 
+/**
+*
+*/
 template <>
 class SOAPTypeTraits< SOAP2DArray<double> > : public SOAP2DArrayTypeTraits
 {
 };
 
+/**
+*
+*/
 template <>
 class SOAPTypeTraits< SOAP2DArray<SOAPString> > : public SOAP2DArrayTypeTraits
 {

@@ -34,6 +34,9 @@
 
 BEGIN_EASYSOAP_NAMESPACE
 
+/**
+*
+*/
 class EASYSOAP_EXPORT SOAPHTTPProtocol : public SOAPProtocolBase
 {
 private:
@@ -121,7 +124,9 @@ public:
 	static void ParseContentType(SOAPString& contentType, SOAPString& charset, const char *contenttype);
 };
 
-
+/**
+*
+*/
 class EASYSOAP_EXPORT SOAPonHTTP : public SOAPTransport
 {
 private:

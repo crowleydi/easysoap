@@ -27,6 +27,9 @@
 
 BEGIN_EASYSOAP_NAMESPACE
 
+/**
+*
+*/
 class EASYSOAP_EXPORT SOAPUrl  
 {
 public:

@@ -25,6 +25,9 @@
 
 BEGIN_EASYSOAP_NAMESPACE
 
+/**
+*
+*/
 class EASYSOAP_EXPORT SOAPEnc
 {
 public:
@@ -45,6 +48,9 @@ public:
 	static const SOAPQName base64;
 };
 
+/**
+*
+*/
 class EASYSOAP_EXPORT SOAPEnv
 {
 public:
@@ -62,6 +68,9 @@ public:
 	static const SOAPQName actor;
 };
 
+/**
+*
+*/
 class EASYSOAP_EXPORT XMLSchema2001
 {
 public:
@@ -102,6 +111,9 @@ public:
 	static const SOAPQName positiveInteger;
 };
 
+/**
+*
+*/
 class EASYSOAP_EXPORT XMLSchema1999
 {
 public:

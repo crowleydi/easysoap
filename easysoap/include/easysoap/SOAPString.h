@@ -38,6 +38,9 @@
 
 BEGIN_EASYSOAP_NAMESPACE
 
+/**
+*
+*/
 class EASYSOAP_EXPORT SOAPString
 {
 private:
@@ -275,6 +278,9 @@ public:
 
 #ifdef __SOAPHASHMAP_H__
 
+/**
+*
+*/
 template <>
 struct SOAPHashCodeFunctor<SOAPString>
 {
@@ -289,6 +295,9 @@ struct SOAPHashCodeFunctor<SOAPString>
 	}
 };
 
+/**
+*
+*/
 template <>
 struct SOAPHashCodeFunctorNoCase<SOAPString>
 {
@@ -303,7 +312,9 @@ struct SOAPHashCodeFunctorNoCase<SOAPString>
 	}
 };
 
-
+/**
+*
+*/
 template <>
 struct SOAPEqualsFunctor<SOAPString>
 {
@@ -318,7 +329,9 @@ struct SOAPEqualsFunctor<SOAPString>
 	}
 };
 
-
+/**
+*
+*/
 template <>
 struct SOAPEqualsFunctorNoCase<SOAPString>
 {

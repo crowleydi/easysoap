@@ -30,6 +30,9 @@ struct rsa_st;
 BEGIN_EASYSOAP_NAMESPACE
 
 #ifndef HAVE_LIBSSL
+/**
+*
+*/
 class EASYSOAP_EXPORT SOAPSSLContext
 {
 public:
@@ -53,7 +56,9 @@ public:
 #else
 
 
-
+/**
+*
+*/
 class EASYSOAP_EXPORT SOAPSSLContext
 {
 public:

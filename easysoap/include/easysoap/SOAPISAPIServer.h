@@ -28,6 +28,9 @@
 
 BEGIN_EASYSOAP_NAMESPACE
 
+/**
+*
+*/
 class EASYSOAP_EXPORT SOAPISAPIImpersonateUser
 {
 public:
@@ -41,6 +44,9 @@ private:
 	EXTENSION_CONTROL_BLOCK	*m_ecb;
 };
 
+/**
+*
+*/
 class EASYSOAP_EXPORT SOAPISAPITransport : public SOAPServerTransport
 {
 public:
@@ -76,6 +82,9 @@ private:
 	bool						m_doContentType;
 };
 
+/**
+*
+*/
 class EASYSOAP_EXPORT SOAPISAPIServer : public SOAPServer<SOAPISAPIServer>
 {
 public:

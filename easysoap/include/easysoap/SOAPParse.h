@@ -35,6 +35,9 @@ BEGIN_EASYSOAP_NAMESPACE
 class SOAPParserEventHandler;
 class SOAPEnvelopeHandler;
 
+/**
+*
+*/
 class EASYSOAP_EXPORT SOAPParser : protected XMLParser
 {
 public:

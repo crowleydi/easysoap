@@ -31,6 +31,9 @@ BEGIN_EASYSOAP_NAMESPACE
 //
 //  A simple Transport class for CGI
 //
+/**
+*
+*/
 class SOAPCGITransport : public SOAPServerTransport
 {
 public:

@@ -34,6 +34,9 @@
 
 BEGIN_EASYSOAP_NAMESPACE
 
+/**
+*
+*/
 class EASYSOAP_EXPORT SOAPException  
 {
 protected:
@@ -64,6 +67,9 @@ public:
 	const SOAPString& What() const {return m_what;}
 };
 
+/**
+*
+*/
 class EASYSOAP_EXPORT SOAPMemoryException : public SOAPException
 {
 public:
@@ -71,7 +77,9 @@ public:
 	~SOAPMemoryException() {}
 };
 
-
+/**
+*
+*/
 class EASYSOAP_EXPORT SOAPSocketException : public SOAPException
 {
 public:

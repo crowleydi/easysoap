@@ -27,6 +27,9 @@
 
 BEGIN_EASYSOAP_NAMESPACE
 
+/**
+*
+*/
 class EASYSOAP_EXPORT SOAPQName  
 {
 public:
@@ -121,6 +124,9 @@ private:
 	SOAPString	m_namespace;
 };
 
+/**
+*
+*/
 template <>
 struct SOAPHashCodeFunctor<SOAPQName>
 {

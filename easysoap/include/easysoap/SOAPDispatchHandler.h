@@ -28,6 +28,9 @@
 
 BEGIN_EASYSOAP_NAMESPACE
 
+/**
+*
+*/
 class EASYSOAP_EXPORT SOAPDispatchHandlerInterface
 {
 public:
@@ -35,7 +38,9 @@ public:
 	virtual bool ExecuteMethod(const SOAPEnvelope& request, SOAPMethod& response) = 0;
 };
 
-
+/**
+*
+*/
 template <typename T>
 class SOAPDispatchHandler : public SOAPDispatchHandlerInterface
 {
@@ -79,7 +84,9 @@ protected:
 	}
 };
 
-
+/**
+*
+*/
 class EASYSOAP_EXPORT SOAPHeaderHandlerInterface
 {
 public:
@@ -87,7 +94,9 @@ public:
 	virtual bool HandleHeader(const SOAPParameter& header, SOAPEnvelope& request, SOAPEnvelope& response) = 0;
 };
 
-
+/**
+*
+*/
 template <typename T>
 class SOAPHeaderHandler : public SOAPHeaderHandlerInterface
 {

@@ -36,6 +36,9 @@ BEGIN_EASYSOAP_NAMESPACE
 
 class SOAPTransport;
 
+/**
+*
+*/
 class EASYSOAP_EXPORT SOAPProxy  
 {
 public:

@@ -29,6 +29,9 @@
 
 BEGIN_EASYSOAP_NAMESPACE
 
+/**
+*
+*/
 class SOAPSocketInterface
 {
 public:
@@ -47,6 +50,9 @@ protected:
 	SOAPSocketInterface() {}
 };
 
+/**
+*
+*/
 class EASYSOAP_EXPORT SOAPProtocolBase
 {
 private:

@@ -55,6 +55,9 @@
 
 BEGIN_EASYSOAP_NAMESPACE
 
+/**
+*
+*/
 class SOAPTypeTraits<std::string>
 {
 public:
@@ -77,35 +80,59 @@ public:
 };
 
 #ifdef HAVE_PARTIAL_SPECIALIZATION
+/**
+*
+*/
 template <typename T>
 class SOAPTypeTraits< std::vector<T> > : public SOAPArrayTypeTraits
 {
 };
 #else // DONT HAVE_PARTIAL_SPECIALIZATION
+/**
+*
+*/
 class SOAPTypeTraits< std::vector<bool> > : public SOAPArrayTypeTraits
 {
 };
 
+/**
+*
+*/
 class SOAPTypeTraits< std::vector<short> > : public SOAPArrayTypeTraits
 {
 };
 
+/**
+*
+*/
 class SOAPTypeTraits< std::vector<int> > : public SOAPArrayTypeTraits
 {
 };
 
+/**
+*
+*/
 class SOAPTypeTraits< std::vector<long> > : public SOAPArrayTypeTraits
 {
 };
 
+/**
+*
+*/
 class SOAPTypeTraits< std::vector<float> > : public SOAPArrayTypeTraits
 {
 };
 
+/**
+*
+*/
 class SOAPTypeTraits< std::vector<double> > : public SOAPArrayTypeTraits
 {
 };
 
+/**
+*
+*/
 class SOAPTypeTraits< std::vector<std::string> > : public SOAPArrayTypeTraits
 {
 };
@@ -114,6 +141,9 @@ class SOAPTypeTraits< std::vector<std::string> > : public SOAPArrayTypeTraits
 
 //
 // Traits for base64 encoded byte arrays
+/**
+*
+*/
 class SOAPSTLBase64 : public SOAPBase64Base
 {
 public:
@@ -135,7 +165,9 @@ private:
 	SOAPSTLBase64& operator=(const SOAPSTLBase64&);
 };
 
-
+/**
+*
+*/
 class SOAPTypeTraits< SOAPSTLBase64 > : public SOAPBase64Traits
 {
 };
@@ -143,6 +175,9 @@ class SOAPTypeTraits< SOAPSTLBase64 > : public SOAPBase64Traits
 
 //
 // Traits for hex encoded byte arrays
+/**
+*
+*/
 class SOAPSTLHex : public SOAPHexBase
 {
 public:
@@ -162,12 +197,16 @@ private:
 	SOAPSTLHex& operator=(const SOAPSTLHex&);
 };
 
-
+/**
+*
+*/
 class SOAPTypeTraits< SOAPSTLHex > : public SOAPHexTraits
 {
 };
 
-
+/**
+*
+*/
 class SOAPSTLMapTypeTraits
 {
 public:
@@ -205,6 +244,9 @@ public:
 };
 
 #ifdef HAVE_PARTIAL_SPECIALIZATION
+/**
+*
+*/
 template <typename K, typename V>
 class SOAPTypeTraits< std::map<K, V> > : public SOAPSTLMapTypeTraits
 {

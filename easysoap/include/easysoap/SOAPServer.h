@@ -29,6 +29,9 @@
 
 BEGIN_EASYSOAP_NAMESPACE
 
+/**
+*
+*/
 template <typename T>
 class SOAPServer
 {

@@ -30,6 +30,9 @@ BEGIN_EASYSOAP_NAMESPACE
 
 class SOAPFaultHandler;
 
+/**
+*
+*/
 class EASYSOAP_EXPORT SOAPFault : public SOAPParameter
 {
 public:
@@ -85,7 +88,9 @@ private:
 	static const SOAPString faultdetail_attr;
 };
 
-
+/**
+*
+*/
 class SOAPFaultException : public SOAPException
 {
 private:

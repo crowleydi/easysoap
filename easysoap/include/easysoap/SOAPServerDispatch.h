@@ -30,6 +30,9 @@ BEGIN_EASYSOAP_NAMESPACE
 class SOAPDispatchHandlerInterface;
 class SOAPHeaderHandlerInterface;
 
+/**
+*
+*/
 class EASYSOAP_EXPORT SOAPServerDispatch
 {
 public:

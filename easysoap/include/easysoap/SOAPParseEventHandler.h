@@ -35,6 +35,10 @@ typedef char XML_Char;
 BEGIN_EASYSOAP_NAMESPACE
 
 class SOAPParser;
+
+/**
+*
+*/
 class SOAPParseEventHandler
 {
 public:

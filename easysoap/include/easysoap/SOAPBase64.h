@@ -35,6 +35,9 @@ BEGIN_EASYSOAP_NAMESPACE
 
 //
 // Encode/Decode as base64
+/**
+*
+*/
 class EASYSOAP_EXPORT SOAPBase64Base
 {
 public:
@@ -52,6 +55,9 @@ private:
 
 //
 // Encode/Decode as hex
+/**
+*
+*/
 class EASYSOAP_EXPORT SOAPHexBase
 {
 public:
