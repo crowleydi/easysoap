@@ -84,7 +84,7 @@ public:
 	virtual bool CanRead() {return IsOpen() && (m_buff != m_buffend || m_socket->WaitRead(0));}
 	virtual bool IsOpen() {return m_socket && m_socket->IsOpen();}
 	virtual void Close();
-	virtual bool Connect(const char *host, unsigned int port, bool secure = false);
+	virtual bool Connect(const char *host, unsigned int port);
 	virtual void SetTimeout(size_t secs) {m_timeout = secs;}
 
 	// read up to len chars

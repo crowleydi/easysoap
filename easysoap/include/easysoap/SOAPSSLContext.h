@@ -76,13 +76,16 @@ public:
 	// callbacks required by openSSL
 	static int 	password_cb(char *buf, int num, int rwflag, void *userdata);
 	
+	bool VerifyServerCert() { return m_verifyserver; } ;
+	void SetVerifyServerCert(bool v) { m_verifyserver = v; } ;
 
+
+private:
 	typedef enum {
 			RSA_cert,
 			DSA_cert
 	} CertType;
 
-private:
 	static rsa_st*		m_tmpRSAKey;
 	ssl_ctx_st*			m_ctx;
 	SOAPString 			m_cafile;
@@ -90,6 +93,9 @@ private:
 	SOAPString 			m_keyfile;
 	SOAPString 			m_password;
 	CertType 			type;
+
+	bool				m_verifyserver;
+
 
 	void sslinit();
 	// handles error, returns true if they are recoverable, false if not.
