@@ -32,66 +32,141 @@
 //////////////////////////////////////////////////////////////////////
 
 unsigned int SOAPParameter::m_gensym = 0;
+static const char *SOAP_xsi_type = TAG_SOAP_XSI ":type";
+
+SOAPParameter::SOAPParameter()
+: m_parent(0)
+, m_basetype(SOAPTypes::xsd_none)
+{
+	Reset();
+}
 
 SOAPParameter::~SOAPParameter()
 {
-	delete m_struct;
+}
+
+void
+SOAPParameter::Assign(const SOAPParameter& param)
+{
+	m_basetype = param.m_basetype;
+	m_name = param.m_name;
+	m_attrs = param.m_attrs;
+	m_strval = param.m_strval;
+
+	const Array& params = param.GetArray();
+	for (int i = 0; i < params.Size(); ++i)
+		AddParameter(params[i].GetName()) = params[i];
 }
 
 SOAPParameter::SOAPParameter(const SOAPParameter& param)
+: m_parent(0)
 {
-	m_name = param.m_name;
-	m_type = param.m_type;
-
-	m_strval = param.m_strval;
-	m_struct = 0;
-
-	GetArray() = param.GetArray();
-	if (param.m_struct)
-		GetStruct() = param.GetStruct();
+	Assign(param);
 }
 
 SOAPParameter&
 SOAPParameter::operator=(const SOAPParameter& param)
 {
-	m_name = param.m_name;
-	m_type = param.m_type;
-
-	m_strval = param.m_strval;
-
-	GetArray() = param.GetArray();
-	if (param.m_struct)
-		GetStruct() = param.GetStruct();
-
+	Reset();
+	Assign(param);
 	return *this;
-}
-
-const char *
-SOAPParameter::GetXsdString() const
-{
-	return SOAPTypes::GetXsdString(m_type);
 }
 
 void
 SOAPParameter::Reset()
 {
-	SetType(SOAPTypes::xsd_none);
 	m_array.Resize(0);
-	if (m_struct)
-		m_struct->Clear();
+	m_struct.Clear();
+	m_attrs.Clear();
+	SetType(SOAPTypes::xsd_none);
+}
+
+void
+SOAPParameter::SetName(const char *name)
+{
+	if (m_parent && m_name.Length() > 0)
+		m_parent->m_struct.Remove(m_name);
+
+	m_name = name;
+
+	if (m_parent)
+		m_parent->m_struct[m_name] = this;
+}
+
+void
+SOAPParameter::SetType(const char *type)
+{
+	m_attrs[SOAP_xsi_type] = type;
+}
+
+void
+SOAPParameter::SetType(const char *type, const char *ns)
+{
+	char nsbuff[64];
+	char typebuff[256];
+
+	unsigned int symnum = ++m_gensym;
+	snprintf(nsbuff, sizeof(nsbuff), "xmlns:ns%d",symnum);
+	snprintf(typebuff, sizeof(typebuff), "ns%d:%s",symnum, type);
+
+	SOAPParameter *param = this;
+	while (param->m_parent)
+		param = param->m_parent;
+	param->m_attrs[nsbuff] = ns;
+	m_attrs[SOAP_xsi_type] = typebuff;
+}
+
+void
+SOAPParameter::SetType(SOAPTypes::xsd_type type)
+{
+	SetType(SOAPTypes::GetXsdString(type));
+}
+
+SOAPTypes::xsd_type
+SOAPParameter::GetType() const
+{
+	if (m_basetype != SOAPTypes::xsd_none)
+		return m_basetype;
+
+	Attrs::Iterator i = m_attrs.Find(SOAP_xsi_type);
+	if (i)
+		return SOAPTypes::GetXsdType(*i);
+	return SOAPTypes::xsd_none;
+}
+
+const char *
+SOAPParameter::GetTypeString() const
+{
+	Attrs::Iterator i = m_attrs.Find(SOAP_xsi_type);
+	if (i)
+		return *i;
+	return 0;
+}
+
+void
+SOAPParameter::SetNull()
+{
+	//SetType(SOAPTypes::xsd_null);
 }
 
 void
 SOAPParameter::SetInteger(const char *val)
 {
+	SetType(SOAPTypes::xsd_int);
 	m_strval = val;
-	m_type = SOAPTypes::xsd_int;
+}
+
+void
+SOAPParameter::SetValue(const char *val)
+{
+	SetType(SOAPTypes::xsd_string);
+	m_strval = val;
 }
 
 void
 SOAPParameter::SetValue(int val)
 {
-	char buffer[32];
+	char buffer[64];
 	snprintf(buffer, sizeof(buffer), "%d", val);
 	SetInteger(buffer);
 }
@@ -99,14 +174,14 @@ SOAPParameter::SetValue(int val)
 void
 SOAPParameter::SetFloat(const char *val)
 {
+	SetType(SOAPTypes::xsd_float);
 	m_strval = val;
-	m_type = SOAPTypes::xsd_float;
 }
 
 void
 SOAPParameter::SetValue(float val)
 {
-	char buffer[32];
+	char buffer[64];
 	snprintf(buffer, sizeof(buffer), "%f", val);
 	SetFloat(buffer);
 }
@@ -114,17 +189,27 @@ SOAPParameter::SetValue(float val)
 void
 SOAPParameter::SetDouble(const char *val)
 {
+	SetType(SOAPTypes::xsd_double);
 	m_strval = val;
-	m_type = SOAPTypes::xsd_double;
 }
 
 void
 SOAPParameter::SetValue(double val)
 {
-	char buffer[32];
+	char buffer[64];
 	snprintf(buffer, sizeof(buffer), "%f", val);
 	SetDouble(buffer);
 }
+
+const SOAPParameter *
+SOAPParameter::GetParameter(const char *name) const
+{
+	Struct::Iterator i = m_struct.Find(name);
+	if (i)
+		return *i;
+	return 0;
+}
+
 
 bool
 SOAPParameter::WriteSOAPPacket(SOAPPacketWriter& packet) const
@@ -132,13 +217,14 @@ SOAPParameter::WriteSOAPPacket(SOAPPacketWriter& packet) const
 	const char *sym = 0;
 	char symbuff[64];
 
-	if (m_type == SOAPTypes::xsd_none)
-		throw SOAPException("Cannot serialize undefined parameter value");
+	//if (m_type == SOAPTypes::xsd_none)
+		//throw SOAPException("Cannot serialize undefined parameter value");
 
 	if (m_name.Length() > 0)
 	{
 		sym = m_name;
 	}
+	/*
 	else if (m_type == SOAPTypes::soap_array)
 	{
 		sym = TAG_SOAP_ENC ":Array";
@@ -146,7 +232,7 @@ SOAPParameter::WriteSOAPPacket(SOAPPacketWriter& packet) const
 	else if (m_type == SOAPTypes::soap_struct)
 	{
 		sym = TAG_SOAP_ENC ":Struct";
-	}
+	}*/
 	else
 	{
 		// TODO: Move random tag generation to packet writer
@@ -155,26 +241,20 @@ SOAPParameter::WriteSOAPPacket(SOAPPacketWriter& packet) const
 	}
 
 	packet.StartTag(sym);
-	packet.AddAttr(TAG_SOAP_XSI ":type", GetXsdString());
 
-	switch (m_type)
+	for (Attrs::Iterator ai = m_attrs.Begin(); ai != m_attrs.End(); ++ai)
+		packet.AddAttr(ai.Key(), ai.Item());
+
+	switch (GetType())
 	{
-	case SOAPTypes::xsd_int:
-	case SOAPTypes::xsd_float:
-	case SOAPTypes::xsd_double:
-	case SOAPTypes::xsd_string:
-		packet.WriteValue(m_strval);
-		break;
-
 	case SOAPTypes::soap_array:
 		{
 			// TODO:  This is bogus.  We need to go through all params
-			// and check their type.  If they're not all the same, use 'variant'
-			// or whatever the xsd type is...
+			// and check their type.  If they're not all the same, use 'anyType'
 			char typebuff[128];
 			if (GetArray().Size() > 0)
 			{
-				snprintf(typebuff, sizeof(typebuff), "%s[%d]", GetArray()[0].GetXsdString(), GetArray().Size());
+				snprintf(typebuff, sizeof(typebuff), "%s[%d]", GetArray()[0].GetTypeString(), GetArray().Size());
 				packet.AddAttr(TAG_SOAP_ENC ":arrayType", typebuff);
 			}
 			else
@@ -191,11 +271,12 @@ SOAPParameter::WriteSOAPPacket(SOAPPacketWriter& packet) const
 	case SOAPTypes::soap_struct:
 		{
 			for (Struct::Iterator i = GetStruct().Begin(); i != GetStruct().End(); ++i)
-				i->WriteSOAPPacket(packet);
+				(*i)->WriteSOAPPacket(packet);
 		}
 		break;
 
 	default:
+		packet.WriteValue(m_strval);
 		break;
 	}
 

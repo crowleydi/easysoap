@@ -33,40 +33,29 @@ class EASYSOAP_EXPORT SOAPParameter
 public:
 
 	typedef SOAPArray<SOAPParameter>				Array;
-	typedef SOAPHashMap<SOAPString, SOAPParameter>	Struct;
+	typedef SOAPHashMap<SOAPString, SOAPParameter*>	Struct;
+	typedef SOAPHashMap<SOAPString, SOAPString>		Attrs;
 
-	SOAPParameter()
-		: m_type(SOAPTypes::xsd_none)
-		, m_struct(0)
-	{
-	}
-
+	SOAPParameter();
 	SOAPParameter(const SOAPParameter& param);
 	virtual ~SOAPParameter();
 
 	SOAPParameter& operator=(const SOAPParameter& param);
 
-	SOAPTypes::xsd_type GetType() const
-	{
-		return m_type;
-	}
 
 	void	Reset();
 
-	void	SetType(SOAPTypes::xsd_type type)
-	{
-		m_type = type;
-	}
-
-	void SetName(const char *name)
-	{
-		m_name = name;
-	}
-
+	void SetName(const char *name);
 	const SOAPString& GetName() const
 	{
 		return m_name;
 	}
+
+	SOAPTypes::xsd_type GetType() const;
+	const char *GetTypeString() const;
+	void SetType(SOAPTypes::xsd_type type);
+	void SetType(const char *type);
+	void SetType(const char *type, const char *ns);
 
 	void SetValue(int val);
 	void SetInteger(const char *val);
@@ -75,23 +64,8 @@ public:
 	void SetValue(double val);
 	void SetDouble(const char *val);
 
-	void SetValue(const char *val)
-		{m_strval = val; m_type = SOAPTypes::xsd_string;}
-
-	void SetNull()			
-		{m_type = SOAPTypes::xsd_null;}
-
-	void SetValue(const Array& val)
-	{
-		GetArray() = val;
-		m_type = SOAPTypes::soap_array;
-	}
-
-	void SetValue(const Struct& val)
-	{
-		GetStruct() = val;
-		m_type = SOAPTypes::soap_struct;
-	}
+	void SetValue(const char *val);
+	void SetNull();
 
 	int GetInt() const						{return atoi(m_strval);}
 	operator int() const					{return GetInt();}
@@ -102,8 +76,8 @@ public:
 	double GetDouble() const				{return atof(m_strval);}
 	operator double() const					{return GetDouble();}
 
-	SOAPString& GetString()				{return m_strval;}
-	const SOAPString& GetString() const	{return m_strval;}
+	//SOAPString& GetString()					{return m_strval;}
+	const SOAPString& GetString() const		{return m_strval;}
 	operator const SOAPString&() const		{return GetString();}
 
 	Array& GetArray()
@@ -118,46 +92,107 @@ public:
 
 	Struct& GetStruct()
 	{
-		return *m_struct;
+		return m_struct;
 	}
 
 	const Struct& GetStruct() const
 	{
-		return *m_struct;
+		return m_struct;
 	}
 
-
-	SOAPParameter& AddParameter()
+	SOAPParameter& AddParameter(const char *name = "item")
 	{
-		m_type = SOAPTypes::soap_array;
 		size_t size = GetArray().Size();
 		GetArray().Resize(size + 1);
-		return GetArray()[size];
+		SOAPParameter& ret = GetArray()[size];
+		ret.SetParent(this);
+		ret.SetName(name);
+		return ret;
 	}
 
-	SOAPParameter& AddParameter(const char *name)
+	const SOAPParameter *GetParameter(const char *name) const;
+
+	void SetBaseType(SOAPTypes::xsd_type type)
 	{
-		m_type = SOAPTypes::soap_struct;
-		SOAPParameter& param = GetStruct()[name];
-		param.SetName(name);
-		return param;
+		m_basetype = type;
 	}
+
+	Attrs& GetAttributes() {return m_attrs;}
+	const Attrs& GetAttributes() const {return m_attrs;}
 
 	bool WriteSOAPPacket(SOAPPacketWriter& packet) const;
 
 private:
-	const char *GetXsdString() const;
+	void SetParent(SOAPParameter *parent) {m_parent = parent;}
+	void Assign(const SOAPParameter&);
 
-	static unsigned int		m_gensym;
-
-	SOAPString				m_name;
-	SOAPTypes::xsd_type		m_type;
+	SOAPParameter	*m_parent;
+	Attrs			m_attrs;
+	SOAPString		m_name;
 
 	SOAPString		m_strval;
 	Array			m_array;
-	// MS compiler SUCKS
-	Struct			*m_struct;
+	Struct			m_struct;
+	SOAPTypes::xsd_type m_basetype;
+
+	static unsigned int		m_gensym;
 };
+
+inline SOAPParameter&
+operator<<(SOAPParameter& param, int val)
+{
+	param.SetValue(val);
+	return param;
+}
+
+inline SOAPParameter&
+operator<<(SOAPParameter& param, float val)
+{
+	param.SetValue(val);
+	return param;
+}
+
+inline SOAPParameter&
+operator<<(SOAPParameter& param, double val)
+{
+	param.SetValue(val);
+	return param;
+}
+
+inline SOAPParameter&
+operator<<(SOAPParameter& param, const char * val)
+{
+	param.SetValue(val);
+	return param;
+}
+
+inline const SOAPParameter&
+operator>>(const SOAPParameter& param, int& val)
+{
+	val = param.GetInt();
+	return param;
+}
+
+inline const SOAPParameter&
+operator>>(const SOAPParameter& param, double& val)
+{
+	val = param.GetDouble();
+	return param;
+}
+
+inline const SOAPParameter&
+operator>>(const SOAPParameter& param, float& val)
+{
+	val = param.GetFloat();
+	return param;
+}
+
+inline const SOAPParameter&
+operator>>(const SOAPParameter& param, SOAPString& val)
+{
+	val = param.GetString();
+	return param;
+}
 
 #endif // !defined(AFX_SOAPPARAMETER_H__30811BAD_D6A1_4535_B256_9EEB56A84026__INCLUDED_)
 
