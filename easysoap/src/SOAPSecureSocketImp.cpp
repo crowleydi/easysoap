@@ -186,7 +186,7 @@ SOAPSecureSocketImp::InitSSL()
 	
 	int retcode;
 
-	if ((retcode = SSL_set_fd(m_ssl, m_socket.m_socket)) != 1)
+	if ((retcode = SSL_set_fd(m_ssl, m_socket.GetRawSocketHandle())) != 1)
 		HandleError("Error attaching security layer to socket : %s\r\n", retcode);
 
 	if ((retcode = SSL_connect(m_ssl)) != 1)

@@ -30,14 +30,15 @@ BEGIN_EASYSOAP_NAMESPACE
 class SOAPClientSocketImp : public SOAPSocketInterface
 {
 protected:
-	friend class SOAPSecureSocketImp;
+//	friend class SOAPSecureSocketImp;
 	unsigned int	m_socket;
-	void			Wait(int sec, int usec);
 
 public:
 	SOAPClientSocketImp();
 	virtual ~SOAPClientSocketImp();
 
+	unsigned int GetRawSocketHandle() { return m_socket; } ;
+	void			Wait(int sec, int usec);
 	virtual bool WaitRead(int sec = -1, int usec = 0);
 	virtual bool WaitWrite(int sec = -1, int usec = 0);
 	virtual bool IsOpen();
