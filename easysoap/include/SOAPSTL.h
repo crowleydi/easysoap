@@ -114,7 +114,7 @@ public:
 	static SOAPParameter& Serialize(SOAPParameter& param, const V& val)
 	{
 		param.SetIsStruct();
-		for (V::const_iterator i = val.begin(); i != val.end(); ++i)
+		for (typename V::const_iterator i = val.begin(); i != val.end(); ++i)
 		{
 			SOAPParameter& p = param.AddParameter();
 			p.SetIsStruct();
@@ -127,7 +127,7 @@ public:
 	template <typename V>
 	static const SOAPParameter& Deserialize(const SOAPParameter& param, V& val)
 	{
-		V::key_type key;
+		typename V::key_type key;
 		const SOAPParameter::Array& arr = param.GetArray();
 		for (SOAPParameter::Array::ConstIterator i = arr.Begin(); i != arr.End(); ++i)
 		{

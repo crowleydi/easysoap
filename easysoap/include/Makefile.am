@@ -22,6 +22,7 @@ easysoap_HEADERS = \
     SOAPProxy.h \
     SOAPQName.h \
     SOAPResponse.h \
+    SOAPSTL.h \
     SOAPServer.h \
     SOAPServerDispatch.h \
     SOAPSocket.h \
