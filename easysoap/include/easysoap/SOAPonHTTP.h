@@ -29,6 +29,7 @@
 #include <easysoap/SOAPUrl.h>
 #include <easysoap/SOAPSocket.h>
 #include <easysoap/SOAPTransport.h>
+#include <easysoap/SOAPDebugger.h>
 
 BEGIN_EASYSOAP_NAMESPACE
 
@@ -94,7 +95,11 @@ public:
 	{}
 
 	void	SetKeepAlive(bool keepAlive = true)	{m_keepAlive = keepAlive;}
-	void 	SetCertificateInfo(const char*keyfile, const char* password) {m_password = password; m_keyfile = keyfile; }
+	void 	SetCertificateInfo(const char*keyfile, const char* password) 
+	{
+			m_password = password;
+			m_keyfile = keyfile; 
+	}
 	void	ConnectTo(const SOAPUrl& endpoint);
 	void	ConnectTo(const SOAPUrl& endpoint, const SOAPUrl& proxy);
 	int		Get(const char *path);
@@ -135,7 +140,6 @@ public:
 	SOAPonHTTP(const SOAPUrl& endpoint);
 	SOAPonHTTP(const SOAPUrl& endpoint, const SOAPUrl& proxy);
 
-	// for SSL Certificate support.
 	virtual ~SOAPonHTTP() {}
 
 	void ConnectTo(const SOAPUrl& endpoint);
@@ -144,7 +148,12 @@ public:
 	void SetUserAgent(const char *userAgent);
 	void SetTimeout(size_t secs) {m_http.SetTimeout(secs);}
 	void SetKeepAlive(bool keepAlive = false)	{m_http.SetKeepAlive(keepAlive);}
-	void SetCertificateInfo(const char*keyfile, const char* password) {m_password = password; m_keyfile = keyfile; }
+	void SetCertificateInfo(const char*keyfile, const char* password) 
+	{
+			m_password = password; 
+			m_keyfile = keyfile; 
+			m_http.SetCertificateInfo(keyfile, password);
+	}
 	//
 	//  Return charset if we know it
 	virtual const char *GetCharset() const;
