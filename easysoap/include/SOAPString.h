@@ -262,6 +262,11 @@ struct SOAPHashCodeFunctor<SOAPString>
 	{
 		return sp_hashcode(str);
 	}
+
+	size_t operator()(const char *str) const
+	{
+		return sp_hashcode(str);
+	}
 };
 
 struct SOAPHashCodeFunctorNoCase<SOAPString>
@@ -270,11 +275,36 @@ struct SOAPHashCodeFunctorNoCase<SOAPString>
 	{
 		return sp_hashcodecase(str);
 	}
+
+	size_t operator()(const char *str) const
+	{
+		return sp_hashcodecase(str);
+	}
 };
+
+
+struct SOAPEqualsFunctor<SOAPString>
+{
+	bool operator()(const SOAPString& a, const SOAPString& b) const
+	{
+		return a == b;
+	}
+
+	bool operator()(const SOAPString& a, const char *b) const
+	{
+		return a == b;
+	}
+};
+
 
 struct SOAPEqualsFunctorNoCase<SOAPString>
 {
 	bool operator()(const SOAPString& a, const SOAPString& b) const
+	{
+		return sp_strcasecmp(a, b) == 0;
+	}
+
+	bool operator()(const SOAPString& a, const char *b) const
 	{
 		return sp_strcasecmp(a, b) == 0;
 	}
