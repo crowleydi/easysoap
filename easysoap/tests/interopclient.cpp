@@ -452,7 +452,7 @@ void
 TestEchoBooleanJunk(SOAPProxy& proxy, const Endpoint& e)
 {
 	SOAPMethod method("echoBoolean", e.nspace, e.soapaction, e.needsappend);
-	(method.AddParameter("inputBoolean") << "junk").SetType("boolean", SOAP_XSI);
+	(method.AddParameter("inputBoolean") << "junk").SetType("boolean", SOAP_XSD);
 
 	const SOAPResponse& response = proxy.Execute(method);
 
@@ -1211,6 +1211,7 @@ hexval(int c)
 	case 'E': case 'e': return 14;
 	case 'F': case 'f': return 15;
 	}
+	return 0;
 }
 
 char *
