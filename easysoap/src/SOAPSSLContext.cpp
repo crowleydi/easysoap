@@ -33,7 +33,7 @@ extern "C" {
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 #include <openssl/rand.h>
-};
+}
 
 //
 // Initialize OpenSSL

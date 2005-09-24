@@ -1,11 +1,3 @@
-dnl @synopsis AC_CXX_PARTIAL_SPECIALIZATION
-dnl
-dnl If the compiler supports partial specialization,
-dnl define HAVE_PARTIAL_SPECIALIZATION.
-dnl
-dnl @version $Id$
-dnl @author Luc Maisonobe
-dnl
 AC_DEFUN([AC_CXX_PARTIAL_SPECIALIZATION],
 [AC_CACHE_CHECK(whether the compiler supports partial specialization,
 ac_cv_cxx_partial_specialization,

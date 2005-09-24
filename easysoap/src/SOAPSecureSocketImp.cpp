@@ -78,7 +78,7 @@ extern "C" {
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 #include <openssl/rand.h>
-};
+}
 
 SOAPSecureSocketImp::SOAPSecureSocketImp()
 : m_ssl(0)

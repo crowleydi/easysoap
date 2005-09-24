@@ -284,7 +284,7 @@ public:
 
 		SOAPQName& atype = param.AddAttribute(SOAPEnc::arrayType);
 		SOAPTypeTraits<TYPENAME(V::value_type)>::GetType(atype);
-		snprintf(buffer, sizeof(buffer), "[%d]", val.size());
+		snprintf(buffer, sizeof(buffer), "[%zu]", val.size());
 		atype.GetName().Append(buffer);
 
 		//
@@ -592,7 +592,7 @@ public:
 
 		SOAPQName& atype = param.AddAttribute(SOAPEnc::arrayType);
 		SOAPTypeTraits<TYPENAME(V::value_type)>::GetType(atype);
-		snprintf(buffer, sizeof(buffer), "[%d,%d]", val.GetNumRows(), val.GetNumCols());
+		snprintf(buffer, sizeof(buffer), "[%zu,%zu]", val.GetNumRows(), val.GetNumCols());
 		atype.GetName().Append(buffer);
 
 		//

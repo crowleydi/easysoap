@@ -34,7 +34,7 @@
 // Some compilers on the other hand don't like it one
 // bit ....
 */
-#ifdef HAVE_TEMPLATE_KEYWORD_QUALIFIER
+#ifdef HAVE_TYPENAME
 #define TYPENAME(T) typename T
 #else
 #define TYPENAME(T) T

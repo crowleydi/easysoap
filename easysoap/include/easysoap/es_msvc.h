@@ -47,7 +47,7 @@
 #define HAVE_STRICMP
 #define HAVE_NAMESPACES
 #if _MSC_VER >= 1310
-#define HAVE_TEMPLATE_KEYWORD_QUALIFIER
+#define HAVE_TYPENAME
 #endif
 
 #define snprintf _snprintf

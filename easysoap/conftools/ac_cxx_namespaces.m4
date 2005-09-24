@@ -1,11 +1,3 @@
-dnl @synopsis AC_CXX_NAMESPACES
-dnl
-dnl If the compiler can prevent names clashes using namespaces, define
-dnl HAVE_NAMESPACES.
-dnl
-dnl @version $Id$
-dnl @author Luc Maisonobe
-dnl
 AC_DEFUN([AC_CXX_NAMESPACES],
 [AC_CACHE_CHECK(whether the compiler implements namespaces,
 ac_cv_cxx_namespaces,

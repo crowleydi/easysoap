@@ -44,6 +44,4 @@
 #endif // EASYSOAP_EXPORTS
 #endif // EASYSOAP_STATIC
 
-#define TYPENAME(T) T
-
 #endif // __ES_BORL_H_

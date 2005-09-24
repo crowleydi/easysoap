@@ -923,7 +923,7 @@ TestEcho2DStringArray(SOAPProxy& proxy, const Endpoint& e)
 	for (size_t i = 0; i < rows; ++i)
 		for (size_t j = 0; j < cols; ++j)
 		{
-			snprintf(buff, sizeof(buff), "%d,%d", i, j);
+			snprintf(buff, sizeof(buff), "%zd,%zd", i, j);
 			twod[i][j] = buff;
 		}
 
@@ -995,12 +995,13 @@ TestEchoBase64(SOAPProxy& proxy, const Endpoint& e)
 		inputBinary[i] = (char)rand();
 
 	SOAPMethod method;
+	SOAPBase64 inbase64(inputBinary);
 	SetupMethod(method, "echoBase64", e);
-	method.AddParameter("inputBase64") << SOAPBase64(inputBinary);
+	method.AddParameter("inputBase64") << inbase64;
 	const SOAPResponse& response = proxy.Execute(method);
 
-	SOAPBase64 base64(outputBinary);
-	response.GetReturnValue() >> base64;
+	SOAPBase64 outbase64(outputBinary);
+	response.GetReturnValue() >> outbase64;
 
 	if (inputBinary != outputBinary)
 		throw SOAPException("Values are not equal");
@@ -1222,12 +1223,13 @@ TestEchoHexBinary(SOAPProxy& proxy, const Endpoint& e)
 		inputBinary[i] = (char)rand();
 
 	SOAPMethod method;
+	SOAPHex inhex(inputBinary);
 	SetupMethod(method, "echoHexBinary", e);
-	method.AddParameter("inputHexBinary") << SOAPHex(inputBinary);
+	method.AddParameter("inputHexBinary") << inhex;
 	const SOAPResponse& response = proxy.Execute(method);
 
-	SOAPHex hex(outputBinary);
-	response.GetReturnValue() >> hex;
+	SOAPHex outhex(outputBinary);
+	response.GetReturnValue() >> outhex;
 
 	if (inputBinary != outputBinary)
 		throw SOAPException("Values are not equal");
