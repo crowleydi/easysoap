@@ -157,7 +157,7 @@ size_t
 SOAPCGITransport::Write(const SOAPMethod&, const char *payload, size_t payloadsize)
 {
 	fprintf(stdout, "SOAPServer: %s/%s\r\n", EASYSOAP_STRING, EASYSOAP_VERSION_STRING);
-	fprintf(stdout, "Content-Length: %d\r\n", payloadsize);
+	fprintf(stdout, "Content-Length: %u\r\n", (unsigned int)payloadsize);
 	fprintf(stdout, "Content-Type: text/xml; charset=\"UTF-8\"\r\n\r\n");
 
 	fwrite(payload, 1, payloadsize, stdout);

@@ -142,6 +142,7 @@ AC_OUTPUT( \
 	proj/win32/MSVC6/Makefile \
 	proj/win32/MSVC7/Makefile \
 	proj/win32/MSVC7.1/Makefile \
+	proj/win32/MSVC8.0/Makefile \
 	include/Makefile \
 	include/easysoap/Makefile \
 	src/Makefile \

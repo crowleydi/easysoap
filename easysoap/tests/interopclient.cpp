@@ -1639,7 +1639,9 @@ hexdecode(char *str)
 		if (*w == '%')
 		{
 			++w;
-			*s++ = char((hexval(*w++) << 4) | hexval(*w++));
+			char a = *w++;
+			char b = *w++;
+			*s++ = char((hexval(a) << 4) | hexval(b));
 		}
 		else
 			*s++ = *w++;

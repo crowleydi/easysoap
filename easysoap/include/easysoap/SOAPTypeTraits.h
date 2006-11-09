@@ -256,6 +256,7 @@ private:
 		// We use strrchr() in case it's something like
 		// "xsd:string[][2]" which is certainly possible...
 		const char *s = sp_strrchr(val.GetName(), '[');
+		x = 0;
 		if (s && *s++ == '[')
 		{
 			if (*s == ']')

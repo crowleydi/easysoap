@@ -417,7 +417,7 @@ SOAPHTTPProtocol::GetReply()
 	const char *contype = GetHeader("Content-Type");
 	if (contype)
 	{
-		const char *charset = charset = sp_strstr(contype, "charset=");
+		const char *charset = sp_strstr(contype, "charset=");
 		if (charset)
 		{
 			charset += 8;

@@ -3,3 +3,6 @@ missing
 mkinstalldirs
 compile
 depcomp
+config.guess
+config.sub
+ltmain.sh
