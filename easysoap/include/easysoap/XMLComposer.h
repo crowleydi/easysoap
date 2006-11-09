@@ -64,7 +64,7 @@ private:
 	XMLComposer(const XMLComposer&);
 	XMLComposer& operator=(const XMLComposer&);
 
-	const char *GetSymbol(char *buff, const char *prefix);
+	const char *GetSymbol(char *buff, size_t buffsize, const char *prefix);
 	void EndStart();
 	void Resize();
 	void Write(const char *str);

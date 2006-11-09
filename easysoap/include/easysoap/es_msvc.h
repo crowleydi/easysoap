@@ -49,6 +49,9 @@
 #if _MSC_VER >= 1310
 #define HAVE_TYPENAME
 #endif
+#if _MSC_VER >= 1400
+#define _CRT_SECURE_NO_DEPRECATE
+#endif
 
 #define snprintf _snprintf
 #define vsnprintf _vsnprintf

@@ -50,10 +50,9 @@ XMLComposer::SetAddWhiteSpace(bool ws)
 }
 
 const char *
-XMLComposer::GetSymbol(char *buff, const char *prefix)
+XMLComposer::GetSymbol(char *buff, size_t size, const char *prefix)
 {
-	// A bit dangerious here...
-	sprintf(buff, "%s%d", prefix, ++m_gensym);
+	snprintf(buff, size, "%s%d", prefix, ++m_gensym);
 	return buff;
 }
 
@@ -147,7 +146,7 @@ XMLComposer::StartTag(const SOAPQName& tag, const char *prefix)
 			if (prefix)
 				nsprefix = prefix;
 			else
-				nsprefix = GetSymbol(buffer, "ns");
+				nsprefix = GetSymbol(buffer, sizeof(buffer), "ns");
 		}
 		else
 		{
@@ -186,7 +185,7 @@ XMLComposer::AddAttr(const SOAPQName& tag, const char *value)
 		if (!i)
 		{
 			addxmlns = true;
-			nsprefix = GetSymbol(buffer, "ns");
+			nsprefix = GetSymbol(buffer, sizeof(buffer), "ns");
 		}
 		else
 		{
@@ -230,7 +229,7 @@ XMLComposer::AddAttr(const SOAPQName& tag, const SOAPQName& value)
 		if (!i)
 		{
 			addtns = true;
-			tnsprefix = GetSymbol(tbuff, "ns");
+			tnsprefix = GetSymbol(tbuff, sizeof(tbuff), "ns");
 		}
 		else
 		{
@@ -254,7 +253,7 @@ XMLComposer::AddAttr(const SOAPQName& tag, const SOAPQName& value)
 		if (!i)
 		{
 			addvns = true;
-			vnsprefix = GetSymbol(vbuff, "ns");
+			vnsprefix = GetSymbol(vbuff, sizeof(vbuff), "ns");
 		}
 		else
 		{

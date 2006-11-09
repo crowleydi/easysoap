@@ -9,7 +9,11 @@
 #define STRICMP strcasecmp
 #else
 #ifdef HAVE_STRICMP
+#if _MSC_VER >= 1400
+#define STRICMP _stricmp
+#else
 #define STRICMP stricmp
+#endif
 #else
 #error "No stricmp function."
 #endif
