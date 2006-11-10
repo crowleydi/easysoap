@@ -1,3 +1,12 @@
+Release 0.8
+=====================================
+
+1) Lots of bug fixes over the years since the last release.  These fixes
+   were in CVS but never released.  Now they are.
+2) Compiles against gcc 4.1.1 and Visual C++ 8.0/Visual Studio 2005.
+3) Needs Expat XML at least 1.95.7 or higher but recommend 2.0.0.
+4) Probably the last release unless somebody wants to take the reins.
+
 
 Release 0.6
 =====================================
