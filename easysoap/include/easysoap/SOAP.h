@@ -28,8 +28,8 @@
 */
 #define EASYSOAP_STRING			"EasySoap++"
 #define EASYSOAP_HOMEPAGE		"http://easysoap.sourceforge.net/"
-#define EASYSOAP_VERSION_STRING	"0.6.3"
-#define EASYSOAP_VERSION		63
+#define EASYSOAP_VERSION_STRING	"0.8.0"
+#define EASYSOAP_VERSION		80
 
 #include <easysoap/es_conf.h>
 

@@ -6,7 +6,7 @@ dnl
 AC_INIT(Makefile.am)
 AC_CONFIG_AUX_DIR(conftools)
 
-AM_INIT_AUTOMAKE(EasySoap++, 0.6.2)
+AM_INIT_AUTOMAKE(EasySoap++, 0.8.0)
 AM_CONFIG_HEADER(include/easysoap/es_config.h)
 
 dnl
