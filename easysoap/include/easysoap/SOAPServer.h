@@ -42,12 +42,12 @@ protected:
 };
 
 #define IMPLEMENT_DISPATCH(T) \
-T& DispatchTo(SOAPDispatchHandlerInterface* disp)\
+T& DispatchTo(EASYSOAP_NAMESPACE(SOAPDispatchHandlerInterface)* disp)\
 {\
 	m_dispatch.DispatchTo(disp);\
 	return *this;\
 }\
-T& DispatchTo(SOAPHeaderHandlerInterface* disp)\
+T& DispatchTo(EASYSOAP_NAMESPACE(SOAPHeaderHandlerInterface)* disp)\
 {\
 	m_dispatch.DispatchTo(disp);\
 	return *this;\
