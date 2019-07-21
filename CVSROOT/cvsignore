@@ -1,7 +1,0 @@
-# Files to ignore
-
-Makefile Makefile.in
-.deps .libs
-*.lo *.la
-configure aclocal.m4 libtool config.status config.log
-stamp-h stamp-h.in
